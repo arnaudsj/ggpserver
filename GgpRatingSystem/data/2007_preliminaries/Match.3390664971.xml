@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="../style-aaai2007/sheets/doubleAsteroids.xsl"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+<match-id>Match.3390664971</match-id>
+<role>Artlest</role>
+<player>FLUXPLAYER</player>
+<history>
+ <step>
+  <step-number>1</step-number>
+  <move>wiluck(basquans)</move>
+ </step>
+ <step>
+  <step-number>2</step-number>
+  <move>liblet</move>
+ </step>
+ <step>
+  <step-number>3</step-number>
+  <move>liblet</move>
+ </step>
+ <step>
+  <step-number>4</step-number>
+  <move>wiluck(basquans)</move>
+ </step>
+ <step>
+  <step-number>5</step-number>
+  <move>liblet</move>
+ </step>
+ <step>
+  <step-number>6</step-number>
+  <move>liblet</move>
+ </step>
+ <step>
+  <step-number>7</step-number>
+  <move>liblet</move>
+ </step>
+ <step>
+  <step-number>8</step-number>
+  <move>yought(theresper)</move>
+ </step>
+ <step>
+  <step-number>9</step-number>
+  <move>caustmises</move>
+ </step>
+ <step>
+  <step-number>10</step-number>
+  <move>yought(theresper)</move>
+ </step>
+ <step>
+  <step-number>11</step-number>
+  <move>caustmises</move>
+ </step>
+ <step>
+  <step-number>12</step-number>
+  <move>caustmises</move>
+ </step>
+ <step>
+  <step-number>13</step-number>
+  <move>caustmises</move>
+ </step>
+ <step>
+  <step-number>14</step-number>
+  <move>yought(theresper)</move>
+ </step>
+ <step>
+  <step-number>15</step-number>
+  <move>caustmises</move>
+ </step>
+ <step>
+  <step-number>16</step-number>
+  <move>caustmises</move>
+ </step>
+ <step>
+  <step-number>17</step-number>
+  <move>caustmises</move>
+ </step>
+</history>
+<scores>
+ <reward>75</reward>
+</scores>
+<state>
+ <fact>
+  <prop-f>COPEAVERE</prop-f>
+  <arg>WHEMAWAST</arg>
+ </fact>
+ <fact>
+  <prop-f>HATHAT</prop-f>
+  <arg>0</arg>
+ </fact>
+ <fact>
+  <prop-f>NOTHOST</prop-f>
+  <arg>0</arg>
+ </fact>
+ <fact>
+  <prop-f>ENTLEBECH</prop-f>
+  <arg>15</arg>
+ </fact>
+ <fact>
+  <prop-f>WILIANDAY</prop-f>
+  <arg>8</arg>
+ </fact>
+ <fact>
+  <prop-f>THESED</prop-f>
+  <arg>8</arg>
+ </fact>
+ <fact>
+  <prop-f>COPICH</prop-f>
+  <arg>WIFEASTIZERS</arg>
+ </fact>
+ <fact>
+  <prop-f>HEROMEND</prop-f>
+  <arg>0</arg>
+ </fact>
+ <fact>
+  <prop-f>ANDUTOCK</prop-f>
+  <arg>0</arg>
+ </fact>
+ <fact>
+  <prop-f>SPEADEAK</prop-f>
+  <arg>15</arg>
+ </fact>
+ <fact>
+  <prop-f>ANYMAN</prop-f>
+  <arg>5</arg>
+ </fact>
+ <fact>
+  <prop-f>FORGAVIR</prop-f>
+  <arg>11</arg>
+ </fact>
+ <fact>
+  <prop-f>MADOLUNE</prop-f>
+ </fact>
+</state>
+</match>

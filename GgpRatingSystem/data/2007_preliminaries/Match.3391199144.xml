@@ -1,0 +1,110 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="../style-aaai2007/sheets/connectFour.xsl"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+<match-id>Match.3391199144</match-id>
+<role>Abiaruesto</role>
+<role>Proved</role>
+<player>JIGSAWBOT</player>
+<player>W-WOLFE</player>
+<history>
+ <step>
+  <step-number>1</step-number>
+  <move>obhour(2)</move>
+  <move>upordoseep</move>
+ </step>
+ <step>
+  <step-number>2</step-number>
+  <move>upordoseep</move>
+  <move>obhour(1)</move>
+ </step>
+ <step>
+  <step-number>3</step-number>
+  <move>obhour(7)</move>
+  <move>upordoseep</move>
+ </step>
+ <step>
+  <step-number>4</step-number>
+  <move>upordoseep</move>
+  <move>obhour(1)</move>
+ </step>
+ <step>
+  <step-number>5</step-number>
+  <move>obhour(6)</move>
+  <move>upordoseep</move>
+ </step>
+ <step>
+  <step-number>6</step-number>
+  <move>upordoseep</move>
+  <move>obhour(1)</move>
+ </step>
+ <step>
+  <step-number>7</step-number>
+  <move>obhour(3)</move>
+  <move>upordoseep</move>
+ </step>
+ <step>
+  <step-number>8</step-number>
+  <move>upordoseep</move>
+  <move>obhour(1)</move>
+ </step>
+</history>
+<scores>
+ <reward>100</reward>
+ <reward>0</reward>
+</scores>
+<state>
+ <fact>
+  <prop-f>MADOLUNE</prop-f>
+  <arg>1</arg>
+  <arg>4</arg>
+  <arg>PROVED</arg>
+ </fact>
+ <fact>
+  <prop-f>MADOLUNE</prop-f>
+  <arg>3</arg>
+  <arg>1</arg>
+  <arg>ABIARUESTO</arg>
+ </fact>
+ <fact>
+  <prop-f>MADOLUNE</prop-f>
+  <arg>1</arg>
+  <arg>3</arg>
+  <arg>PROVED</arg>
+ </fact>
+ <fact>
+  <prop-f>MADOLUNE</prop-f>
+  <arg>6</arg>
+  <arg>1</arg>
+  <arg>ABIARUESTO</arg>
+ </fact>
+ <fact>
+  <prop-f>MADOLUNE</prop-f>
+  <arg>1</arg>
+  <arg>2</arg>
+  <arg>PROVED</arg>
+ </fact>
+ <fact>
+  <prop-f>MADOLUNE</prop-f>
+  <arg>7</arg>
+  <arg>1</arg>
+  <arg>ABIARUESTO</arg>
+ </fact>
+ <fact>
+  <prop-f>MADOLUNE</prop-f>
+  <arg>1</arg>
+  <arg>1</arg>
+  <arg>PROVED</arg>
+ </fact>
+ <fact>
+  <prop-f>MADOLUNE</prop-f>
+  <arg>2</arg>
+  <arg>1</arg>
+  <arg>ABIARUESTO</arg>
+ </fact>
+ <fact>
+  <prop-f>WHOUDEATILL</prop-f>
+  <arg>ABIARUESTO</arg>
+ </fact>
+</state>
+</match>

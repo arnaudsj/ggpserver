@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="../style-aaai2007/sheets/asteroids.xsl"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+<match-id>Match.3390227853</match-id>
+<role>Thesurt</role>
+<player>JIGSAWBOT</player>
+<history>
+ <step>
+  <step-number>1</step-number>
+  <move>hignadm(thatroillof)</move>
+ </step>
+ <step>
+  <step-number>2</step-number>
+  <move>clight</move>
+ </step>
+ <step>
+  <step-number>3</step-number>
+  <move>hignadm(thatroillof)</move>
+ </step>
+ <step>
+  <step-number>4</step-number>
+  <move>hignadm(lonzabell)</move>
+ </step>
+ <step>
+  <step-number>5</step-number>
+  <move>clight</move>
+ </step>
+ <step>
+  <step-number>6</step-number>
+  <move>hignadm(thatroillof)</move>
+ </step>
+ <step>
+  <step-number>7</step-number>
+  <move>hignadm(thatroillof)</move>
+ </step>
+ <step>
+  <step-number>8</step-number>
+  <move>hignadm(thatroillof)</move>
+ </step>
+ <step>
+  <step-number>9</step-number>
+  <move>clight</move>
+ </step>
+ <step>
+  <step-number>10</step-number>
+  <move>clight</move>
+ </step>
+ <step>
+  <step-number>11</step-number>
+  <move>hignadm(lonzabell)</move>
+ </step>
+ <step>
+  <step-number>12</step-number>
+  <move>hignadm(lonzabell)</move>
+ </step>
+ <step>
+  <step-number>13</step-number>
+  <move>clight</move>
+ </step>
+ <step>
+  <step-number>14</step-number>
+  <move>clight</move>
+ </step>
+ <step>
+  <step-number>15</step-number>
+  <move>clight</move>
+ </step>
+</history>
+<scores>
+ <reward>50</reward>
+</scores>
+<state>
+ <fact>
+  <prop-f>SARTUNTENT</prop-f>
+  <arg>OULDIS</arg>
+ </fact>
+ <fact>
+  <prop-f>THEMACK</prop-f>
+  <arg>0</arg>
+ </fact>
+ <fact>
+  <prop-f>HICLUDIS</prop-f>
+  <arg>0</arg>
+ </fact>
+ <fact>
+  <prop-f>THOLDSOIL</prop-f>
+  <arg>17</arg>
+ </fact>
+ <fact>
+  <prop-f>SONOWN</prop-f>
+  <arg>12</arg>
+ </fact>
+ <fact>
+  <prop-f>ENTERLACK</prop-f>
+  <arg>16</arg>
+ </fact>
+</state>
+</match>

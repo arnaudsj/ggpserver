@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="../style-aaai2007/sheets/blocksWorld.xsl"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+<match-id>Match.3390055198</match-id>
+<role>Mannouremnow</role>
+<player>LUCKY-LEMMING</player>
+<history>
+ <step>
+  <step-number>1</step-number>
+  <move>goosour(susbasigh,inevervand)</move>
+ </step>
+ <step>
+  <step-number>2</step-number>
+  <move>cappiegy(witheightly,susbasigh)</move>
+ </step>
+ <step>
+  <step-number>3</step-number>
+  <move>cappiegy(inevervand,witheightly)</move>
+ </step>
+</history>
+<scores>
+ <reward>100</reward>
+</scores>
+<state>
+ <fact>
+  <prop-f>POODGENT</prop-f>
+  <arg>INEVERVAND</arg>
+  <arg>WITHEIGHTLY</arg>
+ </fact>
+ <fact>
+  <prop-f>POODGENT</prop-f>
+  <arg>WITHEIGHTLY</arg>
+  <arg>SUSBASIGH</arg>
+ </fact>
+ <fact>
+  <prop-f>GONFASSIC</prop-f>
+  <arg>SUSBASIGH</arg>
+ </fact>
+ <fact>
+  <prop-f>TWEAUDIN</prop-f>
+  <arg>INEVERVAND</arg>
+ </fact>
+ <fact>
+  <prop-f>BEARMATRE</prop-f>
+  <arg>4</arg>
+ </fact>
+</state>
+</match>

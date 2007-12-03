@@ -1,0 +1,173 @@
+Return-Path: <mit@mail.inf.tu-dresden.de>
+X-Flags: 1001
+Delivered-To: GMX delivery to mintar@gmx.de
+Received: (qmail invoked by alias); 22 Nov 2007 11:15:06 -0000
+Received: from mail.inf.tu-dresden.de (EHLO mail.inf.tu-dresden.de) [141.76.2.1]
+  by mx0.gmx.net (mx027) with SMTP; 22 Nov 2007 12:15:06 +0100
+Received: from localhost (localhost [127.0.0.1])
+	by mail.inf.tu-dresden.de (8.13.8/8.13.7) with ESMTP id lAMBF5QU001871
+	for <mintar@gmx.de>; Thu, 22 Nov 2007 12:15:05 +0100 (CET)
+X-Virus-Scanned: amavisd-new at inf.tu-dresden.de
+Received: from mail.inf.tu-dresden.de ([127.0.0.1])
+	by localhost (mail.inf.tu-dresden.de [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id 8lu1iwJfA1Ve for <mintar@gmx.de>;
+	Thu, 22 Nov 2007 12:15:05 +0100 (CET)
+Received: from mail.inf.tu-dresden.de (localhost [127.0.0.1])
+	by mail.inf.tu-dresden.de (8.13.8/8.13.8) with ESMTP id lAMBF1MJ001848
+	for <mintar@gmx.de>; Thu, 22 Nov 2007 12:15:04 +0100 (CET)
+Received: from 141.76.35.10
+        (SquirrelMail authenticated user mit)
+        by mail.inf.tu-dresden.de with HTTP;
+        Thu, 22 Nov 2007 12:15:04 +0100 (CET)
+Message-ID: <43455.141.76.35.10.1195730104.squirrel@mail.inf.tu-dresden.de>
+Date: Thu, 22 Nov 2007 12:15:04 +0100 (CET)
+Subject: GGP-Rating System
+From: mit@mail.inf.tu-dresden.de
+To: mintar@gmx.de
+User-Agent: SquirrelMail/1.4.10a
+MIME-Version: 1.0
+Content-Type: text/plain;charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+X-Priority: 3 (Normal)
+Importance: Normal
+X-GMX-Antivirus: -1 (not scanned, may not use virus scanner)
+X-GMX-Antispam: -2 (not scanned, spam filter disabled)
+X-GMX-UID: 7QE3Z9kJeSE5vWoeYHQh4Ut2IGRvb0D1
+
+-------------------------------------
+Hier die etwas unstrukturierte :) Gedankensammlung:
+-------------------------------------
+
+
+Michael:
+
+Good point about the preliminaries; I'll change the text to read "...
+The 2008 competition will consist of three rounds of competition
+beginning in May 2008 ..."  Once that's done, if there aren't any
+other suggestions, I'll have it sent off to Carol.
+
+That's great news about the rating system - I'd love to find out more
+when you get the chance.  I've restarted the GameMasters that I had
+running during last year's competition at:
+
+http://games.stanford.edu:4441 (used during the preliminary rounds)
+http://games.stanford.edu:4442 (used during the finals)
+
+All of the records should still be available.
+
+Best,
+eric
+
+----------------------------------------------------------------------
+
+Here's some notation:
+g(m): game associated with match m
+s(r, m): score of role r in match m
+p(r, m): player assigned to role r in match m
+q(p): rating of player p
+
+It seems to me that what we want to be able to express E[s(r, m)] (the
+expected value of the score of role r in match m) in terms of q(p(r', m))
+for each role r' in the game. One way to achieve this might be to assume
+E[s(r, m)] is a linear function of these variables and perfrom least-squares
+linear regression. For a game with roles = {r1, r2, r3}, this yields
+relationships such as:
+
+E[s(r1, m)] = c0 + c1*q(p(r1, m)) + c2*q(p(r2, m)) + c3*q(p(r3, m))
+
+where c0, c1, c2, c3 are game-specific constants computed by the linear
+regression.
+
+We could then calculate the expected outcome for each player in a
+given match and compare it with their actual outcome. If expected and
+actual outcomes are the same, the rating remains unchanged.
+Otherwise, the rating is adjusted up or down proportional to the
+difference between the actual outcome and the expected outcome.
+
+- Jim
+
+----------------------------------------------------------------------
+
+The next question would be: How to change the ratings? In order to do
+this, we need to find a factor by which the difference between expected
+and actual outcome is to be multiplied. The Elo system uses a constant factor
+(which for historical reasons happens to be k=10, where the expected values
+and actual results are numbers between 0 and 1). There is another improtant
+issue: When should the update take effect? As opposed to the Elo system
+we can't do it for a single match, because the calculation depends on the
+final scores after a number of matches. But let's say we have several
+weekly rounds as in the last competition. Should the ratings be updated at
+the end of every week, or just at the very end?
+
+----------------------------------------------------------------------
+
+In case we agree on Jim's formula (which I propose we do), there is this
+additional, secondary issue I raised:
+
+If we have multiple rounds, as we had in the previous two competitions,
+should the rating be updated after every round (that is, every week)? My
+suggestion would be: yes.
+
+This would come closer to ELO, which allows to update the rating after
+every single match.
+
+This would also allow to incorporate competitions with elimination rounds,
+because then every elimination round can be evaluated separately. This, of
+course, would require to play sufficiently many different games in each
+elimination round--which is a requirement that we want to enforce anyway
+after this year's experience.
+
+----------------------------------------------------------------------
+
+There are a few other details we may want to discuss about the
+ratings scheme:
+
+1. When calculating the coefficients for a particular game, it is
+possible that the coefficient associated with the player's rating is
+negatively correlated with the match's outcome. This can happen if a
+game is played in which the higher rated players perform poorly and
+one or more poorly rated players performs well. When the ratings are
+adjusted, this would have the undesirable effect of lowering the
+ratings of those that did best in the game!
+
+A possible fix for this is to require that the coefficient associated
+with the role's rating be non-negative. Returning again the example
+of a game with roles={r1, r2, r3} with the relationship:
+E[s(r1, m)] = c0 + c1*q(p(r1, m)) + c2*q(p(r2, m)) + c3*q(p(r3, m))
+the constraint would be that c1 >= 0, but there would be no
+constraints on c0, c2, and c3.
+
+2. It is not clear to me how to best initialize the ratings prior to
+the first rated tournament and also how to initialize ratings of new
+players once a community of rated players is established.
+
+----------------------------------------------------------------------
+
+Negative correlation may indeed happen (and would be bad if used). As
+you, Jim, said this means we have to find the best "expected performance
+formula" for a specific game under the constraint that the factor for
+the own role is >=0. A value of 0 then indicates that the rating of a player
+doesn't allow any prediction at all about its performence as this
+role--which makes sense in this case.
+
+(Btw, the application of the "expected performance formula" may yield a
+value <0 or >100 for some player, in which case the actual expected
+value should of course be set to 0 or 100, respectively--in order not to
+raise
+the rating of a player who made 0, and to lower the rating of a
+player who made 100.)
+
+For the rating update, ELO uses a constant factor of 10 per single
+match, so that the rating gets raised or lowered by a value up to 10.
+Adapted to our case this would mean to use the factor 0.1 times the number of
+matches in a round. (E.g., if a player played 8 matches and made 550
+points but
+was expected to make just 480, then his score is updated by 0.8 *
+(550-480) = +56.)
+
+ELO handles newcomers by giving them a low initial rating but doing a
+faster update (using factor 25) for the first 30 matches--we could do
+something similar. For the "big bang", one could start with the same
+value (say, 2000) for all active players.
+
+

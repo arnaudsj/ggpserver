@@ -1,0 +1,43 @@
+Probleme mit bei der Übertragung des Elo Rating Systems auf's GGP:
+
+1. Einzelspielerspiele
+2. Spiele mit mehr als 2 Spielern, jeder gegen jeden
+3. Spiele mit mehr als 2 Spielern, in Teams
+4. nicht nur "gewonnen - unentschieden - verloren", sondern Punkte möglich, evtl. nicht Zero-Sum (oder besser: Constant-Sum)
+
+
+zu 1.:
+- da muss man tatsächlich die "Schwierigkeit" des Spiels schätzen
+- entweder mit der linearen-Regressions-Methode von Jim Clune
+- oder, äquivalent, mit einem virtuellen ELO-Ranking für das Spiel, basierend auf den Ergebnissen
+- oder noch cleverer: Alle erzielten Ergebnisse einer Match-Runde als ein Spiel auffassen und die Punkte aller miteinander vergleichen, wie bei 
+- rauskommen soll so oder so am Ende die erwartete Punktzahl in Abhängigkeit des Rankings des Spielers
+
+
+zu 2.:
+- Problem der mehreren Spieler: Ranking aufstellen, dann alle Spieler auf benachbarten Rängen einzeln betrachten (1. gegen 2., 2. gegen 3., ...) oder jeder gegen jeden
+
+zu 3.:
+- im Prinzip: Skill eines Teams = Summe der Skills seiner Mitglieder; beim Update bekommt jeder die selben Punkte
+
+- kleines Problem dabei: dies betrachtet nur Spiele, bei denen es entweder Teams gibt oder alle gegen alle, nicht so was wie teilweise Kooperation
+
+- andere Lösung (sehr unschön): lineare Regression wie bei Clune (deswegen unschön, weil es nichts mit ELO zu tun hat und kein statistisches Modell dahinter steht; außerdem ist die Fallbasis für das Lernen der Gewichte sehr klein); dafür könnte dieses Modell evtl. teilweise Kooperationen erkennen, wenn man NUR den Koeffizienten des Players einschränkt
+
+
+zu 4.: 
+- z.B. zusätzlicher Koeffizient zum k-Faktor (wie bei Football Elo Ranking)
+- viel schöner: Punkte direkt in Erwartungswert einbeziehen
+
+
+============================================================================================================
+
+Probleme mit k-Faktor (Korrekturfaktor beim Update des Elo-Rankings):
+- zu hoch --> System zu sensitiv für neue Ergebnisse
+- zu niedrig --> System braucht zu viele Spiele, um zu einem vernünftigen Ergebnis zu konvergieren
+
+Lösung z.B. Glicko: nicht nur Mittelwert, sondern auch Standardabweichung einbeziehen
+andere Lösung bereits angesprochen: k=25 für die ersten 30 Spiele, dann k=15 oder k=10 (wie bei FIDE)
+
+
+
