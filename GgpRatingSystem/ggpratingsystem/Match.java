@@ -13,6 +13,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -25,6 +26,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 public class Match {
+	private static final Logger log = Logger.getLogger(Match.class.getName());
+	
 	private static final XPathFactory factory = XPathFactory.newInstance();
 	private static final XPath xPath = factory.newXPath();		
 	private static XPathExpression xPathMatchId;
@@ -69,7 +72,7 @@ public class Match {
 			InputSource inputSource = new InputSource(new FileInputStream(xmlDocument));
 
 			this.matchId = xPathMatchId.evaluate(inputSource);
-			System.out.println("processing match: " + matchId);
+			log.info("processing match: " + matchId);
 
 			/* parse roles */
 
@@ -110,13 +113,13 @@ public class Match {
 				Node element = nodeList.item(i); // element = <reward>100</reward>
 				Node firstChild = element.getFirstChild(); // firstChild = 100
 				// System.out.println("Score: " + firstChild.getTextContent());
-				scores.add(new Integer(firstChild.getTextContent()));
+				scores.add(Integer.valueOf(firstChild.getTextContent()));
 			}
 
-			// sanity check: all 3 lists must have the same number of elements, and at least one
-			if (roles.size() != players.size() || players.size() != scores.size() || roles.size() == 0) {
-//				throw new RuntimeException("Invalid XML file: " + xmlDocument.toString());
-				System.out.println("Invalid XML file: " + xmlDocument.toString());
+			// sanity check: all 3 lists must have the same number of elements and must not be empty 
+			if (roles.size() != players.size() || players.size() != scores.size() || roles.isEmpty()) {
+				log.warning("Invalid XML file: " + xmlDocument.toString());				
+				throw new RuntimeException("Invalid XML file: " + xmlDocument.toString());
 			}
 
 			this.matchSet = matchSet;
