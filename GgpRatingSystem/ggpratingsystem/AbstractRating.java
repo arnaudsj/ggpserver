@@ -1,7 +1,7 @@
 package ggpratingsystem;
 
-public abstract class Rating {
-	double curRating = 1000.0;
+public abstract class AbstractRating {
+	private double curRating = 1000.0;
 	
 	public abstract RatingType getType();
 	

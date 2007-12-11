@@ -1,6 +1,6 @@
 package ggpratingsystem;
 
-public class LinearRegressionRating extends Rating {
+public class LinearRegressionRating extends AbstractRating {
 
 	@Override
 	public RatingType getType() {

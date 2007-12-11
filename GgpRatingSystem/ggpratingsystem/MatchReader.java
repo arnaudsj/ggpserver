@@ -1,25 +1,26 @@
 package ggpratingsystem;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 
 import au.com.bytecode.opencsv.CSVReader;
 
 public class MatchReader {
-	
+	private static final Logger log = Logger.getLogger(Match.class.getName());
+
 	public static List<MatchSet> readMatches(String directory) throws IOException {
 		// this ordered List will be returned
 		List<MatchSet> matchSets = new LinkedList<MatchSet>();
 		
 		// this map is only temporary and stores the same MatchSets as the list above,
 		// but it's easier to retrieve stuff from a map
-		HashMap<String, MatchSet> idsToMatchSets = new HashMap<String, MatchSet>();
+		Map<String, MatchSet> idsToMatchSets = new HashMap<String, MatchSet>();
 		
 		int matchSetNumber = 0;	
 		// this should be reset at the "beginning" of a new day,
@@ -61,8 +62,15 @@ public class MatchReader {
 	    	}
 	    	
 	    	/* create the Match and add it to the MatchSet */
-	    	Match match = new Match(matchSet, new File(directory + matchID + ".xml"));
-	    	matchSet.addMatch(match);
+	    	File xmlFile = new File(directory + matchID + ".xml");
+			try {
+				Match match = new Match(matchSet, xmlFile);
+		    	matchSet.addMatch(match);
+			} catch (MatchParsingException e) {
+				log.warning("Error while reading XML file: " + xmlFile + "\nIgnoring this file.");
+				log.throwing(Match.class.getName(), "<init>", e);
+				assert(false);	// notify junit
+			}
 		}
 		return matchSets;
 	}

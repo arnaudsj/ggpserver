@@ -11,15 +11,31 @@ public class MatchReaderTest extends TestCase {
 	/*
 	 * Test method for 'ggpratingsystem.MatchReader.readMatches(String)'
 	 */
-	public void testReadMatches() throws IOException {
+	public void testReadMatchesPreliminaries() throws IOException {
 		String userdir = System.getProperty("user.dir");
 		if (!userdir.endsWith(File.separator))
 			userdir += File.separator;
 
-//		String directory = userdir + "data" + File.separator
-//				+ "2007_final_round";
 		String directory = userdir + "data" + File.separator
 				+ "2007_preliminaries";
+		
+		List<MatchSet> matchSets = MatchReader.readMatches(directory);
+		
+		for (MatchSet set : matchSets) {
+			System.out.println(set.toString());
+		}
+	}
+
+	/*
+	 * Test method for 'ggpratingsystem.MatchReader.readMatches(String)'
+	 */
+	public void testReadMatchesFinals() throws IOException {
+		String userdir = System.getProperty("user.dir");
+		if (!userdir.endsWith(File.separator))
+			userdir += File.separator;
+
+		String directory = userdir + "data" + File.separator
+				+ "2007_final_round";
 		
 		List<MatchSet> matchSets = MatchReader.readMatches(directory);
 		

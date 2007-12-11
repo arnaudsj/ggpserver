@@ -2,13 +2,14 @@ package ggpratingsystem;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class Game {
+public final class Game {
 	private final String name;
 	private List<String> roles;	// TODO: This should be final
 //	private final List<List<Integer>> teams;
 	
-	private static HashMap<String, Game> instances = new HashMap<String, Game>();
+	private static Map<String, Game> instances = new HashMap<String, Game>();
 	
 	private Game(String name) {
 		super();

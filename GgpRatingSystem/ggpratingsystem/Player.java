@@ -2,13 +2,15 @@ package ggpratingsystem;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
-public class Player {
-
+public final class Player {
+	private static final Logger log = Logger.getLogger(Player.class.getName());
+    
 	private static Map<String, Player> instances = new HashMap<String, Player>();
 
 	private final String name;
-	private Map<RatingType, Rating> ratings = new HashMap<RatingType, Rating>();
+	private Map<RatingType, AbstractRating> ratings = new HashMap<RatingType, AbstractRating>();
 	
 	private Player(String name) {
 		super();
@@ -32,8 +34,8 @@ public class Player {
 		return name;
 	}
 
-	public Rating getRating(RatingType type) {
-		Rating result = ratings.get(type);
+	public AbstractRating getRating(RatingType type) {
+		AbstractRating result = ratings.get(type);
 		
 		if (result == null) {
 			switch (type) {
@@ -52,11 +54,11 @@ public class Player {
 		return result;
 	}
 
-	private void putRating(Rating rating) {
+	private void putRating(AbstractRating rating) {
 		RatingType type = rating.getType();
 		
 		if (ratings.get(type) != null)
-			System.err.println("Warning: Rating overwritten!");
+			log.fine("Warning: Rating overwritten!");
 		ratings.put(type, rating);
 	}	
 }

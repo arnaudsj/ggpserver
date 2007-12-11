@@ -1,6 +1,6 @@
 package ggpratingsystem;
 
-public class EloRating extends Rating {
+public class EloRating extends AbstractRating {
 
 	@Override
 	public RatingType getType() {

@@ -20,8 +20,6 @@ public class LinearRegressionStrategy extends RatingStrategy {
 	 */
 	@Override
 	public void updateSkills(MatchSet matches) {
-		// TODO Auto-generated method stub
-		
 		int numPlayers = matches.getGame().getRoles().size();
 		int numMatches = matches.getMatches().size();
 		
