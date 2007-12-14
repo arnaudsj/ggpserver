@@ -1,9 +1,14 @@
 package ggpratingsystem;
 
 public abstract class AbstractRating {
-	private double curRating = 1000.0;
+	private double curRating;
 	
-	public abstract RatingType getType();
+	public AbstractRating() {
+		super();
+		reset();
+	}
+
+	public abstract RatingSystemType getType();
 	
 	public double getCurRating() {
 		return curRating;
@@ -12,5 +17,11 @@ public abstract class AbstractRating {
 	public void setCurRating(double curRating) {
 		this.curRating = curRating;
 	}
-	
+
+	/**
+	 * Resets the rating to the default values.
+	 */
+	public void reset() {
+		curRating = 1000.0;		
+	}
 }

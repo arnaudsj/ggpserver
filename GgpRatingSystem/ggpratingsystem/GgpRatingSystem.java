@@ -10,8 +10,6 @@ import flanagan.analysis.Regression;
 public class GgpRatingSystem {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
 		////// Multiple Linear Regression Test //////
 		
 		/* generate test data */
@@ -24,7 +22,7 @@ public class GgpRatingSystem {
 		
 		// Y = 10 + 1 * X_1 + 2 * X_2 + 3 * X_3		
 		for (int i = 0; i < TEST_SET_SIZE; i++) {
-			ydata[i] = 10  + Math.random();
+			ydata[i] = 10  ; //+ Math.random() * 40;
 			
 			for (int j = 0; j < NUM_VARS; j++) {
 				xdata[j][i] = Math.random() * X_RANGE;
@@ -36,7 +34,11 @@ public class GgpRatingSystem {
 		reg.linear();
 		double [] coeff = reg.getCoeff();
 		
-		// reg.print("/home/martin/workspace/GgpRatingSystem/data/regression.txt");
-		// reg.linearPlot();
+		for (double d : coeff) {
+			System.out.println(d);
+		}
+		
+		reg.print("/home/martin/workspace/GgpRatingSystem/data/regression.txt");
+		reg.linearPlot();
 	}
 }

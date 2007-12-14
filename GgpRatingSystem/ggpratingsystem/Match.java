@@ -35,13 +35,8 @@ public class Match {
 	
 	// Data available in the XML source
 	private final String matchId;
-	// private final List<String> roles;	// TODO: This should be moved to Game; isn't needed anyway
 	private final List<Player> players;
 	private final List<Integer> scores;
-	
-	// The following data is available in the XML source, but not needed here
-	// private final History history;	
-	// private final State finalState;
 	
 	/**
 	 * @param matchSet
@@ -90,7 +85,7 @@ public class Match {
 				}
 			}
 			
-			matchSet.getGame().setRoles(roles);	// FIXME What an ugly hack.
+			matchSet.getGame().setRoles(roles);	// TODO What an ugly hack. Fix this in the future when roles of a game are available directly and not only via the matches.  
 			
 			/* parse players */
 			result = queryXPath(xmlFile, "/match/player");
@@ -196,13 +191,5 @@ public class Match {
 		XPathResult result = (XPathResult) evaluator.evaluate(xpath, doc,
 				resolver, XPathResult.UNORDERED_NODE_ITERATOR_TYPE, null);
 		return result;
-	}
-  
-	/** Decide if the node is text, and so must be handled specially */
-	private static boolean isTextNode(Node n) {
-		if (n == null)
-			return false;
-		short nodeType = n.getNodeType();
-		return nodeType == Node.CDATA_SECTION_NODE || nodeType == Node.TEXT_NODE;
 	}
 }

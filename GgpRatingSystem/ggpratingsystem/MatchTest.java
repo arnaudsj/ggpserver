@@ -38,12 +38,6 @@ public class MatchTest extends TestCase {
 				new File(matchFileName));		
 	}
 
-	/*
-	 * Test method for 'ggpratingsystem.Match.Match(MatchSet, Game, File)'
-	 */
-	public void testMatch() {
-		// TODO
-	}
 
 	/*
 	 * Test method for 'ggpratingsystem.Match.getMatchId()'
@@ -53,12 +47,6 @@ public class MatchTest extends TestCase {
 		assertEquals(match3390055120.getMatchId(), "Match.3390055120");
 	}
 
-	/*
-	 * Test method for 'ggpratingsystem.Match.getMatchSet()'
-	 */
-	public void testGetMatchSet() {
-		// TODO
-	}
 
 	/*
 	 * Test method for 'ggpratingsystem.Match.getPlayers()'

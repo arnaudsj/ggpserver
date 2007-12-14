@@ -10,7 +10,7 @@ public final class Player {
 	private static Map<String, Player> instances = new HashMap<String, Player>();
 
 	private final String name;
-	private Map<RatingType, AbstractRating> ratings = new HashMap<RatingType, AbstractRating>();
+	private Map<RatingSystemType, AbstractRating> ratings = new HashMap<RatingSystemType, AbstractRating>();
 	
 	private Player(String name) {
 		super();
@@ -34,18 +34,18 @@ public final class Player {
 		return name;
 	}
 
-	public AbstractRating getRating(RatingType type) {
+	public AbstractRating getRating(RatingSystemType type) {
 		AbstractRating result = ratings.get(type);
 		
 		if (result == null) {
 			switch (type) {
-			case ELO:
-				result = new EloRating();
+			case LINEAR_REGRESSION:
+				result = new LinearRegressionRating();
 				break;			
-			// TODO: add other cases
+			/* all new subclasses of AbstractRating have to be added here */
 				
 			default:
-				throw new IllegalArgumentException("unknown RatingType!");
+				throw new IllegalArgumentException("unknown RatingSystemType!");
 			}
 			
 			putRating(result);
@@ -55,10 +55,15 @@ public final class Player {
 	}
 
 	private void putRating(AbstractRating rating) {
-		RatingType type = rating.getType();
+		RatingSystemType type = rating.getType();
 		
 		if (ratings.get(type) != null)
 			log.fine("Warning: Rating overwritten!");
 		ratings.put(type, rating);
-	}	
+	}
+
+	@Override
+	public String toString() {
+		return getName();
+	}
 }
