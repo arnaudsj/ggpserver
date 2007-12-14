@@ -192,4 +192,17 @@ public class Match {
 				resolver, XPathResult.UNORDERED_NODE_ITERATOR_TYPE, null);
 		return result;
 	}
+	
+	/**
+	 * simply print out some debug info
+	 */
+	public void print() {
+		String result = toString() + ": " + players.get(0) + "(" + scores.get(0) + ") "; 
+		
+		for (int i = 1; i < players.size(); i++) {
+			Player player = players.get(i);
+			result += " vs. " + player + "(" + scores.get(i) + ") ";
+		}
+		System.out.println(result);
+	}
 }

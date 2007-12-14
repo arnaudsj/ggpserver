@@ -122,7 +122,7 @@ public class LinearRegressionGameInfo extends AbstractGameInfo {
 	 * Calculates the y value for the following linear regression with
 	 * intercept:
 	 * 
-	 * y = c[0] + c[1]*x[0] + c[2]*x[1] +c[3]*x[3] + . . .
+	 * y = c[0] + c[1]*x[0] + c[2]*x[1] +c[3]*x[2] + . . .
 	 * 
 	 * where c[i] = coeffs[targetRole][i]
 	 * and   x[j] = rating of the player playing role j.
@@ -210,72 +210,134 @@ public class LinearRegressionGameInfo extends AbstractGameInfo {
 
 	
 	/**
+	 * Calculates an array coefficients[numRoles], where numRoles is the number 
+	 * of roles in the game.
+	 *    coefficients[0] = y-axis intercept
+	 *    coefficients[n + 1] = coefficient of role n
+	 * 
+	 * If the flag zeroTargetCoeff is set, then it will be ensured that
+	 *    coefficients[targetRole] = 0.0
+	 *    
+	 * The reason for this is that sometimes, coefficients[targetRole] will be
+	 * negative, which is not desirable. In this case, calcCoefficientsInner
+	 * can be called again with zeroTargetCoeff = true.  
+	 * 
 	 * @param matches
 	 * @param targetRole       role number for which to calculate the coefficients
 	 * @param zeroTargetCoeff  force the coefficient of the target player to be 0
 	 * @return
 	 */
 	private static double[] calcCoefficientsInner(MatchSet matches, int targetRole, boolean zeroTargetCoeff) {
-		int numPlayers = matches.getGame().getRoles().size();
+		int numRoles = matches.getGame().getRoles().size();
 		int numMatches = matches.getMatches().size();
 		
-		double[][] xdata = new double[numPlayers][numMatches] ;;
-		double[]   ydata = new double[numMatches];
-		
-		for (int i = 0; i < numMatches; i++) {
-			Match match = matches.getMatches().get(i);
-			
-			/* the target variable is the score of the current player */
-			ydata[i] = match.getScores().get(targetRole);
-			
-			/* the source variables are the ratings of all players in the match */
-			for (int j = 0; j < numPlayers; j++) {
-				if (zeroTargetCoeff && j == targetRole) {
-					// By setting the player's ranking to 0, the target player's coefficient
-					// will not be included in the linear regression
-					xdata[j][i] = 0.0;
+		double[] coefficients = new double[numRoles + 1];
 
-					/*
-					 * FIXME This does not work; targetRole has to be removed completely
-					 * (otherwise the Regression class complains about a singular Matrix)
-					 */
-				}
-				else {
-					Player player = match.getPlayers().get(j);
-					xdata[j][i] = player.getRating(LINEAR_REGRESSION).getCurRating();
-				}
-			}
-		}
-		
-		
-		/* Degrees of freedom must be at least 1 */
-        int degreesOfFreedom = ydata.length - (xdata.length + 1);
-		
-        if ((degreesOfFreedom  < 1) || (zeroTargetCoeff && (numPlayers == 1))) {	// TODO: number of non-ignored players must also be at least 1 
-			/* Not enough matches for a linear regression --> fallback: average score */
-			double[] coefficients = new double[numPlayers + 1];
-			coefficients[0] = matches.averageScorePerMatch();
-			
-			return coefficients;			
-		} else {
-			/* Perform multiple linear regression on the data */
-			
-			Regression reg = new Regression(xdata, ydata);
-			reg.linear();
-			double[] coefficients = reg.getCoeff();
-	
-			/*
-			 * when the target player's ranking is set to zero, the linear
-			 * regression may return an arbitrary coefficient for the target player,
-			 * so the coefficient also has to be forced to zero afterwards.
-			 */
-			if (zeroTargetCoeff) {
-				coefficients[targetRole + 1] = 0.0;
-				// the y-axis intercept is at coefficients[0], so the coefficient
-				// for player n is at n + 1
-			}
+		/* Number of non-ignored players must be at least 1 to perform a linear regression */
+        if (zeroTargetCoeff && (numRoles == 1)) {
+			/* fallback */
+//			coefficients[0] = matches.averageScorePerMatch();
+			coefficients[0] = matches.averageRoleScore().get(targetRole);
 			
 			return coefficients;
 		}
+        
+        /*
+		 * Prepare the arrays xdata and ydata: inputs to the linear regression
+		 * algorithm. ydata holds the target variable, xdata holds the source
+		 * variables (see below).
+		 */
+		double[][] xdata;
+		double[]   ydata = new double[numMatches];
+
+		if (zeroTargetCoeff) {
+			// role targetRole will not be written, so we need one column less in the array 
+			xdata = new double[numRoles - 1][numMatches] ; 
+		} else {
+			xdata = new double[numRoles][numMatches] ;
+		}
+		
+		/* copy the match data into the xdata/ydata arrays */
+		for (int matchNumber = 0; matchNumber < numMatches; matchNumber++) {
+			Match match = matches.getMatches().get(matchNumber);
+			
+			/*
+			 * the target variable (the value that the linear regression is
+			 * trying to predict) is the score of the target role
+			 */
+			ydata[matchNumber] = match.getScores().get(targetRole);
+			
+			/*
+			 * the source variables (the values used by the linear regression in
+			 * its prediction) are the ratings of all players in the match, in the
+			 * order of the roles that they played
+			 */
+			int roleToRead = 0;
+			int roleToWrite = 0;
+			while (true) {
+				if (zeroTargetCoeff && roleToRead == targetRole) {					
+					// skip this role, don't include it in the xdata array
+					roleToRead++;
+				}
+				
+				if (roleToRead >= numRoles) {
+					break;
+				}
+				
+				Player player = match.getPlayers().get(roleToRead);
+				xdata[roleToWrite][matchNumber] = player.getRating(LINEAR_REGRESSION).getCurRating();
+
+				roleToWrite++;
+				roleToRead++;
+			}
+		}
+		
+		/*
+		 * Degrees of freedom must be at least 1 to perform a linear regression
+		 * (i.e., you have to have enough matches relative to the number of
+		 * source variables (the number of players))
+		 */
+        int degreesOfFreedom = ydata.length - (xdata.length + 1);
+        if (degreesOfFreedom  < 1) {
+			/* fallback */
+//			coefficients[0] = matches.averageScorePerMatch();
+			coefficients[0] = matches.averageRoleScore().get(targetRole);
+			
+			return coefficients;
+		}
+        
+		/* Everything seems to be okay, now we can perform the linear regression */		
+		Regression reg = new Regression(xdata, ydata);
+		reg.linear();
+		
+		double[] tempCoeff = reg.getCoeff();
+
+		/* If all roles were included in the regression, we are done */
+		if (!zeroTargetCoeff) {
+			return tempCoeff;
+		}
+		
+		/*
+		 * Otherwise (if a player was skipped), we have to adjust the
+		 * coefficients again: the value for the removed player (which is zero)
+		 * must be re-inserted into the coefficients
+		 */
+		int roleToRead = 0;
+		int roleToWrite = 0;
+		while (roleToWrite < numRoles) {
+			if (roleToRead == targetRole + 1) { // targetRole + 1, because
+												// tempCoeff[0] is the y-axis
+												// intercept --> everything
+												// shifts by 1 to the right
+				// skip writing (leave value at 0.0)
+				roleToWrite++;
+			}
+			
+			coefficients[roleToWrite] = tempCoeff[roleToRead];
+
+			roleToWrite++;
+			roleToRead++;
+		}
+		return coefficients;
 	}
 }

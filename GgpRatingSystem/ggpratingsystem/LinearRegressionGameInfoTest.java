@@ -22,7 +22,6 @@ public class LinearRegressionGameInfoTest extends TestCase {
 	
 	public LinearRegressionGameInfoTest() throws IOException {
 		super();
-
 		matchSets = MatchReaderTest.readSubdir("2007_preliminaries");
 	}
 
@@ -114,7 +113,9 @@ public class LinearRegressionGameInfoTest extends TestCase {
 		Map<Player, Double> expectedScores = gameInfo.expectedScores(matchSet);
 		Map<Player, Integer> numMatchesPerPlayer = matchSet.numMatchesPerPlayer();
 		
-		Set<Player> players = expectedScores.keySet();
+		Set<Player> players = matchSet.getPlayers();
+		
+		assert(players.equals(expectedScores.keySet()));
 		
 		for (Player player : players) {
 			double correctExpectedScore = LinearRegressionGameInfo.DEFAULT_EXPECTED_SCORE * numMatchesPerPlayer.get(player);
@@ -138,12 +139,18 @@ public class LinearRegressionGameInfoTest extends TestCase {
 
 		gameInfo.updateGameInfo(matchSet);
 		
-		double average = matchSet.averageScorePerPlayer();
-
+		/*
+		 * since all ratings were equal and did therefore not provide any
+		 * information whatsoever to the linear regression, each player's rating
+		 * should be the expected score without ratings
+		 */
 		Map<Player, Double> expectedScores = gameInfo.expectedScores(matchSet);
 		Set<Entry<Player, Double>> entrySet = expectedScores.entrySet();
+
 		for (Entry<Player, Double> entry : entrySet) {
-			assertEquals("matchSet: " + matchSet, average, entry.getValue(), 1.0);
+			double expectedScoreWithoutRatings = matchSet.expectedScoreWithoutRatings().get(entry.getKey());
+
+			assertEquals("matchSet: " + matchSet, expectedScoreWithoutRatings, entry.getValue(), 1.0);
 		}
 	}
 
@@ -194,12 +201,11 @@ public class LinearRegressionGameInfoTest extends TestCase {
 		Player.getInstance("RANDOM2").getRating(LINEAR_REGRESSION).setCurRating(200.0);
 		Player.getInstance("RANDOM3").getRating(LINEAR_REGRESSION).setCurRating(200.0);
 		
-		gameInfo.expectedScores(matchSet);	// TODO remove
-		
 		gameInfo.updateGameInfo(matchSet);
 
 		Map<Player, Double> expectedScores = gameInfo.expectedScores(matchSet);
 		
-		// TODO assertions
+		System.out.println(expectedScores);
+		// TODO: assertions; a little hard to really say anything sensible here
 	}
 }

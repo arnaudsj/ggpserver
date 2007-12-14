@@ -108,6 +108,17 @@ public class MatchSetTest extends TestCase {
 		assertEquals( 25.0, overallScores.get(Player.getInstance("RANDOM2")));
 		assertEquals( 50.0, overallScores.get(Player.getInstance("RANDOM3")));
 	}
+	
+//	public void testCountRoles() {
+//		for (MatchSet matchSet : matchSets) {
+//			System.out.println(matchSet);
+//			Set<Player> players = matchSet.getPlayers();
+//			for (Player player : players) {
+//				System.out.println(matchSet.countRoles().get(player));
+//			}
+//			System.out.println();
+//		}
+//	}
 
 
 	private void assertArraysEqual(Object[] expected, Object[] actual) {

@@ -19,7 +19,8 @@ public class LinearRegressionRating extends AbstractRating {
 		Map<Player, Double> actualScores = matches.overallScores();		
 		Map<Player, Double> expectedScores = gameInfo.expectedScores(matches);
 		
-		Set<Player> players = actualScores.keySet();
+		Set<Player> players = matches.getPlayers();		
+		assert(players.equals(actualScores.keySet()));
 		
 		/* update the player's rating accordingly */
 		for (Player player : players) {
@@ -40,8 +41,6 @@ public class LinearRegressionRating extends AbstractRating {
 		
 		double difference = actualScore - expectedScore;		
 		double newRating = LEARNING_RATE * difference + getCurRating();
-		
-		// TODO: What if newRating becomes negative?
 		
 		setCurRating(newRating);
 	}

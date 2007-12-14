@@ -12,12 +12,12 @@ import java.util.logging.Logger;
 import au.com.bytecode.opencsv.CSVReader;
 
 public class MatchReader {
-	private static final Logger log = Logger.getLogger(Match.class.getName());
+	private static final Logger log = Logger.getLogger(MatchReader.class.getName());
 
 	public static List<MatchSet> readMatches(String directory) throws IOException {
 		// this ordered List will be returned
 		List<MatchSet> matchSets = new LinkedList<MatchSet>();
-		
+
 		// this map is only temporary and stores the same MatchSets as the list above,
 		// but it's easier to retrieve stuff from a map
 		Map<String, MatchSet> idsToMatchSets = new HashMap<String, MatchSet>();
@@ -32,6 +32,10 @@ public class MatchReader {
 	    /* look for a file called match_index.csv and try to read the match set data from it */
 		CSVReader reader = new CSVReader(new FileReader(directory + "match_index.csv"));
 	    List<String[]> lines = (List<String[]>) reader.readAll();
+	    
+	    if (lines.size() > 10) {
+			log.info("Reading " + lines.size() + " XML files, this may take a while...");
+	    }
 	    for (String[] line : lines) {	// Match ID; Game; Year; Round; Day
 	    	if (line.length != 5) {
 	    		throw new  IllegalArgumentException("Incorrect number of arguments in CSV file " + directory + "match_index.csv");
@@ -72,6 +76,8 @@ public class MatchReader {
 				assert(false);	// notify junit
 			}
 		}
+	    
+	    log.info("Done reading XML files, thank you for your patience! ;-)");
 		return matchSets;
 	}
 }
