@@ -1,6 +1,15 @@
 package ggpratingsystem;
 
-import flanagan.analysis.Regression;
+import static ggpratingsystem.RatingSystemType.LINEAR_REGRESSION;
+import ggpratingsystem.output.CSVLeaderboardBuilder;
+import ggpratingsystem.output.LeaderboardBuilder;
+import ggpratingsystem.output.ValidatingLeaderboardBuilder;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.LinkedList;
+import java.util.List;
 
 
 /**
@@ -9,36 +18,37 @@ import flanagan.analysis.Regression;
  */
 public class GgpRatingSystem {
 
-	public static void main(String[] args) {
-		////// Multiple Linear Regression Test //////
+	public static void main(String[] args) throws IOException {
+		List<MatchSet> matchSets = MatchReader.readSubdir("2007_preliminaries");
 		
-		/* generate test data */
-		final int TEST_SET_SIZE = 50;
-		final int NUM_VARS = 3;
-		final int X_RANGE = 100;
+		AbstractRatingStrategy strategy = LinearRegressionStrategy.getInstance();
 		
-		double[][] xdata = new double[NUM_VARS][TEST_SET_SIZE] ;
-		double[] ydata = new double[TEST_SET_SIZE];
+		Writer writer = new FileWriter("/tmp/ggp-rating-output.csv");
 		
-		// Y = 10 + 1 * X_1 + 2 * X_2 + 3 * X_3		
-		for (int i = 0; i < TEST_SET_SIZE; i++) {
-			ydata[i] = 10  ; //+ Math.random() * 40;
+		List<Player> players = Player.getAllPlayers();
+		
+		LeaderboardBuilder builder = new ValidatingLeaderboardBuilder(
+				new CSVLeaderboardBuilder(writer, players, LINEAR_REGRESSION));
+		
+		// TODO should the builder be passed to the MatchReader?
+
+		for (MatchSet set : matchSets) {
+			strategy.update(set);
 			
-			for (int j = 0; j < NUM_VARS; j++) {
-				xdata[j][i] = Math.random() * X_RANGE;
-				ydata[i] += (j + 1) * xdata[j][i]; 
+			builder.beginMatchSet(set);
+			
+			List<Match> matches = set.getMatches();
+			for (Match match : matches) {
+				List<Player> playersInMatch = match.getPlayers();
+				
+				for (Player player : playersInMatch) {
+					builder.ratingUpdate(player.getRating(LINEAR_REGRESSION));
+				}
 			}
+			
+			builder.endMatchSet(set);
 		}
 		
-		Regression reg = new Regression(xdata, ydata);
-		reg.linear();
-		double [] coeff = reg.getCoeff();
-		
-		for (double d : coeff) {
-			System.out.println(d);
-		}
-		
-		reg.print("/home/martin/workspace/GgpRatingSystem/data/regression.txt");
-		reg.linearPlot();
+		builder.finish();
 	}
 }

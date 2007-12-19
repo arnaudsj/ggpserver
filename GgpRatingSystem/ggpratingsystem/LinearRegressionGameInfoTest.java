@@ -22,7 +22,7 @@ public class LinearRegressionGameInfoTest extends TestCase {
 	
 	public LinearRegressionGameInfoTest() throws IOException {
 		super();
-		matchSets = MatchReaderTest.readSubdir("2007_preliminaries");
+		matchSets = MatchReader.readSubdir("2007_preliminaries");
 	}
 
 	@Override

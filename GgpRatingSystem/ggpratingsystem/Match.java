@@ -47,7 +47,7 @@ public class Match {
 
 		this.matchSet = matchSet;
 
-		log.info("processing XML file: " + xmlFile);
+		log.fine("processing XML file: " + xmlFile);
 		
 		try {
 			/* parse matchId */

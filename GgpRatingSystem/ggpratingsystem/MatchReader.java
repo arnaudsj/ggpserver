@@ -80,4 +80,15 @@ public class MatchReader {
 	    log.info("Done reading XML files, thank you for your patience! ;-)");
 		return matchSets;
 	}
+	
+	public static List<MatchSet> readSubdir(String subdirectory) throws IOException {
+		String userdir = System.getProperty("user.dir");
+		if (!userdir.endsWith(File.separator))
+			userdir += File.separator;
+
+		String directory = userdir + "data" + File.separator + subdirectory;
+		
+		return readMatches(directory);
+		
+	}
 }

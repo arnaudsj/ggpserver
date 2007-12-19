@@ -15,7 +15,7 @@ public class MatchSetTest extends TestCase {
 	
 	public MatchSetTest() throws IOException {
 		super();
-		matchSets = MatchReaderTest.readSubdir("2007_preliminaries");
+		matchSets = MatchReader.readSubdir("2007_preliminaries");
 		blocksworld = matchSets.get(0);	
 		tictactoe = matchSets.get(5);
 		chinesecheckers4p = matchSets.get(8); 

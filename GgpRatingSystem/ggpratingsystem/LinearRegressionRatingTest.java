@@ -12,7 +12,7 @@ public class LinearRegressionRatingTest extends TestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		rating = new LinearRegressionRating();
+		rating = new LinearRegressionRating(Player.getInstance("TESTPLAYER"));
 	}
 
 	public void testGetType() {
@@ -20,7 +20,7 @@ public class LinearRegressionRatingTest extends TestCase {
 	}
 
 	public void testUpdateRatings() {
-		fail("Not yet implemented"); // FIXME
+		fail("Not yet implemented"); // TODO implement this test
 	}
 
 	public void testGetSetCurRating() {

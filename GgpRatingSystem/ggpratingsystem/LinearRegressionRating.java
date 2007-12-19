@@ -7,6 +7,10 @@ import java.util.Set;
 
 public class LinearRegressionRating extends AbstractRating {
 
+	public LinearRegressionRating(Player player) {
+		super(player);
+	}
+
 	@Override
 	public RatingSystemType getType() {
 		return RatingSystemType.LINEAR_REGRESSION;

@@ -2,9 +2,10 @@ package ggpratingsystem;
 
 public abstract class AbstractRating {
 	private double curRating;
+	private final Player player;
 	
-	public AbstractRating() {
-		super();
+	public AbstractRating(Player player) {
+		this.player = player;
 		reset();
 	}
 
@@ -23,5 +24,9 @@ public abstract class AbstractRating {
 	 */
 	public void reset() {
 		curRating = 1000.0;		
+	}
+
+	public Player getPlayer() {
+		return player;
 	}
 }

@@ -20,7 +20,7 @@ public class LinearRegressionStrategyTest extends TestCase {
 	}
 
 //	public void testUpdate() {
-//		fail("Not yet implemented"); // TODO
+//		fail("Not yet implemented"); // TODO implement this test
 //	}
 
 	public void testGetInstance() {

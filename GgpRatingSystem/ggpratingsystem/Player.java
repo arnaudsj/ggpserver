@@ -1,6 +1,8 @@
 package ggpratingsystem;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -40,7 +42,7 @@ public final class Player {
 		if (result == null) {
 			switch (type) {
 			case LINEAR_REGRESSION:
-				result = new LinearRegressionRating();
+				result = new LinearRegressionRating(this);
 				break;			
 			/* all new subclasses of AbstractRating have to be added here */
 				
@@ -90,5 +92,9 @@ public final class Player {
 		} else if (!name.equals(other.name))
 			return false;
 		return true;
+	}
+
+	public static List<Player> getAllPlayers() {
+		return new LinkedList<Player>(instances.values());
 	}
 }
