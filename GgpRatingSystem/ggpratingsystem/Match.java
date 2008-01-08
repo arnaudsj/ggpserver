@@ -31,12 +31,20 @@ import org.xml.sax.SAXException;
 public class Match {
 	private static final Logger log = Logger.getLogger(Match.class.getName());
 	
+	static {
+		// inherit default level for package ggpratingsystem
+		log.setLevel(null);
+	}
+	
 	private final MatchSet matchSet;
 	
 	// Data available in the XML source
 	private final String matchId;
 	private final List<Player> players;
 	private final List<Integer> scores;
+	
+	
+	// TODO: add a constructor that takes an URI instead of an XML file
 	
 	/**
 	 * @param matchSet

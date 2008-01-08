@@ -15,46 +15,46 @@ public class MatchSetTest extends TestCase {
 	
 	public MatchSetTest() throws IOException {
 		super();
-		matchSets = MatchReader.readSubdir("2007_preliminaries");
+		matchSets = MatchReader.readDataDir("2007_preliminaries");
 		blocksworld = matchSets.get(0);	
 		tictactoe = matchSets.get(5);
 		chinesecheckers4p = matchSets.get(8); 
 	}
 
 	public void testGetDay() {
-		assertEquals(blocksworld.getDay(), 1);
-		assertEquals(tictactoe.getDay(), 1);
-		assertEquals(chinesecheckers4p.getDay(), 1);
+		assertEquals(1, blocksworld.getDay());
+		assertEquals(1, tictactoe.getDay());
+		assertEquals(1, chinesecheckers4p.getDay());
 	}
 
 	public void testGetGame() {
-		assertEquals(blocksworld.getGame().getName(), "Blocksworld-Obfuscated");
-		assertEquals(tictactoe.getGame().getName(), "Tictactoe-Obfuscated");
-		assertEquals(chinesecheckers4p.getGame().getName(), "Chinesecheckers4p-Obfuscated");
+		assertEquals("Blocksworld-Obfuscated", blocksworld.getGame().getName());
+		assertEquals("Tictactoe-Obfuscated", tictactoe.getGame().getName());
+		assertEquals("Chinesecheckers4p-Obfuscated", chinesecheckers4p.getGame().getName());
 	}
 
 	public void testGetId() {
-		assertEquals(blocksworld.getId(), "Blocksworld-Obfuscated_2007_R1_D1");
-		assertEquals(tictactoe.getId(), "Tictactoe-Obfuscated_2007_R1_D1");
-		assertEquals(chinesecheckers4p.getId(), "Chinesecheckers4p-Obfuscated_2007_R1_D1");
+		assertEquals("Blocksworld-Obfuscated_2007_R1_D1", blocksworld.getId());
+		assertEquals("Tictactoe-Obfuscated_2007_R1_D1", tictactoe.getId());
+		assertEquals("Chinesecheckers4p-Obfuscated_2007_R1_D1", chinesecheckers4p.getId());
 	}
 
 	public void testGetRound() {
-		assertEquals(blocksworld.getRound(), 1);
-		assertEquals(tictactoe.getRound(), 1);
-		assertEquals(chinesecheckers4p.getRound(), 1);
+		assertEquals(1, blocksworld.getRound());
+		assertEquals(1, tictactoe.getRound());
+		assertEquals(1, chinesecheckers4p.getRound());
 	}
 
 	public void testGetYear() {
-		assertEquals(blocksworld.getYear(), 2007);
-		assertEquals(tictactoe.getYear(), 2007);
-		assertEquals(chinesecheckers4p.getYear(), 2007);
+		assertEquals(2007, blocksworld.getYear());
+		assertEquals(2007, tictactoe.getYear());
+		assertEquals(2007, chinesecheckers4p.getYear());
 	}
 
 	public void testGetMatchSetNumber() {
-		assertEquals(blocksworld.getMatchSetNumber(), 1);
-		assertEquals(tictactoe.getMatchSetNumber(), 6);
-		assertEquals(chinesecheckers4p.getMatchSetNumber(), 9);
+		assertEquals(1, blocksworld.getMatchSetNumber());
+		assertEquals(6, tictactoe.getMatchSetNumber());
+		assertEquals(9, chinesecheckers4p.getMatchSetNumber());
 	}
 
 	public void testGetMatches() {
@@ -63,9 +63,9 @@ public class MatchSetTest extends TestCase {
 		final String[] chinesecheckers4pMatchNames = {"Match.3390083667", "Match.3390083853"};
 		
 		
-		assertArraysEqual(listMatchNames(blocksworld), blocksworldMatchNames);
-		assertArraysEqual(listMatchNames(tictactoe), tictactoeMatchNames);
-		assertArraysEqual(listMatchNames(chinesecheckers4p), chinesecheckers4pMatchNames);
+		assertArraysEqual(blocksworldMatchNames, listMatchNames(blocksworld));
+		assertArraysEqual(tictactoeMatchNames, listMatchNames(tictactoe));
+		assertArraysEqual(chinesecheckers4pMatchNames, listMatchNames(chinesecheckers4p));
 	}
 
 	public void testOverallScores() {

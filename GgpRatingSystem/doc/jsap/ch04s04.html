@@ -1,0 +1,20 @@
+<html><head><link rel='stylesheet' type='text/css' href='manual.css'/><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Parsing the command line.</title><meta name="generator" content="DocBook XSL Stylesheets V1.68.1"><link rel="start" href="index.html" title="JSAP - Java Simple Argument Parser (v2.1)"><link rel="up" href="ch04.html" title="Chapter&nbsp;4.&nbsp;How It Works"><link rel="prev" href="ch04s03.html" title="Registering your parameters with JSAP."><link rel="next" href="ch04s05.html" title="Using the JSAPResult"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Parsing the command line.</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch04s03.html">Prev</a>&nbsp;</td><th width="60%" align="center">Chapter&nbsp;4.&nbsp;How It Works</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="ch04s05.html">Next</a></td></tr></table><hr></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="id2567481"></a>Parsing the command line.</h2></div></div></div><p>The <code class="classname">JSAP</code> object provides two
+      <code class="methodname">parse()</code> methods to parse a command line. The
+      first takes an array of <code class="classname">String</code>s as its only
+      parameter; in most uses of <code class="classname">JSAP</code>, this will simply
+      be the <code class="varname">args[]</code> array supplied by the JVM to your
+      <code class="methodname">main()</code> method.</p><p>The second <code class="methodname">parse()</code> method takes a single
+      <code class="classname">String</code> as its only parameter. This method first
+      tokenizes the <code class="classname">String</code> into an array, much like the
+      operating system does for the JVM in providing your
+      <code class="methodname">main()</code> method with the <code class="varname">args[]</code>
+      array, then calls the <code class="methodname">parse(String[])</code> method
+      described above.</p><p>Both of these methods return a <code class="classname">JSAPResult</code>
+      object encapsulating the parsed command line.</p><p><code class="classname">SimpleJSAP</code> is a subclass of
+      <code class="classname">JSAP</code>, and works analogously: however, if an error
+      is detected, or if the user specified <code class="literal">--help</code>, a full
+      usage and help message is printed automatically. You can learn whether
+      the message has been printed or not by invoking the method
+      <code class="methodname">messagePrinted()</code> on the <code class="classname">SimpleJSAP</code>
+      instance just after parsing: if it returns true, you shoud usually
+      terminate the program execution.</p></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch04s03.html">Prev</a>&nbsp;</td><td width="20%" align="center"><a accesskey="u" href="ch04.html">Up</a></td><td width="40%" align="right">&nbsp;<a accesskey="n" href="ch04s05.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Registering your parameters with JSAP.&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;Using the JSAPResult</td></tr></table></div></body></html>

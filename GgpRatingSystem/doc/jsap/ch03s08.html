@@ -1,0 +1,91 @@
+<html><head><link rel='stylesheet' type='text/css' href='manual.css'/><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>HelloWorld_8</title><meta name="generator" content="DocBook XSL Stylesheets V1.68.1"><link rel="start" href="index.html" title="JSAP - Java Simple Argument Parser (v2.1)"><link rel="up" href="ch03.html" title="Chapter&nbsp;3.&nbsp;Quick Start"><link rel="prev" href="ch03s07.html" title="HelloWorld_7"><link rel="next" href="ch03s09.html" title="HelloWorld_Simple"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">HelloWorld_8</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch03s07.html">Prev</a>&nbsp;</td><th width="60%" align="center">Chapter&nbsp;3.&nbsp;Quick Start</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="ch03s09.html">Next</a></td></tr></table><hr></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="id2566761"></a><a name="HelloWorld_8"></a>HelloWorld_8</h2></div></div></div><p>The following example uses a <code class="classname">QualifiedSwitch</code>
+      to allow the user to specify the language(s) to use in verbose mode.</p><pre class="programlisting">
+    public static void main(String[] args) throws Exception {
+        JSAP jsap = new JSAP();
+        
+        FlaggedOption opt1 = new FlaggedOption("count")
+                                .setStringParser(JSAP.INTEGER_PARSER)
+                                .setDefault("1") 
+                                .setRequired(true) 
+                                .setShortFlag('n') 
+                                .setLongFlag(JSAP.NO_LONGFLAG);
+
+        opt1.setHelp("The number of times to say hello.");
+        jsap.registerParameter(opt1);
+        
+        QualifiedSwitch sw1 = (QualifiedSwitch)
+                                (new QualifiedSwitch("verbose")
+                                .setShortFlag('v')
+                                .setLongFlag("verbose")
+                                .setList(true)
+                                .setListSeparator(','));
+        
+        sw1.setHelp("Requests verbose output.");
+        jsap.registerParameter(sw1);
+        
+        UnflaggedOption opt2 = new UnflaggedOption("name")
+                                .setStringParser(JSAP.STRING_PARSER)
+                                .setDefault("World")
+                                .setRequired(true)
+                                .setGreedy(true);
+        
+        opt2.setHelp("One or more names of people you would like to greet.");
+        jsap.registerParameter(opt2);
+        
+        JSAPResult config = jsap.parse(args);    
+
+        if (!config.success()) {
+            
+            System.err.println();
+
+            // print out specific error messages describing the problems
+            // with the command line, THEN print usage, THEN print full
+            // help.  This is called "beating the user with a clue stick."
+            for (java.util.Iterator errs = config.getErrorMessageIterator();
+                    errs.hasNext();) {
+                System.err.println("Error: " + errs.next());
+            }
+            
+            System.err.println();
+            System.err.println("Usage: java "
+                                + Manual_HelloWorld_8.class.getName());
+            System.err.println("                "
+                                + jsap.getUsage());
+            System.err.println();
+            System.err.println(jsap.getHelp());
+            System.exit(1);
+        }
+        
+        String[] names = config.getStringArray("name");
+        String[] languages = config.getStringArray("verbose");
+        for (int i = 0; i &lt; languages.length; ++i) {
+            System.out.println("language=" + languages[i]);
+        }
+        for (int i = 0; i &lt; config.getInt("count"); ++i) {
+            for (int j = 0; j &lt; names.length; ++j) {
+                System.out.println((config.getBoolean("verbose") ? "Hello" : "Hi")
+                                + ", "
+                                + names[j]
+                                + "!");
+            }
+        }
+    }</pre><pre class="screen"><code class="prompt">[mlamb@morbo]$ </code><span><strong class="command">java com.martiansoftware.jsap.examples.Manual_HelloWorld_8 -n 2 --verbose Zoidberg</strong></span>
+<code class="computeroutput">Hello, Zoidberg!
+Hello, Zoidberg!
+</code>
+
+<code class="prompt">[mlamb@morbo]$ </code><span><strong class="command">java com.martiansoftware.jsap.examples.Manual_HelloWorld_8 --verbose:de Farnsworth</strong></span>
+<code class="computeroutput">language=de
+Hello, Farnsworth!
+</code>
+
+<code class="prompt">[mlamb@morbo]$ </code><span><strong class="command">java com.martiansoftware.jsap.examples.Manual_HelloWorld_8 -v:de,en Branigan</strong></span>
+<code class="computeroutput">language=de
+language=en
+Hello, Branigan!
+</code>
+
+<code class="prompt">[mlamb@morbo]$ </code><span><strong class="command">java com.martiansoftware.jsap.examples.Manual_HelloWorld_8 Horrible_Gelatanous_Blob</strong></span>
+<code class="computeroutput">Hi, Horrible_Gelatanous_Blob!
+</code>
+</pre><p></p></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch03s07.html">Prev</a>&nbsp;</td><td width="20%" align="center"><a accesskey="u" href="ch03.html">Up</a></td><td width="40%" align="right">&nbsp;<a accesskey="n" href="ch03s09.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">HelloWorld_7&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;HelloWorld_Simple</td></tr></table></div></body></html>

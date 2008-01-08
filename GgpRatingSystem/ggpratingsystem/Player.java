@@ -9,6 +9,11 @@ import java.util.logging.Logger;
 public final class Player {
 	private static final Logger log = Logger.getLogger(Player.class.getName());
     
+	static {
+		// inherit default level for package ggpratingsystem
+		log.setLevel(null);
+	}
+	
 	private static Map<String, Player> instances = new HashMap<String, Player>();
 
 	private final String name;

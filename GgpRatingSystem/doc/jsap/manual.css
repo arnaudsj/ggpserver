@@ -1,0 +1,61 @@
+body { background-image: url("/images/wave.png"); color: black; background: white;  }
+
+.blue { color: #33275b; background: white }
+.green { color: #80c254; background: white; }
+.green-on-blue { color: #80c254; background: #33275b; }
+
+a:link { color: #33275b; }
+a:link img, a:visited img { border-style: none }
+a:visited { color: #33275b; }
+
+pre.programlisting { 
+	font-size: 9pt; 
+	margin: 1em 1em 1em 1em; 
+	padding: 0 1em 0 1em; 
+	border: 1px solid #80c254; 
+	font-family: courier, monospace; 
+	color: #33275b; 
+	background: #ffffff;
+}
+
+pre.screen { 
+	font-size: 9pt;
+	white-space:pre; 
+	padding: 0 1em 0 1em; 
+	border: 1px solid #80c254; 
+	font-family: courier, monospace; 
+	color: #ffffff; 
+	background: #000000;
+}
+
+b.command {
+	white-space: normal;
+}
+
+div.tip, div.note, div.caution, div.warning {
+	background-repeat: no-repeat;
+	background: #e3f4b0;
+	border: 1px solid #80c254; 
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+div.tip h3.title, div.note h3.title, div.caution h3.title, div.warning h3.title {
+	color: #33275b;
+	font-family: helvetica, sans-serif;
+	margin-left: 1em;
+	margin-right: 1em;
+	margin-top: 0.5em;
+}
+
+div.tip p, div.note p, div.caution p, div.warning p {
+	color: #33275b;
+	margin-left: 1em;
+	margin-right: 1em;
+}
+
+p {margin: 0 0 1em; font-family: Book Antiqua, New York, New Century Schoolbook, Times New Roman, Times, serif; }
+li { font-family: Book Antiqua, New York, New Century Schoolbook, Times New Roman, Times, serif; }
+h1 { margin: 1em 0 0; font-size: 150%; font-family: helvetica, sans-serif; color: #33275b; background: white; font-weight: normal; border-bottom: 2px solid #80c254 }
+h2 { margin: 2em 0 0; font-size: 125%; font-family: helvetica, sans-serif; color: #33275b; background: white; font-weight: normal; border-bottom: 2px solid #80c254 }
+hr { color: #80c254; background: white; }

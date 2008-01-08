@@ -1,0 +1,127 @@
+<html><head><link rel='stylesheet' type='text/css' href='manual.css'/><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Chapter&nbsp;14.&nbsp;Loading JSAP Configurations at Runtime with XML</title><meta name="generator" content="DocBook XSL Stylesheets V1.68.1"><link rel="start" href="index.html" title="JSAP - Java Simple Argument Parser (v2.1)"><link rel="up" href="index.html" title="JSAP - Java Simple Argument Parser (v2.1)"><link rel="prev" href="ch13.html" title="Chapter&nbsp;13.&nbsp;DefaultSources and Configuration Files"><link rel="next" href="ch15.html" title="Chapter&nbsp;15.&nbsp;Contributors"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter&nbsp;14.&nbsp;Loading JSAP Configurations at Runtime with XML</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch13.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="ch15.html">Next</a></td></tr></table><hr></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="id2568402"></a>Chapter&nbsp;14.&nbsp;<a name="XML"></a>Loading JSAP Configurations at Runtime with XML</h2></div></div></div><div class="caution" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Caution</h3><p>As of v2.0 this feature should be considered experimental.</p></div><p>In order to keep your program source free of clutter and to support
+    a large number of possible command line syntaxes, <code class="classname">JSAP</code>
+    provides a means to load configurations from XML sources at run time. A
+    new contructor with the signature <code class="function">JSAP(<code class="classname">URL</code>
+    xmlJSAPSource)</code> has been introduced to support this. It is now
+    very easy to store a number of <code class="classname">JSAP</code> configurations
+    in XML files in the same <code class="filename">.jar</code> as your application.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>This feature requires the <code class="classname">XStream</code>
+      <code class="filename">.jar</code> from <a href="http://xstream.codehaus.org" target="_top">http://xstream.codehaus.org</a>.
+      <code class="classname">XStream</code> is an excellent library that provides a
+      simple means to map objects to/from XML. It is made available under a
+      <a href="http://xstream.codehaus.org/license.html" target="_top">BSD-style license</a>.</p><p>Although a <code class="filename">.jar</code> is available with
+      <code class="classname">JSAP</code>, <code class="classname">XStream</code> is in no way
+      affiliated with Martian Software or the <code class="classname">JSAP</code>
+      project. Furthermore, you're virtually guaranteed a more up-to-date
+      version of the <code class="filename">.jar</code> if you go straight to their
+      website. As a bonus, codehaus hosts a variety of other great projects
+      worth checking out.</p></div><p>The XML syntax for <code class="classname">JSAP</code> configurations is
+    designed to closely mirror the sequence of function calls required to
+    manually instantiate a <code class="classname">JSAP</code>.</p><div class="tip" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Tip</h3><p>An Eclipse plug-in for editing <code class="classname">JSAP</code> XML
+      files would be <span class="emphasis"><em>very</em></span> cool. If you're interested
+      in writing one, let me know!</p></div><p>The following example is a reimplementation of the <a href="ch03s08.html" target="_top"><a href="ch03s08.html#HelloWorld_8"><a href="/cgi-bin/olink?sysid=" class="olink"><a href="???" target="_top"><a href="ch03s08.html#HelloWorld_8">HelloWorld_8</a></a></a></a></a>
+    example found earlier in this document.</p><pre class="programlisting">
+&lt;jsap&gt;
+    &lt;parameters&gt;
+        &lt;flaggedOption&gt;
+            &lt;id&gt;count&lt;/id&gt;
+            &lt;stringParser&gt;
+                &lt;classname&gt;IntegerStringParser&lt;/classname&gt;
+            &lt;/stringParser&gt; 
+            &lt;required&gt;true&lt;/required&gt;
+            &lt;shortFlag&gt;n&lt;/shortFlag&gt;
+            &lt;defaults&gt;
+                &lt;string&gt;1&lt;/string&gt;
+            &lt;/defaults&gt;
+            &lt;help&gt;The number of times to say hello (default=1).&lt;/help&gt;
+        &lt;/flaggedOption&gt;
+
+        &lt;qualifiedSwitch&gt;
+            &lt;id&gt;verbose&lt;/id&gt;
+            &lt;shortFlag&gt;v&lt;/shortFlag&gt;
+            &lt;longFlag&gt;verbose&lt;/longFlag&gt;
+            &lt;list&gt;true&lt;/list&gt;
+            &lt;listSeparator&gt;,&lt;/listSeparator&gt;
+            &lt;help&gt;Requests verbose output.&lt;/help&gt;
+        &lt;/qualifiedSwitch&gt;
+        
+        &lt;unflaggedOption&gt;
+            &lt;id&gt;name&lt;/id&gt;
+            &lt;defaults&gt;
+                &lt;string&gt;World&lt;/string&gt;
+            &lt;/defaults&gt;
+            &lt;required&gt;true&lt;/required&gt;
+            &lt;greedy&gt;true&lt;/greedy&gt;
+            &lt;help&gt;One or more names of people you would like to greet.&lt;/help&gt;
+        &lt;/unflaggedOption&gt;
+
+    &lt;/parameters&gt;
+&lt;/jsap&gt;</pre><pre class="programlisting">
+    public static void main(String[] args) throws Exception {
+        JSAP jsap = new JSAP(Manual_HelloWorld_9.class.getResource("Manual_HelloWorld_9.jsap"));
+        
+        JSAPResult config = jsap.parse(args);    
+
+        if (!config.success()) {
+            
+            System.err.println();
+
+            // print out specific error messages describing the problems
+            // with the command line, THEN print usage, THEN print full
+            // help.  This is called "beating the user with a clue stick."
+            for (java.util.Iterator errs = config.getErrorMessageIterator();
+                    errs.hasNext();) {
+                System.err.println("Error: " + errs.next());
+            }
+            
+            System.err.println();
+            System.err.println("Usage: java "
+                                + Manual_HelloWorld_9.class.getName());
+            System.err.println("                "
+                                + jsap.getUsage());
+            System.err.println();
+            System.err.println(jsap.getHelp());
+            System.exit(1);
+        }
+        
+        String[] names = config.getStringArray("name");
+        String[] languages = config.getStringArray("verbose");
+        if (languages.length == 0) languages = new String[] {"en"};
+        
+        for (int lang = 0; lang &lt; languages.length; ++lang) {
+            for (int i = 0; i &lt; config.getInt("count"); ++i) {
+                for (int j = 0; j &lt; names.length; ++j) {
+                    System.out.println((config.getBoolean("verbose") ? getVerboseHello(languages[lang]) : "Hi")
+                                    + ", "
+                                    + names[j]
+                                    + "!");
+                }
+            }
+        }
+    }
+    
+    private static String getVerboseHello(String language) {
+        if ((language == null) || "en".equalsIgnoreCase(language)) {
+            return("Hello");
+        } else if ("de".equalsIgnoreCase(language)) {
+            return("Guten Tag");
+        } else {
+            return("(Barely audible grunt)");
+        }
+    }    </pre><pre class="screen"><code class="prompt">[mlamb@morbo]$ </code><span><strong class="command">java com.martiansoftware.jsap.examples.Manual_HelloWorld_9 -n 2 --verbose Zoidberg</strong></span>
+<code class="computeroutput">Hello, Zoidberg!
+Hello, Zoidberg!
+</code>
+
+<code class="prompt">[mlamb@morbo]$ </code><span><strong class="command">java com.martiansoftware.jsap.examples.Manual_HelloWorld_9 --verbose:de Farnsworth</strong></span>
+<code class="computeroutput">Guten Tag, Farnsworth!
+</code>
+
+<code class="prompt">[mlamb@morbo]$ </code><span><strong class="command">java com.martiansoftware.jsap.examples.Manual_HelloWorld_9 -v:de,en Branigan</strong></span>
+<code class="computeroutput">Guten Tag, Branigan!
+Hello, Branigan!
+</code>
+
+<code class="prompt">[mlamb@morbo]$ </code><span><strong class="command">java com.martiansoftware.jsap.examples.Manual_HelloWorld_9 Horrible_Gelatanous_Blob</strong></span>
+<code class="computeroutput">Hi, Horrible_Gelatanous_Blob!
+</code>
+</pre><p></p></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch13.html">Prev</a>&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right">&nbsp;<a accesskey="n" href="ch15.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter&nbsp;13.&nbsp;DefaultSources and Configuration Files&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;Chapter&nbsp;15.&nbsp;Contributors</td></tr></table></div></body></html>

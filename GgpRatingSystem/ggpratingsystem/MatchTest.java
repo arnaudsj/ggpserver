@@ -1,5 +1,7 @@
 package ggpratingsystem;
 
+import ggpratingsystem.util.Util;
+
 import java.io.File;
 import java.util.List;
 
@@ -16,26 +18,24 @@ public class MatchTest extends TestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		String userdir = System.getProperty("user.dir");
-		if (!userdir.endsWith(File.separator))
-			userdir += File.separator;
+		File datadir = Util.getDataDir();
 
-		String matchFileName = userdir + "data" + File.separator
-				+ "2007_final_round" + File.separator
-				+ "Match.33941143263.xml";
+		File matchFile = new File(datadir, 
+				"2007_final_round" + File.separator
+				+ "Match.33941143263.xml");
 
 		match33941143263 = new Match(new MatchSet("Breakthroughholes_2007_R5_D1", 2007, 5,
 				1, 1, Game.getInstance("Breakthroughholes")), 
-				new File(matchFileName));		
+				matchFile);		
 
-		matchFileName = userdir + "data" + File.separator
-				+ "2007_preliminaries" + File.separator 
-				+ "Match.3390055120.xml";
+		matchFile = new File(datadir,
+				"2007_preliminaries" + File.separator 
+				+ "Match.3390055120.xml");
 
 		match3390055120 = new Match(new MatchSet(
 				"Blocksworld-Obfuscated_2007_R1_D1", 2007, 1, 1, 1, 
 				Game.getInstance("Blocksworld-Obfuscated")), 
-				new File(matchFileName));		
+				matchFile);		
 	}
 
 

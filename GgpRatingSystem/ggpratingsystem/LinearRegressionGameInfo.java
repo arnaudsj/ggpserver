@@ -14,10 +14,15 @@ import flanagan.analysis.Regression;
  *
  */
 public class LinearRegressionGameInfo extends AbstractGameInfo {
-	private static final Logger log = Logger.getLogger(LinearRegressionGameInfo.class.getName());
-	
 	public static final double DEFAULT_EXPECTED_SCORE = 50.0;
 	
+	private static final Logger log = Logger.getLogger(LinearRegressionGameInfo.class.getName());
+	
+	static {
+		// inherit default level for package ggpratingsystem
+		log.setLevel(null);
+	}
+
 	private double coeffs[][];
 		// first dimension: target player
 		// second dimension: coefficients (index 0 is y-axis intercept, index n is player n-1)
@@ -74,6 +79,7 @@ public class LinearRegressionGameInfo extends AbstractGameInfo {
 		}
 			
 		updateCoefficients(coefficients, newNumMatches);
+		// TODO: add some debug output and watch how the game info changes
 	}
 	
 	/**
@@ -143,7 +149,8 @@ public class LinearRegressionGameInfo extends AbstractGameInfo {
 		double result = coeffs[targetRole][0];	// intercept
 		
 		for (int i = 0; i < numPlayers; i++) {
-			assert (ratings[i] > 0);
+//			assert (ratings[i] > 0);
+			// This had to be uncommented; the ratings CAN become negative!
 			
 			result += coeffs[targetRole][i + 1] * ratings[i];
 		}

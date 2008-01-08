@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class LinearRegressionRating extends AbstractRating {
+	private static int numMatches = 0;	// XXX
 
 	public LinearRegressionRating(Player player) {
 		super(player);
@@ -17,6 +18,7 @@ public class LinearRegressionRating extends AbstractRating {
 	}
 	
 	public static void updateRatings(MatchSet matches) {
+		numMatches++;	// XXX
 		LinearRegressionGameInfo gameInfo = (LinearRegressionGameInfo) matches
 				.getGame().getGameInfo(LINEAR_REGRESSION);
 		
@@ -41,7 +43,8 @@ public class LinearRegressionRating extends AbstractRating {
 	 * @param expectedScore
 	 */
 	private void updateSingleRating(double actualScore, double expectedScore) {
-		final double LEARNING_RATE = 0.3;
+		// final double LEARNING_RATE = 10.0;			// XXX constant learning rate
+		double LEARNING_RATE = (60 - numMatches) / 10;	// dynamic learning rate (60 is a good number, because we have 44 MatchSets and 60 > 44)
 		
 		double difference = actualScore - expectedScore;		
 		double newRating = LEARNING_RATE * difference + getCurRating();

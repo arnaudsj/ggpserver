@@ -1,0 +1,33 @@
+<html><head><link rel='stylesheet' type='text/css' href='manual.css'/><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Chapter&nbsp;2.&nbsp;Vocabulary</title><meta name="generator" content="DocBook XSL Stylesheets V1.68.1"><link rel="start" href="index.html" title="JSAP - Java Simple Argument Parser (v2.1)"><link rel="up" href="index.html" title="JSAP - Java Simple Argument Parser (v2.1)"><link rel="prev" href="ch01s02.html" title="So what does JSAP actually do?"><link rel="next" href="ch03.html" title="Chapter&nbsp;3.&nbsp;Quick Start"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter&nbsp;2.&nbsp;Vocabulary</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch01s02.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="ch03.html">Next</a></td></tr></table><hr></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="id2518749"></a>Chapter&nbsp;2.&nbsp;Vocabulary</h2></div></div></div><p>Before continuing, some explanation of the vocabulary used in this
+    manual is required:</p><div class="variablelist"><dl><dt><span class="term">Argument</span></dt><dd><p>A single (<code class="classname">String</code>) token from the
+          command line. The JVM will provide an array of these to your
+          <code class="methodname">main()</code> method.</p></dd><dt><span class="term">Parameter</span></dt><dd><p>One or more arguments that must be taken together to have
+          meaning. For example, in the command "<span><strong class="command">java -cp
+          myjar.jar MyClass</strong></span>", the arguments "<span><strong class="command">-cp</strong></span>"
+          and "<span><strong class="command">myjar.jar</strong></span>" comprise a single
+          parameter defining the classpath. The argument "<span><strong class="command">MyClass</strong></span>"
+          comprises another parameter indicating the class to load and run.</p></dd><dt><span class="term">Switch</span></dt><dd><p>A single-argument parameter whose presence alone conveys
+          meaning. For example, in the command "<span><strong class="command">java -version</strong></span>",
+          the "<span><strong class="command">-version</strong></span>" switch tells the JVM to
+          print its version information and exit.</p></dd><dt><span class="term">Option</span></dt><dd><p>A parameter whose content conveys meaning. In the command
+          "<span><strong class="command">java -cp myjar.jar MyClass</strong></span>", the "<span><strong class="command">-cp
+          myjar.jar</strong></span>" parameter is an option, as is the "<span><strong class="command">MyClass</strong></span>"
+          parameter.</p></dd><dt><span class="term">Flagged Option</span></dt><dd><p>An option that is preceded by a "flag" to indicate
+          which option is being set. In the command "<span><strong class="command">java -cp
+          myjar.jar MyClass</strong></span>", the "<span><strong class="command">-cp myjar.jar</strong></span>"
+          option is flagged by "<span><strong class="command">-cp</strong></span>".</p></dd><dt><span class="term">Unflagged Option</span></dt><dd><p>An option that is not preceded by a flag, and whose meaning is
+          conveyed by its position in the command line relative to other
+          Unflagged Options. In the command "<span><strong class="command">java -cp myjar.jar
+          MyClass</strong></span>", "<span><strong class="command">MyClass</strong></span>" is an
+          unflagged option.</p></dd><dt><span class="term">QualifiedSwitch</span></dt><dd><p>A combination of <code class="classname">Switch</code> and
+          <code class="classname">FlaggedOption</code>. It serves the same function as
+          a <code class="classname">Switch</code> on a command line, but it may be
+          "qualified" with additional data following a colon. In the
+          commands "<span><strong class="command">java -verbose MyClass</strong></span>" and
+          "<span><strong class="command">java -verbose:class MyClass</strong></span>", "<span><strong class="command">verbose</strong></span>"
+          is a <code class="classname">QualifiedSwitch</code> qualified by the
+          "class" qualifier in the second example.</p></dd><dt><span class="term">Short Flag</span></dt><dd><p>A single-character flag preceded by a single dash.</p></dd><dt><span class="term">Long Flag</span></dt><dd><p>A multi-character flag preceded by a double dash.</p></dd><dt><span class="term">ID</span></dt><dd><p>A unique identifier assigned by the programmer to each
+          parameter <code class="classname">JSAP</code> should recognize. A
+          parameter's ID is seen only by the programmer, and is used to
+          retrieve its values from the <code class="classname">JSAPResult</code>
+          object.</p></dd></dl></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch01s02.html">Prev</a>&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right">&nbsp;<a accesskey="n" href="ch03.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">So what does JSAP actually do?&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;Chapter&nbsp;3.&nbsp;Quick Start</td></tr></table></div></body></html>

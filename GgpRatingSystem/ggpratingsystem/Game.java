@@ -15,6 +15,11 @@ public final class Game {
 	
 	private Map<RatingSystemType, AbstractGameInfo> gameInfos = new HashMap<RatingSystemType, AbstractGameInfo>();
 	
+	static {
+		// inherit default level for package ggpratingsystem
+		log.setLevel(null);
+	}
+	
 	private Game(String name) {
 		super();
 		this.name = name;

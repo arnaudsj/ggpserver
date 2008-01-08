@@ -1,6 +1,7 @@
 package ggpratingsystem;
 
 public abstract class AbstractRating {
+	private static final double DEFAULT_RATING = 1000.0;	// This must NOT be 0.0! (Otherwise error in flanagan.math.Matrix)
 	private double curRating;
 	private final Player player;
 	
@@ -23,7 +24,7 @@ public abstract class AbstractRating {
 	 * Resets the rating to the default values.
 	 */
 	public void reset() {
-		curRating = 1000.0;		
+		curRating = DEFAULT_RATING;		
 	}
 
 	public Player getPlayer() {

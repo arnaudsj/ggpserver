@@ -1,5 +1,7 @@
 package ggpratingsystem;
 
+import ggpratingsystem.util.Util;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -13,24 +15,29 @@ import au.com.bytecode.opencsv.CSVReader;
 
 public class MatchReader {
 	private static final Logger log = Logger.getLogger(MatchReader.class.getName());
+	
+	static {
+		// inherit default level for package ggpratingsystem
+		log.setLevel(null);
+	}
 
-	public static List<MatchSet> readMatches(String directory) throws IOException {
+	public static List<MatchSet> readMatches(File directory) throws IOException {
 		// this ordered List will be returned
 		List<MatchSet> matchSets = new LinkedList<MatchSet>();
 
 		// this map is only temporary and stores the same MatchSets as the list above,
-		// but it's easier to retrieve stuff from a map
+		// but it's more efficient to retrieve stuff from a map
 		Map<String, MatchSet> idsToMatchSets = new HashMap<String, MatchSet>();
 		
 		int matchSetNumber = 0;	
 		// this should be reset at the "beginning" of a new day,
 		// but this stuff is temporary anyway
 		
-		if (!directory.endsWith(File.separator))
-			directory += File.separator;
-		
 	    /* look for a file called match_index.csv and try to read the match set data from it */
-		CSVReader reader = new CSVReader(new FileReader(directory + "match_index.csv"));
+		CSVReader reader;
+		File matchIndexFile = new File(directory, "match_index.csv");
+		reader = new CSVReader(new FileReader(matchIndexFile));
+
 	    List<String[]> lines = (List<String[]>) reader.readAll();
 	    
 	    if (lines.size() > 10) {
@@ -38,7 +45,7 @@ public class MatchReader {
 	    }
 	    for (String[] line : lines) {	// Match ID; Game; Year; Round; Day
 	    	if (line.length != 5) {
-	    		throw new  IllegalArgumentException("Incorrect number of arguments in CSV file " + directory + "match_index.csv");
+	    		throw new  IllegalArgumentException("Incorrect number of arguments in CSV file " + matchIndexFile);
 	    	}
 	    	
 	    	String matchID = line[0];
@@ -66,14 +73,14 @@ public class MatchReader {
 	    	}
 	    	
 	    	/* create the Match and add it to the MatchSet */
-	    	File xmlFile = new File(directory + matchID + ".xml");
+	    	File xmlFile = new File(directory, matchID + ".xml");
 			try {
 				Match match = new Match(matchSet, xmlFile);
 		    	matchSet.addMatch(match);
 			} catch (MatchParsingException e) {
 				log.warning("Error while reading XML file: " + xmlFile + "\nIgnoring this file.");
 				log.throwing(Match.class.getName(), "<init>", e);
-				assert(false);	// notify junit
+//				assert(false);	// notify junit
 			}
 		}
 	    
@@ -81,14 +88,8 @@ public class MatchReader {
 		return matchSets;
 	}
 	
-	public static List<MatchSet> readSubdir(String subdirectory) throws IOException {
-		String userdir = System.getProperty("user.dir");
-		if (!userdir.endsWith(File.separator))
-			userdir += File.separator;
-
-		String directory = userdir + "data" + File.separator + subdirectory;
-		
-		return readMatches(directory);
+	public static List<MatchSet> readDataDir(String subdirectory) throws IOException {
+		return readMatches(new File(Util.getDataDir(), subdirectory));
 		
 	}
 }

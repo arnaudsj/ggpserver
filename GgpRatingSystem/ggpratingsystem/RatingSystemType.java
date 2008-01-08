@@ -5,6 +5,7 @@ public enum RatingSystemType {
 //	GLICKO,
 //	GLICKO_2,
 //	TRUE_SKILL,
+//	DIRECT,
 	LINEAR_REGRESSION;
 	
 	/*
@@ -16,6 +17,7 @@ public enum RatingSystemType {
 	 * - a new subclass of AbstractRating
 	 * - a corresponding entry in Player.getRating()
 	 * - a new subclass of AbstractRatingStrategy
-	 * - TODO: add this somewhere in the main method
+	 * - a new option in CommandLineInterface
+	 * - add the new RatingStrategy to the known rating strategies in the GgpRatingSystem.main()
 	 */
 }
