@@ -18,7 +18,7 @@ public class GgpRatingSystemTest extends TestCase {
 		String cmdLine = 
 			" --input-dir " + (new File(Util.getDataDir(), "2007_preliminaries")).toString()
 			+ " --output-dir " + "/tmp/ggp-rating-system/"
-			+ " --linear-regression-rating"
+			+ " --dynamic-linear-regression-rating"
 			+ " --csv-output"
 			+ " --debug-level ALL";
 		String[] args = CommandLineTokenizer.tokenize(cmdLine);

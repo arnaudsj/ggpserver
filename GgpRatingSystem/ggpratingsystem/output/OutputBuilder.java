@@ -2,8 +2,8 @@ package ggpratingsystem.output;
 
 import java.io.IOException;
 
-import ggpratingsystem.AbstractRating;
 import ggpratingsystem.MatchSet;
+import ggpratingsystem.ratingsystems.AbstractRating;
 
 /**
  * Builds a leaderboard -- i.e., an output of the development of the players'
@@ -53,6 +53,6 @@ public interface OutputBuilder {
 	 * has been called is illegal.
 	 * @throws IOException 
 	 */
-	public abstract void finish() throws IOException;
+	public abstract void finish() throws IOException;	// TODO: remove throws in whole call hierarchy
 
 }

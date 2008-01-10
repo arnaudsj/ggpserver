@@ -1,6 +1,21 @@
 package ggpratingsystem;
 
 
+import ggpratingsystem.output.CachingCSVOutputBuilder;
+import ggpratingsystem.output.OutputBuilder;
+import ggpratingsystem.output.ValidatingOutputBuilder;
+import ggpratingsystem.ratingsystems.DynamicLinearRegressionStrategy;
+import ggpratingsystem.ratingsystems.RatingSystemType;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.martiansoftware.jsap.CommandLineTokenizer;
 import com.martiansoftware.jsap.FlaggedOption;
 import com.martiansoftware.jsap.JSAP;
@@ -16,7 +31,7 @@ public class CommandLineInterface extends SimpleJSAP {
 	public static final String APPLICATION_CALL = "java -jar ggp_rating_system.jar";
 	public static final String OPTION_INPUT_DIR = "input-dir";
 	public static final String OPTION_OUTPUT_DIR = "output-dir";
-	public static final String OPTION_LINEAR_REGRESSION = "linear-regression-rating";
+	public static final String OPTION_DYNAMIC_LINEAR_REGRESSION = "dynamic-linear-regression-rating";
 	public static final String OPTION_CSV_OUTPUT = "csv-output";
 	public static final String OPTION_GNUPLOT_OUTPUT = "gnuplot-output";
 	public static final String OPTION_DEBUG_LEVEL = "debug-level";
@@ -64,16 +79,16 @@ public class CommandLineInterface extends SimpleJSAP {
     				// which is not the case for any Swing based GUI output, for example).
                     
             /* Rating algorithm selection */                    
-            		// --linear-regression
+            		// --dynamic-linear-regression-rating
     				new Switch(
-    						OPTION_LINEAR_REGRESSION,
+    						OPTION_DYNAMIC_LINEAR_REGRESSION,
     						JSAP.NO_SHORTFLAG,
-    						OPTION_LINEAR_REGRESSION,
-    						"Enables the linear regression rating algorithm."),
+    						OPTION_DYNAMIC_LINEAR_REGRESSION,
+    						"Enables the linear regression rating algorithm, using a dynamic learning rate."),
                     	
             		// TODO --direct-scores
 
-                    // --elo etc.
+					/* ****************** ADD NEW RATING SYSTEMS HERE ****************** */
             		
             /* Output selection */
     				// --csv-output
@@ -131,7 +146,7 @@ public class CommandLineInterface extends SimpleJSAP {
         /* parameter checking */
         this.messagePrinted = super.messagePrinted();
         
-        boolean existsEnabledRatingAlgorithm = config.getBoolean(OPTION_LINEAR_REGRESSION);
+        boolean existsEnabledRatingAlgorithm = config.getBoolean(OPTION_DYNAMIC_LINEAR_REGRESSION);
         			// add other rating algorithms here
         
         if (!existsEnabledRatingAlgorithm) {
@@ -161,5 +176,66 @@ public class CommandLineInterface extends SimpleJSAP {
         	config.addException(null, new JSAPException("Help message printed."));
         }
 		return config;
+	}
+	
+	public static void main(String[] args) throws IOException, JSAPException {
+		CommandLineInterface commandLineInterface = new CommandLineInterface();
+        
+		JSAPResult jsap = commandLineInterface.parse(args);
+		if (!jsap.success()) {
+			throw new JSAPException("Command line parsing failed.");
+		}
+        
+        //////////////////////////////////////////////////////		
+		//             now configure everything             //
+        //////////////////////////////////////////////////////		
+		
+		/* configure debug level */
+		String debugLevel = jsap.getString(OPTION_DEBUG_LEVEL).toUpperCase();
+		Level level = Level.parse(debugLevel);
+		Logger.getLogger("ggpratingsystem").setLevel(level);
+        
+		/* configure input dir */
+		List<MatchSet> matchSets = MatchReader.readMatches(jsap.getFile(OPTION_INPUT_DIR));
+
+		/* create output dir, if it does not exist */
+		File outputDir = jsap.getFile(OPTION_OUTPUT_DIR);
+		if (!outputDir.exists()) {
+			outputDir.mkdirs();
+		}
+		
+		/* configure rating algorithms */
+		Configuration configuration = new Configuration();
+
+		if (jsap.getBoolean(OPTION_DYNAMIC_LINEAR_REGRESSION)) {
+			configuration.addRatingSystem(new DynamicLinearRegressionStrategy(60));	// TODO: (60 is a good number here, because we have 44 MatchSets and 60 > 44)
+		}
+		/* ****************** ADD NEW RATING SYSTEMS HERE ****************** */
+		
+		/* configure output methods */
+		Set<RatingSystemType> enabledRatingSystems = configuration.getEnabledRatingSystems();
+		
+		for (RatingSystemType type : enabledRatingSystems) {
+			if (jsap.getBoolean(OPTION_CSV_OUTPUT)) {
+				// TODO: move this to configuration, too (config acts as a facade)
+				Writer writer = new FileWriter(new File(outputDir, type.toString().toLowerCase() + ".csv"));
+					// one separate file for each RatingSystem   
+
+				OutputBuilder outputBuilder = 
+					new ValidatingOutputBuilder(
+						new CachingCSVOutputBuilder(writer, type));
+				
+				configuration.addOutputBuilder(type, outputBuilder);
+			}
+		}
+		/* ****************** ADD NEW OUTPUT METHODS HERE ****************** */
+		// TODO gnuplot
+
+		// TODO: pass the matchReader instead
+		for (MatchSet matchSet : matchSets) {
+			configuration.processMatchSet(matchSet);
+		}
+		
+		configuration.closeOutputBuilders();
 	}
 }

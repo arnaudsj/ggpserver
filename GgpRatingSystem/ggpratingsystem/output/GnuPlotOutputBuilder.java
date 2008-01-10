@@ -1,7 +1,7 @@
 package ggpratingsystem.output;
 
-import ggpratingsystem.AbstractRating;
 import ggpratingsystem.MatchSet;
+import ggpratingsystem.ratingsystems.AbstractRating;
 
 public class GnuPlotOutputBuilder implements OutputBuilder {
 	private GnuPlotRatingsWriter writer;

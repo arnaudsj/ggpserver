@@ -1,5 +1,9 @@
 package ggpratingsystem;
 
+import ggpratingsystem.ratingsystems.AbstractGameInfo;
+import ggpratingsystem.ratingsystems.GameInfoFactory;
+import ggpratingsystem.ratingsystems.RatingSystemType;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,27 +62,10 @@ public final class Game {
 		AbstractGameInfo result = gameInfos.get(type);
 		
 		if (result == null) {
-			switch (type) {
-			case LINEAR_REGRESSION:
-				result = new LinearRegressionGameInfo(this);
-				break;			
-			/* all new subclasses of AbstractGameInfo have to be added here */
-				
-			default:
-				throw new IllegalArgumentException("unknown RatingSystemType!");
-			}
-			
-			putGameInfo(result);
+			result = GameInfoFactory.makeGameInfo(type, this);
+			gameInfos.put(type, result);
 		}
 		
 		return result;
-	}
-
-	private void putGameInfo(AbstractGameInfo gameInfo) {
-		RatingSystemType type = gameInfo.getType();
-		
-		if (gameInfos.get(type) != null)
-			log.fine("Warning: GameInfo overwritten!");
-		gameInfos.put(type, gameInfo);
 	}
 }

@@ -1,5 +1,9 @@
 package ggpratingsystem;
 
+import ggpratingsystem.ratingsystems.AbstractRating;
+import ggpratingsystem.ratingsystems.RatingFactory;
+import ggpratingsystem.ratingsystems.RatingSystemType;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,28 +49,11 @@ public final class Player {
 		AbstractRating result = ratings.get(type);
 		
 		if (result == null) {
-			switch (type) {
-			case LINEAR_REGRESSION:
-				result = new LinearRegressionRating(this);
-				break;			
-			/* all new subclasses of AbstractRating have to be added here */
-				
-			default:
-				throw new IllegalArgumentException("unknown RatingSystemType!");
-			}
-			
-			putRating(result);
+			result = RatingFactory.makeRating(type, this);
+			ratings.put(type, result);
 		}
 		
 		return result;
-	}
-
-	private void putRating(AbstractRating rating) {
-		RatingSystemType type = rating.getType();
-		
-		if (ratings.get(type) != null)
-			log.fine("Warning: Rating overwritten!");
-		ratings.put(type, rating);
 	}
 
 	@Override

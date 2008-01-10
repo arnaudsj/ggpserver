@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
 
-import ggpratingsystem.AbstractRating;
 import ggpratingsystem.MatchSet;
 import ggpratingsystem.Player;
-import ggpratingsystem.RatingSystemType;
+import ggpratingsystem.ratingsystems.AbstractRating;
+import ggpratingsystem.ratingsystems.RatingSystemType;
 
 public class CSVOutputBuilder implements OutputBuilder {
 	private final CSVRatingsWriter writer;

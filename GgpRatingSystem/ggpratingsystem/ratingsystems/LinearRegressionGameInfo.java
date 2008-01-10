@@ -1,6 +1,6 @@
-package ggpratingsystem;
+package ggpratingsystem.ratingsystems;
 
-import static ggpratingsystem.RatingSystemType.LINEAR_REGRESSION;
+import static ggpratingsystem.ratingsystems.RatingSystemType.DYNAMIC_LINEAR_REGRESSION;
 
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +8,10 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import flanagan.analysis.Regression;
+import ggpratingsystem.Game;
+import ggpratingsystem.Match;
+import ggpratingsystem.MatchSet;
+import ggpratingsystem.Player;
 
 /**
  * @author martin
@@ -33,7 +37,11 @@ public class LinearRegressionGameInfo extends AbstractGameInfo {
 	private int numMatches;
 	private final int numPlayers;
 	
-	public LinearRegressionGameInfo(Game game) {
+	/**
+     * @deprecated Use {@link ggpratingsystem.ratingsystems.GameInfoFactory#makeGameInfo(RatingSystemType, Game)} instead.
+	 */
+	@Deprecated
+	protected LinearRegressionGameInfo(Game game) {
 		super(game);
 		numPlayers = game.getRoles().size();
 		reset();
@@ -59,7 +67,7 @@ public class LinearRegressionGameInfo extends AbstractGameInfo {
 	
 	@Override
 	public RatingSystemType getType() {
-		return RatingSystemType.LINEAR_REGRESSION;
+		return RatingSystemType.DYNAMIC_LINEAR_REGRESSION;
 	}
 
 	
@@ -110,7 +118,7 @@ public class LinearRegressionGameInfo extends AbstractGameInfo {
 				/* extract ratings */
 				double[] ratings = new double[numPlayers];
 				for (int j = 0; j < numPlayers; j++) {
-					ratings[j] = players.get(j).getRating(LINEAR_REGRESSION).getCurRating();
+					ratings[j] = players.get(j).getRating(DYNAMIC_LINEAR_REGRESSION).getCurRating();
 				}
 				
 				expectedScore += multiplyRatingsCoefficients(i, ratings);
@@ -292,7 +300,7 @@ public class LinearRegressionGameInfo extends AbstractGameInfo {
 				}
 				
 				Player player = match.getPlayers().get(roleToRead);
-				xdata[roleToWrite][matchNumber] = player.getRating(LINEAR_REGRESSION).getCurRating();
+				xdata[roleToWrite][matchNumber] = player.getRating(DYNAMIC_LINEAR_REGRESSION).getCurRating();
 
 				roleToWrite++;
 				roleToRead++;

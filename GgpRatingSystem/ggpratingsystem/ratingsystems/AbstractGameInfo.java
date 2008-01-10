@@ -1,9 +1,16 @@
-package ggpratingsystem;
+package ggpratingsystem.ratingsystems;
+
+import ggpratingsystem.Game;
+import ggpratingsystem.MatchSet;
 
 public abstract class AbstractGameInfo {
 	private final Game game;
 
-	public AbstractGameInfo(final Game game) {
+	/**
+     * @deprecated Use {@link ggpratingsystem.ratingsystems.GameInfoFactory#makeGameInfo(RatingSystemType, Game)} instead.
+	 */
+	@Deprecated
+	protected AbstractGameInfo(final Game game) {
 		super();
 		this.game = game;
 	}

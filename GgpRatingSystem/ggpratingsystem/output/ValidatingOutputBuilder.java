@@ -2,8 +2,8 @@ package ggpratingsystem.output;
 
 import java.io.IOException;
 
-import ggpratingsystem.AbstractRating;
 import ggpratingsystem.MatchSet;
+import ggpratingsystem.ratingsystems.AbstractRating;
 
 /**
  * Implementation of OutputBuilder which validates the constraints on the method call order.

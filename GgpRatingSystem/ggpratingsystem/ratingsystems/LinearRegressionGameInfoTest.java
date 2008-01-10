@@ -1,6 +1,11 @@
-package ggpratingsystem;
+package ggpratingsystem.ratingsystems;
 
-import static ggpratingsystem.RatingSystemType.LINEAR_REGRESSION;
+import static ggpratingsystem.ratingsystems.RatingSystemType.DYNAMIC_LINEAR_REGRESSION;
+
+import ggpratingsystem.Game;
+import ggpratingsystem.MatchReader;
+import ggpratingsystem.MatchSet;
+import ggpratingsystem.Player;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -39,7 +44,8 @@ public class LinearRegressionGameInfoTest extends TestCase {
 		
 		testgame = Game.getInstance("TESTGAME");
 		testgame.setRoles(roles);
-		testGameInfo = new LinearRegressionGameInfo(testgame);
+		testGameInfo = (LinearRegressionGameInfo) GameInfoFactory.makeGameInfo(
+				DYNAMIC_LINEAR_REGRESSION, testgame);
 	}
 
 	@Override
@@ -47,25 +53,25 @@ public class LinearRegressionGameInfoTest extends TestCase {
 		super.tearDown();
 		
 		for (MatchSet matchSet : matchSets) {
-			matchSet.getGame().getGameInfo(LINEAR_REGRESSION).reset();		
+			matchSet.getGame().getGameInfo(DYNAMIC_LINEAR_REGRESSION).reset();		
 		}
 		
-		Player.getInstance("FLUXPLAYER").getRating(LINEAR_REGRESSION).reset();
-		Player.getInstance("U-TEXAS-LARG").getRating(LINEAR_REGRESSION).reset();
-		Player.getInstance("CLUNEPLAYER").getRating(LINEAR_REGRESSION).reset();
-		Player.getInstance("JIGSAWBOT").getRating(LINEAR_REGRESSION).reset();
-		Player.getInstance("W-WOLFE").getRating(LINEAR_REGRESSION).reset();
-		Player.getInstance("ARY").getRating(LINEAR_REGRESSION).reset();
-		Player.getInstance("CADIA-PLAYER").getRating(LINEAR_REGRESSION).reset();
-		Player.getInstance("LUCKY-LEMMING").getRating(LINEAR_REGRESSION).reset();
-		Player.getInstance("THE-PIRATE").getRating(LINEAR_REGRESSION).reset();
-		Player.getInstance("RANDOM").getRating(LINEAR_REGRESSION).reset();
-		Player.getInstance("RANDOM2").getRating(LINEAR_REGRESSION).reset();
-		Player.getInstance("RANDOM3").getRating(LINEAR_REGRESSION).reset();
+		Player.getInstance("FLUXPLAYER").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
+		Player.getInstance("U-TEXAS-LARG").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
+		Player.getInstance("CLUNEPLAYER").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
+		Player.getInstance("JIGSAWBOT").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
+		Player.getInstance("W-WOLFE").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
+		Player.getInstance("ARY").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
+		Player.getInstance("CADIA-PLAYER").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
+		Player.getInstance("LUCKY-LEMMING").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
+		Player.getInstance("THE-PIRATE").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
+		Player.getInstance("RANDOM").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
+		Player.getInstance("RANDOM2").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
+		Player.getInstance("RANDOM3").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
 	}
 		
 	public void testGetType() {
-		assertEquals(LINEAR_REGRESSION, testGameInfo.getType());
+		assertEquals(DYNAMIC_LINEAR_REGRESSION, testGameInfo.getType());
 	}
 
 	public void testUpdateGameInfoThrowsException() {
@@ -108,7 +114,7 @@ public class LinearRegressionGameInfoTest extends TestCase {
 	
 	public void testExpectedScoresUntrained(MatchSet matchSet) {
 		LinearRegressionGameInfo gameInfo = (LinearRegressionGameInfo) matchSet
-				.getGame().getGameInfo(LINEAR_REGRESSION);
+				.getGame().getGameInfo(DYNAMIC_LINEAR_REGRESSION);
 
 		Map<Player, Double> expectedScores = gameInfo.expectedScores(matchSet);
 		Map<Player, Integer> numMatchesPerPlayer = matchSet.numMatchesPerPlayer();
@@ -135,7 +141,7 @@ public class LinearRegressionGameInfoTest extends TestCase {
 	
 	public void testExpectedScoresTrainedOnce(MatchSet matchSet) {
 		LinearRegressionGameInfo gameInfo = (LinearRegressionGameInfo) matchSet
-				.getGame().getGameInfo(LINEAR_REGRESSION);
+				.getGame().getGameInfo(DYNAMIC_LINEAR_REGRESSION);
 
 		gameInfo.updateGameInfo(matchSet);
 		
@@ -165,7 +171,7 @@ public class LinearRegressionGameInfoTest extends TestCase {
 
 	public void testExpectedScoresTwiceInARow(MatchSet matchSet) {
 		LinearRegressionGameInfo gameInfo = (LinearRegressionGameInfo) matchSet
-				.getGame().getGameInfo(LINEAR_REGRESSION);
+				.getGame().getGameInfo(DYNAMIC_LINEAR_REGRESSION);
 
 		gameInfo.updateGameInfo(matchSet);
 
@@ -186,20 +192,20 @@ public class LinearRegressionGameInfoTest extends TestCase {
 
 	public void testExpectedScoresDifferentRankings(MatchSet matchSet) {
 		LinearRegressionGameInfo gameInfo = (LinearRegressionGameInfo) matchSet
-				.getGame().getGameInfo(LINEAR_REGRESSION);
+				.getGame().getGameInfo(DYNAMIC_LINEAR_REGRESSION);
 
-		Player.getInstance("CADIA-PLAYER").getRating(LINEAR_REGRESSION).setCurRating(1400.0);
-		Player.getInstance("FLUXPLAYER").getRating(LINEAR_REGRESSION).setCurRating(1400.0);
-		Player.getInstance("CLUNEPLAYER").getRating(LINEAR_REGRESSION).setCurRating(1350.0);
-		Player.getInstance("U-TEXAS-LARG").getRating(LINEAR_REGRESSION).setCurRating(1300.0);
-		Player.getInstance("ARY").getRating(LINEAR_REGRESSION).setCurRating(900.0);
-		Player.getInstance("JIGSAWBOT").getRating(LINEAR_REGRESSION).setCurRating(700.0);
-		Player.getInstance("LUCKY-LEMMING").getRating(LINEAR_REGRESSION).setCurRating(600.0);
-		Player.getInstance("W-WOLFE").getRating(LINEAR_REGRESSION).setCurRating(400.0);
-		Player.getInstance("THE-PIRATE").getRating(LINEAR_REGRESSION).setCurRating(300.0);
-		Player.getInstance("RANDOM").getRating(LINEAR_REGRESSION).setCurRating(200.0);
-		Player.getInstance("RANDOM2").getRating(LINEAR_REGRESSION).setCurRating(200.0);
-		Player.getInstance("RANDOM3").getRating(LINEAR_REGRESSION).setCurRating(200.0);
+		Player.getInstance("CADIA-PLAYER").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(1400.0);
+		Player.getInstance("FLUXPLAYER").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(1400.0);
+		Player.getInstance("CLUNEPLAYER").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(1350.0);
+		Player.getInstance("U-TEXAS-LARG").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(1300.0);
+		Player.getInstance("ARY").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(900.0);
+		Player.getInstance("JIGSAWBOT").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(700.0);
+		Player.getInstance("LUCKY-LEMMING").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(600.0);
+		Player.getInstance("W-WOLFE").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(400.0);
+		Player.getInstance("THE-PIRATE").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(300.0);
+		Player.getInstance("RANDOM").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(200.0);
+		Player.getInstance("RANDOM2").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(200.0);
+		Player.getInstance("RANDOM3").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(200.0);
 		
 		gameInfo.updateGameInfo(matchSet);
 

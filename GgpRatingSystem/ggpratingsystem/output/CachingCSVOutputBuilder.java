@@ -7,10 +7,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import ggpratingsystem.AbstractRating;
 import ggpratingsystem.MatchSet;
 import ggpratingsystem.Player;
-import ggpratingsystem.RatingSystemType;
+import ggpratingsystem.ratingsystems.AbstractRating;
+import ggpratingsystem.ratingsystems.RatingSystemType;
 
 /**
  * This class caches all calls in memory and then, on finish(), passes them
@@ -52,8 +52,12 @@ public class CachingCSVOutputBuilder implements OutputBuilder {
 
 	public void ratingUpdate(AbstractRating rating) {
 		List<AbstractRating> ratings = ratingLists.get(ratingLists.size() - 1);
-		ratings.add(rating);	// TODO: clone this here or make rating immutable
-		players.add(rating.getPlayer());
+		try {
+			ratings.add((AbstractRating) rating.clone());
+			players.add(rating.getPlayer());
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void endMatchSet(MatchSet matchSet) {
