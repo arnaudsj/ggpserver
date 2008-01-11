@@ -1,12 +1,15 @@
 package ggpratingsystem;
 
-import static ggpratingsystem.ratingsystems.RatingSystemType.DYNAMIC_LINEAR_REGRESSION;
-
+import ggpratingsystem.output.CachingCSVOutputBuilder;
 import ggpratingsystem.output.OutputBuilder;
+import ggpratingsystem.output.ValidatingOutputBuilder;
 import ggpratingsystem.ratingsystems.RatingStrategy;
 import ggpratingsystem.ratingsystems.RatingSystemType;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,6 +28,8 @@ import java.util.Set;
  *    - updating GameInfos and
  *    - updating Ratings.
  * 
+ * Configuration acts as a facade to the whole GGP Subsystem, 
+ * providing convenience methods for adding output builders etc. 
  * 
  * @author martin
  *
@@ -79,7 +84,7 @@ public class Configuration {
 				
 				for (Player player : playersInMatch) {
 					for (OutputBuilder builder : builders) {
-						builder.ratingUpdate(player.getRating(DYNAMIC_LINEAR_REGRESSION));
+						builder.ratingUpdate(player.getRating(type));
 					}
 				}
 			}
@@ -100,5 +105,23 @@ public class Configuration {
 				builder.finish();
 			}
 		}
+	}
+
+	public RatingStrategy getRatingSystem(RatingSystemType type) {
+		return ratingSystems.get(type);
+	}
+	
+	
+	/** Convenience method for adding a CSV Output Builder to a rating system. */
+	public void addCSVOutputBuilder(RatingSystemType type, File outputDir) throws IOException {
+		Writer writer = new FileWriter(new File(outputDir,
+				getRatingSystem(type).idString() + ".csv"));
+			// one separate file for each RatingSystem   
+
+		OutputBuilder outputBuilder = 
+			new ValidatingOutputBuilder(
+				new CachingCSVOutputBuilder(writer, type));
+		
+		addOutputBuilder(type, outputBuilder);
 	}
 }

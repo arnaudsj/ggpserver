@@ -1,5 +1,7 @@
 package ggpratingsystem.ratingsystems;
 
+import static ggpratingsystem.ratingsystems.RatingSystemType.CONSTANT_LINEAR_REGRESSION;
+import static ggpratingsystem.ratingsystems.RatingSystemType.DYNAMIC_LINEAR_REGRESSION;
 import ggpratingsystem.Game;
 
 public class GameInfoFactory {
@@ -14,11 +16,11 @@ public class GameInfoFactory {
 		AbstractGameInfo result;
 		switch (type) {
 		case DYNAMIC_LINEAR_REGRESSION:
-			result = new LinearRegressionGameInfo(game);
+			result = new LinearRegressionGameInfo(DYNAMIC_LINEAR_REGRESSION, game);
 			break;
 			
 		case CONSTANT_LINEAR_REGRESSION:
-			result = new LinearRegressionGameInfo(game);
+			result = new LinearRegressionGameInfo(CONSTANT_LINEAR_REGRESSION, game);
 			break;
 			
 		/* ****************** ADD NEW RATING SYSTEMS HERE ****************** */

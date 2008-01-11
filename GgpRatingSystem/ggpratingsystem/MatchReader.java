@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,7 @@ public class MatchReader {
 	
 	static {
 		// inherit default level for package ggpratingsystem
-		log.setLevel(null);
+		log.setLevel(null);	// TODO: do this everywhere where a logger is needed
 	}
 
 	public static List<MatchSet> readMatches(File directory) throws IOException {
@@ -38,8 +39,12 @@ public class MatchReader {
 		File matchIndexFile = new File(directory, "match_index.csv");
 		reader = new CSVReader(new FileReader(matchIndexFile));
 
-	    List<String[]> lines = (List<String[]>) reader.readAll();
-	    
+		List<String[]> lines = new LinkedList<String[]>();
+		for (Iterator iter = reader.readAll().iterator(); iter.hasNext();) {
+			String[] line = (String[]) iter.next();
+			lines.add(line);
+		}
+		
 	    if (lines.size() > 10) {
 			log.info("Reading " + lines.size() + " XML files, this may take a while...");
 	    }

@@ -19,4 +19,10 @@ public interface RatingStrategy {
 	 * Update the corresponding Ratings and the GameInfos, if used.
 	 */
 	public void update(MatchSet matches);
+	
+	/**
+	 * @return A String identifying this rating strategy that can be used as
+	 *         a unique ID. Must not clash with other rating strategies.
+	 */
+	public String idString();
 }

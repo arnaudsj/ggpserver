@@ -1,16 +1,12 @@
 package ggpratingsystem;
 
 
-import ggpratingsystem.output.CachingCSVOutputBuilder;
-import ggpratingsystem.output.OutputBuilder;
-import ggpratingsystem.output.ValidatingOutputBuilder;
+import ggpratingsystem.ratingsystems.ConstantLinearRegressionStrategy;
 import ggpratingsystem.ratingsystems.DynamicLinearRegressionStrategy;
 import ggpratingsystem.ratingsystems.RatingSystemType;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -18,12 +14,12 @@ import java.util.logging.Logger;
 
 import com.martiansoftware.jsap.CommandLineTokenizer;
 import com.martiansoftware.jsap.FlaggedOption;
-import com.martiansoftware.jsap.JSAP;
 import com.martiansoftware.jsap.JSAPException;
 import com.martiansoftware.jsap.JSAPResult;
 import com.martiansoftware.jsap.Parameter;
 import com.martiansoftware.jsap.SimpleJSAP;
 import com.martiansoftware.jsap.Switch;
+import com.martiansoftware.jsap.UnspecifiedParameterException;
 import com.martiansoftware.jsap.stringparsers.EnumeratedStringParser;
 import com.martiansoftware.jsap.stringparsers.FileStringParser;
 
@@ -32,6 +28,7 @@ public class CommandLineInterface extends SimpleJSAP {
 	public static final String OPTION_INPUT_DIR = "input-dir";
 	public static final String OPTION_OUTPUT_DIR = "output-dir";
 	public static final String OPTION_DYNAMIC_LINEAR_REGRESSION = "dynamic-linear-regression-rating";
+	public static final String OPTION_CONSTANT_LINEAR_REGRESSION = "constant-linear-regression-rating";
 	public static final String OPTION_CSV_OUTPUT = "csv-output";
 	public static final String OPTION_GNUPLOT_OUTPUT = "gnuplot-output";
 	public static final String OPTION_DEBUG_LEVEL = "debug-level";
@@ -52,8 +49,8 @@ public class CommandLineInterface extends SimpleJSAP {
                     new FlaggedOption(
     						OPTION_INPUT_DIR,
     						FileStringParser.getParser().setMustBeDirectory(true).setMustExist(true),
-    						JSAP.NO_DEFAULT,
-    						JSAP.REQUIRED,
+    						NO_DEFAULT,
+    						REQUIRED,
     						'i',
     						OPTION_INPUT_DIR,
     						"The directory to read matches from. Must contain a file called "
@@ -68,23 +65,44 @@ public class CommandLineInterface extends SimpleJSAP {
                     new FlaggedOption(
     						OPTION_OUTPUT_DIR,
     						FileStringParser.getParser().setMustBeDirectory(true).setMustExist(false),
-    						JSAP.NO_DEFAULT,
-    						JSAP.REQUIRED,
+    						NO_DEFAULT,
+    						REQUIRED,
     						'o',
     						OPTION_OUTPUT_DIR,
     						"The directory to write output files to."),
     				
-    				// TODO: stdout; only valid if there is exactly one enabled rating algorithm
+    				// TODO: stdout-output; only valid if there is exactly one enabled rating algorithm
     				// and exactly one enabled output (and the output supports writing to a file,
     				// which is not the case for any Swing based GUI output, for example).
                     
             /* Rating algorithm selection */                    
             		// --dynamic-linear-regression-rating
-    				new Switch(
+    				new FlaggedOption(
     						OPTION_DYNAMIC_LINEAR_REGRESSION,
-    						JSAP.NO_SHORTFLAG,
+    						INTEGER_PARSER,
+    						NO_DEFAULT,
+    						NOT_REQUIRED,
+    						NO_SHORTFLAG,
     						OPTION_DYNAMIC_LINEAR_REGRESSION,
-    						"Enables the linear regression rating algorithm, using a dynamic learning rate."),
+    						"Enables the linear regression rating algorithm, using a dynamic learning rate. " +
+    						"Expects an integer value that is bigger or equal to the maximum number of " +
+    						"MatchSets that will be read."),
+    						
+    				// --constant-linear-regression-rating
+//    				new Switch(
+//    						OPTION_CONSTANT_LINEAR_REGRESSION,
+//    						NO_SHORTFLAG,
+//    						OPTION_CONSTANT_LINEAR_REGRESSION,
+//    						"Enables the linear regression rating algorithm, using a constant learning rate."),
+    				new FlaggedOption(
+    						OPTION_CONSTANT_LINEAR_REGRESSION,
+    						DOUBLE_PARSER,
+    						NO_DEFAULT,
+    						NOT_REQUIRED,
+    						NO_SHORTFLAG,
+    						OPTION_CONSTANT_LINEAR_REGRESSION,
+    						"Enables the linear regression rating algorithm, using a constant learning rate. " +
+    						"Expects a double value specifying the learning rate to be used (e.g. 1.0)."),
                     	
             		// TODO --direct-scores
 
@@ -94,14 +112,14 @@ public class CommandLineInterface extends SimpleJSAP {
     				// --csv-output
     				new Switch(
     						OPTION_CSV_OUTPUT,
-    						JSAP.NO_SHORTFLAG,
+    						NO_SHORTFLAG,
     						OPTION_CSV_OUTPUT,
     						"Enables CSV (comma separated values) output for all rating algorithms."),
     	    						
     				// --gnuplot-output
     				new Switch(
     						OPTION_GNUPLOT_OUTPUT,
-    						JSAP.NO_SHORTFLAG,
+    						NO_SHORTFLAG,
     						OPTION_GNUPLOT_OUTPUT,
     						"Enables gnuplot output for all rating algorithms."),
 
@@ -115,7 +133,7 @@ public class CommandLineInterface extends SimpleJSAP {
                     				"OFF; SEVERE; WARNING; INFO; CONFIG; FINE; FINER; FINEST; ALL",
                     				false, false),
                     		"INFO",
-                    		JSAP.NOT_REQUIRED,
+                    		NOT_REQUIRED,
                     		'd',
                     		OPTION_DEBUG_LEVEL,
                     		"Sets the level of debug output. One of the following (in order of "
@@ -141,40 +159,51 @@ public class CommandLineInterface extends SimpleJSAP {
 
 	@Override
 	public JSAPResult parse(String[] args) {
-        JSAPResult config = super.parse(args);
+        JSAPResult config;
+        config = super.parse(args);
 
-        /* parameter checking */
-        this.messagePrinted = super.messagePrinted();
-        
-        boolean existsEnabledRatingAlgorithm = config.getBoolean(OPTION_DYNAMIC_LINEAR_REGRESSION);
-        			// add other rating algorithms here
-        
-        if (!existsEnabledRatingAlgorithm) {
-        	messagePrinted = true;
-        	if (!config.getBoolean(OPTION_HELP)) {
-        		System.err.println("Error: At least one rating algorithm must be enabled.");
-        	}
-        }
-        
-        boolean existsEnabledOutputAlgorithm = config.getBoolean(OPTION_CSV_OUTPUT);
-			// add other output algorithms here
-			// TODO: gnuplot
+		try {
+			/* parameter checking */
+			this.messagePrinted = super.messagePrinted();
+			
+			boolean existsEnabledRatingAlgorithm = 
+				config.contains(OPTION_DYNAMIC_LINEAR_REGRESSION)
+				&& config.contains(OPTION_CONSTANT_LINEAR_REGRESSION);
+				/* ****************** ADD NEW RATING SYSTEMS HERE ****************** */
+			
+			if (!existsEnabledRatingAlgorithm) {
+				messagePrinted = true;
+				if (!config.getBoolean(OPTION_HELP)) {
+					System.err.println("Error: At least one rating algorithm must be enabled.");
+				}
+			}
+			
+			boolean existsEnabledOutputAlgorithm = config.getBoolean(OPTION_CSV_OUTPUT);
+				/* ****************** ADD NEW OUTPUT METHODS HERE ****************** */
+				// TODO: gnuplot
 
-		if (!existsEnabledOutputAlgorithm) {
-			messagePrinted = true;
-        	if (!config.getBoolean(OPTION_HELP)) {
-        		System.err.println("Error: At least one output algorithm must be enabled.");
-        	}
+			if (!existsEnabledOutputAlgorithm) {
+				messagePrinted = true;
+				if (!config.getBoolean(OPTION_HELP)) {
+					System.err.println("Error: At least one output algorithm must be enabled.");
+				}
+			}
+			
+			if (messagePrinted) {
+				// if user hasn't asked for help, "beat him with a clue stick", as the JSAP manual says
+				if (!config.getBoolean(OPTION_HELP)) {
+					System.err.println();
+					System.err.println("Type " + APPLICATION_CALL + " --" + OPTION_HELP + " for help.");
+				}
+				config.addException(null, new JSAPException("Help message printed."));
+			}
+		} catch (UnspecifiedParameterException e) {
+			if (!config.getBoolean(OPTION_HELP)) {
+				System.err.println();
+				System.err.println("Type " + APPLICATION_CALL + " --" + OPTION_HELP + " for help.");
+			}
+			throw e;
 		}
-		
-		if (messagePrinted) {
-        	// if user hasn't asked for help, "beat him with a clue stick", as the JSAP manual says
-        	if (!config.getBoolean(OPTION_HELP)) {
-        		System.err.println();
-        		System.err.println("Type " + APPLICATION_CALL + " --" + OPTION_HELP + " for help.");
-        	}
-        	config.addException(null, new JSAPException("Help message printed."));
-        }
 		return config;
 	}
 	
@@ -207,9 +236,15 @@ public class CommandLineInterface extends SimpleJSAP {
 		/* configure rating algorithms */
 		Configuration configuration = new Configuration();
 
-		if (jsap.getBoolean(OPTION_DYNAMIC_LINEAR_REGRESSION)) {
-			configuration.addRatingSystem(new DynamicLinearRegressionStrategy(60));	// TODO: (60 is a good number here, because we have 44 MatchSets and 60 > 44)
+		if (jsap.contains(OPTION_DYNAMIC_LINEAR_REGRESSION)) {
+			int maxMatchSets = jsap.getInt(OPTION_DYNAMIC_LINEAR_REGRESSION);
+			configuration.addRatingSystem(new DynamicLinearRegressionStrategy(maxMatchSets));
 		}
+		if (jsap.contains(OPTION_CONSTANT_LINEAR_REGRESSION)) {
+			double learningRate = jsap.getDouble(OPTION_CONSTANT_LINEAR_REGRESSION);
+			configuration.addRatingSystem(new ConstantLinearRegressionStrategy(learningRate));
+		}
+		
 		/* ****************** ADD NEW RATING SYSTEMS HERE ****************** */
 		
 		/* configure output methods */
@@ -217,15 +252,7 @@ public class CommandLineInterface extends SimpleJSAP {
 		
 		for (RatingSystemType type : enabledRatingSystems) {
 			if (jsap.getBoolean(OPTION_CSV_OUTPUT)) {
-				// TODO: move this to configuration, too (config acts as a facade)
-				Writer writer = new FileWriter(new File(outputDir, type.toString().toLowerCase() + ".csv"));
-					// one separate file for each RatingSystem   
-
-				OutputBuilder outputBuilder = 
-					new ValidatingOutputBuilder(
-						new CachingCSVOutputBuilder(writer, type));
-				
-				configuration.addOutputBuilder(type, outputBuilder);
+				configuration.addCSVOutputBuilder(type, outputDir);
 			}
 		}
 		/* ****************** ADD NEW OUTPUT METHODS HERE ****************** */
@@ -238,4 +265,5 @@ public class CommandLineInterface extends SimpleJSAP {
 		
 		configuration.closeOutputBuilders();
 	}
+
 }

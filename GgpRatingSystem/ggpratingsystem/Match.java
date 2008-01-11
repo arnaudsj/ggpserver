@@ -43,9 +43,6 @@ public class Match {
 	private final List<Player> players;
 	private final List<Integer> scores;
 	
-	
-	// TODO: add a constructor that takes an URI instead of an XML file
-	
 	/**
 	 * @param matchSet
 	 * @param game

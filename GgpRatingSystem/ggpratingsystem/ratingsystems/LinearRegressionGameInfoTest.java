@@ -212,6 +212,6 @@ public class LinearRegressionGameInfoTest extends TestCase {
 		Map<Player, Double> expectedScores = gameInfo.expectedScores(matchSet);
 		
 		System.out.println(expectedScores);
-		// TODO: assertions; a little hard to really say anything sensible here
+		// TO DO: assertions; a little hard to really say anything sensible here
 	}
 }

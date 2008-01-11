@@ -1,7 +1,5 @@
 package ggpratingsystem.ratingsystems;
 
-import static ggpratingsystem.ratingsystems.RatingSystemType.DYNAMIC_LINEAR_REGRESSION;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,16 +32,19 @@ public class LinearRegressionGameInfo extends AbstractGameInfo {
 		//   coeffs[2][0] is target player 2, intercept
 		//   coeffs[0][3] is target player 0, coefficient for player 2
 
-	private int numMatches;
 	private final int numPlayers;
+	private final RatingSystemType ratingSystemType;
+	
+	private int numMatches;
 	
 	/**
      * @deprecated Use {@link ggpratingsystem.ratingsystems.GameInfoFactory#makeGameInfo(RatingSystemType, Game)} instead.
 	 */
 	@Deprecated
-	protected LinearRegressionGameInfo(Game game) {
+	protected LinearRegressionGameInfo(RatingSystemType ratingSystemType, Game game) {
 		super(game);
 		numPlayers = game.getRoles().size();
+		this.ratingSystemType = ratingSystemType;
 		reset();
 	}
 	
@@ -67,7 +68,7 @@ public class LinearRegressionGameInfo extends AbstractGameInfo {
 	
 	@Override
 	public RatingSystemType getType() {
-		return RatingSystemType.DYNAMIC_LINEAR_REGRESSION;
+		return ratingSystemType;
 	}
 
 	
@@ -118,7 +119,7 @@ public class LinearRegressionGameInfo extends AbstractGameInfo {
 				/* extract ratings */
 				double[] ratings = new double[numPlayers];
 				for (int j = 0; j < numPlayers; j++) {
-					ratings[j] = players.get(j).getRating(DYNAMIC_LINEAR_REGRESSION).getCurRating();
+					ratings[j] = players.get(j).getRating(ratingSystemType).getCurRating();
 				}
 				
 				expectedScore += multiplyRatingsCoefficients(i, ratings);
@@ -203,7 +204,7 @@ public class LinearRegressionGameInfo extends AbstractGameInfo {
 	}
 	
 	
-	private static double[] calcCoefficients(MatchSet matches, int targetRole) {
+	private double[] calcCoefficients(MatchSet matches, int targetRole) {
 		double[] result;
 		
 		/* calculate coefficients for all players */
@@ -242,7 +243,7 @@ public class LinearRegressionGameInfo extends AbstractGameInfo {
 	 * @param zeroTargetCoeff  force the coefficient of the target player to be 0
 	 * @return
 	 */
-	private static double[] calcCoefficientsInner(MatchSet matches, int targetRole, boolean zeroTargetCoeff) {
+	private double[] calcCoefficientsInner(MatchSet matches, int targetRole, boolean zeroTargetCoeff) {
 		int numRoles = matches.getGame().getRoles().size();
 		int numMatches = matches.getMatches().size();
 		
@@ -300,7 +301,7 @@ public class LinearRegressionGameInfo extends AbstractGameInfo {
 				}
 				
 				Player player = match.getPlayers().get(roleToRead);
-				xdata[roleToWrite][matchNumber] = player.getRating(DYNAMIC_LINEAR_REGRESSION).getCurRating();
+				xdata[roleToWrite][matchNumber] = player.getRating(ratingSystemType).getCurRating();
 
 				roleToWrite++;
 				roleToRead++;

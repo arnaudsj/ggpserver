@@ -18,7 +18,13 @@ import java.util.logging.Logger;
 public class DynamicLinearRegressionStrategy extends AbstractLinearRegressionStrategy {
 	private static final Logger log = Logger.getLogger(DynamicLinearRegressionStrategy.class.getName());
 	
-	private static final double LEARNING_FACTOR = 0.1;
+	/*
+	 * This constant multiplicative factor should not have too much of an
+	 * influence on the relative outcomes. Its primary purpose is to scale the
+	 * player ratings roughly between 0 and 2000 for cosmetic reasons.
+	 * 
+	 */ 
+	private static final double LEARNING_FACTOR = 0.05;	
 	
 	private final int maxMatchSets;
 	private int numMatchSets = 0;
@@ -55,4 +61,7 @@ public class DynamicLinearRegressionStrategy extends AbstractLinearRegressionStr
 		return learningRate;
 	}
 	
+	public String idString() {
+		return getType().toString().toLowerCase() + "_" + maxMatchSets;
+	}
 }
