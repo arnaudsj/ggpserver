@@ -1,0 +1,29 @@
+(role a)
+
+(init (cell empty))
+
+(colour white)
+(colour black)
+
+(<= (next (cell ?x))
+    (does a (mark ?x))
+    (colour ?x)
+    (true (cell empty))
+)
+
+(<= (legal a (mark ?y))
+    (true (cell empty))
+    (colour ?y)
+)
+
+(<= (goal a 100)
+    (true (cell white))
+)
+
+(<= (goal a 0)
+    (true (cell black))
+)
+
+(<= terminal
+    (not (true (cell empty)))
+)

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="Bender" basedir="." default="all">
+
+	<!-- project wide properties -->
+    <property name="src"   location="source"/>
+    <property name="build" location="build"/>
+	<property name="dist"  location="dist"/>
+	<property name="lib"   location="lib"/>
+	<property name="tests" location="tests"/>
+
+	<fileset id="libraries" dir="${lib}">
+		<include name="**/*.jar"/>		
+	</fileset>
+
+	<!-- initialise the ant building -->
+	<target name="init">
+	    <tstamp/>
+	    <!-- Create the build directory structure used by compile -->
+	    <mkdir dir="${build}"/>
+	</target>
+
+	<!-- compiles cup -->
+	<target name	= "compileCUP">
+        <javac srcdir="${lib}/java-cup-dist/" destdir="${lib}/java-cup-dist"/>
+		<jar jarfile="${lib}/java-cup.jar" basedir="${lib}/java-cup-dist"/>
+	</target>
+	
+	<!-- compiles the source tree -->
+	<target name        = "compile"
+    		depends     = "init"
+    	    description = "Compiles everything undere JavaProver directory">
+        <javac srcdir="${src}" destdir="${build}" debug="true">
+			<classpath>
+				<fileset refid="libraries"/>
+			</classpath>
+		</javac>
+		
+        <javac srcdir="${tests}" destdir="${build}" debug="true">
+			<classpath>
+				<pathelement path="${build}"/>
+				<fileset refid="libraries"/>
+			</classpath>
+		</javac>
+
+		<!-- copies the log4j and hibernate property files to build -->
+		<copy todir="${build}">
+			<fileset dir="${src}">
+				<include name="**/*.properties"/>
+				<include name="**/*.xml"/>
+			</fileset>
+		</copy>
+    </target>
+
+	<!-- prepares a runable distribution -->
+ 	<target name="dist" depends="compile">
+        <!-- creates the directories -->
+		<mkdir dir="${dist}/lib"/>
+		<mkdir dir="${dist}/data"/>
+
+		<!-- creates the jar file -->
+		<jar jarfile="${dist}/lib/${ant.project.name}.jar" basedir="${build}"/>
+
+		<!-- copies the data files into the dist dir -->
+		<copy todir="${dist}/data">
+			<fileset dir="testdata">
+				<include name="**/*.kif"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<!-- main target used by IDE -->
+    <target name="all" depends="clean,compile" description="Main Target">
+    </target>
+
+	<!-- runs the project out of the distribution package -->
+	<target name="run" depends="all">
+		<java classname="de.tu_dresden.inf.ggp06_2.connection.PlayerServer"
+			fork="true">
+			<classpath>
+				<pathelement path="${build}"/>
+				<fileset refid="libraries"/>
+			</classpath>
+		</java>
+	</target>
+
+	<!-- runs the unit tests out of the distribution package -->
+	<target name="unittest" depends="all">
+		<junit fork="yes">
+			<classpath>
+				<pathelement path="${build}"/>
+				<fileset refid="libraries"/>
+			</classpath>			
+		</junit>
+	</target>
+
+
+	<!-- cleans up the project -->
+	<target name="clean" description="Deletes everything build via ant">
+		<delete dir="${build}" failonerror="false"/>
+    	<delete dir="${dist}"  failonerror="false"/>
+    </target>
+
+</project>

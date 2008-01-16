@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+          "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+          "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+    <class name  = "de.tu_dresden.inf.ggp06_2.gamedb.objects.StrategyInformation" 
+    	   table = "StrategyInformation" >
+
+        <id name="ident" type="int" unsaved-value="null" >
+            <column name="Strategy_IDENT" sql-type="int" not-null="true"/>
+            <generator class="increment"/>
+        </id>
+
+        <property name="name"/>
+
+    </class>
+
+</hibernate-mapping>

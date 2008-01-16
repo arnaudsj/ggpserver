@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+          "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+          "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+    <class name  = "de.tu_dresden.inf.ggp06_2.gamedb.objects.MatchInformation" 
+    	   table = "MatchInformation" >
+
+        <id name="ident" type="int" unsaved-value="null" >
+            <column name="Match_IDENT" sql-type="int" not-null="true"/>
+            <generator class="increment"/>
+        </id>
+
+        <property name="matchId"/>
+        <property name="role"/>
+        
+		<list name="moves">
+			<key column="id"/>
+			<list-index column="sortOrder"/>
+			<element column="move" type="string"/>
+		</list>
+
+		<list name="states">
+			<key column="id"/>
+			<list-index column="sortOrder"/>
+			<element column="state" type="string"/>
+		</list>
+
+    </class>
+
+</hibernate-mapping>

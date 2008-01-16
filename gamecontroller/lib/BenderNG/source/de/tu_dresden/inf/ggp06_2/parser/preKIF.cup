@@ -1,0 +1,48 @@
+// CUP specification for a simple expression evaluator (w/ actions)
+
+import de.tu_dresden.inf.ggp06_2.resolver.*;
+
+/* Preliminaries to set up and use the scanner.  */
+/* init with {: preKIFScanner.init();              :};
+scan with {: return preKIFScanner.next_token(); :};
+*/
+
+/* Terminals (tokens returned by the scanner). */
+terminal           OPEN, CLOSE;
+terminal String    VARIABLE, CONSTANT, PREDICATE; 
+
+/* Non-terminals */
+non terminal ExpressionList expr_list, term_list;
+non terminal Expression     expr, term;
+
+/* The grammar */
+expr_list ::= expr_list:el expr:e
+			  {: RESULT = ExpressionList.addToList(el, e); :}
+	          | 
+              expr:e
+			  {: RESULT = ExpressionList.addToList(null, e); :}
+              ;
+
+expr      ::= OPEN PREDICATE:a term_list:tl CLOSE
+			  {: RESULT = new Predicate( new Atom(a), (ExpressionList) tl ); :}
+	          |
+	          OPEN PREDICATE:a CLOSE
+			  {: RESULT = new Predicate( new Atom(a), new ExpressionList() ); :}
+	          ;
+	          
+term_list ::= term_list:tl term:t
+			  {: RESULT = ExpressionList.addToList(tl, t); :} 
+			  |
+			  term:t
+			  {: RESULT = ExpressionList.addToList(null, t); :} 
+			  ;
+			  
+term      ::= VARIABLE:v
+			  {: RESULT = new Variable(v); :}
+			  |
+			  CONSTANT:a
+			  {: RESULT = new Atom(a); :} 
+			  |
+			  expr:e
+			  {: RESULT = e; :} 
+			  ;

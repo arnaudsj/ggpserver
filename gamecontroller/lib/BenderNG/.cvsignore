@@ -1,0 +1,11 @@
+.classpath
+.project
+dist
+build
+*.kif
+doc
+*.checkstyle
+*.texlipse
+JRatOutput
+knowledge
+BenderGame.db
