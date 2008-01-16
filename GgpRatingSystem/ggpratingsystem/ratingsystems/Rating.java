@@ -52,7 +52,11 @@ public class Rating implements Cloneable {
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
-		return new Rating(getPlayer(), getCurRating());
+	public Object clone() throws CloneNotSupportedException {		
+		try {
+			return (Rating) super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new InternalError();
+		}		
 	}
 }

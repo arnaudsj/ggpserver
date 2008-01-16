@@ -33,7 +33,6 @@ public class CommandLineInterface extends SimpleJSAP {
 	public static final String OPTION_DIRECT_SCORES = "direct-scores-rating";
 	
 	public static final String OPTION_CSV_OUTPUT = "csv-output";
-	public static final String OPTION_GNUPLOT_OUTPUT = "gnuplot-output";
 	
 	public static final String OPTION_DEBUG_LEVEL = "debug-level";
 	public static final String OPTION_HELP = "help";
@@ -116,17 +115,10 @@ public class CommandLineInterface extends SimpleJSAP {
     						NO_SHORTFLAG,
     						OPTION_CSV_OUTPUT,
     						"Enables CSV (comma separated values) output for all rating algorithms."),
-    	    						
-    				// --gnuplot-output
-    				new Switch(
-    						OPTION_GNUPLOT_OUTPUT,
-    						NO_SHORTFLAG,
-    						OPTION_GNUPLOT_OUTPUT,
-    						"Enables gnuplot output for all rating algorithms."),
 
-    				// --elo-output etc.
-            
-            /* Debug level */
+					/* ****************** ADD NEW OUTPUT METHODS HERE ****************** */
+
+    		/* Debug level */
             	// --debug-level, -d
                     new FlaggedOption(
                     		OPTION_DEBUG_LEVEL,
@@ -182,7 +174,6 @@ public class CommandLineInterface extends SimpleJSAP {
 			
 			boolean existsEnabledOutputAlgorithm = config.getBoolean(OPTION_CSV_OUTPUT);
 				/* ****************** ADD NEW OUTPUT METHODS HERE ****************** */
-				// TODO: gnuplot
 
 			if (!existsEnabledOutputAlgorithm) {
 				messagePrinted = true;
@@ -235,7 +226,10 @@ public class CommandLineInterface extends SimpleJSAP {
 		/* create output dir, if it does not exist */
 		File outputDir = jsap.getFile(OPTION_OUTPUT_DIR);
 		if (!outputDir.exists()) {
-			outputDir.mkdirs();
+			boolean success = outputDir.mkdirs();
+			if (!success) {
+				throw new IOException("Directory " + outputDir + " could not be created!");
+			}
 		}
 		
 		/* configure rating algorithms */
@@ -261,7 +255,6 @@ public class CommandLineInterface extends SimpleJSAP {
 			}
 		}
 		/* ****************** ADD NEW OUTPUT METHODS HERE ****************** */
-		// TODO gnuplot
 
 		configuration.run();
 	}

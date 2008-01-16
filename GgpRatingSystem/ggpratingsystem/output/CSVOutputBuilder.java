@@ -2,6 +2,7 @@ package ggpratingsystem.output;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Arrays;
 import java.util.List;
 
 import ggpratingsystem.MatchSet;
@@ -31,7 +32,7 @@ public class CSVOutputBuilder implements OutputBuilder {
 		this(writer, players);
 
 		/* initialize nextLine with the given initial scores */
-		nextLine = initialRatings;
+		nextLine = Arrays.copyOf(initialRatings, initialRatings.length) ;
 	}
 
 	private CSVOutputBuilder(Writer writer, List<Player> players) throws IOException {

@@ -29,6 +29,10 @@ public class LinearRegressionRating extends Rating {
 	
 	@Override
 	public Object clone() throws CloneNotSupportedException {
-		return new LinearRegressionRating(getPlayer(), getCurRating());
+		try {
+			return (LinearRegressionRating) super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new InternalError();
+		}		
 	}
 }
