@@ -1,6 +1,6 @@
 package ggpratingsystem;
 
-import ggpratingsystem.ratingsystems.AbstractRating;
+import ggpratingsystem.ratingsystems.Rating;
 import ggpratingsystem.ratingsystems.RatingFactory;
 import ggpratingsystem.ratingsystems.RatingSystemType;
 
@@ -21,7 +21,7 @@ public final class Player {
 	private static Map<String, Player> instances = new HashMap<String, Player>();
 
 	private final String name;
-	private Map<RatingSystemType, AbstractRating> ratings = new HashMap<RatingSystemType, AbstractRating>();
+	private Map<RatingSystemType, Rating> ratings = new HashMap<RatingSystemType, Rating>();
 	
 	private Player(String name) {
 		super();
@@ -45,8 +45,8 @@ public final class Player {
 		return name;
 	}
 
-	public AbstractRating getRating(RatingSystemType type) {
-		AbstractRating result = ratings.get(type);
+	public Rating getRating(RatingSystemType type) {
+		Rating result = ratings.get(type);
 		
 		if (result == null) {
 			result = RatingFactory.makeRating(type, this);

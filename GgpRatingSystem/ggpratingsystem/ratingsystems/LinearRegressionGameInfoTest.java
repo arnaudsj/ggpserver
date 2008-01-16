@@ -3,10 +3,13 @@ package ggpratingsystem.ratingsystems;
 import static ggpratingsystem.ratingsystems.RatingSystemType.DYNAMIC_LINEAR_REGRESSION;
 
 import ggpratingsystem.Game;
+import ggpratingsystem.FileMatchReader;
 import ggpratingsystem.MatchReader;
 import ggpratingsystem.MatchSet;
 import ggpratingsystem.Player;
+import ggpratingsystem.util.Util;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,7 +30,12 @@ public class LinearRegressionGameInfoTest extends TestCase {
 	
 	public LinearRegressionGameInfoTest() throws IOException {
 		super();
-		matchSets = MatchReader.readDataDir("2007_preliminaries");
+		MatchReader matchReader = new FileMatchReader(new File(Util.getDataDir(), "2007_preliminaries"));
+		
+		matchSets = new LinkedList<MatchSet>();
+		while (matchReader.hasNext()) {
+			matchSets.add(matchReader.readMatchSet());
+		}
 	}
 
 	@Override
@@ -107,6 +115,10 @@ public class LinearRegressionGameInfoTest extends TestCase {
 	 * LinearRegressionGameInfo.DEFAULT_EXPECTED_SCORE to all players
 	 */
 	public void testExpectedScoresUntrained() {
+		for (Player player : Player.getAllPlayers()) {
+			player.getRating(DYNAMIC_LINEAR_REGRESSION).reset();
+		}
+		
 		for (MatchSet matchSet : matchSets) {
 			testExpectedScoresUntrained(matchSet);
 		}
@@ -134,6 +146,10 @@ public class LinearRegressionGameInfoTest extends TestCase {
 	 * scores to all players
 	 */
 	public void testExpectedScoresTrainedOnce() {
+		for (Player player : Player.getAllPlayers()) {
+			player.getRating(DYNAMIC_LINEAR_REGRESSION).reset();
+		}
+		
 		for (MatchSet matchSet : matchSets) {
 			testExpectedScoresTrainedOnce(matchSet);
 		}
@@ -209,9 +225,9 @@ public class LinearRegressionGameInfoTest extends TestCase {
 		
 		gameInfo.updateGameInfo(matchSet);
 
-		Map<Player, Double> expectedScores = gameInfo.expectedScores(matchSet);
+		// call this so that the expected scores are logged
+		gameInfo.expectedScores(matchSet);
 		
-		System.out.println(expectedScores);
 		// TO DO: assertions; a little hard to really say anything sensible here
 	}
 }

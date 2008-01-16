@@ -23,6 +23,8 @@ public class GameInfoFactory {
 			result = new LinearRegressionGameInfo(CONSTANT_LINEAR_REGRESSION, game);
 			break;
 			
+//		case DIRECT_SCORES: direct scores does not need game info
+			
 		/* ****************** ADD NEW RATING SYSTEMS HERE ****************** */
 			
 		default:

@@ -5,9 +5,9 @@ public enum RatingSystemType {
 //	GLICKO,
 //	GLICKO_2,
 //	TRUE_SKILL,
-//	DIRECT,
 	CONSTANT_LINEAR_REGRESSION,
-	DYNAMIC_LINEAR_REGRESSION;
+	DYNAMIC_LINEAR_REGRESSION,
+	DIRECT_SCORES;
 	
 	/*
 	 * Whenever a new RatingSystemType is created, the following have to be
@@ -16,7 +16,7 @@ public enum RatingSystemType {
 	 * - a new class implementing RatingStrategy, defining how to update all Ratings and GameInfos for a match set
 	 * 
 	 * - if needed: 
-	 * 		- a new subclass of AbstractRating, defining how to update a single rating
+	 * 		- a new subclass of Rating, defining how to update a single rating
 	 * 		- a corresponding entry in RatingFactory
 	 * 
 	 * - if needed:

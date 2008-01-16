@@ -1,5 +1,7 @@
 package ggpratingsystem.ratingsystems;
 
+import static java.util.logging.Level.FINE;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,7 +90,6 @@ public class LinearRegressionGameInfo extends AbstractGameInfo {
 		}
 			
 		updateCoefficients(coefficients, newNumMatches);
-		// TODO: add some debug output and watch how the game info changes
 	}
 	
 	/**
@@ -108,18 +109,18 @@ public class LinearRegressionGameInfo extends AbstractGameInfo {
 		for (Match match : matchList) {
 			List<Player> players = match.getPlayers();
 			
+			/* extract ratings */
+			double[] ratings = new double[numPlayers];
+			for (int j = 0; j < numPlayers; j++) {
+				ratings[j] = players.get(j).getRating(ratingSystemType).getCurRating();
+			}
+			
 			for (int i = 0; i < numPlayers; i++) {
 				Player player = players.get(i);
 				
 				Double expectedScore = expectedScores.get(player);
 				if (expectedScore == null) {
 					expectedScore = 0.0;
-				}
-				
-				/* extract ratings */
-				double[] ratings = new double[numPlayers];
-				for (int j = 0; j < numPlayers; j++) {
-					ratings[j] = players.get(j).getRating(ratingSystemType).getCurRating();
 				}
 				
 				expectedScore += multiplyRatingsCoefficients(i, ratings);
@@ -325,6 +326,20 @@ public class LinearRegressionGameInfo extends AbstractGameInfo {
 		/* Everything seems to be okay, now we can perform the linear regression */		
 		Regression reg = new Regression(xdata, ydata);
 		reg.linear();
+		
+		/*
+		 * If the debug level at least "FINE", output some debug info, but only
+		 * the first time this function is called, not when it is called the
+		 * second time with zeroTargetCoeff == true.
+		 */
+		if (log.isLoggable(FINE) && !zeroTargetCoeff) {
+			String filename = "output_" + ratingSystemType + "_" + matches.toString() + "_role_" + targetRole + "_run_.txt";	// the number after "run_" will be written by reg.print()
+			filename = filename.toLowerCase();
+			log.fine("Writing regression debug output to file " + filename + ". " +
+					"If you don't want this, set the log level higher than FINE.");
+			reg.print(filename);
+		}
+
 		
 		double[] tempCoeff = reg.getCoeff();
 

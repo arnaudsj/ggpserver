@@ -4,18 +4,24 @@ import ggpratingsystem.Player;
 
 import java.util.logging.Logger;
 
-public abstract class AbstractRating implements Cloneable {
-	private static final Logger log = Logger.getLogger(AbstractRating.class.getName());
+public class Rating implements Cloneable {
+	private static final Logger log = Logger.getLogger(Rating.class.getName());
+	
+	static {
+		// inherit default level for package ggpratingsystem
+		log.setLevel(null);
+	}
+	
 	private static final double DEFAULT_RATING = 1000.0;
 	private double curRating;
 	private final Player player;
 	
-	public AbstractRating(Player player) {
+	public Rating(Player player) {
 		this.player = player;
 		setCurRating(DEFAULT_RATING);
 	}
 	
-	public AbstractRating(Player player, double initialRating) {
+	public Rating(Player player, double initialRating) {
 		this.player = player;
 		setCurRating(initialRating);
 	}
@@ -46,5 +52,7 @@ public abstract class AbstractRating implements Cloneable {
 	}
 
 	@Override
-	public abstract Object clone() throws CloneNotSupportedException;
+	public Object clone() throws CloneNotSupportedException {
+		return new Rating(getPlayer(), getCurRating());
+	}
 }

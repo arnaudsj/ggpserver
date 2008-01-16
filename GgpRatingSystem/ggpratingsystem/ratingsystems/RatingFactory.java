@@ -3,8 +3,8 @@ package ggpratingsystem.ratingsystems;
 import ggpratingsystem.Player;
 
 public class RatingFactory {
-	public static AbstractRating makeRating(RatingSystemType type, Player player) {
-		AbstractRating result;
+	public static Rating makeRating(RatingSystemType type, Player player) {
+		Rating result;
 		
 		switch (type) {
 		case DYNAMIC_LINEAR_REGRESSION:
@@ -15,10 +15,14 @@ public class RatingFactory {
 			result = new LinearRegressionRating(player);
 			break;
 			
+		case DIRECT_SCORES:
+			result = new Rating(player, 0.0);
+			break;
+			
 			/* ****************** ADD NEW RATING SYSTEMS HERE ****************** */
 			
 		default:
-			throw new IllegalArgumentException("unknown RatingSystemType!");
+			throw new IllegalArgumentException("unknown RatingSystemType: " + type);
 		}
 		
 		return result;

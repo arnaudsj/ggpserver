@@ -3,7 +3,7 @@ package ggpratingsystem.output;
 import java.io.IOException;
 
 import ggpratingsystem.MatchSet;
-import ggpratingsystem.ratingsystems.AbstractRating;
+import ggpratingsystem.ratingsystems.Rating;
 
 /**
  * Builds a leaderboard -- i.e., an output of the development of the players'
@@ -46,13 +46,13 @@ public interface OutputBuilder {
 	 *   
 	 * @param rating
 	 */
-	public abstract void ratingUpdate(AbstractRating rating);
+	public abstract void ratingUpdate(Rating rating);
 
 	/**
 	 * Finishes output of this Builder. Calling any more methods after this
 	 * has been called is illegal.
 	 * @throws IOException 
 	 */
-	public abstract void finish() throws IOException;	// TODO: remove throws in whole call hierarchy
+	public abstract void finish();
 
 }

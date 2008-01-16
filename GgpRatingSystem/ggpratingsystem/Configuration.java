@@ -37,6 +37,7 @@ import java.util.Set;
 public class Configuration {
 	private Map<RatingSystemType, List<OutputBuilder>> outputBuilders = new HashMap<RatingSystemType, List<OutputBuilder>>();	
 	private Map<RatingSystemType, RatingStrategy> ratingSystems = new HashMap<RatingSystemType, RatingStrategy>();
+	private MatchReader matchReader;
 
 	public void addRatingSystem(RatingStrategy ratingSystem) {
 		ratingSystems.put(ratingSystem.getType(), ratingSystem);
@@ -64,42 +65,43 @@ public class Configuration {
 		return ratingSystems.keySet();
 	}
 
-	/**
-	 * @param matchSet
-	 */
-	public void processMatchSet(MatchSet matchSet) {
-		for (RatingStrategy ratingSystem : ratingSystems.values()) {
-			ratingSystem.update(matchSet);
-			RatingSystemType type = ratingSystem.getType(); 
-
-			List<OutputBuilder> builders = outputBuilders.get(type);
-
-			for (OutputBuilder builder : builders) {
-				builder.beginMatchSet(matchSet);
-			}
-			
-			List<Match> matchList = matchSet.getMatches();
-			for (Match match : matchList) {
-				List<Player> playersInMatch = match.getPlayers();
+	public void run() {
+		if (matchReader == null) {
+			throw new IllegalStateException("setMatchReader() must be called before calling run()!");
+		}
+		
+		while (matchReader.hasNext()) {
+			MatchSet matchSet = matchReader.readMatchSet();
+			for (RatingStrategy ratingSystem : ratingSystems.values()) {
+				ratingSystem.update(matchSet);
+				RatingSystemType type = ratingSystem.getType(); 
+	
+				List<OutputBuilder> builders = outputBuilders.get(type);
+	
+				for (OutputBuilder builder : builders) {
+					builder.beginMatchSet(matchSet);
+				}
 				
-				for (Player player : playersInMatch) {
-					for (OutputBuilder builder : builders) {
-						builder.ratingUpdate(player.getRating(type));
+				List<Match> matchList = matchSet.getMatches();
+				for (Match match : matchList) {
+					List<Player> playersInMatch = match.getPlayers();
+					
+					for (Player player : playersInMatch) {
+						for (OutputBuilder builder : builders) {
+							builder.ratingUpdate(player.getRating(type));
+						}
 					}
 				}
-			}
-			
-			for (OutputBuilder builder : builders) {
-				builder.endMatchSet(matchSet);
+				
+				for (OutputBuilder builder : builders) {
+					builder.endMatchSet(matchSet);
+				}
 			}
 		}
+		closeOutputBuilders();
 	}
 
-	/**
-	 * Has to be called after processing the last MatchSet
-	 * @throws IOException
-	 */
-	public void closeOutputBuilders() throws IOException {
+	public void closeOutputBuilders() {
 		for (List<OutputBuilder> builders : outputBuilders.values()) {
 			for (OutputBuilder builder : builders) {
 				builder.finish();
@@ -123,5 +125,9 @@ public class Configuration {
 				new CachingCSVOutputBuilder(writer, type));
 		
 		addOutputBuilder(type, outputBuilder);
+	}
+
+	public void setMatchReader(MatchReader matchReader) {
+		this.matchReader = matchReader;
 	}
 }

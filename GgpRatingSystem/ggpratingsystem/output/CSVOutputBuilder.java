@@ -6,7 +6,7 @@ import java.util.List;
 
 import ggpratingsystem.MatchSet;
 import ggpratingsystem.Player;
-import ggpratingsystem.ratingsystems.AbstractRating;
+import ggpratingsystem.ratingsystems.Rating;
 import ggpratingsystem.ratingsystems.RatingSystemType;
 
 public class CSVOutputBuilder implements OutputBuilder {
@@ -60,7 +60,7 @@ public class CSVOutputBuilder implements OutputBuilder {
 
 	}
 
-	public void ratingUpdate(AbstractRating rating) {
+	public void ratingUpdate(Rating rating) {
 		/* update the player's rating */
 		int position = players.indexOf(rating.getPlayer());
 		nextLine[position] = rating.getCurRating(); 

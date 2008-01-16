@@ -11,7 +11,7 @@ public class RatingFactoryTest extends TestCase {
 		RatingSystemType[] types = RatingSystemType.values();
 		
 		for (RatingSystemType type : types) {
-			AbstractRating rating = RatingFactory.makeRating(type, player);
+			Rating rating = RatingFactory.makeRating(type, player);
 			assertNotNull(rating);
 		}
 	}

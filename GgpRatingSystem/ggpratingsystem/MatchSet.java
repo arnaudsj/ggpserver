@@ -73,15 +73,16 @@ public class MatchSet {
 
 	@Override
 	public String toString() {
-		String result = "";
-		result += getId() + ";";
-		result += getGame().toString() + ";";
-		result += getYear() + ";";
-		result += getRound() + ";";
-		result += getDay() + ";";
-		result += getMatchSetNumber() + ";";
-		result += getMatches();
-		return result;
+//		String result = "";
+//		result += getId() + ";";
+//		result += getGame().toString() + ";";
+//		result += getYear() + ";";
+//		result += getRound() + ";";
+//		result += getDay() + ";";
+//		result += getMatchSetNumber() + ";";
+//		result += getMatches();
+//		return result;
+		return getId();
 	}
 
 	/**

@@ -18,6 +18,11 @@ import java.util.logging.Logger;
 public class DynamicLinearRegressionStrategy extends AbstractLinearRegressionStrategy {
 	private static final Logger log = Logger.getLogger(DynamicLinearRegressionStrategy.class.getName());
 	
+	static {
+		// inherit default level for package ggpratingsystem
+		log.setLevel(null);
+	}
+	
 	/*
 	 * This constant multiplicative factor should not have too much of an
 	 * influence on the relative outcomes. Its primary purpose is to scale the

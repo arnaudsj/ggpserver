@@ -2,7 +2,7 @@ package ggpratingsystem.ratingsystems;
 
 import ggpratingsystem.Player;
 
-public class LinearRegressionRating extends AbstractRating {
+public class LinearRegressionRating extends Rating {
 	public LinearRegressionRating(Player player) {
 		super(player);
 	}

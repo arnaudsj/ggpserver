@@ -20,6 +20,7 @@ public class GgpRatingSystemTest extends TestCase {
 			+ " --output-dir " + "/tmp/ggp-rating-system/"
 			+ " --dynamic-linear-regression-rating 60" 	// (60 is a good number here, because we have 44 MatchSets and 60 > 44)
 			+ " --constant-linear-regression-rating 1.0"
+			+ " --direct-scores-rating"
 			+ " --csv-output"
 			+ " --debug-level ALL";
 		String[] args = CommandLineTokenizer.tokenize(cmdLine);

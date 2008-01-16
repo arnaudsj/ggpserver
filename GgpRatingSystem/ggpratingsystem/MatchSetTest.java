@@ -1,6 +1,10 @@
 package ggpratingsystem;
 
+import ggpratingsystem.util.Util;
+
+import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -15,7 +19,14 @@ public class MatchSetTest extends TestCase {
 	
 	public MatchSetTest() throws IOException {
 		super();
-		matchSets = MatchReader.readDataDir("2007_preliminaries");
+		MatchReader matchReader = new FileMatchReader(new File(Util.getDataDir(), "2007_preliminaries"));
+
+		matchSets = new LinkedList<MatchSet>();
+		for (int i = 0; i < 9; i++) {	// intentionally not reading all MatchSets here, are not needed
+			assert(matchReader.hasNext());
+			matchSets.add(matchReader.readMatchSet());
+		}
+
 		blocksworld = matchSets.get(0);	
 		tictactoe = matchSets.get(5);
 		chinesecheckers4p = matchSets.get(8); 

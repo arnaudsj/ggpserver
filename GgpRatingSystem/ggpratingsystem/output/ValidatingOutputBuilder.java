@@ -1,9 +1,7 @@
 package ggpratingsystem.output;
 
-import java.io.IOException;
-
 import ggpratingsystem.MatchSet;
-import ggpratingsystem.ratingsystems.AbstractRating;
+import ggpratingsystem.ratingsystems.Rating;
 
 /**
  * Implementation of OutputBuilder which validates the constraints on the method call order.
@@ -61,7 +59,7 @@ public class ValidatingOutputBuilder implements OutputBuilder {
 	/* (non-Javadoc)
 	 * @see ggpratingsystem.output.OutputBuilder#ratingUpdate(ggpratingsystem.AbstractRating)
 	 */
-	public void ratingUpdate(AbstractRating rating) {
+	public void ratingUpdate(Rating rating) {
 		if (finished) {
 			throw new IllegalStateException("finished() has been called before!");
 		}
@@ -75,7 +73,7 @@ public class ValidatingOutputBuilder implements OutputBuilder {
 	/* (non-Javadoc)
 	 * @see ggpratingsystem.output.OutputBuilder#finish()
 	 */
-	public void finish() throws IOException {
+	public void finish() {
 		if (currentMatchSet != null) {
 			throw new IllegalStateException("finish() was called before calling endMatchSet()!");
 		}

@@ -2,12 +2,12 @@ package ggpratingsystem;
 
 
 import ggpratingsystem.ratingsystems.ConstantLinearRegressionStrategy;
+import ggpratingsystem.ratingsystems.DirectScoresStrategy;
 import ggpratingsystem.ratingsystems.DynamicLinearRegressionStrategy;
 import ggpratingsystem.ratingsystems.RatingSystemType;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,10 +27,14 @@ public class CommandLineInterface extends SimpleJSAP {
 	public static final String APPLICATION_CALL = "java -jar ggp_rating_system.jar";
 	public static final String OPTION_INPUT_DIR = "input-dir";
 	public static final String OPTION_OUTPUT_DIR = "output-dir";
+	
 	public static final String OPTION_DYNAMIC_LINEAR_REGRESSION = "dynamic-linear-regression-rating";
 	public static final String OPTION_CONSTANT_LINEAR_REGRESSION = "constant-linear-regression-rating";
+	public static final String OPTION_DIRECT_SCORES = "direct-scores-rating";
+	
 	public static final String OPTION_CSV_OUTPUT = "csv-output";
 	public static final String OPTION_GNUPLOT_OUTPUT = "gnuplot-output";
+	
 	public static final String OPTION_DEBUG_LEVEL = "debug-level";
 	public static final String OPTION_HELP = "help";
 	
@@ -71,10 +75,6 @@ public class CommandLineInterface extends SimpleJSAP {
     						OPTION_OUTPUT_DIR,
     						"The directory to write output files to."),
     				
-    				// TODO: stdout-output; only valid if there is exactly one enabled rating algorithm
-    				// and exactly one enabled output (and the output supports writing to a file,
-    				// which is not the case for any Swing based GUI output, for example).
-                    
             /* Rating algorithm selection */                    
             		// --dynamic-linear-regression-rating
     				new FlaggedOption(
@@ -89,11 +89,6 @@ public class CommandLineInterface extends SimpleJSAP {
     						"MatchSets that will be read."),
     						
     				// --constant-linear-regression-rating
-//    				new Switch(
-//    						OPTION_CONSTANT_LINEAR_REGRESSION,
-//    						NO_SHORTFLAG,
-//    						OPTION_CONSTANT_LINEAR_REGRESSION,
-//    						"Enables the linear regression rating algorithm, using a constant learning rate."),
     				new FlaggedOption(
     						OPTION_CONSTANT_LINEAR_REGRESSION,
     						DOUBLE_PARSER,
@@ -103,8 +98,14 @@ public class CommandLineInterface extends SimpleJSAP {
     						OPTION_CONSTANT_LINEAR_REGRESSION,
     						"Enables the linear regression rating algorithm, using a constant learning rate. " +
     						"Expects a double value specifying the learning rate to be used (e.g. 1.0)."),
-                    	
-            		// TODO --direct-scores
+                    
+    				// --direct-scores-rating
+    				new Switch(
+    						OPTION_DIRECT_SCORES,
+    						NO_SHORTFLAG,
+    						OPTION_DIRECT_SCORES,
+    						"Enables the direct scores rating algorithm. This is not really a rating algorithm, " +
+    						"but rather sums up the scores received by the players."),
 
 					/* ****************** ADD NEW RATING SYSTEMS HERE ****************** */
             		
@@ -168,7 +169,8 @@ public class CommandLineInterface extends SimpleJSAP {
 			
 			boolean existsEnabledRatingAlgorithm = 
 				config.contains(OPTION_DYNAMIC_LINEAR_REGRESSION)
-				&& config.contains(OPTION_CONSTANT_LINEAR_REGRESSION);
+				|| config.contains(OPTION_CONSTANT_LINEAR_REGRESSION)
+				|| config.getBoolean(OPTION_DIRECT_SCORES);
 				/* ****************** ADD NEW RATING SYSTEMS HERE ****************** */
 			
 			if (!existsEnabledRatingAlgorithm) {
@@ -218,6 +220,7 @@ public class CommandLineInterface extends SimpleJSAP {
         //////////////////////////////////////////////////////		
 		//             now configure everything             //
         //////////////////////////////////////////////////////		
+		Configuration configuration = new Configuration();
 		
 		/* configure debug level */
 		String debugLevel = jsap.getString(OPTION_DEBUG_LEVEL).toUpperCase();
@@ -225,8 +228,10 @@ public class CommandLineInterface extends SimpleJSAP {
 		Logger.getLogger("ggpratingsystem").setLevel(level);
         
 		/* configure input dir */
-		List<MatchSet> matchSets = MatchReader.readMatches(jsap.getFile(OPTION_INPUT_DIR));
-
+//		List<MatchSet> matchSets = MatchReader.readMatches(jsap.getFile(OPTION_INPUT_DIR));
+		MatchReader matchReader = new FileMatchReader(jsap.getFile(OPTION_INPUT_DIR));
+		configuration.setMatchReader(matchReader);
+		
 		/* create output dir, if it does not exist */
 		File outputDir = jsap.getFile(OPTION_OUTPUT_DIR);
 		if (!outputDir.exists()) {
@@ -234,8 +239,6 @@ public class CommandLineInterface extends SimpleJSAP {
 		}
 		
 		/* configure rating algorithms */
-		Configuration configuration = new Configuration();
-
 		if (jsap.contains(OPTION_DYNAMIC_LINEAR_REGRESSION)) {
 			int maxMatchSets = jsap.getInt(OPTION_DYNAMIC_LINEAR_REGRESSION);
 			configuration.addRatingSystem(new DynamicLinearRegressionStrategy(maxMatchSets));
@@ -244,7 +247,9 @@ public class CommandLineInterface extends SimpleJSAP {
 			double learningRate = jsap.getDouble(OPTION_CONSTANT_LINEAR_REGRESSION);
 			configuration.addRatingSystem(new ConstantLinearRegressionStrategy(learningRate));
 		}
-		
+		if (jsap.getBoolean(OPTION_DIRECT_SCORES)) {
+			configuration.addRatingSystem(new DirectScoresStrategy());
+		}
 		/* ****************** ADD NEW RATING SYSTEMS HERE ****************** */
 		
 		/* configure output methods */
@@ -258,12 +263,6 @@ public class CommandLineInterface extends SimpleJSAP {
 		/* ****************** ADD NEW OUTPUT METHODS HERE ****************** */
 		// TODO gnuplot
 
-		// TODO: pass the matchReader instead
-		for (MatchSet matchSet : matchSets) {
-			configuration.processMatchSet(matchSet);
-		}
-		
-		configuration.closeOutputBuilders();
+		configuration.run();
 	}
-
 }
