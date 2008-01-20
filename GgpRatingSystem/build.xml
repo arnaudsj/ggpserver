@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project name="GgpRatingSystem" basedir="." default="main">
+
+    <property name="src.dir"       value="src"/>
+    <property name="lib.dir"       value="lib"/>
+    <property name="data.dir"      value="data"/>
+    <property name="build.dir"     value="build"/>
+    <property name="install.dir"   value="install"/>
+    <property name="resources.dir" value="resources"/>
+    <property name="classes.dir"   value="${build.dir}/classes"/>
+    <property name="jar.dir"       value="${build.dir}/jar"/>
+    <property name="javadoc.dir"   value="${build.dir}/javadoc"/>
+    <property name="report.dir"    value="${build.dir}/junitreport"/>
+    <property name="output.dir"    value="${build.dir}/app-output"/>
+
+    <property name="main-class"  value="ggpratingsystem.GgpRatingSystem"/>
+
+    <path id="classpath">
+	<path location="${jar.dir}/${ant.project.name}.jar"/>
+	<fileset dir="${lib.dir}" includes="**/*.jar"/>
+	<path location="${java.home}/junit.jar"/>
+	<path location="${java.home}/xml-apis.jar"/>
+    </path>
+    
+    <path id="install_classpath">
+	    <path location="${install.dir}/${ant.project.name}.jar"/>
+	    <fileset dir="${install.dir}/${lib.dir}" includes="**/*.jar"/>
+	    <path location="${java.home}/junit.jar"/>
+	    <path location="${java.home}/xml-apis.jar"/>
+    </path>
+    
+    <target name="clean" description="Removes the result of the last build.">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <target name="compile" description="Compiles all *.class files.">
+        <mkdir dir="${classes.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath"/>
+        <copy todir="${classes.dir}">
+            <fileset dir="${src.dir}" excludes="**/*.java"/>
+        </copy>
+    </target>
+
+    <target name="jar" depends="compile" description="Builds the jar file.">
+        <mkdir dir="${jar.dir}"/>
+        <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="${main-class}"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="run" depends="jar" description="Runs the application with some standard options.">
+        <java fork="true" classname="${main-class}">
+            <classpath>
+		    <path refid="classpath"/>
+            </classpath>
+	    <arg value="--input-dir"/> <arg path="${data.dir}/2007_preliminaries"/>
+	    <arg value="--output-dir"/> <arg path="${output.dir}"/>
+	    <arg value="--dynamic-linear-regression-rating"/> <arg value="60"/>
+	    <arg value="--constant-linear-regression-rating"/> <arg value="1.0"/>
+	    <arg value="--direct-scores-rating"/>
+	    <arg value="--debug-level"/> <arg value="WARNING"/>
+	    <arg value="--csv-output"/>
+        </java>
+    </target>
+
+    <target name="junit" depends="jar" description="Executes all JUnit tests.">
+        <mkdir dir="${report.dir}"/>
+        <junit printsummary="yes">
+            <classpath>
+                <path refid="classpath"/>
+            </classpath>
+            
+            <formatter type="xml"/>
+            
+            <batchtest fork="yes" todir="${report.dir}">
+                <fileset dir="${src.dir}" includes="**/*Test.java"/>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="junitreport" depends="junit" description="Executes all JUnit tests and creates an HTML report.">
+        <junitreport todir="${report.dir}">
+            <fileset dir="${report.dir}" includes="TEST-*.xml"/>
+            <report todir="${report.dir}"/>
+        </junitreport>
+    </target>
+
+    <target name="javadoc" depends="jar" description="Builds the Javadoc documentation for GgpRatingSystem.">
+	    <javadoc sourcepath="${src.dir}" destdir="${javadoc.dir}" classpathref="classpath"/>
+    </target>
+    
+    <target name="clean-build" depends="clean,jar" description="Creates a jar from scratch."/>
+
+    <target name="main" depends="clean,jar,javadoc" description="Builds the application and javadoc."/>
+
+    <target name="install" depends="jar" description="Installs all necessary files to run the program into the installation directory.">
+	    <mkdir dir="${install.dir}"/>
+	    <copy file="${jar.dir}/${ant.project.name}.jar" 
+todir="${install.dir}"/>
+	    <copy todir="${install.dir}/lib">
+		    <fileset dir="${lib.dir}" includes="*.jar"/>
+	    </copy>
+	    
+	    <pathconvert targetos="unix" property="install_classpath.unix" refid="install_classpath"/>
+
+	    <echo file="${install.dir}/ggp_rating_system.sh" append="false">#!/bin/sh
+java -cp "${install_classpath.unix}" ${main-class} $$*
+	    </echo>	    
+	    <chmod perm="ugo+x">
+		    <fileset dir="${install.dir}" includes="*.sh"/>
+	    </chmod>
+	<echo>
+	
+	
+	Now run the application by typing, for example:
+	   install/ggp_rating_system.sh -i data/2007_preliminaries/ -o /tmp
+	            --dynamic-linear-regression-rating 60 --csv-output
+		
+	You can get help by typing 
+	   install/ggp_rating_system.sh --help
+	</echo>
+    </target>
+</project>

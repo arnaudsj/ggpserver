@@ -1,0 +1,54 @@
+%======================================================================
+%	user.sty
+%======================================================================
+%	$Id: user.sty,v 1.1 2008-01-20 19:26:41 s3882841 Exp $
+%	Matthias Kupfer
+%======================================================================
+
+%%======================================================================
+%%		epsinc (graphicx): eps-Bilder einfuegen
+%%		\epsinc{bild.eps}{scale=1}{Bildunterschrift}
+%%======================================================================
+\newcommand{\epsinc}[3]{
+	\begin{figure}[hbt]
+		\begin{center}
+			\vspace{3ex}
+			%\includegraphics[width=#2]{#1}
+			\includegraphics[#2]{#1}
+			\caption{\label{#1}\small#3}
+		\end{center}
+	\end{figure}
+}	
+
+%%======================================================================
+%%		missing: eine Randnote fuer fehlende Teile
+%%		\missing{Beweis fehlt noch}
+%%======================================================================
+\newcommand{\missing}[1]{\textcolor{red}{(\marginpar[\hfill\huge\bf$\longrightarrow$ Hier fehlt was!]{\huge\bf$\longleftarrow$ Hier fehlt was!}#1)}}
+
+%%======================================================================
+%%		comment: Kommentar und einer farbigen Box
+%%		\comment{Ein Kommentar}
+%%======================================================================
+%\definecolor{commentcolor}{rgb}{0.38, 0.80, 1.0}
+\definecolor{commentcolor}{rgb}{1.0, 0.95, 0.65}
+\definecolor{commentborder}{rgb}{1.0, 0.85, 0.55}
+\setlength{\fboxrule}{1.5mm}
+%\newcommand{\comment}[1]{\begin{center}\colorbox{commentcolor}{\parbox[]{\textwidth-4em}{#1}}\end{center}
+\newcommand{\comment}[1]{\begin{center}\fcolorbox{commentborder}{commentcolor}{\parbox[][][c]{\textwidth-4em}{#1}}\end{center}}
+%\newcommand{\comment}[1]{\begin{center}\shadowbox{\parbox[][][c]{\textwidth-4em}{#1}}\end{center}
+
+
+%%======================================================================
+%%
+%%
+%%======================================================================
+%\newcommand*{\clearemptydoublepage}{%
+%	\clearpage
+%	\begingroup
+%		\pagestyle{plain}	% mit Seitenzahl 
+%		%\pagestyle{empty}	% ohne Seitenzahl
+%		\cleardoublepage
+%	\endgroup
+%}
+

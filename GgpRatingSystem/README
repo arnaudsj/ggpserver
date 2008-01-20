@@ -1,0 +1,16 @@
+GgpRatingSystem requires Java 1.6 to run 
+and Apache Ant to build.
+
+You can get a list of available build targets
+by executing "ant -projecthelp" in the same 
+directory as the file build.xml.
+
+
+How to build:
+- ant install
+
+How to generate developer documentation:
+- ant javadoc
+
+How to run:
+- install/ggp_rating_system.sh
