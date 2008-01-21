@@ -1,2 +1,3 @@
-output_*.txt
+bin
+build
 install
