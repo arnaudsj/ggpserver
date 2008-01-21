@@ -88,12 +88,14 @@
 							%
 %	lscape,			% Erstellt eine um 90% gedrehte *neue* Seite
 %	textcomp,		% Sonderzeichen
-	booktabs,		% Tabellenlinien
-	longtable,			% Tabellen > 1 Seite
+%	booktabs,		% Tabellenlinien
+%	longtable,			% Tabellen > 1 Seite
 %	supertabular,		% Tabellen > 1 Seite
 %	tabularx,		% The tabularx package defines a tabular environment that generates a table with a specified width. The package automatically adjusts the widths of certain columns rather than adding space between columns. 
 %	ltxtable,		% tabularx + longtable
 %	multicol,		% mehrspaltige Zeilen
+	multirow,		% mehrzeilige Spalten
+	array,
 	varioref,		% intelligent page references (``see figure 5 on page 7'', ``see figure 3.2 on the facing page''...)
 %	endnotes,		% Fussnoten -> Endnoten
 %	rotating,		% sidewaystable und sidewaysfigure
@@ -132,7 +134,7 @@
 	\usepackage[
 		pdftex=true, 						% pdftex output 
 		breaklinks=true, 				% it's ok to introduce a linebreak into links (may break some older viewers)
-		pdfpagelabels=true, 		% name pages, e.g. ``ii (4 of 40)'', to fix ``pdfTeX warning (ext4)'' problem
+		pdfpagelabels=true, 		% name pages, e.g.\ ``ii (4 of 40)'', to fix ``pdfTeX warning (ext4)'' problem
 		plainpages=false,				% use named pages as page labels, to fix ``pdfTeX warning (ext4)'' problem
 %		colorlinks=true,				% Achtung! Farbige Links werden mitgedruckt, farbige Rahmen nicht!
 		linkcolor=darkblue,
@@ -230,45 +232,47 @@
 \maketitle
 
 \begin{abstract}
-This document describes the theoretical backgrounds and the practical issues of the current
-implementation of the GGP rating system.
+This document describes the current implementation of the GGP rating system.
 \end{abstract}
 
-\section{Background of the Linear Regression Rating}
-
-\subsection{Data structures}
+\section{Data structures}
 First, some words on the used data structures (ref.\ table~\ref{tab:data_structures}).
 The data structures used for player, game and match have the intuitive meaning, but there
 is a new data structure called ``match set''. A match set simply is a collection of matches,
 all played in the same year, round and day of a competition, and all on the same game.
 All past competitions have featured such match sets, and explicit handling of match sets
-will be needed later.
+makes it possible to process all matches of such a match set in one batch.
 
-Another unusual entry is the  ``coefficients'' property of a game. This will be explained in section % \ref{TODO}
-. For now, it suffices to think of it as the information that the linear regression rating stores about a game.
+Another unusual entry is the  ``coefficients'' property of a game, which will be explained in section~\ref{sec:updating_game_information}. For now, it suffices to think of it as the information that the linear regression rating stores about a game.
 
 \begin{table}
 \begin{center}
-% use packages: array,booktabs,longtable
-\begin{longtable}{l p{2.8cm} p{6cm}}
-player & rating & a single number reflecting the player's current rating (e.g. $1000.0$) \\ 
-game & name & the game name (e.g. chess) \\ 
- & roles & the roles of the game (e.g. black, white) \\ 
- & coefficients &  \\ % TODO
-match & match ID & the ID of the match (e.g. Match.3390056123) \\ 
- & players & the players involved in the match \textit{($\rightarrow$ player)} \\ 
- & scores & the scores ($0 \dotsc 100$) achieved by the players\\ 
- & match set & the match set that this match is part of \textit{($\rightarrow$ match set)} \\ 
-match set & match ID & the ID of this match set (e.g. MatchSet.385572910) \\ 
- & year, round, day, match set number & self-explanatory (e.g. 2007, 3, 2, 10) \\ 
- & game & the played game (by definition, this is identical for all played matches of a match set) \textit{($\rightarrow$ game)}
-\end{longtable}
+\begin{tabular}{l m{2.8cm} m{6cm}}
+\hline
+\textbf{class} & \textbf{property} & \textbf{description} \\
+\hline
+player & rating & a single number reflecting the player's current rating (e.g.\ $1000.0$) \\ 
+\hline
+\multirow{3}{*}{game} & name & the game name (e.g.\ chess) \\ 
+ & roles & the roles of the game (e.g.\ black, white) \\ 
+ & coefficients &  linear-regression-specific game info \\
+\hline
+\multirow{7}{*}{match} & match ID & the ID of the match (e.g.\ Match.3390056123) \\ 
+ & players & the participants of the match \textit{($\rightarrow$~player)} \\ 
+ & scores & the scores ($0 \dotsc 100$) achieved by each player\\ 
+ & match set & the match set that this match is part of \textit{($\rightarrow$~match set)} \\ 
+\hline
+\multirow{6}{*}{match set} & match ID & the ID of this match set (e.g.\ MatchSet.385572910) \\ 
+ & year, round, day, match set number & self-explanatory (e.g.\ 2007, 3, 2, 10) \\ 
+ & game & the played game (by definition, this is identical for all played matches of a match set) \textit{($\rightarrow$~game)} \\
+\hline
+\end{tabular}
 \end{center}
 \caption{Data structures}
 \label{tab:data_structures}
 \end{table} 
 
-\subsection{Linear regression rating}
+\section{Linear regression rating}
 
 The central idea of linear regression rating is summarized in an email by Jim Clune:
 \begin{quotation}
@@ -304,49 +308,52 @@ difference between the actual outcome and the expected outcome.
 - Jim
 \end{quotation}
 
-The following subsections will show how to update the game information (the game-specific coefficients $c_0, c_1, c_2, c_3$; section~\ref{sec:updating_game_information}), how to calculate the expected scores of a player (section~\ref{sec:calculating_expected_scores}) and how to update the player ratings (section~\ref{sec:updating_player_ratings}).
+The following sections will show how to update the game-specific coefficients $c_0, c_1, c_2, c_3$ (section~\ref{sec:updating_game_information}), how to calculate the expected scores of a player (section~\ref{sec:calculating_expected_scores}) and how to update the player ratings (section~\ref{sec:updating_player_ratings}).
 
-\subsubsection{Updating the game information}
+\subsection{Updating the game information}
 \label{sec:updating_game_information}
 
-As stated above, linear regression rating assumes that the expected score of a player playing role $target\_role$ can be approximated by a linear function of the  form:
+The linear regression rating algorithm keeps so-called ``game information'' about each played game. This game information is just a matrix of linear regression coefficients and reflects the relationship between the role a player plays, the ratings of all players in the game and the expected score of the player in a certain game.
 
-\[expected\_score(target\_role) = coeff(target\_role, 0) + coeff(target\_role, 1) * score(1) + \dotsb + coeff(target\_role, n) * score(n)\]
+As stated above, linear regression rating assumes that the expected score of a player playing role $target\_role$ can be approximated by a linear function of the form:
+\begin{equation}
+	E[s(r_1, m)] = c_0 + c_1*q(p(r_1, m)) + c_2*q(p(r_2, m)) + c_3*q(p(r_3, m)) 
+	\label{eqn:expected_performance}
+\end{equation} 
 
-where $n = $ % TODO
+The coefficients $c_0, \dotsc, c_3$ are updated immediately after each played match set for the whole batch of matches. (The coefficients are different for each role, so the game information for a 3-player game such as this would consist of $3 * 4 = 12$ coefficients.)
 
-- requirement that the coefficient associated
-with the role's rating be non-negative, but there would be no
-constraints on $c_0$, $c_2$, and $c_3$.
+If, in a given match set, players with a high rating scored worse (on average) than players with a high rating, the coefficient associated with the target role ($c_1$ in the example above) can become negative. If this is the case, the linear regression is repeated without the target role, and the target role's coefficient is set to zero. There are no constraints on the other coefficients.
 
-\subsubsection{Calculating the expected scores}
+If there are already known coefficients from former matches, the weighted average of the old and new coefficients is stored.
+
+\subsection{Calculating the expected scores}
 \label{sec:calculating_expected_scores}
-- Btw, the application of the "expected performance formula" may yield a
-value <0 or >100 for some player, in which case the actual expected
-value should of course be set to 0 or 100, respectively--in order not to
-raise the rating of a player who made 0, and to lower the rating of a
-player who made 100.)
+In the next step, the expected score of each player is calculated using formula~\ref{eqn:expected_performance}. If the calculated value is less than 0 or greater than 100, the actual expected value is set to 0 or 100, respectively. After that, the total expected scores of each player are calculated by summing up the player's expected scores in all matches that the player played in that match set, so that the total expected score can exceed 100.
 
-\subsubsection{Updating the player ratings}
+
+\subsection{Updating the player ratings}
 \label{sec:updating_player_ratings}
 
-- Learning rate (=factor by which the difference between expected
-and actual outcome is to be multiplied)
+In a third step, the player rankings are updated according to the following formula:
 
-- when do we update? (after each match (not good, because order of matches in a matchset shouldn't matter!), after each matchset, at the end of every round, or just at the very end)?
+\begin{equation}
+ q'(p) \leftarrow q(p) + l * (a(p) - e(p))
+\end{equation} 
 
-- how to initialize ratings prior to the first rated tournament and also how to initialize ratings of new players once a community of rated players is established?
+where $q(p)$ and $q'(p)$ are the current and updated rating of player $p$, $l$ is the learning rate (cf.\ section~\ref{sec:constant_dynamic}), $a(p)$ is the actual and $e(p)$ the expected score. Update also takes place after each completed match set, so the player ratings are adjusted as quick as possible in order to provide more accurate information to the next game information updating step.
 
-- constant / dynamic learning rate
+On a side remark, the player's ratings are initialized with a constant value ($1000$, at the moment).
 
 
+\subsection{Constant vs.\ dynamic learning rate}
+\label{sec:constant_dynamic}
 
-\begin{figure}
- \centering
- \includegraphics[width=\textwidth]{direct_scores}
- \caption{Direct scores (Competition 2007 Preliminaries; using round weights 0.25, 0.5, 0.5 and 1.0)}
- \label{fig:direct_scores}
-\end{figure}
+The choice of the learning rate has a big impact on the actual results of the algorithm. If the learning rate is too large, the player ratings become erratic and don't converge. If the learning rate is too small, convergation takes too long. One solution is to use a dynamic learning rate: starting off with a high learning rate and reducing it over time.
+
+\section{Results}
+
+The results for one run of both algorithms are shown in figures \ref{fig:constant_linear_regression} and \ref{fig:dynamic_linear_regression}. Figure~\ref{fig:direct_scores} shows the actual scores for comparison.
 
 \begin{figure}
  \centering
@@ -362,8 +369,11 @@ and actual outcome is to be multiplied)
  \label{fig:dynamic_linear_regression}
 \end{figure}
 
-\section{Installing GgpRatingSystem}
-
-\section{Running GgpRatingSystem}
+\begin{figure}
+ \centering
+ \includegraphics[width=\textwidth]{direct_scores}
+ \caption{Direct scores (Competition 2007 Preliminaries; using round weights 0.25, 0.5, 0.5 and 1.0)}
+ \label{fig:direct_scores}
+\end{figure}
 
 \end{document}

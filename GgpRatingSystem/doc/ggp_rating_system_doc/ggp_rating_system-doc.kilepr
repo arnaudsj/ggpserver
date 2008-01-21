@@ -25,10 +25,10 @@ open=false
 
 [item:ggp_rating_system-doc.tex]
 archive=true
-column=16
+column=0
 encoding=UTF-8
 highlight=LaTeX
-line=319
+line=350
 open=true
 
 [item:img/constant_linear_regression_1.0.eps]
