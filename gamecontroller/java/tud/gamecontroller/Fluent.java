@@ -2,11 +2,11 @@ package tud.gamecontroller;
 
 import cs227b.teamIago.resolver.Expression;
 
-public class Move {
-	Expression expr;
+public class Fluent {
+	public Expression expr;
 	
-	public Move(Expression expression) {
-		this.expr=expression;
+	public Fluent(Expression expr){
+		this.expr=expr;
 	}
 
 	public String toString(){

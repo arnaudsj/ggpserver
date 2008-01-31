@@ -1,5 +1,7 @@
 package tud.gamecontroller;
 
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.StreamHandler;
@@ -10,25 +12,53 @@ import tud.gamecontroller.logging.PlainTextLogFormatter;
 
 public class GameController{
 	public static final String GAMEDIR="games/";
-	private Game game;
+	private Match match;
+	private GameInterface game;
 	private State currentState;
 	private Player players[];
 	private int startclock;
 	private int playclock;
 	private int goalValues[]=null;
 	private Logger logger;
+	private Collection<GameControllerListener> listeners;
 	
-	public GameController(Game game, PlayerInfo[] players, int startclock, int playclock) {
-		this(game,players,startclock,playclock,null);
+	public GameController(Match match, PlayerInfo[] players) {
+		this(match,players,null);
 	}
-	public GameController(Game game, PlayerInfo[] players, int startclock, int playclock, Logger logger) {
-		this.game=game;
-		this.startclock=startclock;
-		this.playclock=playclock;
+	public GameController(Match match, PlayerInfo[] players, Logger logger) {
+		this.match=match;
+		this.game=match.getGame();
+		this.startclock=match.getStartclock();
+		this.playclock=match.getPlayclock();
 		this.logger=logger;
 		initializePlayers(players);
+		listeners=new LinkedList<GameControllerListener>();
 	}
 
+	public void addListener(GameControllerListener l){
+		listeners.add(l);
+	}
+
+	public void removeListener(GameControllerListener l){
+		listeners.remove(l);
+	}
+	
+	private void fireGameStart(State currentState){
+		for(GameControllerListener l:listeners){
+			l.gameStarted(match, players, currentState);
+		}
+	}
+	private void fireGameStep(Move[] priormoves, State currentState){
+		for(GameControllerListener l:listeners){
+			l.gameStep(priormoves, currentState);
+		}
+	}
+	private void fireGameStop(State currentState, int goalValues[]){
+		for(GameControllerListener l:listeners){
+			l.gameStopped(currentState, goalValues);
+		}
+	}
+	
 	private void initializePlayers(PlayerInfo[] definedplayers) {
 		players=new Player[game.getNumberOfRoles()];
 		goalValues=new int[players.length];
@@ -60,6 +90,7 @@ public class GameController{
 		Move[] priormoves=null;
 		log(Level.INFO, "step:"+step+"\n"+"current state:"+currentState);
 		gameStart();
+		fireGameStart(currentState);
 		while(!currentState.isTerminal()){
 			try {
 				Thread.sleep(100);
@@ -69,6 +100,7 @@ public class GameController{
 			}
 			final Move[] moves = gamePlay(step, priormoves);
 			currentState=currentState.getSuccessor(moves);
+			fireGameStep(moves, currentState);
 			priormoves=moves;
 			step++;
 			log(Level.INFO, "step:"+step+"\n"+"current state:"+currentState);
@@ -79,6 +111,7 @@ public class GameController{
 			goalValues[i]=currentState.getGoalValue(game.getRole(i+1));
 			goalmsg+=goalValues[i]+" ";
 		}
+		fireGameStop(currentState, goalValues);
 		log(Level.INFO, goalmsg+"\n");
 	}
 
@@ -87,7 +120,7 @@ public class GameController{
 		PlayerThreadStart[] playerthreads=new PlayerThreadStart[players.length];
 		for(int i=0;i<players.length;i++){
 			log(Level.INFO, "player "+i+": "+players[i]);
-			playerthreads[i]=new PlayerThreadStart(players[i], game, game.getRole(i+1), startclock, playclock);
+			playerthreads[i]=new PlayerThreadStart(players[i], game.getRole(i+1));
 			playerthreads[i].start();
 		}
 		long startTime=System.currentTimeMillis(), deadline=startTime+startclock*1000+1000;
@@ -177,20 +210,14 @@ public class GameController{
 	
 	private class PlayerThreadStart extends Thread {
 		private Player player;
-		private GameInterface game;
-		private int startclock;
-		private int playclock;
 		private Role role;
 		
-		public PlayerThreadStart(Player player, GameInterface game, Role role, int startclock, int playclock){
+		public PlayerThreadStart(Player player, Role role){
 			this.player=player;
-			this.game=game;
 			this.role=role;
-			this.startclock=startclock;
-			this.playclock=playclock;
 		}
 		public void run(){
-			player.gameStart(game, role, startclock, playclock);
+			player.gameStart(match, role);
 		}
 	}
 	private class PlayerThreadPlay extends Thread {
@@ -256,6 +283,7 @@ public class GameController{
 						System.exit(-1);
 					}
 					player=new RemotePlayerInfo(roleindex-1, host, port);
+					index+=4;
 				}else{
 					System.err.println("missing arguments");
 					printUsage();
@@ -285,12 +313,13 @@ public class GameController{
 				}else{
 					player=new RandomPlayerInfo(roleindex-1);
 				}
+				index+=2;
 			}else{
 				System.err.println("invalid argument: "+argv[index]);
 				printUsage();
 				System.exit(-1);
 			}
-			if(playerinfos[roleindex-1]!=null){
+			if(playerinfos[roleindex-1]==null){
 				playerinfos[roleindex-1]=player;
 			}else{
 				System.err.println("duplicate roleindex: "+roleindex);
@@ -302,35 +331,48 @@ public class GameController{
 	}
 	
 	public static void printUsage(){
-		System.out.println("usage:\n java -jar gamecontroller.jar GAMEFILE STARTCLOCK PLAYCLOCK { -remote ROLEINDEX HOST PORT | -legal ROLEINDEX | -random ROLEINDEX } ...");
-		System.out.println("e.g.: java -jar gamecontroller.jar tictactoe.gdl 30 5 -remote 2 localhost 4001");
+		System.out.println("usage:\n java -jar gamecontroller.jar MATCHID GAMEFILE STARTCLOCK PLAYCLOCK { -remote ROLEINDEX HOST PORT | -legal ROLEINDEX | -random ROLEINDEX } ...");
+		System.out.println("e.g.: java -jar gamecontroller.jar A_TicTacToe_Match tictactoe.gdl 30 5 -remote 2 localhost 4001");
 	}
 	public static void main(String argv[]){
 		Game game=null;
 		int startclock=0, playclock=0;
-		
+		boolean printXML=false;
+		String matchID;
 		if(argv.length>=3){
-			game=Game.readFromFile(argv[0]);
+			matchID=argv[0];
+			game=Game.readFromFile(argv[1]);
 			try{
-				startclock=Integer.parseInt(argv[1]);
+				startclock=Integer.parseInt(argv[2]);
 			}catch(NumberFormatException ex){
 				System.err.println("startclock argument is not an integer");
 				printUsage();
 				System.exit(-1);
 			}
 			try{
-				playclock=Integer.parseInt(argv[2]);
+				playclock=Integer.parseInt(argv[3]);
 			}catch(NumberFormatException ex){
 				System.err.println("playclock argument is not an integer");
 				printUsage();
 				System.exit(-1);
 			}
-			PlayerInfo[] playerinfos=parsePlayerArguments(3, argv, game);
+			PlayerInfo[] playerinfos;
+			if(argv[4].equals("-printxml")){
+				printXML=true;
+				playerinfos=parsePlayerArguments(5, argv, game);
+			}else{
+				playerinfos=parsePlayerArguments(4, argv, game);
+			}
 			Logger logger=Logger.getAnonymousLogger();
 			logger.addHandler(new StreamHandler(System.out, new PlainTextLogFormatter()));
 			logger.setLevel(Level.ALL);
-			GameController gc=new GameController(game, playerinfos, startclock, playclock, logger);
-			System.out.println("game:"+argv[0]);
+			GameController gc=new GameController(new Match(matchID, game, startclock, playclock), playerinfos, logger);
+			System.out.println("match:"+matchID);
+			System.out.println("game:"+argv[1]);
+			if(printXML){
+				XMLGameStateWriter gsw=new XMLGameStateWriter("output/");
+				gc.addListener(gsw);
+			}
 			gc.runGame();
 		}else{
 			System.err.println("wrong number of arguments");

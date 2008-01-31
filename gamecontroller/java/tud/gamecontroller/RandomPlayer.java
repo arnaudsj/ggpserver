@@ -6,12 +6,17 @@ import java.util.Random;
 public class RandomPlayer extends LocalPlayer {
 
 	public Move getNextMove() {
-		Collection l=currentState.getLegalMoves(role);
+		Collection<Move> l=currentState.getLegalMoves(role);
 		int i=(new Random()).nextInt(l.size());
-		return (Move)l.toArray()[i];
+		return l.toArray(new Move[0])[i];
 	}
 	
 	public String toString(){
 		return "RandomPlayer";
 	}
+
+	public String getName() {
+		return "Random";
+	}
+
 }

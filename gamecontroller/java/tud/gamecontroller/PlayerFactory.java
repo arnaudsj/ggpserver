@@ -3,7 +3,7 @@ package tud.gamecontroller;
 public class PlayerFactory {
 
 	public static Player createRemotePlayer(RemotePlayerInfo info) {
-		return new RemotePlayer(info.getHost(), info.getPort());
+		return new RemotePlayer(info.getHost()+":"+info.getPort(), info.getHost(), info.getPort());
 	}
 	public static Player createRandomPlayer(RandomPlayerInfo info) {
 		return new RandomPlayer();

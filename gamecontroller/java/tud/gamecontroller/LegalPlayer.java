@@ -10,4 +10,8 @@ public class LegalPlayer extends LocalPlayer {
 		return "LegalPlayer";
 	}
 
+	public String getName() {
+		return "Legal";
+	}
+
 }

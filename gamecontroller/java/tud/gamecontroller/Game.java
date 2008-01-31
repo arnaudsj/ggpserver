@@ -2,20 +2,19 @@ package tud.gamecontroller;
 
 import java.io.File;
 
-import cs227b.teamIago.gameProver.GameSimulator;
 import cs227b.teamIago.parser.Axioms;
 
 public class Game implements GameInterface {
 
-	private GameSimulator gameSim;
+	private Reasoner reasoner;
 	private String gameDescription;
 	private String name;
 		
 	private Game(String gameDescription, String name) {
 		this.gameDescription=gameDescription;
 		this.name=name;
-		gameSim=new GameSimulator(false, false);
-		gameSim.ParseDescIntoTheory(gameDescription);
+		reasoner=new Reasoner(gameDescription);
+		
 	}
 
 	public static Game readFromFile(String filename) {
@@ -24,16 +23,15 @@ public class Game implements GameInterface {
 	}
 
 	public int getNumberOfRoles() {
-		return gameSim.GetRoles().size();
+		return reasoner.GetRoles().size();
 	}
 
 	public State getInitialState() {
-		gameSim.SimulateStart();
-		return new State(gameSim, gameSim.getTheory().getState());
+		return new State(reasoner, reasoner.getInitialState());
 	}
 
 	public Role getRole(int roleindex) {
-		return new Role(gameSim.GetRoles().get(roleindex-1));
+		return new Role(reasoner.GetRoles().get(roleindex-1));
 	}
 
 	public String getGameDescription() {

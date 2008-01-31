@@ -2,6 +2,7 @@ package tud.gamecontroller;
 
 public abstract class LocalPlayer implements Player {
 	
+	protected Match match;
 	protected State currentState;
 	protected Role role;
 	protected int startclock;
@@ -10,11 +11,10 @@ public abstract class LocalPlayer implements Player {
 	public LocalPlayer() {
 	}
 
-	public void gameStart(GameInterface game, Role role, int startclock, int playclock) {
-		currentState=game.getInitialState();
+	public void gameStart(Match match, Role role) {
+		this.match=match;
+		currentState=match.getGame().getInitialState();
 		this.role=role;
-		this.startclock=startclock;
-		this.playclock=playclock;
 	}
 
 	public Move gamePlay(Move[] priormoves) {

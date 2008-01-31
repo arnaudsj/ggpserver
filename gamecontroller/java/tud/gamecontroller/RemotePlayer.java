@@ -13,25 +13,29 @@ import cs227b.teamIago.parser.Parser;
 import cs227b.teamIago.resolver.Atom;
 import cs227b.teamIago.resolver.Connective;
 import cs227b.teamIago.resolver.ExpList;
+import cs227b.teamIago.resolver.Term;
 
 public class RemotePlayer implements Player {
 	private String host;
 	private int port;
-	private int playclock;
+	private Match match;
+	private String name;
 	
-	public RemotePlayer(String host, int port) {
+	public RemotePlayer(String name, String host, int port) {
 		this.host=host;
 		this.port=port;
+		this.name=name;
+		this.match=null;
 	}
 
-	public void gameStart(GameInterface game, Role role, int startclock, int playclock) {
-		this.playclock=playclock;
-		String msg="(START TestMatch "+role+" (\n"+game.getGameDescription().toUpperCase()+"\n) "+startclock+" "+playclock+")";
-		sendMsg(msg, startclock);
+	public void gameStart(Match match, Role role) {
+		this.match=match;
+		String msg="(START "+match.getMatchID()+" "+role+" (\n"+match.getGame().getGameDescription().toUpperCase()+"\n) "+match.getStartclock()+" "+match.getPlayclock()+")";
+		sendMsg(msg, match.getStartclock());
 	}
 
 	public Move gamePlay(Move[] priormoves) {
-		String msg="(PLAY TestMatch ";
+		String msg="(PLAY "+match.getMatchID()+" ";
 		if(priormoves==null){
 			msg+="NIL)";
 		}else{
@@ -41,19 +45,19 @@ public class RemotePlayer implements Player {
 			}
 			msg+="))";
 		}
-		String reply=sendMsg(msg, playclock);
+		String reply=sendMsg(msg, match.getPlayclock());
 		if(reply==null)
 			reply="NIL";
 		ExpList list=Parser.parseDesc("(bla "+reply+")");
 		if(list.size()>0){
-			return new Move(((Connective)list.get(0)).getOperands().get(0));
+			return new Move((Term)((Connective)list.get(0)).getOperands().get(0));
 		}else{
 			return new Move(new Atom("NIL"));
 		}
 	}
 
 	public void gameStop(Move[] priormoves) {
-		String msg="(STOP TestMatch ";
+		String msg="(STOP "+match.getMatchID()+" ";
 		if(priormoves==null){
 			msg+="NIL)";
 		}else{
@@ -63,7 +67,7 @@ public class RemotePlayer implements Player {
 			}
 			msg+="))";
 		}
-		sendMsg(msg, playclock);
+		sendMsg(msg, match.getPlayclock());
 	}
 
 	private String sendMsg(String msg, int timeout) {
@@ -113,6 +117,10 @@ public class RemotePlayer implements Player {
 
 	public String toString(){
 		return "remote("+host+":"+port+")";
+	}
+
+	public String getName() {
+		return name;
 	}
 
 }
