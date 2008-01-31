@@ -24,6 +24,7 @@ import javax.swing.text.JTextComponent;
 
 import tud.gamecontroller.Game;
 import tud.gamecontroller.GameController;
+import tud.gamecontroller.Match;
 import tud.gamecontroller.PlayerInfo;
 import tud.gamecontroller.logging.PlainTextLogFormatter;
 
@@ -237,7 +238,7 @@ public class GameControllerFrame extends JFrame {
 		jLogPaneAppender.setFormatter(new PlainTextLogFormatter());
 		jLogPaneAppender.setLevel(Level.ALL);
 		logger.addHandler(jLogPaneAppender);
-		gameController=new GameController(game, players, startclock, playclock, logger);
+		gameController=new GameController(new Match("testmatch", game, startclock, playclock), players, logger);
 		gameThread=new Thread(){
 			public void run(){
 				gameController.runGame();

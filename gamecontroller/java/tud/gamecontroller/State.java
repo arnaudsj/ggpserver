@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import cs227b.teamIago.resolver.Atom;
 import cs227b.teamIago.resolver.Connective;
 import cs227b.teamIago.resolver.ExpList;
-import cs227b.teamIago.resolver.Expression;
 import cs227b.teamIago.resolver.Predicate;
 import cs227b.teamIago.util.GameState;
 
