@@ -71,7 +71,7 @@ public class XMLGameStateWriter implements GameControllerListener {
 			 // Document.
 			 xmldoc = impl.createDocument(null, null, null);
 			 xmldoc.setXmlVersion("1.0");
-			 Node xsl=xmldoc.createProcessingInstruction("xml-stylesheet","type=\"text/xsl\" href=\"../styles/"+stylesheet+"\"");
+			 Node xsl=xmldoc.createProcessingInstruction("xml-stylesheet","type=\"text/xsl\" href=\""+stylesheet+"\"");
 			 xmldoc.appendChild(xsl);
 			 xmldoc.appendChild(impl.createDocumentType("match", null, "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd"));
 			 // Root element.
