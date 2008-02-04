@@ -65,14 +65,16 @@ public class GameController{
 			goalValues[i]=-1;
 		}
 		for(int i=0; i<definedplayers.length; i++){
-			if(definedplayers[i].getRoleindex()<players.length){
-				if(players[definedplayers[i].getRoleindex()]==null){
-					players[definedplayers[i].getRoleindex()]=PlayerFactory.createPlayer(definedplayers[i]);
+			if(definedplayers[i]!=null){
+				if(definedplayers[i].getRoleindex()<players.length){
+					if(players[definedplayers[i].getRoleindex()]==null){
+						players[definedplayers[i].getRoleindex()]=PlayerFactory.createPlayer(definedplayers[i]);
+					}else{
+						throw new IllegalArgumentException("duplicate roleindex in given player list");
+					}
 				}else{
-					throw new IllegalArgumentException("duplicate roleindex in given player list");
+					throw new IllegalArgumentException("roleindex must be between 0 and n-1 for an n-player game");
 				}
-			}else{
-				throw new IllegalArgumentException("roleindex must be between 0 and n-1 for an n-player game");
 			}
 		}
 		for(int i=0; i<players.length; i++){
@@ -259,7 +261,7 @@ public class GameController{
 		PlayerInfo player=null;
 		while(index<argv.length){
 			if(argv[index].equals("-remote")){
-				if(argv.length>index+4){
+				if(argv.length>index+3){
 					try{
 						roleindex=Integer.parseInt(argv[index+1]);
 					}catch(NumberFormatException ex){
@@ -283,7 +285,7 @@ public class GameController{
 					player=new RemotePlayerInfo(roleindex-1, host, port);
 					index+=4;
 				}else{
-					System.err.println("missing arguments");
+					System.err.println("missing arguments for -remote");
 					printUsage();
 					System.exit(-1);
 				}
@@ -302,7 +304,7 @@ public class GameController{
 						System.exit(-1);
 					}
 				}else{
-					System.err.println("missing arguments");
+					System.err.println("missing arguments for "+argv[index]);
 					printUsage();
 					System.exit(-1);
 				}
