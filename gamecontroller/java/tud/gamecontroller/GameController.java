@@ -8,8 +8,6 @@ import java.util.logging.StreamHandler;
 
 import tud.gamecontroller.logging.PlainTextLogFormatter;
 
-
-
 public class GameController{
 	public static final String GAMEDIR="games/";
 	private Match match;
@@ -337,8 +335,7 @@ public class GameController{
 	public static void main(String argv[]){
 		Game game=null;
 		int startclock=0, playclock=0;
-		boolean printXML=false;
-		String matchID;
+		String matchID, stylesheet=null;
 		if(argv.length>=3){
 			matchID=argv[0];
 			game=Game.readFromFile(argv[1]);
@@ -358,8 +355,8 @@ public class GameController{
 			}
 			PlayerInfo[] playerinfos;
 			if(argv[4].equals("-printxml")){
-				printXML=true;
-				playerinfos=parsePlayerArguments(5, argv, game);
+				stylesheet=argv[5];
+				playerinfos=parsePlayerArguments(6, argv, game);
 			}else{
 				playerinfos=parsePlayerArguments(4, argv, game);
 			}
@@ -369,8 +366,8 @@ public class GameController{
 			GameController gc=new GameController(new Match(matchID, game, startclock, playclock), playerinfos, logger);
 			System.out.println("match:"+matchID);
 			System.out.println("game:"+argv[1]);
-			if(printXML){
-				XMLGameStateWriter gsw=new XMLGameStateWriter("output/");
+			if(stylesheet!=null){
+				XMLGameStateWriter gsw=new XMLGameStateWriter("output/", stylesheet);
 				gc.addListener(gsw);
 			}
 			gc.runGame();

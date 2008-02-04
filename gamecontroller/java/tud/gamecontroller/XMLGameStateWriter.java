@@ -31,9 +31,11 @@ public class XMLGameStateWriter implements GameControllerListener {
 	private List<Move[]> moves;
 	private int step;
 	private Match match;
+	private String stylesheet;
 		
-	public XMLGameStateWriter(String outputDir) {
+	public XMLGameStateWriter(String outputDir, String stylesheet) {
 		this.outputDir=outputDir;
+		this.stylesheet=stylesheet;
 		this.moves=new LinkedList<Move[]>();
 		this.match=null;
 	}
@@ -69,7 +71,7 @@ public class XMLGameStateWriter implements GameControllerListener {
 			 // Document.
 			 xmldoc = impl.createDocument(null, null, null);
 			 xmldoc.setXmlVersion("1.0");
-			 Node xsl=xmldoc.createProcessingInstruction("xml-stylesheet","type=\"text/xsl\" href=\"../styles/generic.xml\"");
+			 Node xsl=xmldoc.createProcessingInstruction("xml-stylesheet","type=\"text/xsl\" href=\"../styles/"+stylesheet+"\"");
 			 xmldoc.appendChild(xsl);
 			 xmldoc.appendChild(impl.createDocumentType("match", null, "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd"));
 			 // Root element.
