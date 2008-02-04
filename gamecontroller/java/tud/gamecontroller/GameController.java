@@ -28,7 +28,11 @@ public class GameController{
 		this.game=match.getGame();
 		this.startclock=match.getStartclock();
 		this.playclock=match.getPlayclock();
-		this.logger=logger;
+		if(logger==null){
+			this.logger=Logger.getLogger("tud.gamecontroller");
+		}else{
+			this.logger=logger;
+		}
 		initializePlayers(players);
 		listeners=new LinkedList<GameControllerListener>();
 	}
@@ -88,7 +92,9 @@ public class GameController{
 		int step=1;
 		currentState=game.getInitialState();
 		Move[] priormoves=null;
-		log(Level.INFO, "step:"+step+"\n"+"current state:"+currentState);
+		logger.info("starting game with startclock="+startclock+", playerclock="+playclock);
+		logger.info("step:"+step);
+		logger.info("current state:"+currentState);
 		gameStart();
 		fireGameStart(currentState);
 		while(!currentState.isTerminal()){
@@ -103,7 +109,8 @@ public class GameController{
 			fireGameStep(moves, currentState);
 			priormoves=moves;
 			step++;
-			log(Level.INFO, "step:"+step+"\n"+"current state:"+currentState);
+			logger.info("step:"+step);
+			logger.info("current state:"+currentState);
 		}
 		gameStop(priormoves);
 		String goalmsg="Game over! results: ";
@@ -112,21 +119,21 @@ public class GameController{
 			goalmsg+=goalValues[i]+" ";
 		}
 		fireGameStop(currentState, goalValues);
-		log(Level.INFO, goalmsg+"\n");
+		logger.info(goalmsg);
 	}
 
 
 	private void gameStart() {
 		PlayerThreadStart[] playerthreads=new PlayerThreadStart[players.length];
 		for(int i=0;i<players.length;i++){
-			log(Level.INFO, "player "+i+": "+players[i]);
+			logger.info("player "+i+": "+players[i]);
 			playerthreads[i]=new PlayerThreadStart(players[i], game.getRole(i+1));
 			playerthreads[i].start();
 		}
 		long startTime=System.currentTimeMillis(), deadline=startTime+startclock*1000+1000;
 		for(int i=0;i<players.length;i++){
 			if(!waitForThread(playerthreads[i], deadline)){
-				log(Level.SEVERE, "player "+players[i]+" timed out!");
+				logger.severe("player "+players[i]+" timed out!");
 			}
 		}
 	}
@@ -143,12 +150,12 @@ public class GameController{
 			if(waitForThread(playerthreads[i], deadline)){
 				moves[i]=playerthreads[i].getMove();
 			}else{
-				log(Level.SEVERE, "player "+players[i]+" timed out!");
+				logger.severe("player "+players[i]+" timed out!");
 				moves[i]=currentState.getLegalMove(game.getRole(i+1));
 			}
 			playerthreads[i]=null;
 			if(moves[i]==null || !currentState.isLegal(game.getRole(i+1), moves[i])){
-				log(Level.SEVERE, "Illegal move \""+moves[i]+"\" from "+players[i]+ " in step "+step);
+				logger.severe("Illegal move \""+moves[i]+"\" from "+players[i]+ " in step "+step);
 				moves[i]=currentState.getLegalMove(game.getRole(i+1));
 			}
 		}
@@ -156,7 +163,7 @@ public class GameController{
 		for(int i=0;i<moves.length;i++){
 			movesmsg+=moves[i]+" ";
 		}
-		log(Level.INFO, movesmsg);
+		logger.info(movesmsg);
 		return moves;
 	}
 
@@ -169,7 +176,7 @@ public class GameController{
 		long startTime=System.currentTimeMillis(), deadline=startTime+playclock*1000;
 		for(int i=0;i<players.length;i++){
 			if(!waitForThread(playerthreads[i], deadline)){
-				log(Level.WARNING, "player "+players[i]+" timed out! (non critical)");
+				logger.warning("player "+players[i]+" timed out! (non critical)");
 			}
 		}
 	}
@@ -202,12 +209,6 @@ public class GameController{
 		this.logger = logger;
 	}
 
-	private void log(Level level, String msg){
-		if(logger!=null){
-			logger.log(level, msg);
-		}
-	}
-	
 	private class PlayerThreadStart extends Thread {
 		private Player player;
 		private Role role;
@@ -362,12 +363,13 @@ public class GameController{
 			}else{
 				playerinfos=parsePlayerArguments(4, argv, game);
 			}
-			Logger logger=Logger.getAnonymousLogger();
+			Logger logger=Logger.getLogger("tud.gamecontroller");
+			logger.setUseParentHandlers(false);
 			logger.addHandler(new StreamHandler(System.out, new PlainTextLogFormatter()));
 			logger.setLevel(Level.ALL);
 			GameController gc=new GameController(new Match(matchID, game, startclock, playclock), playerinfos, logger);
-			System.out.println("match:"+matchID);
-			System.out.println("game:"+argv[1]);
+			logger.info("match:"+matchID);
+			logger.info("game:"+argv[1]);
 			if(stylesheet!=null){
 				XMLGameStateWriter gsw=new XMLGameStateWriter("output/", stylesheet);
 				gc.addListener(gsw);

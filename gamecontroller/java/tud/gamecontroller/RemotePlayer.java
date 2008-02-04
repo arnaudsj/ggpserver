@@ -8,12 +8,13 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.logging.Logger;
 
 import cs227b.teamIago.parser.Parser;
 import cs227b.teamIago.resolver.Atom;
 import cs227b.teamIago.resolver.Connective;
 import cs227b.teamIago.resolver.ExpList;
-import cs227b.teamIago.resolver.Term;
+import cs227b.teamIago.resolver.Expression;
 
 public class RemotePlayer implements Player {
 	private String host;
@@ -35,6 +36,7 @@ public class RemotePlayer implements Player {
 	}
 
 	public Move gamePlay(Move[] priormoves) {
+		Move move=null;
 		String msg="(PLAY "+match.getMatchID()+" ";
 		if(priormoves==null){
 			msg+="NIL)";
@@ -46,14 +48,25 @@ public class RemotePlayer implements Player {
 			msg+="))";
 		}
 		String reply=sendMsg(msg, match.getPlayclock());
-		if(reply==null)
-			reply="NIL";
-		ExpList list=Parser.parseDesc("(bla "+reply+")");
-		if(list.size()>0){
-			return new Move((Term)((Connective)list.get(0)).getOperands().get(0));
-		}else{
-			return new Move(new Atom("NIL"));
+		try{
+			ExpList list=Parser.parseDesc("(bla "+reply+")");
+			if(list.size()>0){
+				Expression expr=((Connective)list.get(0)).getOperands().get(0);
+				if(expr.getVars().size()>0){
+					Logger.getLogger("tud.gamecontroller").severe("Reply from "+this+" is not a ground term:"+reply);
+				}else{
+					move=new Move(expr);
+				}
+			}else{
+				Logger.getLogger("tud.gamecontroller").severe("Reply from "+this+" is not a valid term:"+reply);
+			}
+		}catch(Exception ex){
+			Logger.getLogger("tud.gamecontroller").severe("Exception while parsing reply \""+reply+"\" from "+this+":"+ex.getMessage());
 		}
+		if(move==null){
+			move=new Move(new Atom("NIL"));
+		}
+		return move;
 	}
 
 	public void gameStop(Move[] priormoves) {
@@ -108,9 +121,9 @@ public class RemotePlayer implements Player {
 			out.close();
 			in.close();
 		} catch (UnknownHostException e) {
-			System.err.println("error: unknown host \""+ host+ "\"");
+			Logger.getLogger("tud.gamecontroller").severe("error: unknown host \""+ host+ "\"");
 		} catch (IOException e) {
-			System.err.println("error: io error for "+ this+" : "+e.getMessage());
+			Logger.getLogger("tud.gamecontroller").severe("error: io error for "+ this+" : "+e.getMessage());
 		}
 		return reply;
 	}

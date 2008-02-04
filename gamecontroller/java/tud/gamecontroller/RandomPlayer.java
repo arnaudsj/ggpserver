@@ -5,9 +5,16 @@ import java.util.Random;
 
 public class RandomPlayer extends LocalPlayer {
 
+	private Random random;
+	
+	public RandomPlayer(){
+		super();
+		random=new Random();
+	}
+	
 	public Move getNextMove() {
 		Collection<Move> l=currentState.getLegalMoves(role);
-		int i=(new Random()).nextInt(l.size());
+		int i=random.nextInt(l.size());
 		return l.toArray(new Move[0])[i];
 	}
 	
