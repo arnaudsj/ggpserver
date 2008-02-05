@@ -6,7 +6,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.StreamHandler;
 
+import tud.gamecontroller.game.Game;
+import tud.gamecontroller.game.GameInterface;
+import tud.gamecontroller.game.Match;
+import tud.gamecontroller.game.Move;
+import tud.gamecontroller.game.Role;
+import tud.gamecontroller.game.State;
 import tud.gamecontroller.logging.PlainTextLogFormatter;
+import tud.gamecontroller.players.LegalPlayerInfo;
+import tud.gamecontroller.players.Player;
+import tud.gamecontroller.players.PlayerFactory;
+import tud.gamecontroller.players.PlayerInfo;
+import tud.gamecontroller.players.RandomPlayerInfo;
+import tud.gamecontroller.players.RemotePlayerInfo;
 
 public class GameController{
 	public static final String GAMEDIR="games/";
@@ -101,7 +113,6 @@ public class GameController{
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			final Move[] moves = gamePlay(step, priormoves);
@@ -332,13 +343,13 @@ public class GameController{
 	}
 	
 	public static void printUsage(){
-		System.out.println("usage:\n java -jar gamecontroller.jar MATCHID GAMEFILE STARTCLOCK PLAYCLOCK { -remote ROLEINDEX HOST PORT | -legal ROLEINDEX | -random ROLEINDEX } ...");
+		System.out.println("usage:\n java -jar gamecontroller.jar MATCHID GAMEFILE STARTCLOCK PLAYCLOCK [ -printxml OUTPUTDIR XSLT ] { -remote ROLEINDEX NAME HOST PORT | -legal ROLEINDEX | -random ROLEINDEX } ...");
 		System.out.println("e.g.: java -jar gamecontroller.jar A_TicTacToe_Match tictactoe.gdl 30 5 -remote 2 localhost 4001");
 	}
 	public static void main(String argv[]){
 		Game game=null;
 		int startclock=0, playclock=0;
-		String matchID, stylesheet=null;
+		String matchID, stylesheet=null, xmloutputdir=null;
 		if(argv.length>=3){
 			matchID=argv[0];
 			game=Game.readFromFile(argv[1]);
@@ -358,8 +369,9 @@ public class GameController{
 			}
 			PlayerInfo[] playerinfos;
 			if(argv[4].equals("-printxml")){
-				stylesheet=argv[5];
-				playerinfos=parsePlayerArguments(6, argv, game);
+				xmloutputdir=argv[5];
+				stylesheet=argv[6];
+				playerinfos=parsePlayerArguments(7, argv, game);
 			}else{
 				playerinfos=parsePlayerArguments(4, argv, game);
 			}
@@ -371,7 +383,7 @@ public class GameController{
 			logger.info("match:"+matchID);
 			logger.info("game:"+argv[1]);
 			if(stylesheet!=null){
-				XMLGameStateWriter gsw=new XMLGameStateWriter("output/", stylesheet);
+				XMLGameStateWriter gsw=new XMLGameStateWriter(xmloutputdir, stylesheet);
 				gc.addListener(gsw);
 			}
 			gc.runGame();
@@ -380,5 +392,4 @@ public class GameController{
 			System.exit(-1);
 		}
 	}
-
 }

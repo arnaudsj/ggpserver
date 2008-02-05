@@ -1,4 +1,4 @@
-package tud.gamecontroller;
+package tud.gamecontroller.game;
 
 import cs227b.teamIago.resolver.Expression;
 

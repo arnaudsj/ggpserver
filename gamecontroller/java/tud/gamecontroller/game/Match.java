@@ -1,4 +1,4 @@
-package tud.gamecontroller;
+package tud.gamecontroller.game;
 
 public class Match {
 	private String matchID;

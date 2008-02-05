@@ -1,15 +1,15 @@
-package tud.gamecontroller;
+package tud.gamecontroller.players;
 
 public class PlayerFactory {
 
 	public static Player createRemotePlayer(RemotePlayerInfo info) {
-		return new RemotePlayer(info.getHost()+":"+info.getPort(), info.getHost(), info.getPort());
+		return new RemotePlayer(info.getName(), info.getHost(), info.getPort());
 	}
 	public static Player createRandomPlayer(RandomPlayerInfo info) {
-		return new RandomPlayer();
+		return new RandomPlayer(info.getName());
 	}
 	public static Player createLegalPlayer(LegalPlayerInfo info) {
-		return new LegalPlayer();
+		return new LegalPlayer(info.getName());
 	}
 	public static Player createPlayer(PlayerInfo info) {
 		if(info instanceof RemotePlayerInfo){

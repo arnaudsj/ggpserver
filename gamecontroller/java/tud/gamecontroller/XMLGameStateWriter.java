@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -19,6 +21,12 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import tud.gamecontroller.game.Fluent;
+import tud.gamecontroller.game.Match;
+import tud.gamecontroller.game.Move;
+import tud.gamecontroller.game.State;
+import tud.gamecontroller.players.Player;
 
 import cs227b.teamIago.resolver.Atom;
 import cs227b.teamIago.resolver.ExpList;
@@ -105,14 +113,11 @@ public class XMLGameStateWriter implements GameControllerListener {
 			 serializer.transform(domSource, streamResult); 
 			 			 
 		} catch (TransformerConfigurationException ex) {
-			// TODO Auto-generated catch block
-			ex.printStackTrace();
+			Logger.getLogger("tud.gamecontroller").warning("Exception occured while generation xml:"+ex.getMessage());
 		} catch (ParserConfigurationException ex) {
-			// TODO Auto-generated catch block
-			ex.printStackTrace();
+			Logger.getLogger("tud.gamecontroller").warning("Exception occured while generation xml:"+ex.getMessage());
 		} catch (TransformerException ex) {
-			// TODO Auto-generated catch block
-			ex.printStackTrace();
+			Logger.getLogger("tud.gamecontroller").warning("Exception occured while generation xml:"+ex.getMessage());
 		}
 	}
 
@@ -133,14 +138,13 @@ public class XMLGameStateWriter implements GameControllerListener {
 						e.setTextContent(exp.toString().toUpperCase());
 					}else{
 						e.setTextContent("?");
-						System.err.println("XMLGameStateWriter: unsupported expression as argument of a fluent:"+exp);
+						Logger.getLogger("tud.gamecontroller").warning("in XMLGameStateWriter.createStateElement: unsupported expression as argument of a fluent:"+exp);
 					}
 					fact.appendChild(e);
 				}
 			}else if(!(f.expr instanceof Atom)){
-				System.err.println("XMLGameStateWriter: unsupported fluent expression in state:"+f.expr);
+				Logger.getLogger("tud.gamecontroller").warning("in XMLGameStateWriter.createStateElement: unsupported fluent expression in state:"+f.expr);
 			}
-			
 			state.appendChild(fact);
 		}
 		return state;
@@ -166,7 +170,7 @@ public class XMLGameStateWriter implements GameControllerListener {
 			step.appendChild(e);
 			for(int i=0;i<move.length;i++){
 				e=xmldoc.createElement("move");
-				e.setTextContent(ExpressionFormatter.prefixForm(move[i].expr));
+				e.setTextContent(move[i].getPrefixForm());
 				step.appendChild(e);
 			}
 			history.appendChild(step);

@@ -1,4 +1,6 @@
-package tud.gamecontroller;
+package tud.gamecontroller.game;
+
+import java.util.logging.Logger;
 
 import cs227b.teamIago.gameProver.GameSimulator;
 import cs227b.teamIago.resolver.Atom;
@@ -12,7 +14,7 @@ public class Reasoner {
 	private GameSimulator gameSim;
 	
 	public Reasoner(String gameDescription) {
-		gameSim=new GameSimulator(false, false);
+		gameSim=new GameSimulator(false, true);
 		gameSim.ParseDescIntoTheory(gameDescription);
 	}
 
@@ -46,8 +48,9 @@ public class Reasoner {
 			try {
 				return gameSim.getTheory().findp(new Predicate(new Atom("LEGAL"),roleVar));
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Logger logger=Logger.getLogger("tud.gamecontroller");
+				logger.severe("reasoner was interrupted during findp("+new Predicate(new Atom("LEGAL"),roleVar)+"):");
+				logger.severe(e.getMessage());
 				return false;
 			}
 		}

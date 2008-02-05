@@ -1,8 +1,9 @@
-package tud.gamecontroller;
+package tud.gamecontroller.game;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+
 
 import cs227b.teamIago.resolver.Atom;
 import cs227b.teamIago.resolver.Connective;

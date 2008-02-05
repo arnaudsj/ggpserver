@@ -1,5 +1,7 @@
 package tud.gamecontroller;
 
+import java.util.logging.Logger;
+
 import cs227b.teamIago.resolver.Connective;
 import cs227b.teamIago.resolver.ExpList;
 import cs227b.teamIago.resolver.Expression;
@@ -27,7 +29,7 @@ public class ExpressionFormatter {
 				s+=")";
 			}
 		}else{
-			System.err.println("ExpressionFormatter: unsupported expression:"+expr);
+			Logger.getLogger("tud.gamecontroller").warning("in ExpressionFormatter.prefixForm: unsupported expression:"+expr);
 		}
 		return s;
 	}

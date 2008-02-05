@@ -1,9 +1,9 @@
-package tud.gamecontroller;
+package tud.gamecontroller.players;
 
 public class RandomPlayerInfo extends PlayerInfo {
 
 	public RandomPlayerInfo(int roleindex) {
-		super(roleindex);
+		super(roleindex, "Random");
 	}
 
 }

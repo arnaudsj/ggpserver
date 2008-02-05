@@ -1,4 +1,4 @@
-package tud.gamecontroller;
+package tud.gamecontroller.players;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,27 +10,28 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.logging.Logger;
 
+import tud.gamecontroller.game.Match;
+import tud.gamecontroller.game.Move;
+import tud.gamecontroller.game.Role;
+
 import cs227b.teamIago.parser.Parser;
 import cs227b.teamIago.resolver.Atom;
 import cs227b.teamIago.resolver.Connective;
 import cs227b.teamIago.resolver.ExpList;
 import cs227b.teamIago.resolver.Expression;
 
-public class RemotePlayer implements Player {
+public class RemotePlayer extends AbstractPlayer {
 	private String host;
 	private int port;
-	private Match match;
-	private String name;
 	
 	public RemotePlayer(String name, String host, int port) {
+		super(name);
 		this.host=host;
 		this.port=port;
-		this.name=name;
-		this.match=null;
 	}
 
 	public void gameStart(Match match, Role role) {
-		this.match=match;
+		super.gameStart(match, role);
 		String msg="(START "+match.getMatchID()+" "+role+" (\n"+match.getGame().getGameDescription().toUpperCase()+"\n) "+match.getStartclock()+" "+match.getPlayclock()+")";
 		sendMsg(msg, match.getStartclock());
 	}
@@ -70,6 +71,7 @@ public class RemotePlayer implements Player {
 	}
 
 	public void gameStop(Move[] priormoves) {
+		super.gameStop(priormoves);
 		String msg="(STOP "+match.getMatchID()+" ";
 		if(priormoves==null){
 			msg+="NIL)";
@@ -129,11 +131,6 @@ public class RemotePlayer implements Player {
 	}
 
 	public String toString(){
-		return "remote("+host+":"+port+")";
+		return "remote("+getName()+", "+host+":"+port+")";
 	}
-
-	public String getName() {
-		return name;
-	}
-
 }

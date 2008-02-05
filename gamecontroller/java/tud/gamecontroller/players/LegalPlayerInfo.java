@@ -1,9 +1,9 @@
-package tud.gamecontroller;
+package tud.gamecontroller.players;
 
 public class LegalPlayerInfo extends PlayerInfo {
 
 	public LegalPlayerInfo(int roleindex) {
-		super(roleindex);
+		super(roleindex, "Legal");
 	}
 
 }

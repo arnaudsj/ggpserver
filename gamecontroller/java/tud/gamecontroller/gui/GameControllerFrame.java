@@ -22,11 +22,11 @@ import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.text.JTextComponent;
 
-import tud.gamecontroller.Game;
 import tud.gamecontroller.GameController;
-import tud.gamecontroller.Match;
-import tud.gamecontroller.PlayerInfo;
+import tud.gamecontroller.game.Game;
+import tud.gamecontroller.game.Match;
 import tud.gamecontroller.logging.PlainTextLogFormatter;
+import tud.gamecontroller.players.PlayerInfo;
 
 public class GameControllerFrame extends JFrame {
 

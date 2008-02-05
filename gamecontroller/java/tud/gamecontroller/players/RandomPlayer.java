@@ -1,14 +1,16 @@
-package tud.gamecontroller;
+package tud.gamecontroller.players;
 
 import java.util.Collection;
 import java.util.Random;
+
+import tud.gamecontroller.game.Move;
 
 public class RandomPlayer extends LocalPlayer {
 
 	private Random random;
 	
-	public RandomPlayer(){
-		super();
+	public RandomPlayer(String name){
+		super(name);
 		random=new Random();
 	}
 	
@@ -17,13 +19,4 @@ public class RandomPlayer extends LocalPlayer {
 		int i=random.nextInt(l.size());
 		return l.toArray(new Move[0])[i];
 	}
-	
-	public String toString(){
-		return "RandomPlayer";
-	}
-
-	public String getName() {
-		return "Random";
-	}
-
 }

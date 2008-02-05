@@ -1,4 +1,4 @@
-package tud.gamecontroller;
+package tud.gamecontroller.players;
 
 public class RemotePlayerInfo extends PlayerInfo {
 
@@ -6,7 +6,10 @@ public class RemotePlayerInfo extends PlayerInfo {
 	private int port;
 
 	public RemotePlayerInfo(int roleindex, String host, int port) {
-		super(roleindex);
+		this(roleindex, host+":"+port, host, port);
+	}
+	public RemotePlayerInfo(int roleindex, String name, String host, int port) {
+		super(roleindex, name);
 		this.host=host;
 		this.port=port;
 	}

@@ -2,12 +2,12 @@ package tud.gamecontroller.gui;
 
 import javax.swing.table.AbstractTableModel;
 
-import tud.gamecontroller.Game;
-import tud.gamecontroller.LegalPlayerInfo;
-import tud.gamecontroller.PlayerInfo;
-import tud.gamecontroller.RandomPlayerInfo;
-import tud.gamecontroller.RemotePlayerInfo;
-import tud.gamecontroller.Role;
+import tud.gamecontroller.game.Game;
+import tud.gamecontroller.game.Role;
+import tud.gamecontroller.players.LegalPlayerInfo;
+import tud.gamecontroller.players.PlayerInfo;
+import tud.gamecontroller.players.RandomPlayerInfo;
+import tud.gamecontroller.players.RemotePlayerInfo;
 
 public class PlayerTableModel extends AbstractTableModel {
 

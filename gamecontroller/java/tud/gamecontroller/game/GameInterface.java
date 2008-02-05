@@ -1,4 +1,4 @@
-package tud.gamecontroller;
+package tud.gamecontroller.game;
 
 public interface GameInterface {
 

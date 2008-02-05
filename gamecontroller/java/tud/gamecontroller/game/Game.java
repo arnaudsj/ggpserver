@@ -1,6 +1,7 @@
-package tud.gamecontroller;
+package tud.gamecontroller.game;
 
 import java.io.File;
+
 
 import cs227b.teamIago.parser.Axioms;
 

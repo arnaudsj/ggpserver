@@ -1,9 +1,9 @@
-package tud.gamecontroller;
+package tud.gamecontroller.game;
 
 import cs227b.teamIago.resolver.Expression;
 
 public class Role {
-	Expression expr;
+	protected Expression expr;
 
 	public Role(Expression expr) {
 		this.expr=expr;
