@@ -1,11 +1,12 @@
-package tud.gamecontroller.game;
+package tud.gamecontroller.game.javaprover;
 
 import java.io.File;
 
-
+import tud.gamecontroller.game.GameInterface;
+import tud.gamecontroller.game.Role;
 import cs227b.teamIago.parser.Axioms;
 
-public class Game implements GameInterface {
+public class Game implements GameInterface<Term, State> {
 
 	private Reasoner reasoner;
 	private String gameDescription;
@@ -31,8 +32,8 @@ public class Game implements GameInterface {
 		return new State(reasoner, reasoner.getInitialState());
 	}
 
-	public Role getRole(int roleindex) {
-		return new Role(reasoner.GetRoles().get(roleindex-1));
+	public Role<Term> getRole(int roleindex) {
+		return new Role<Term>(new Term(reasoner.GetRoles().get(roleindex-1)));
 	}
 
 	public String getGameDescription() {

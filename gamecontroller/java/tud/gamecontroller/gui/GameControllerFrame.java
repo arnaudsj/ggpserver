@@ -5,6 +5,8 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -23,8 +25,12 @@ import javax.swing.ListSelectionModel;
 import javax.swing.text.JTextComponent;
 
 import tud.gamecontroller.GameController;
-import tud.gamecontroller.game.Game;
 import tud.gamecontroller.game.Match;
+import tud.gamecontroller.game.javaprover.Game;
+import tud.gamecontroller.game.javaprover.State;
+import tud.gamecontroller.game.javaprover.Term;
+import tud.gamecontroller.game.javaprover.TermFactory;
+import tud.gamecontroller.gui.PlayerTableModel.PlayerRecord;
 import tud.gamecontroller.logging.PlainTextLogFormatter;
 import tud.gamecontroller.players.PlayerInfo;
 
@@ -58,7 +64,7 @@ public class GameControllerFrame extends JFrame {
 
 	private JTable jPlayersTable = null;
 
-	private GameController gameController = null;  //  @jve:decl-index=0:
+	private GameController<Term,State> gameController = null;  //  @jve:decl-index=0:
 
 	private PlayerTableModel playerTableModel = null;
 
@@ -220,9 +226,9 @@ public class GameControllerFrame extends JFrame {
 		int startclock, playclock;
 		startclock=((Integer)jStartclockComboBox.getSelectedItem()).intValue();
 		playclock=((Integer)jPlayclockComboBox.getSelectedItem()).intValue();
-		PlayerInfo[] players=new PlayerInfo[game.getNumberOfRoles()];
-		for(int i=0;i<game.getNumberOfRoles();i++){
-			players[i]=playerTableModel.getPlayerRecords()[i].getPlayerInfo();
+		Collection<PlayerInfo> players=new LinkedList<PlayerInfo>();
+		for(PlayerRecord p:playerTableModel.getPlayerRecords()){
+			players.add(p.getPlayerInfo());
 		}
 		Logger logger=Logger.getAnonymousLogger();
 		logger.addHandler(new ConsoleHandler());
@@ -238,7 +244,7 @@ public class GameControllerFrame extends JFrame {
 		jLogPaneAppender.setFormatter(new PlainTextLogFormatter());
 		jLogPaneAppender.setLevel(Level.ALL);
 		logger.addHandler(jLogPaneAppender);
-		gameController=new GameController(new Match("testmatch", game, startclock, playclock), players, logger);
+		gameController=new GameController<Term,State>(new Match<Term,State>("testmatch", game, startclock, playclock), players, new TermFactory(), logger);
 		gameThread=new Thread(){
 			public void run(){
 				gameController.runGame();

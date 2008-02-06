@@ -1,15 +1,9 @@
 package tud.gamecontroller.game;
 
-import cs227b.teamIago.resolver.Expression;
+public class Role<T extends TermInterface> extends TermDelegator<T> {
 
-public class Role {
-	protected Expression expr;
-
-	public Role(Expression expr) {
-		this.expr=expr;
+	public Role(T term) {
+		super(term);
 	}
 
-	public String toString(){
-		return expr.toString();
-	}
 }

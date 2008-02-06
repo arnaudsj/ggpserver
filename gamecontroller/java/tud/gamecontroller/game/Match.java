@@ -1,12 +1,16 @@
 package tud.gamecontroller.game;
 
-public class Match {
+
+public class Match<
+		T extends TermInterface,
+		S extends StateInterface<T,S>
+		> {
 	private String matchID;
-	private GameInterface game;
+	private GameInterface<T, S> game;
 	private int startclock;
 	private int playclock;
 	
-	public Match(String matchID, GameInterface game, int startclock, int playclock){
+	public Match(String matchID, GameInterface<T, S> game, int startclock, int playclock){
 		this.matchID=matchID;
 		this.game=game;
 		this.startclock=startclock;
@@ -17,7 +21,7 @@ public class Match {
 		return matchID;
 	}
 
-	public GameInterface getGame() {
+	public GameInterface<T, S> getGame() {
 		return game;
 	}
 

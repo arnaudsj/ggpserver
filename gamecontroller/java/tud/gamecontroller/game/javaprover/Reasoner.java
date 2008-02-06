@@ -1,4 +1,4 @@
-package tud.gamecontroller.game;
+package tud.gamecontroller.game.javaprover;
 
 import java.util.logging.Logger;
 

@@ -2,8 +2,8 @@ package tud.gamecontroller.gui;
 
 import javax.swing.table.AbstractTableModel;
 
-import tud.gamecontroller.game.Game;
 import tud.gamecontroller.game.Role;
+import tud.gamecontroller.game.javaprover.Game;
 import tud.gamecontroller.players.LegalPlayerInfo;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.players.RandomPlayerInfo;

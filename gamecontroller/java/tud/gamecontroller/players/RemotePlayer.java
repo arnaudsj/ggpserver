@@ -8,77 +8,77 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.List;
 import java.util.logging.Logger;
 
+import tud.gamecontroller.game.InvalidKIFException;
 import tud.gamecontroller.game.Match;
 import tud.gamecontroller.game.Move;
 import tud.gamecontroller.game.Role;
+import tud.gamecontroller.game.StateInterface;
+import tud.gamecontroller.game.TermFactoryInterface;
+import tud.gamecontroller.game.TermInterface;
 
-import cs227b.teamIago.parser.Parser;
-import cs227b.teamIago.resolver.Atom;
-import cs227b.teamIago.resolver.Connective;
-import cs227b.teamIago.resolver.ExpList;
-import cs227b.teamIago.resolver.Expression;
+public class RemotePlayer<
+		T extends TermInterface,
+		S extends StateInterface<T,S>
+		> extends AbstractPlayer<T,S> {
 
-public class RemotePlayer extends AbstractPlayer {
 	private String host;
 	private int port;
+	private TermFactoryInterface<T> termfactory;
 	
-	public RemotePlayer(String name, String host, int port) {
+	public RemotePlayer(String name, String host, int port, TermFactoryInterface<T> termfactory) {
 		super(name);
 		this.host=host;
 		this.port=port;
+		this.termfactory=termfactory;
 	}
 
-	public void gameStart(Match match, Role role) {
+	public void gameStart(Match<T,S> match, Role<T> role) {
 		super.gameStart(match, role);
 		String msg="(START "+match.getMatchID()+" "+role+" (\n"+match.getGame().getGameDescription().toUpperCase()+"\n) "+match.getStartclock()+" "+match.getPlayclock()+")";
 		sendMsg(msg, match.getStartclock());
 	}
 
-	public Move gamePlay(Move[] priormoves) {
-		Move move=null;
+	public Move<T> gamePlay(List<Move<T>> priormoves) {
+		Move<T> move=null;
 		String msg="(PLAY "+match.getMatchID()+" ";
 		if(priormoves==null){
 			msg+="NIL)";
 		}else{
 			msg+="(";
-			for(int i=0;i<priormoves.length;i++){
-				msg+=priormoves[i]+" ";
+			for(Move<T> m:priormoves){
+				msg+=m.getKIFForm()+" ";
 			}
 			msg+="))";
 		}
 		String reply=sendMsg(msg, match.getPlayclock());
-		try{
-			ExpList list=Parser.parseDesc("(bla "+reply+")");
-			if(list.size()>0){
-				Expression expr=((Connective)list.get(0)).getOperands().get(0);
-				if(expr.getVars().size()>0){
-					Logger.getLogger("tud.gamecontroller").severe("Reply from "+this+" is not a ground term:"+reply);
-				}else{
-					move=new Move(expr);
-				}
-			}else{
-				Logger.getLogger("tud.gamecontroller").severe("Reply from "+this+" is not a valid term:"+reply);
+		if(reply!=null){
+			T moveterm=null;
+			try {
+				moveterm = termfactory.getTermFromKIF(reply);
+			} catch (InvalidKIFException ex) {
+				Logger.getLogger("tud.gamecontroller").severe("Error parsing reply from "+this+":"+ex.getMessage());
 			}
-		}catch(Exception ex){
-			Logger.getLogger("tud.gamecontroller").severe("Exception while parsing reply \""+reply+"\" from "+this+":"+ex.getMessage());
-		}
-		if(move==null){
-			move=new Move(new Atom("NIL"));
+			if(moveterm!=null && !moveterm.isGround()){
+				Logger.getLogger("tud.gamecontroller").severe("Reply from "+this+" is not a ground term:"+reply);
+			}else{
+				move=new Move<T>(moveterm);
+			}
 		}
 		return move;
 	}
 
-	public void gameStop(Move[] priormoves) {
+	public void gameStop(List<Move<T>> priormoves) {
 		super.gameStop(priormoves);
 		String msg="(STOP "+match.getMatchID()+" ";
 		if(priormoves==null){
 			msg+="NIL)";
 		}else{
 			msg+="(";
-			for(int i=0;i<priormoves.length;i++){
-				msg+=priormoves[i]+" ";
+			for(Move<T> m:priormoves){
+				msg+=m.getKIFForm()+" ";
 			}
 			msg+="))";
 		}

@@ -25,30 +25,30 @@ import org.w3c.dom.Node;
 import tud.gamecontroller.game.Fluent;
 import tud.gamecontroller.game.Match;
 import tud.gamecontroller.game.Move;
-import tud.gamecontroller.game.State;
+import tud.gamecontroller.game.StateInterface;
+import tud.gamecontroller.game.TermInterface;
 import tud.gamecontroller.players.Player;
 
-import cs227b.teamIago.resolver.Atom;
-import cs227b.teamIago.resolver.ExpList;
-import cs227b.teamIago.resolver.Expression;
-import cs227b.teamIago.resolver.Predicate;
+public class XMLGameStateWriter<
+		T extends TermInterface,
+		S extends StateInterface<T,S>
+		> implements GameControllerListener<T,S> {
 
-public class XMLGameStateWriter implements GameControllerListener {
 	private String outputDir, matchDir;
-	private Player[] players;
-	private List<Move[]> moves;
+	private List<Player<T,S>> players;
+	private List<List<Move<T>>> moves;
 	private int step;
-	private Match match;
+	private Match<T,S> match;
 	private String stylesheet;
 		
 	public XMLGameStateWriter(String outputDir, String stylesheet) {
 		this.outputDir=outputDir;
 		this.stylesheet=stylesheet;
-		this.moves=new LinkedList<Move[]>();
+		this.moves=new LinkedList<List<Move<T>>>();
 		this.match=null;
 	}
 
-	public void gameStarted(Match match, Player[] players, State currentState) {
+	public void gameStarted(Match<T,S> match, List<Player<T,S>> players, S currentState) {
 		this.match=match;
 		this.players=players;
 		this.step=1;
@@ -57,18 +57,18 @@ public class XMLGameStateWriter implements GameControllerListener {
 		writeState(currentState, null);
 	}
 
-	public void gameStep(Move[] priormoves, State currentState) {
+	public void gameStep(List<Move<T>> priormoves, S currentState) {
 		step++;
 		moves.add(priormoves);
 		writeState(currentState, null);
 	}
 
-	public void gameStopped(State currentState, int[] goalValues) {
+	public void gameStopped(S currentState, int[] goalValues) {
 		writeState(currentState, goalValues);
-		this.moves=new LinkedList<Move[]>();
+		this.moves=new LinkedList<List<Move<T>>>();
 	}
 
-	private void writeState(State currentState, int[] goalValues) {
+	private void writeState(S currentState, int[] goalValues) {
 		 Document xmldoc = null;
 		 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		 DocumentBuilder builder;
@@ -93,9 +93,9 @@ public class XMLGameStateWriter implements GameControllerListener {
 				 e.setTextContent(match.getGame().getRole(i).toString());
 				 root.appendChild(e);
 			 }
-			 for(int i=0;i<players.length;i++){
+			 for(Player<T,S> p:players){
 				 e=xmldoc.createElement("player");
-				 e.setTextContent(players[i].getName().toUpperCase());
+				 e.setTextContent(p.getName().toUpperCase());
 				 root.appendChild(e);
 			 }
 			 root.appendChild(createHistoryElement(xmldoc));
@@ -121,29 +121,27 @@ public class XMLGameStateWriter implements GameControllerListener {
 		}
 	}
 
-	private Node createStateElement(Document xmldoc, State currentState) {
+	private Node createStateElement(Document xmldoc, StateInterface<T,S> currentState) {
 		Element state=xmldoc.createElement("state");
-		Collection<Fluent> fluents=currentState.getFluents();
-		for(Fluent f:fluents){
+		Collection<Fluent<T>> fluents=currentState.getFluents();
+		for(Fluent<T> f:fluents){
 			Element fact=xmldoc.createElement("fact");
 			Element e=xmldoc.createElement("prop-f");
-			e.setTextContent(f.expr.firstOp().toString().toUpperCase());
+			e.setTextContent(f.getName().toUpperCase());
 			fact.appendChild(e);
-			if(f.expr instanceof Predicate){
-				ExpList el=((Predicate)f.expr).getOperands();
-				for(int i=0;i<el.size();i++){
-					Expression exp=el.get(i);
+			if(!f.isVariable()){
+				for(TermInterface arg:f.getArgs()){
 					e=xmldoc.createElement("arg");
-					if(exp instanceof Atom){
-						e.setTextContent(exp.toString().toUpperCase());
+					if(arg.isConstant()){
+						e.setTextContent(arg.getName().toUpperCase());
 					}else{
 						e.setTextContent("?");
-						Logger.getLogger("tud.gamecontroller").warning("in XMLGameStateWriter.createStateElement: unsupported expression as argument of a fluent:"+exp);
+						Logger.getLogger("tud.gamecontroller").warning("in XMLGameStateWriter.createStateElement: unsupported expression as argument of a fluent:"+arg);
 					}
 					fact.appendChild(e);
 				}
-			}else if(!(f.expr instanceof Atom)){
-				Logger.getLogger("tud.gamecontroller").warning("in XMLGameStateWriter.createStateElement: unsupported fluent expression in state:"+f.expr);
+			}else{
+				Logger.getLogger("tud.gamecontroller").warning("in XMLGameStateWriter.createStateElement: unsupported fluent expression in state:"+f);
 			}
 			state.appendChild(fact);
 		}
@@ -163,14 +161,14 @@ public class XMLGameStateWriter implements GameControllerListener {
 	private Element createHistoryElement(Document xmldoc) {
 		Element history=xmldoc.createElement("history");
 		int s=1;
-		for(Move[] move:moves){
+		for(List<Move<T>> jointmove:moves){
 			Element step=xmldoc.createElement("step");
 			Element e=xmldoc.createElement("step-number");
 			e.setTextContent(""+s);
 			step.appendChild(e);
-			for(int i=0;i<move.length;i++){
+			for(Move<T> move:jointmove){
 				e=xmldoc.createElement("move");
-				e.setTextContent(move[i].getPrefixForm());
+				e.setTextContent(move.getPrefixForm());
 				step.appendChild(e);
 			}
 			history.appendChild(step);

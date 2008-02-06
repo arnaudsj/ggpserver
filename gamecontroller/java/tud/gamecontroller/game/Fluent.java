@@ -1,15 +1,9 @@
 package tud.gamecontroller.game;
 
-import cs227b.teamIago.resolver.Expression;
+public class Fluent<T extends TermInterface> extends TermDelegator<T> {
 
-public class Fluent {
-	public Expression expr;
-	
-	public Fluent(Expression expr){
-		this.expr=expr;
+	public Fluent(T term) {
+		super(term);
 	}
 
-	public String toString(){
-		return expr.toString();
-	}
 }

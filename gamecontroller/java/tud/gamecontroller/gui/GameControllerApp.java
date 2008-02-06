@@ -8,7 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 
-import tud.gamecontroller.game.Game;
+import tud.gamecontroller.game.javaprover.Game;
 
 import java.io.File;
 

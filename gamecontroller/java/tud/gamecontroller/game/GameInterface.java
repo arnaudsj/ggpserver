@@ -1,12 +1,15 @@
 package tud.gamecontroller.game;
 
-public interface GameInterface {
+public interface GameInterface<
+		T extends TermInterface,
+		S extends StateInterface<T,S>
+		> {
 
 	public int getNumberOfRoles();
 
-	public State getInitialState();
+	public S getInitialState();
 
-	public Role getRole(int roleindex);
+	public Role<T> getRole(int roleindex);
 
 	public String getGameDescription();
 
