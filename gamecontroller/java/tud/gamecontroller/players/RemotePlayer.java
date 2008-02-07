@@ -37,7 +37,7 @@ public class RemotePlayer<
 
 	public void gameStart(Match<T,S> match, Role<T> role) {
 		super.gameStart(match, role);
-		String msg="(START "+match.getMatchID()+" "+role+" (\n"+match.getGame().getGameDescription().toUpperCase()+"\n) "+match.getStartclock()+" "+match.getPlayclock()+")";
+		String msg="(START "+match.getMatchID()+" "+role+" (\n"+match.getGame().getKIFGameDescription()+"\n) "+match.getStartclock()+" "+match.getPlayclock()+")";
 		sendMsg(msg, match.getStartclock());
 	}
 
@@ -62,7 +62,7 @@ public class RemotePlayer<
 				Logger.getLogger("tud.gamecontroller").severe("Error parsing reply from "+this+":"+ex.getMessage());
 			}
 			if(moveterm!=null && !moveterm.isGround()){
-				Logger.getLogger("tud.gamecontroller").severe("Reply from "+this+" is not a ground term:"+reply);
+				Logger.getLogger("tud.gamecontroller").severe("Reply from "+this+" is not a ground term:"+reply+" term:"+moveterm);
 			}else{
 				move=new Move<T>(moveterm);
 			}
@@ -131,6 +131,7 @@ public class RemotePlayer<
 	}
 
 	public String toString(){
-		return "remote("+getName()+", "+host+":"+port+")";
+//		return "remote("+getName()+", "+host+":"+port+")";
+		return "remote("+host+":"+port+")";
 	}
 }

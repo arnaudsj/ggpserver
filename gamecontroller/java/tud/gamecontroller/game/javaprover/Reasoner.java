@@ -1,8 +1,11 @@
 package tud.gamecontroller.game.javaprover;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 import cs227b.teamIago.gameProver.GameSimulator;
+import cs227b.teamIago.parser.PublicAxiomsWrapper;
+import cs227b.teamIago.parser.Statement;
 import cs227b.teamIago.resolver.Atom;
 import cs227b.teamIago.resolver.ExpList;
 import cs227b.teamIago.resolver.Expression;
@@ -12,8 +15,10 @@ import cs227b.teamIago.util.GameState;
 public class Reasoner {
 
 	private GameSimulator gameSim;
+	private String gameDescription; 
 	
 	public Reasoner(String gameDescription) {
+		this.gameDescription=gameDescription;
 		gameSim=new GameSimulator(false, true);
 		gameSim.ParseDescIntoTheory(gameDescription);
 	}
@@ -75,6 +80,17 @@ public class Reasoner {
 			gameSim.SimulateStart();
 			return gameSim.getTheory().getState();
 		}
+	}
+
+	public String getKIFGameDescription() {
+		PublicAxiomsWrapper a=new PublicAxiomsWrapper();
+		a.parseFromString(gameDescription);
+		List<Statement> statements=a.getStatements();
+		StringBuilder stringBuilder=new StringBuilder();
+		for(Statement statement:statements){
+			stringBuilder.append(statement.toString()).append(' ');
+		}
+		return stringBuilder.toString().toUpperCase();
 	}
 
 }

@@ -1,18 +1,25 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="ISO-8859-15"?>
 <jardesc>
 <jar path="/usr/users/iki/ss177134/GGP-LECTURE/testsystem/gamecontroller.jar"/>
-<options buildIfNeeded="true" compress="true" descriptionLocation="/gamecontroller/gamecontroller-jar.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" useSourceFolders="false"/>
-<manifest generateManifest="true" mainClassHandleIdentifier="=gamecontroller/&lt;tud.gamecontroller{GameController.java[GameController" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+<options buildIfNeeded="true" compress="true" descriptionLocation="/gamecontroller/gamecontroller-jar.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+<storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+<selectedProjects/>
+<manifest generateManifest="false" manifestLocation="/gamecontroller/gamecontroller-Manifest" manifestVersion="1.0" reuseManifest="false" saveManifest="true" usesManifest="true">
 <sealing sealJar="false">
 <packagesToSeal/>
 <packagesToUnSeal/>
 </sealing>
 </manifest>
 <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
+<file path="/gamecontroller/.classpath"/>
+<javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.game.javaprover"/>
+<javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.game"/>
+<javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller"/>
 <javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.gameProver"/>
-<javaElement handleIdentifier="=gamecontroller"/>
 <javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.resolver"/>
-<javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.util"/>
+<javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.players"/>
+<javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.logging"/>
 <javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.parser"/>
+<javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.util"/>
 </selectedElements>
 </jardesc>

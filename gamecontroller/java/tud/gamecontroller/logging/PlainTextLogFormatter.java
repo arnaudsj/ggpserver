@@ -7,7 +7,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Formatter;
 
 public class PlainTextLogFormatter extends Formatter {
-	private static final DateFormat format = new SimpleDateFormat("HH:mm:ss.S");
+	private static final DateFormat format = new SimpleDateFormat("HH:mm:ss.SSS");
 	private static final String lineSep = System.getProperty("line.separator");
 	
 	public synchronized String format(LogRecord record) {

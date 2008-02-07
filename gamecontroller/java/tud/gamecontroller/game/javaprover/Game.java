@@ -44,8 +44,8 @@ public class Game implements GameInterface<Term, State> {
 		return name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public String getKIFGameDescription() {
+		return reasoner.getKIFGameDescription();
 	}
 
 

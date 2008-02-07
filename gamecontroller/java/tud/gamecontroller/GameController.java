@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.StreamHandler;
 
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.Match;
@@ -19,6 +18,7 @@ import tud.gamecontroller.game.javaprover.State;
 import tud.gamecontroller.game.javaprover.Term;
 import tud.gamecontroller.game.javaprover.TermFactory;
 import tud.gamecontroller.logging.PlainTextLogFormatter;
+import tud.gamecontroller.logging.UnbufferedStreamHandler;
 import tud.gamecontroller.players.LegalPlayerInfo;
 import tud.gamecontroller.players.Player;
 import tud.gamecontroller.players.PlayerFactory;
@@ -115,7 +115,7 @@ public class GameController<
 		int step=1;
 		currentState=game.getInitialState();
 		List<Move<T>> priormoves=null;
-		logger.info("starting game with startclock="+startclock+", playerclock="+playclock);
+		logger.info("starting game with startclock="+startclock+", playclock="+playclock);
 		logger.info("step:"+step);
 		logger.info("current state:"+currentState);
 		gameStart();
@@ -162,6 +162,7 @@ public class GameController<
 			logger.info("player "+i+": "+players.get(i));
 			playerthreads.add(new PlayerThreadStart<T,S>(i+1, players.get(i), match));
 		}
+		logger.info("Sending start messages ...");
 		runThreads(playerthreads, startclock*1000+1000, Level.WARNING);
 	}
 
@@ -172,6 +173,7 @@ public class GameController<
 			moves.add(null);
 			playerthreads.add(new PlayerThreadPlay<T,S>(i+1, players.get(i), match, priormoves));
 		}
+		logger.info("Sending play messages ...");
 		runThreads(playerthreads, playclock*1000+1000, Level.SEVERE);
 		for(PlayerThreadPlay<T,S> pt:playerthreads){
 			int i=pt.getRoleIndex()-1;
@@ -196,6 +198,7 @@ public class GameController<
 		for(int i=0;i<players.size();i++){
 			playerthreads.add(new PlayerThreadStop<T,S>(i+1, players.get(i), match, priormoves));
 		}
+		logger.info("Sending stop messages ...");
 		runThreads(playerthreads, playclock*1000+1000, Level.WARNING);
 	}
 	
@@ -308,7 +311,7 @@ public class GameController<
 	}
 	
 	public static void printUsage(){
-		System.out.println("usage:\n java -jar gamecontroller.jar MATCHID GAMEFILE STARTCLOCK PLAYCLOCK [ -printxml OUTPUTDIR XSLT ] { -remote ROLEINDEX NAME HOST PORT | -legal ROLEINDEX | -random ROLEINDEX } ...");
+		System.out.println("usage:\n java -jar gamecontroller.jar MATCHID GAMEFILE STARTCLOCK PLAYCLOCK [ -printxml OUTPUTDIR XSLT ] { -remote ROLEINDEX HOST PORT | -legal ROLEINDEX | -random ROLEINDEX } ...");
 		System.out.println("e.g.: java -jar gamecontroller.jar A_TicTacToe_Match tictactoe.gdl 30 5 -remote 2 localhost 4001");
 	}
 	public static void main(String argv[]){
@@ -318,6 +321,7 @@ public class GameController<
 		if(argv.length>=3){
 			matchID=argv[0];
 			game=Game.readFromFile(argv[1]);
+			System.out.println("GDL: "+game.getKIFGameDescription());
 			try{
 				startclock=Integer.parseInt(argv[2]);
 			}catch(NumberFormatException ex){
@@ -342,7 +346,7 @@ public class GameController<
 			}
 			Logger logger=Logger.getLogger("tud.gamecontroller");
 			logger.setUseParentHandlers(false);
-			logger.addHandler(new StreamHandler(System.out, new PlainTextLogFormatter()));
+			logger.addHandler(new UnbufferedStreamHandler(System.out, new PlainTextLogFormatter()));
 			logger.setLevel(Level.ALL);
 			GameController<Term, State> gc=new GameController<Term, State>(new Match<Term, State>(matchID, game, startclock, playclock), playerinfos, new TermFactory(), logger);
 			logger.info("match:"+matchID);
@@ -354,6 +358,7 @@ public class GameController<
 			gc.runGame();
 		}else{
 			System.err.println("wrong number of arguments");
+			printUsage();
 			System.exit(-1);
 		}
 	}

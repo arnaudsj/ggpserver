@@ -37,7 +37,7 @@ public class Term extends AbstractTerm{
 	}
 	
 	public boolean isGround() {
-		return expr.getVars().size()>0;
+		return expr.getVars().size()==0;
 	}
 
 	public List<TermInterface> getArgs() {
@@ -63,6 +63,10 @@ public class Term extends AbstractTerm{
 			return expList.size();
 		}
 		
+	}
+	
+	public String toString(){
+		return expr.toString();
 	}
 
 }

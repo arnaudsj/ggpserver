@@ -3,6 +3,7 @@ package tud.gamecontroller.game;
 import java.util.List;
 
 public abstract class TermDelegator<T extends TermInterface> implements TermInterface {
+
 	private T term;
 
 	public TermDelegator(T term) {
@@ -45,4 +46,21 @@ public abstract class TermDelegator<T extends TermInterface> implements TermInte
 		return term.isGround();
 	}
 	
+	public String toString() {
+		return term.toString();
+	}
+
+	public boolean equals(Object obj) {
+		if(obj instanceof TermDelegator){
+			return term.equals(((TermDelegator<?>)obj).getTerm());
+		}else if(obj instanceof TermInterface){
+			return term.equals(obj);
+		}else{
+			return false;
+		}
+	}
+
+	public int hashCode() {
+		return term.hashCode();
+	}
 }

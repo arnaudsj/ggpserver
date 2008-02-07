@@ -12,5 +12,9 @@ public interface GameInterface<
 	public Role<T> getRole(int roleindex);
 
 	public String getGameDescription();
-
+	
+	/**
+	 * @return the GDL game description in infix KIF format without comments and linebreaks
+	 */
+	public String getKIFGameDescription();
 }
