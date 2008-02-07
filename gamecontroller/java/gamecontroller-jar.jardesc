@@ -13,12 +13,14 @@
 <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
 <file path="/gamecontroller/.classpath"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.game.javaprover"/>
+<javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.scrambling"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.game"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller"/>
 <javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.gameProver"/>
-<javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.resolver"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.players"/>
+<javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.resolver"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.logging"/>
+<javaElement handleIdentifier="=gamecontroller/&lt;cs227b.teamIago.parser"/>
 <javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.parser"/>
 <javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.util"/>
 </selectedElements>

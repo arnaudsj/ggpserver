@@ -11,6 +11,7 @@ import java.net.UnknownHostException;
 import java.util.List;
 import java.util.logging.Logger;
 
+import tud.gamecontroller.MessageSentNotifier;
 import tud.gamecontroller.game.InvalidKIFException;
 import tud.gamecontroller.game.Match;
 import tud.gamecontroller.game.Move;
@@ -39,18 +40,18 @@ public class RemotePlayer<
 		this.logger=Logger.getLogger("tud.gamecontroller");
 	}
 
-	public void gameStart(Match<T,S> match, Role<T> role) {
-		super.gameStart(match, role);
+	public void gameStart(Match<T,S> match, Role<T> role, MessageSentNotifier notifier) {
+		super.gameStart(match, role, notifier);
 		this.gamescrambler=match.getScrambler();
 		String msg="(START "+
 				match.getMatchID()+" "+
 				gamescrambler.scramble(role.getKIFForm())+
 				" ("+gamescrambler.scramble(match.getGame().getKIFGameDescription())+") "+
 				match.getStartclock()+" "+match.getPlayclock()+")";
-		sendMsg(msg, match.getStartclock());
+		sendMsg(msg, match.getStartclock(), notifier);
 	}
 
-	public Move<T> gamePlay(List<Move<T>> priormoves) {
+	public Move<T> gamePlay(List<Move<T>> priormoves, MessageSentNotifier notifier) {
 		Move<T> move=null;
 		String msg="(PLAY "+match.getMatchID()+" ";
 		if(priormoves==null){
@@ -62,8 +63,8 @@ public class RemotePlayer<
 			}
 			msg+="))";
 		}
-		String reply=sendMsg(msg, match.getPlayclock()), descrambledReply;
-		logger.info("reply from "+this.getName()+":"+reply);
+		String reply=sendMsg(msg, match.getPlayclock(), notifier), descrambledReply;
+		logger.info("reply from "+this.getName()+": "+reply);
 		if(reply!=null){
 			descrambledReply=gamescrambler.descramble(reply);
 			T moveterm=null;
@@ -81,8 +82,8 @@ public class RemotePlayer<
 		return move;
 	}
 
-	public void gameStop(List<Move<T>> priormoves) {
-		super.gameStop(priormoves);
+	public void gameStop(List<Move<T>> priormoves, MessageSentNotifier notifier) {
+		super.gameStop(priormoves, notifier);
 		String msg="(STOP "+match.getMatchID()+" ";
 		if(priormoves==null){
 			msg+="NIL)";
@@ -93,10 +94,10 @@ public class RemotePlayer<
 			}
 			msg+="))";
 		}
-		sendMsg(msg, match.getPlayclock());
+		sendMsg(msg, match.getPlayclock(), notifier);
 	}
 
-	private String sendMsg(String msg, int timeout) {
+	private String sendMsg(String msg, int timeout, MessageSentNotifier notifier) {
 		String reply=null;
 		Socket s;
 		try {
@@ -114,6 +115,8 @@ public class RemotePlayer<
 	
 			pw.print(msg);
 			pw.flush();
+			logger.info("message to "+this.getName()+" sent");
+			notifier.messageWasSent();
 			
 			InputStream is = s.getInputStream();
 			if ( is == null) return null;

@@ -2,6 +2,7 @@ package tud.gamecontroller.players;
 
 import java.util.List;
 
+import tud.gamecontroller.MessageSentNotifier;
 import tud.gamecontroller.game.Match;
 import tud.gamecontroller.game.Move;
 import tud.gamecontroller.game.Role;
@@ -21,12 +22,12 @@ public abstract class AbstractPlayer<
 		this.name=name;
 	}
 	
-	public void gameStart(Match<T,S> match, Role<T> role) {
+	public void gameStart(Match<T,S> match, Role<T> role, MessageSentNotifier notifier) {
 		this.match=match;
 		this.role=role;
 	}
 
-	public void gameStop(List<Move<T>> priormoves) { }
+	public void gameStop(List<Move<T>> priormoves, MessageSentNotifier notifier) { }
 
 	public String getName() {
 		return name;

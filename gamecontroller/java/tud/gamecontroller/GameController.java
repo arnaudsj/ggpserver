@@ -147,13 +147,12 @@ public class GameController<
 		logger.info(goalmsg);
 	}
 
-	private void runThreads(Collection<? extends AbstractPlayerThread<T,S>> threads, long timeout, Level loglevel){
+	private void runThreads(Collection<? extends AbstractPlayerThread<T,S>> threads, Level loglevel){
 		for(AbstractPlayerThread<T,S> t:threads){
 			t.start();
-			t.setDeadLine(System.currentTimeMillis()+timeout);
 		}
 		for(AbstractPlayerThread<T,S> t:threads){
-			if(!waitForThread(t, t.getDeadLine())){
+			if(!t.waitUntilDeadline()){
 				logger.log(loglevel, "player "+t.getPlayer()+" timed out!");
 			}
 		}
@@ -163,10 +162,10 @@ public class GameController<
 		Collection<PlayerThreadStart<T,S>> playerthreads=new LinkedList<PlayerThreadStart<T,S>>();
 		for(int i=0;i<players.size();i++){
 			logger.info("player "+i+": "+players.get(i));
-			playerthreads.add(new PlayerThreadStart<T,S>(i+1, players.get(i), match));
+			playerthreads.add(new PlayerThreadStart<T,S>(i+1, players.get(i), match, startclock*1000+1000));
 		}
 		logger.info("Sending start messages ...");
-		runThreads(playerthreads, startclock*1000+1000, Level.WARNING);
+		runThreads(playerthreads, Level.WARNING);
 	}
 
 	private List<Move<T>> gamePlay(int step, List<Move<T>> priormoves) {
@@ -174,10 +173,10 @@ public class GameController<
 		Collection<PlayerThreadPlay<T,S>> playerthreads=new LinkedList<PlayerThreadPlay<T,S>>();
 		for(int i=0;i<players.size();i++){
 			moves.add(null);
-			playerthreads.add(new PlayerThreadPlay<T,S>(i+1, players.get(i), match, priormoves));
+			playerthreads.add(new PlayerThreadPlay<T,S>(i+1, players.get(i), match, priormoves, playclock*1000+1000));
 		}
 		logger.info("Sending play messages ...");
-		runThreads(playerthreads, playclock*1000+1000, Level.SEVERE);
+		runThreads(playerthreads, Level.SEVERE);
 		for(PlayerThreadPlay<T,S> pt:playerthreads){
 			int i=pt.getRoleIndex()-1;
 			Move<T> move=pt.getMove();
@@ -199,32 +198,12 @@ public class GameController<
 	private void gameStop(List<Move<T>> priormoves) {
 		Collection<PlayerThreadStop<T,S>> playerthreads=new LinkedList<PlayerThreadStop<T,S>>();
 		for(int i=0;i<players.size();i++){
-			playerthreads.add(new PlayerThreadStop<T,S>(i+1, players.get(i), match, priormoves));
+			playerthreads.add(new PlayerThreadStop<T,S>(i+1, players.get(i), match, priormoves, playclock*1000+1000));
 		}
 		logger.info("Sending stop messages ...");
-		runThreads(playerthreads, playclock*1000+1000, Level.WARNING);
+		runThreads(playerthreads, Level.WARNING);
 	}
 	
-	private static boolean waitForThread(Thread t, long deadLineMillis){
-		long timeLeft=deadLineMillis-System.currentTimeMillis();
-		if(timeLeft<=0){
-			timeLeft=1;
-		}
-		if(t.isAlive()){
-			try {
-				t.join(timeLeft);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		if(t.isAlive()){
-			t.interrupt();
-			return false;
-		}else{
-			return true;
-		}
-	}
-
 	public int[] getGoalValues() {
 		return goalValues;
 	}

@@ -15,11 +15,11 @@ public class PlayerThreadStop<
 
 	private List<Move<T>> priormoves;
 	
-	public PlayerThreadStop(int roleindex, Player<T,S> player, Match<T,S> match, List<Move<T>> priormoves){
-		super(roleindex, player, match);
+	public PlayerThreadStop(int roleindex, Player<T,S> player, Match<T,S> match, List<Move<T>> priormoves, long deadline){
+		super(roleindex, player, match, deadline);
 		this.priormoves=priormoves;
 	}
 	public void run(){
-		player.gameStop(priormoves);
+		player.gameStop(priormoves, this);
 	}
 }
