@@ -18,6 +18,7 @@ import tud.gamecontroller.game.Role;
 import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.game.TermFactoryInterface;
 import tud.gamecontroller.game.TermInterface;
+import tud.gamecontroller.scrambling.GameScramblerInterface;
 
 public class RemotePlayer<
 		T extends TermInterface,
@@ -27,17 +28,25 @@ public class RemotePlayer<
 	private String host;
 	private int port;
 	private TermFactoryInterface<T> termfactory;
+	private GameScramblerInterface gamescrambler=null;
+	private Logger logger;
 	
 	public RemotePlayer(String name, String host, int port, TermFactoryInterface<T> termfactory) {
 		super(name);
 		this.host=host;
 		this.port=port;
 		this.termfactory=termfactory;
+		this.logger=Logger.getLogger("tud.gamecontroller");
 	}
 
 	public void gameStart(Match<T,S> match, Role<T> role) {
 		super.gameStart(match, role);
-		String msg="(START "+match.getMatchID()+" "+role+" (\n"+match.getGame().getKIFGameDescription()+"\n) "+match.getStartclock()+" "+match.getPlayclock()+")";
+		this.gamescrambler=match.getScrambler();
+		String msg="(START "+
+				match.getMatchID()+" "+
+				gamescrambler.scramble(role.getKIFForm())+
+				" ("+gamescrambler.scramble(match.getGame().getKIFGameDescription())+") "+
+				match.getStartclock()+" "+match.getPlayclock()+")";
 		sendMsg(msg, match.getStartclock());
 	}
 
@@ -49,20 +58,22 @@ public class RemotePlayer<
 		}else{
 			msg+="(";
 			for(Move<T> m:priormoves){
-				msg+=m.getKIFForm()+" ";
+				msg+=gamescrambler.scramble(m.getKIFForm())+" ";
 			}
 			msg+="))";
 		}
-		String reply=sendMsg(msg, match.getPlayclock());
+		String reply=sendMsg(msg, match.getPlayclock()), descrambledReply;
+		logger.info("reply from "+this.getName()+":"+reply);
 		if(reply!=null){
+			descrambledReply=gamescrambler.descramble(reply);
 			T moveterm=null;
 			try {
-				moveterm = termfactory.getTermFromKIF(reply);
+				moveterm = termfactory.getTermFromKIF(descrambledReply);
 			} catch (InvalidKIFException ex) {
-				Logger.getLogger("tud.gamecontroller").severe("Error parsing reply from "+this+":"+ex.getMessage());
+				logger.severe("Error parsing reply \""+reply+"\" from "+this+":"+ex.getMessage());
 			}
 			if(moveterm!=null && !moveterm.isGround()){
-				Logger.getLogger("tud.gamecontroller").severe("Reply from "+this+" is not a ground term:"+reply+" term:"+moveterm);
+				logger.severe("Reply \""+reply+"\" from "+this+" is not a ground term. (descrambled:\""+descrambledReply+"\")");
 			}else{
 				move=new Move<T>(moveterm);
 			}
@@ -78,7 +89,7 @@ public class RemotePlayer<
 		}else{
 			msg+="(";
 			for(Move<T> m:priormoves){
-				msg+=m.getKIFForm()+" ";
+				msg+=gamescrambler.scramble(m.getKIFForm())+" ";
 			}
 			msg+="))";
 		}
@@ -123,9 +134,9 @@ public class RemotePlayer<
 			out.close();
 			in.close();
 		} catch (UnknownHostException e) {
-			Logger.getLogger("tud.gamecontroller").severe("error: unknown host \""+ host+ "\"");
+			logger.severe("error: unknown host \""+ host+ "\"");
 		} catch (IOException e) {
-			Logger.getLogger("tud.gamecontroller").severe("error: io error for "+ this+" : "+e.getMessage());
+			logger.severe("error: io error for "+ this+" : "+e.getMessage());
 		}
 		return reply;
 	}

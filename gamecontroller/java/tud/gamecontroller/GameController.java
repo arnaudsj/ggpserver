@@ -1,5 +1,6 @@
 package tud.gamecontroller;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -25,6 +26,8 @@ import tud.gamecontroller.players.PlayerFactory;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.players.RandomPlayerInfo;
 import tud.gamecontroller.players.RemotePlayerInfo;
+import tud.gamecontroller.scrambling.GameScrambler;
+import tud.gamecontroller.scrambling.GameScramblerInterface;
 
 public class GameController<
 		T extends TermInterface,
@@ -229,64 +232,37 @@ public class GameController<
 	public void setLogger(Logger logger) {
 		this.logger = logger;
 	}
-
-	private static Collection<PlayerInfo> parsePlayerArguments(int index, String argv[], Game game){
-		List<PlayerInfo> playerinfos=new LinkedList<PlayerInfo>();
-		for(int i=0;i<game.getNumberOfRoles();i++){
-			playerinfos.add(null);
-		}
+	private static int parsePlayerArguments(int index, String argv[], Game game, List<PlayerInfo> playerinfos){
 		int roleindex=0;
 		String host="";
 		int port=0;
 		PlayerInfo player=null;
-		while(index<argv.length){
+		if(index<argv.length){
 			if(argv[index].equals("-remote")){
 				if(argv.length>index+3){
-					try{
-						roleindex=Integer.parseInt(argv[index+1]);
-					}catch(NumberFormatException ex){
-						System.err.println("roleindex argument is not an integer");
-						printUsage();
-						System.exit(-1);
-					}
+					roleindex=getIntArg(argv[index+1], "roleindex");
 					if(roleindex<1 || roleindex>game.getNumberOfRoles()){
 						System.err.println("roleindex out of bounds");
 						printUsage();
 						System.exit(-1);
 					}
 					host=argv[index+2];
-					try{
-						port=Integer.parseInt(argv[index+3]);
-					}catch(NumberFormatException ex){
-						System.err.println("port argument is not an integer");
-						printUsage();
-						System.exit(-1);
-					}
+					port=getIntArg(argv[index+3], "port");
 					player=new RemotePlayerInfo(roleindex-1, host, port);
 					index+=4;
 				}else{
-					System.err.println("missing arguments for -remote");
-					printUsage();
-					System.exit(-1);
+					missingArgumentsExit(argv[index]);
 				}
 			}else if(argv[index].equals("-legal") || argv[index].equals("-random")){
 				if(argv.length>index+1){
-					try{
-						roleindex=Integer.parseInt(argv[index+1]);
-					}catch(NumberFormatException ex){
-						System.err.println("roleindex argument is not an integer");
-						printUsage();
-						System.exit(-1);
-					}
+					roleindex=getIntArg(argv[index+1], "roleindex");
 					if(roleindex<1 || roleindex>game.getNumberOfRoles()){
 						System.err.println("roleindex out of bounds");
 						printUsage();
 						System.exit(-1);
 					}
 				}else{
-					System.err.println("missing arguments for "+argv[index]);
-					printUsage();
-					System.exit(-1);
+					missingArgumentsExit(argv[index]);
 				}
 				if(argv[index].equals("-legal")){
 					player=new LegalPlayerInfo(roleindex-1);
@@ -307,48 +283,71 @@ public class GameController<
 				System.exit(-1);
 			}
 		}
-		return playerinfos;
+		return index;
 	}
-	
+
 	public static void printUsage(){
-		System.out.println("usage:\n java -jar gamecontroller.jar MATCHID GAMEFILE STARTCLOCK PLAYCLOCK [ -printxml OUTPUTDIR XSLT ] { -remote ROLEINDEX HOST PORT | -legal ROLEINDEX | -random ROLEINDEX } ...");
-		System.out.println("e.g.: java -jar gamecontroller.jar A_TicTacToe_Match tictactoe.gdl 30 5 -remote 2 localhost 4001");
+		System.out.println("usage:\n java -jar gamecontroller.jar MATCHID GAMEFILE STARTCLOCK PLAYCLOCK [ -printxml OUTPUTDIR XSLT ] [-scramble WORDFILE] { -remote ROLEINDEX HOST PORT | -legal ROLEINDEX | -random ROLEINDEX } ...");
+		System.out.println("usage:\n java -jar gamecontroller.jar MATCHID GAMEFILE STARTCLOCK PLAYCLOCK [ -printxml OUTPUTDIR XSLT ] [-scramble WORDFILE] { -remote ROLEINDEX HOST PORT | -legal ROLEINDEX | -random ROLEINDEX } ...");
+	}
+	public static int getIntArg(String arg, String argName){
+		try{
+			return Integer.parseInt(arg);
+		}catch(NumberFormatException ex){
+			System.err.println(argName+" argument is not an integer");
+			printUsage();
+			System.exit(-1);
+		}
+		return -1;
+	
+	}
+	public static void missingArgumentsExit(String arg){
+		System.err.println("missing arguments for "+arg);
+		printUsage();
+		System.exit(-1);
 	}
 	public static void main(String argv[]){
 		Game game=null;
 		int startclock=0, playclock=0;
 		String matchID, stylesheet=null, xmloutputdir=null;
-		if(argv.length>=3){
-			matchID=argv[0];
-			game=Game.readFromFile(argv[1]);
-			System.out.println("GDL: "+game.getKIFGameDescription());
-			try{
-				startclock=Integer.parseInt(argv[2]);
-			}catch(NumberFormatException ex){
-				System.err.println("startclock argument is not an integer");
-				printUsage();
-				System.exit(-1);
+		int index=0;
+		GameScramblerInterface gameScrambler=null;
+		if(argv.length>=4){
+			matchID=argv[index]; ++index;
+			game=Game.readFromFile(argv[index]); ++index;
+			startclock=getIntArg(argv[index],"startclock"); ++index;
+			playclock=getIntArg(argv[index],"playclock"); ++index;
+			
+			List<PlayerInfo> playerinfos=new LinkedList<PlayerInfo>();
+			for(int i=0;i<game.getNumberOfRoles();i++){
+				playerinfos.add(null);
 			}
-			try{
-				playclock=Integer.parseInt(argv[3]);
-			}catch(NumberFormatException ex){
-				System.err.println("playclock argument is not an integer");
-				printUsage();
-				System.exit(-1);
+			while(index<argv.length){
+				if(argv[index].equals("-printxml")){
+					if(index+2<argv.length){
+						xmloutputdir=argv[index+1];
+						stylesheet=argv[index+2];
+						index+=3;
+					}else{
+						missingArgumentsExit(argv[index]);
+					}
+				}else if(argv[index].equals("-scramble")){
+					if(index+1<argv.length){
+						gameScrambler=new GameScrambler(new File(argv[index+1]));
+						index+=2;
+					}else{
+						missingArgumentsExit(argv[index]);
+					}
+				}else{
+					index=parsePlayerArguments(index, argv, game, playerinfos);
+				}
 			}
-			Collection<PlayerInfo> playerinfos;
-			if(argv[4].equals("-printxml")){
-				xmloutputdir=argv[5];
-				stylesheet=argv[6];
-				playerinfos=parsePlayerArguments(7, argv, game);
-			}else{
-				playerinfos=parsePlayerArguments(4, argv, game);
-			}
+
 			Logger logger=Logger.getLogger("tud.gamecontroller");
 			logger.setUseParentHandlers(false);
 			logger.addHandler(new UnbufferedStreamHandler(System.out, new PlainTextLogFormatter()));
 			logger.setLevel(Level.ALL);
-			GameController<Term, State> gc=new GameController<Term, State>(new Match<Term, State>(matchID, game, startclock, playclock), playerinfos, new TermFactory(), logger);
+			GameController<Term, State> gc=new GameController<Term, State>(new Match<Term, State>(matchID, game, startclock, playclock, gameScrambler), playerinfos, new TermFactory(), logger);
 			logger.info("match:"+matchID);
 			logger.info("game:"+argv[1]);
 			if(stylesheet!=null){

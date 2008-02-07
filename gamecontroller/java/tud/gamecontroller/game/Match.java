@@ -1,5 +1,7 @@
 package tud.gamecontroller.game;
 
+import tud.gamecontroller.scrambling.GameScramblerInterface;
+import tud.gamecontroller.scrambling.IdentityGameScrambler;
 
 public class Match<
 		T extends TermInterface,
@@ -9,12 +11,21 @@ public class Match<
 	private GameInterface<T, S> game;
 	private int startclock;
 	private int playclock;
+	private GameScramblerInterface scrambler;
 	
 	public Match(String matchID, GameInterface<T, S> game, int startclock, int playclock){
+		this(matchID, game, startclock, playclock, null);
+	}
+	public Match(String matchID, GameInterface<T, S> game, int startclock, int playclock, GameScramblerInterface scrambler){
 		this.matchID=matchID;
 		this.game=game;
 		this.startclock=startclock;
 		this.playclock=playclock;
+		if(scrambler!=null){
+			this.scrambler=scrambler;
+		}else{
+			this.scrambler=new IdentityGameScrambler();
+		}
 	}
 
 	public String getMatchID() {
@@ -31,5 +42,9 @@ public class Match<
 
 	public int getPlayclock() {
 		return playclock;
+	}
+
+	public GameScramblerInterface getScrambler() {
+		return scrambler;
 	}
 }
