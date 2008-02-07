@@ -63,8 +63,9 @@ public class Tokenizer {
 
 	String next(){
 		if (x >= tokens.size()) {
-			System.err.println("Error: No more tokens in file");
-			System.exit(-1);
+			return null;
+//			System.err.println("Error: No more tokens in file");
+//			System.exit(-1);
 		}
 		x++;
 		return (String)tokens.get(x-1);
@@ -72,8 +73,9 @@ public class Tokenizer {
 
 	Integer sourceLine() {
 		if (x > tokens.size()) {
-			System.err.println("Error: Source line not defined for token past EOF");
-			System.exit(-1);
+			return null;
+//			System.err.println("Error: Source line not defined for token past EOF");
+//			System.exit(-1);
 		}
 		return (Integer)lineNums.get(x - 1);
 	}

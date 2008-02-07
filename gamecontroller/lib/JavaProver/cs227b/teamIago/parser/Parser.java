@@ -130,45 +130,47 @@ public static Expression parseExpression(Object _s){
 		ExpList premises = parseExpList(s.members.subList(0, s.members.size()-1));
 		res = new Implication(consequence, premises);
 	} 
-	else if (opt.equals("OR"))
+	else if (opt.equals("OR") && s.members.size() >= 2)
 	{
-		if (s.members.size() < 2) 
-		{
-			System.err.println("Parse error: No handling for OR of arity < 2.");
-			System.exit(-1);
-		}
-		else res = new OrOp(parseExpList(s.members));
+//		if (s.members.size() < 2) 
+//		{
+//			System.err.println("Parse error: No handling for OR of arity < 2.");
+//			System.exit(-1);
+//		}
+//		else 
+			res = new OrOp(parseExpList(s.members));
 	}
-	else if (opt.equals("AND"))
+	else if (opt.equals("AND") && s.members.size() >= 2)
 	{
-		if (s.members.size() < 2) 
-		{
-			System.err.println("Parse error: No handling for AND of arity < 2.");
-			System.exit(-1);
-		}
-		else res = new AndOp(parseExpList(s.members));
+//		if (s.members.size() < 2) 
+//		{
+//			System.err.println("Parse error: No handling for AND of arity < 2.");
+//			System.exit(-1);
+//		}
+//		else
+			res = new AndOp(parseExpList(s.members));
 	}
-	else if (opt.equals("DISTINCT"))
+	else if (opt.equals("DISTINCT") && s.members.size() == 2)
 	{
-		if (s.members.size() != 2) 
-		{
-			System.err.println("Parse error: No handling for non-binary DISTINCT.");
-			System.exit(-1);
-		}
-		else res = new DistinctOp(
+//		if (s.members.size() != 2) 
+//		{
+//			System.err.println("Parse error: No handling for non-binary DISTINCT.");
+//			System.exit(-1);
+//		}
+//		else 
+			res = new DistinctOp(
 				parseExpression(s.members.get(0)),
 				parseExpression(s.members.get(1)));
 	}
-	else if (opt.equals("NOT") || opt.equals("UNPROVABLE"))
+	else if (opt.equals("NOT") && s.members.size() == 1)
 	{
-		// In "endgame," he uses the nonstandard predicate "unprovable"
-		// apparently to mean the same thing as "not."
-		if (s.members.size() != 1) 
-		{
-			System.err.println("Parse error: No handling for non-unary NOT.");
-			System.exit(-1);
-		}
-		else res = new NotOp(parseExpression(s.members.get(0)));
+//		if (s.members.size() != 1) 
+//		{
+//			System.err.println("Parse error: No handling for non-unary NOT.");
+//			System.exit(-1);
+//		}
+//		else 
+			res = new NotOp(parseExpression(s.members.get(0)));
 	}
 	// 2. Associations
 	else {

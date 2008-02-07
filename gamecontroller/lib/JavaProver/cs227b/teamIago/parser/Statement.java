@@ -52,33 +52,42 @@ ArrayList members = new ArrayList();
 boolean parse(Tokenizer tk){
 	int start = tk.x;
 	String tok = tk.next();
+	if(tok==null) return false;
 	boolean parseSuccess;
 	if (!(tok.equals("("))){
 		tk.x = start;
 		return false;
 	}
 	operator = tk.next(); // operator
+	if(operator==null) return false;
 	if (operator.equals("(")){
 		// Syntax error in source
-		System.err.println("Error: List as function name at line " + tk.sourceLine());
-		System.exit(-1);
+//		System.err.println("Error: List as function name at line " + tk.sourceLine());
+//		System.exit(-1);
+		throw new RuntimeException("Syntax Error: List as function name at line " + tk.sourceLine());
 	}
 	if (operator.equals(")")){
 		// Syntax error in source
-		System.err.println("Error: No operator in list at line " + tk.sourceLine());
-		System.exit(-1);
+//		System.err.println("Error: No operator in list at line " + tk.sourceLine());
+//		System.exit(-1);
+		throw new RuntimeException("Syntax Error: No operator in list at line " + tk.sourceLine());
 	}
 	Statement s = new Statement();
 
 	while((parseSuccess=s.parse(tk)) || isLiteral(tk)){
 		if(parseSuccess)
 			members.add(s);
-		else
-			members.add(tk.next());
+		else{
+			tok=tk.next();
+			if(tok==null) return false;
+			members.add(tok);
+		}
 		s = new Statement();
 	}
 
-	if (!(tk.next().equals(")"))){
+	tok=tk.next();
+	if(tok==null) return false;
+	if (!(tok.equals(")"))){
 		tk.x = start;
 		return false;
 	}
@@ -88,7 +97,7 @@ boolean parse(Tokenizer tk){
 	boolean isLiteral(Tokenizer tk) {
 		int start=tk.x;
 		String tok = tk.next();
-		if (!tok.equals("(") && !tok.equals(")")){
+		if (tok !=null && !tok.equals("(") && !tok.equals(")")){
 			tk.x=start;
 			return true;
 		}
