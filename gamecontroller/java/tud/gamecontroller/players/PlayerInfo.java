@@ -9,8 +9,16 @@ public abstract class PlayerInfo {
 		this.name=name;
 	}
 
+	public void setRoleindex(int roleindex) {
+		this.roleindex = roleindex;
+	}
+
 	public int getRoleindex() {
 		return roleindex;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getName() {

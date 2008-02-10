@@ -138,14 +138,22 @@ public class RemotePlayer<
 			in.close();
 		} catch (UnknownHostException e) {
 			logger.severe("error: unknown host \""+ host+ "\"");
+			// call the notifier in case of an exception, otherwise 
+			// the GameController will wait forever if the exception occurred
+			// before the sending of the message
+			notifier.messageWasSent();
 		} catch (IOException e) {
 			logger.severe("error: io error for "+ this+" : "+e.getMessage());
+			// call the notifier in case of an exception, otherwise 
+			// the GameController will wait forever if the exception occurred
+			// before the sending of the message
+			notifier.messageWasSent();
 		}
 		return reply;
 	}
 
 	public String toString(){
-//		return "remote("+getName()+", "+host+":"+port+")";
-		return "remote("+host+":"+port+")";
+		return "remote("+getName()+", "+host+":"+port+")";
+//		return "remote("+host+":"+port+")";
 	}
 }

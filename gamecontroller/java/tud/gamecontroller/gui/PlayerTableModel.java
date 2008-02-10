@@ -166,7 +166,7 @@ public class PlayerTableModel extends AbstractTableModel {
 		}
 		public PlayerInfo getPlayerInfo(){
 			if(type.equals(PlayerType.REMOTE)){
-				return new RemotePlayerInfo(row,host,port); 
+				return new RemotePlayerInfo(row,host+":"+port,host,port); 
 			}else if(type.equals(PlayerType.RANDOM)){
 				return new RandomPlayerInfo(row);
 			}else{

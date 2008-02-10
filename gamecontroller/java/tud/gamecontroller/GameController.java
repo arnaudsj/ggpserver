@@ -213,22 +213,23 @@ public class GameController<
 	}
 	private static int parsePlayerArguments(int index, String argv[], Game game, List<PlayerInfo> playerinfos){
 		int roleindex=0;
-		String host="";
+		String host="", name="";
 		int port=0;
 		PlayerInfo player=null;
 		if(index<argv.length){
 			if(argv[index].equals("-remote")){
-				if(argv.length>index+3){
+				if(argv.length>index+4){
 					roleindex=getIntArg(argv[index+1], "roleindex");
 					if(roleindex<1 || roleindex>game.getNumberOfRoles()){
 						System.err.println("roleindex out of bounds");
 						printUsage();
 						System.exit(-1);
 					}
-					host=argv[index+2];
-					port=getIntArg(argv[index+3], "port");
-					player=new RemotePlayerInfo(roleindex-1, host, port);
-					index+=4;
+					name=argv[index+2];
+					host=argv[index+3];
+					port=getIntArg(argv[index+4], "port");
+					player=new RemotePlayerInfo(roleindex-1, name, host, port);
+					index+=5;
 				}else{
 					missingArgumentsExit(argv[index]);
 				}
@@ -266,8 +267,8 @@ public class GameController<
 	}
 
 	public static void printUsage(){
-		System.out.println("usage:\n java -jar gamecontroller.jar MATCHID GAMEFILE STARTCLOCK PLAYCLOCK [ -printxml OUTPUTDIR XSLT ] [-scramble WORDFILE] { -remote ROLEINDEX HOST PORT | -legal ROLEINDEX | -random ROLEINDEX } ...");
-		System.out.println("example:\n java -jar gamecontroller.jar A_Tictactoe_Match tictactoe.gdl 120 30 -remote 2 localhost 4000");
+		System.out.println("usage:\n java -jar gamecontroller.jar MATCHID GAMEFILE STARTCLOCK PLAYCLOCK [ -printxml OUTPUTDIR XSLT ] [-scramble WORDFILE] { -remote ROLEINDEX NAME HOST PORT | -legal ROLEINDEX | -random ROLEINDEX } ...");
+		System.out.println("example:\n java -jar gamecontroller.jar A_Tictactoe_Match tictactoe.gdl 120 30 -remote 2 MyPlayer localhost 4000");
 	}
 	public static int getIntArg(String arg, String argName){
 		try{
