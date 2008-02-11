@@ -121,8 +121,8 @@ public class GameController<
 		logger.info("starting game with startclock="+startclock+", playclock="+playclock);
 		logger.info("step:"+step);
 		logger.info("current state:"+currentState);
-		gameStart();
 		fireGameStart(currentState);
+		gameStart();
 		while(!currentState.isTerminal()){
 			try {
 				Thread.sleep(100);
@@ -137,14 +137,14 @@ public class GameController<
 			logger.info("step:"+step);
 			logger.info("current state:"+currentState);
 		}
-		gameStop(priormoves);
 		String goalmsg="Game over! results: ";
 		for(int i=0;i<goalValues.length;i++){
 			goalValues[i]=currentState.getGoalValue(game.getRole(i+1));
 			goalmsg+=goalValues[i]+" ";
 		}
-		fireGameStop(currentState, goalValues);
 		logger.info(goalmsg);
+		fireGameStop(currentState, goalValues);
+		gameStop(priormoves);
 	}
 
 	private void runThreads(Collection<? extends AbstractPlayerThread<T,S>> threads, Level loglevel){

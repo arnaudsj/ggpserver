@@ -98,12 +98,21 @@ public class XMLGameStateWriter<
 				 e.setTextContent(p.getName().toUpperCase());
 				 root.appendChild(e);
 			 }
+			 e=xmldoc.createElement("playclock");
+			 e.setTextContent(Integer.toString(match.getPlayclock()));
+			 root.appendChild(e);
 			 root.appendChild(createHistoryElement(xmldoc));
 			 if(goalValues!=null) root.appendChild(createScoresElement(xmldoc, goalValues));
 			 root.appendChild(createStateElement(xmldoc, currentState));
 			 // Serialization through Transform.
 			 DOMSource domSource = new DOMSource(xmldoc);
-			 StreamResult streamResult = new StreamResult(new File(matchDir+File.separator+"step_"+step+".xml"));
+			 String filename;
+			 if(goalValues!=null){
+				 filename="step_"+step;
+			 }else{
+				 filename="finalstate";
+			 }
+			 StreamResult streamResult = new StreamResult(new File(matchDir+File.separator+filename+".xml"));
 			 TransformerFactory tf = TransformerFactory.newInstance();
 			 Transformer serializer;
 			 serializer = tf.newTransformer();
