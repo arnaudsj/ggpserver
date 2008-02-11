@@ -25,7 +25,7 @@ public abstract class AbstractTerm implements TermInterface {
 		if(!isCompound()){
 			s=getName().toLowerCase();
 		}else{
-			s=getName().toUpperCase()+"(";
+			s=getName().toLowerCase()+"(";
 			boolean first=true;
 			for(TermInterface arg:getArgs()){
 				if(!first){

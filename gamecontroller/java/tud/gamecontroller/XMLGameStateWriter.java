@@ -1,6 +1,10 @@
 package tud.gamecontroller;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -98,35 +102,44 @@ public class XMLGameStateWriter<
 				 e.setTextContent(p.getName().toUpperCase());
 				 root.appendChild(e);
 			 }
-			 e=xmldoc.createElement("playclock");
-			 e.setTextContent(Integer.toString(match.getPlayclock()));
+			 e=xmldoc.createElement("startclock");
+			 e.setTextContent(Integer.toString(match.getStartclock()));
 			 root.appendChild(e);
+			 if(goalValues==null){ // don't write playclock if the game is over
+				 e=xmldoc.createElement("playclock");
+				 e.setTextContent(Integer.toString(match.getPlayclock()));
+				 root.appendChild(e);
+			 }
 			 root.appendChild(createHistoryElement(xmldoc));
 			 if(goalValues!=null) root.appendChild(createScoresElement(xmldoc, goalValues));
 			 root.appendChild(createStateElement(xmldoc, currentState));
 			 // Serialization through Transform.
 			 DOMSource domSource = new DOMSource(xmldoc);
-			 String filename;
-			 if(goalValues!=null){
-				 filename="step_"+step;
-			 }else{
-				 filename="finalstate";
-			 }
-			 StreamResult streamResult = new StreamResult(new File(matchDir+File.separator+filename+".xml"));
+			 ByteArrayOutputStream os=new ByteArrayOutputStream();
+			 StreamResult streamResult = new StreamResult(os);
 			 TransformerFactory tf = TransformerFactory.newInstance();
 			 Transformer serializer;
 			 serializer = tf.newTransformer();
 			 serializer.setOutputProperty(OutputKeys.ENCODING,"ISO-8859-1");
 			 serializer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM,"http://games.stanford.edu/gamemaster/xml/viewmatch.dtd");
 			 serializer.setOutputProperty(OutputKeys.INDENT,"yes");
-			 serializer.transform(domSource, streamResult); 
-			 			 
+			 serializer.transform(domSource, streamResult);
+			 (new FileOutputStream(new File(matchDir+File.separator+"step_"+step+".xml"))).write(os.toByteArray());
+			 if(goalValues!=null){ // write the final state twice (once as step_X.xml and once as finalstate.xml)
+				 (new FileOutputStream(new File(matchDir+File.separator+"finalstate.xml"))).write(os.toByteArray());
+			 }
 		} catch (TransformerConfigurationException ex) {
 			Logger.getLogger("tud.gamecontroller").warning("Exception occured while generation xml:"+ex.getMessage());
 		} catch (ParserConfigurationException ex) {
 			Logger.getLogger("tud.gamecontroller").warning("Exception occured while generation xml:"+ex.getMessage());
 		} catch (TransformerException ex) {
 			Logger.getLogger("tud.gamecontroller").warning("Exception occured while generation xml:"+ex.getMessage());
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
