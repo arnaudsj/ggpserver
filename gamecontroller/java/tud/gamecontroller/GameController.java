@@ -202,6 +202,7 @@ public class GameController<
 		}
 		logger.info("Sending stop messages ...");
 		runThreads(playerthreads, Level.WARNING);
+		logger.info("Done.");
 	}
 	
 	public int[] getGoalValues() {
