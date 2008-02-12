@@ -102,6 +102,9 @@ public class XMLGameStateWriter<
 				 e.setTextContent(p.getName().toUpperCase());
 				 root.appendChild(e);
 			 }
+			 e=xmldoc.createElement("timestamp");
+			 e.setTextContent(Long.toString(System.currentTimeMillis()));
+			 root.appendChild(e);
 			 e=xmldoc.createElement("startclock");
 			 e.setTextContent(Integer.toString(match.getStartclock()));
 			 root.appendChild(e);
