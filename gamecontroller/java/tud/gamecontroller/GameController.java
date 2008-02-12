@@ -125,7 +125,7 @@ public class GameController<
 		gameStart();
 		while(!currentState.isTerminal()){
 			try {
-				Thread.sleep(100);
+				Thread.sleep(500);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -162,7 +162,7 @@ public class GameController<
 		Collection<PlayerThreadStart<T,S>> playerthreads=new LinkedList<PlayerThreadStart<T,S>>();
 		for(int i=0;i<players.size();i++){
 			logger.info("player "+i+": "+players.get(i));
-			playerthreads.add(new PlayerThreadStart<T,S>(i+1, players.get(i), match, startclock*1000+1000));
+			playerthreads.add(new PlayerThreadStart<T,S>(i+1, players.get(i), match, startclock*1000+3000));
 		}
 		logger.info("Sending start messages ...");
 		runThreads(playerthreads, Level.WARNING);
@@ -173,7 +173,7 @@ public class GameController<
 		Collection<PlayerThreadPlay<T,S>> playerthreads=new LinkedList<PlayerThreadPlay<T,S>>();
 		for(int i=0;i<players.size();i++){
 			moves.add(null);
-			playerthreads.add(new PlayerThreadPlay<T,S>(i+1, players.get(i), match, priormoves, playclock*1000+1000));
+			playerthreads.add(new PlayerThreadPlay<T,S>(i+1, players.get(i), match, priormoves, playclock*1000+3000));
 		}
 		logger.info("Sending play messages ...");
 		runThreads(playerthreads, Level.SEVERE);
@@ -198,7 +198,7 @@ public class GameController<
 	private void gameStop(List<Move<T>> priormoves) {
 		Collection<PlayerThreadStop<T,S>> playerthreads=new LinkedList<PlayerThreadStop<T,S>>();
 		for(int i=0;i<players.size();i++){
-			playerthreads.add(new PlayerThreadStop<T,S>(i+1, players.get(i), match, priormoves, playclock*1000+1000));
+			playerthreads.add(new PlayerThreadStop<T,S>(i+1, players.get(i), match, priormoves, playclock*1000+3000));
 		}
 		logger.info("Sending stop messages ...");
 		runThreads(playerthreads, Level.WARNING);
