@@ -7,6 +7,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -32,6 +33,7 @@ import tud.gamecontroller.game.javaprover.Term;
 import tud.gamecontroller.game.javaprover.TermFactory;
 import tud.gamecontroller.gui.PlayerTableModel.PlayerRecord;
 import tud.gamecontroller.logging.PlainTextLogFormatter;
+import tud.gamecontroller.players.Player;
 import tud.gamecontroller.players.PlayerInfo;
 
 public class GameControllerFrame extends JFrame {
@@ -244,13 +246,13 @@ public class GameControllerFrame extends JFrame {
 		jLogPaneAppender.setFormatter(new PlainTextLogFormatter());
 		jLogPaneAppender.setLevel(Level.ALL);
 		logger.addHandler(jLogPaneAppender);
-		gameController=new GameController<Term,State>(new Match<Term,State>("testmatch", game, startclock, playclock), players, new TermFactory(), logger);
+		gameController=new GameController<Term,State>(new Match<Term,State,Player<Term,State>>("testmatch", game, startclock, playclock, null), players, new TermFactory(), null, logger);
 		gameThread=new Thread(){
 			public void run(){
 				gameController.runGame();
-				int[] goalValues=gameController.getGoalValues();
-				for(int i=0;i<goalValues.length;i++){
-					playerTableModel.getPlayerRecords()[i].setValue(goalValues[i]);
+				List<Integer> goalValues=gameController.getGoalValues();
+				for(int i=0;i<goalValues.size();i++){
+					playerTableModel.getPlayerRecords()[i].setValue(goalValues.get(i));
 				}
 				jStopGameButton.setEnabled(false);
 				gameThread=null;

@@ -29,24 +29,24 @@ public class RemotePlayer<
 	private String host;
 	private int port;
 	private TermFactoryInterface<T> termfactory;
-	private GameScramblerInterface gamescrambler=null;
+	private GameScramblerInterface gameScrambler;
 	private Logger logger;
 	
-	public RemotePlayer(String name, String host, int port, TermFactoryInterface<T> termfactory) {
+	public RemotePlayer(String name, String host, int port, TermFactoryInterface<T> termfactory, GameScramblerInterface gamescrambler) {
 		super(name);
 		this.host=host;
 		this.port=port;
 		this.termfactory=termfactory;
+		this.gameScrambler=gamescrambler;
 		this.logger=Logger.getLogger("tud.gamecontroller");
 	}
 
-	public void gameStart(Match<T,S> match, Role<T> role, MessageSentNotifier notifier) {
+	public void gameStart(Match<T, S, Player<T,S>> match, Role<T> role, MessageSentNotifier notifier) {
 		super.gameStart(match, role, notifier);
-		this.gamescrambler=match.getScrambler();
 		String msg="(START "+
 				match.getMatchID()+" "+
-				gamescrambler.scramble(role.getKIFForm())+
-				" ("+gamescrambler.scramble(match.getGame().getKIFGameDescription())+") "+
+				gameScrambler.scramble(role.getKIFForm()).toUpperCase()+
+				" ("+gameScrambler.scramble(match.getGame().getKIFGameDescription()).toUpperCase()+") "+
 				match.getStartclock()+" "+match.getPlayclock()+")";
 		sendMsg(msg, match.getStartclock(), notifier);
 	}
@@ -59,14 +59,14 @@ public class RemotePlayer<
 		}else{
 			msg+="(";
 			for(Move<T> m:priormoves){
-				msg+=gamescrambler.scramble(m.getKIFForm())+" ";
+				msg+=gameScrambler.scramble(m.getKIFForm()).toUpperCase()+" ";
 			}
 			msg+="))";
 		}
 		String reply=sendMsg(msg, match.getPlayclock(), notifier), descrambledReply;
 		logger.info("reply from "+this.getName()+": "+reply);
 		if(reply!=null){
-			descrambledReply=gamescrambler.descramble(reply);
+			descrambledReply=gameScrambler.descramble(reply);
 			T moveterm=null;
 			try {
 				moveterm = termfactory.getTermFromKIF(descrambledReply);
@@ -90,7 +90,7 @@ public class RemotePlayer<
 		}else{
 			msg+="(";
 			for(Move<T> m:priormoves){
-				msg+=gamescrambler.scramble(m.getKIFForm())+" ";
+				msg+=gameScrambler.scramble(m.getKIFForm()).toUpperCase()+" ";
 			}
 			msg+="))";
 		}
@@ -115,7 +115,7 @@ public class RemotePlayer<
 	
 			pw.print(msg);
 			pw.flush();
-			logger.info("message to "+this.getName()+" sent");
+			logger.info("message to "+this.getName()+" sent: \"" + msg+ "\"");
 			notifier.messageWasSent();
 			
 			InputStream is = s.getInputStream();

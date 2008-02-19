@@ -12,13 +12,13 @@ public abstract class AbstractPlayerThread<
 	
 	protected Player<T,S> player;
 	protected int roleindex;
-	protected Match<T,S> match;
+	protected Match<T, S, Player<T,S>> match;
 	private long deadline;
 	private long timeout;
 	private ChangeableBoolean messageSent;
 	private ChangeableBoolean deadlineSet;
 	
-	public AbstractPlayerThread(int roleindex, Player<T,S> player, Match<T,S> match, long timeout){
+	public AbstractPlayerThread(int roleindex, Player<T,S> player, Match<T, S, Player<T,S>> match, long timeout){
 		this.roleindex=roleindex;
 		this.player=player;
 		this.match=match;

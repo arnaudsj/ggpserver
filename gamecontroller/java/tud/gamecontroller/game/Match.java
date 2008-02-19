@@ -1,31 +1,24 @@
 package tud.gamecontroller.game;
 
-import tud.gamecontroller.scrambling.GameScramblerInterface;
-import tud.gamecontroller.scrambling.IdentityGameScrambler;
+import java.util.List;
 
 public class Match<
 		T extends TermInterface,
-		S extends StateInterface<T,S>
+		S extends StateInterface<T,S>,
+		PlayerType
 		> {
 	private String matchID;
 	private GameInterface<T, S> game;
 	private int startclock;
 	private int playclock;
-	private GameScramblerInterface scrambler;
+	private List<PlayerType> players;
 	
-	public Match(String matchID, GameInterface<T, S> game, int startclock, int playclock){
-		this(matchID, game, startclock, playclock, null);
-	}
-	public Match(String matchID, GameInterface<T, S> game, int startclock, int playclock, GameScramblerInterface scrambler){
+	public Match(String matchID, GameInterface<T, S> game, int startclock, int playclock, List<PlayerType> players){
 		this.matchID=matchID;
 		this.game=game;
 		this.startclock=startclock;
 		this.playclock=playclock;
-		if(scrambler!=null){
-			this.scrambler=scrambler;
-		}else{
-			this.scrambler=new IdentityGameScrambler();
-		}
+		this.players=players;
 	}
 
 	public String getMatchID() {
@@ -44,7 +37,11 @@ public class Match<
 		return playclock;
 	}
 
-	public GameScramblerInterface getScrambler() {
-		return scrambler;
+	public List<PlayerType> getPlayers() {
+		return players;
+	}
+
+	public void setPlayers(List<PlayerType> players) {
+		this.players = players;
 	}
 }

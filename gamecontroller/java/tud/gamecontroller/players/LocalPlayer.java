@@ -20,7 +20,7 @@ public abstract class LocalPlayer<
 		super(name);
 	}
 
-	public void gameStart(Match<T,S> match, Role<T> role, MessageSentNotifier notifier) {
+	public void gameStart(Match<T, S, Player<T,S>> match, Role<T> role, MessageSentNotifier notifier) {
 		super.gameStart(match, role, notifier);
 		notifier.messageWasSent();
 		currentState=match.getGame().getInitialState();

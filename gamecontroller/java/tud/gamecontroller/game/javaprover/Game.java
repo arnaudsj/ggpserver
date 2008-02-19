@@ -9,11 +9,9 @@ import cs227b.teamIago.parser.Axioms;
 public class Game implements GameInterface<Term, State> {
 
 	private Reasoner reasoner;
-	private String gameDescription;
 	private String name;
 		
 	private Game(String gameDescription, String name) {
-		this.gameDescription=gameDescription;
 		this.name=name;
 		reasoner=new Reasoner(gameDescription);
 		
@@ -34,10 +32,6 @@ public class Game implements GameInterface<Term, State> {
 
 	public Role<Term> getRole(int roleindex) {
 		return new Role<Term>(new Term(reasoner.GetRoles().get(roleindex-1)));
-	}
-
-	public String getGameDescription() {
-		return gameDescription;
 	}
 
 	public String getName() {

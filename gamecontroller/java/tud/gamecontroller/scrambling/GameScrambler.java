@@ -33,7 +33,7 @@ public class GameScrambler implements GameScramblerInterface {
 		this.wordlist=new LinkedList<String>(wordset);
 		this.scrambling=new HashMap<String,String>();
 		this.descrambling=new HashMap<String,String>();
-		this.identifierPattern=Pattern.compile("([()?\\s]|^)([a-zA-Z][a-z0-9A-Z_\\-]*)", Pattern.CASE_INSENSITIVE);
+		this.identifierPattern=Pattern.compile("([()?\\s]|^)([a-zA-Z][a-z0-9A-Z_\\-\\+]*)", Pattern.CASE_INSENSITIVE);
 		this.random=new Random();
 		addKeywords();
 	}
@@ -50,9 +50,6 @@ public class GameScrambler implements GameScramblerInterface {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see tud.gamecontroller.GameScramblerInterface#scramble(java.lang.String)
-	 */
 	public String scramble(String s){
 		StringBuilder scrambled=new StringBuilder();
 		Matcher m=identifierPattern.matcher(s);
@@ -64,12 +61,18 @@ public class GameScrambler implements GameScramblerInterface {
 			lastpos=m.end(2);
 			identifier=m.group(2);
 			lowercaseIdentifier=identifier.toLowerCase();
-			scrambledIdentifier=scrambling.get(lowercaseIdentifier);
-			if(scrambledIdentifier==null){
-				scrambledIdentifier=getNewWord();
-				scrambling.put(lowercaseIdentifier, scrambledIdentifier);
-				descrambling.put(scrambledIdentifier, identifier);
-				Logger.getLogger("tud.gamecontroller").info("scrambling: "+lowercaseIdentifier+" -> "+scrambledIdentifier);
+			synchronized(this) {
+				// this must be synchronized otherwise
+				// if two threads call scramble at the same time
+				// multiple occurrences of an identifier in s could be mapped to
+				// different scrambledIdentifiers   
+				scrambledIdentifier=scrambling.get(lowercaseIdentifier);
+				if(scrambledIdentifier==null){
+					scrambledIdentifier=getNewWord();
+					scrambling.put(lowercaseIdentifier, scrambledIdentifier);
+					descrambling.put(scrambledIdentifier, identifier);
+					Logger.getLogger("tud.gamecontroller").info("scrambling: "+lowercaseIdentifier+" -> "+scrambledIdentifier);
+				}
 			}
 			scrambled.append(scrambledIdentifier);
 		}
@@ -131,13 +134,13 @@ public class GameScrambler implements GameScramblerInterface {
 		BufferedReader reader;
 		try {
 			reader = new BufferedReader(new FileReader(wordlistfile));
-			Pattern p=Pattern.compile("[a-z][a-z]*");
+			Pattern p=Pattern.compile("[A-Za-z][A-Za-z]*");
 			Matcher m;
-			String line=reader.readLine().toLowerCase();
+			String line=reader.readLine();
 			while(line!=null){
 				m=p.matcher(line);
 				if(m.find()){
-					wordset.add(m.group());
+					wordset.add(m.group().toLowerCase());
 				}
 				line=reader.readLine();
 			}

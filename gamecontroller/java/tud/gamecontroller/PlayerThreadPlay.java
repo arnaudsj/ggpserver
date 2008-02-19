@@ -16,7 +16,7 @@ public class PlayerThreadPlay<
 	private Move<T> move;
 	private List<Move<T>> priormoves;
 	
-	public PlayerThreadPlay(int roleindex, Player<T,S> player, Match<T,S> match, List<Move<T>> priormoves, long deadline){
+	public PlayerThreadPlay(int roleindex, Player<T,S> player, Match<T, S, Player<T,S>> match, List<Move<T>> priormoves, long deadline){
 		super(roleindex, player, match, deadline);
 		this.priormoves=priormoves;
 		this.move=null;

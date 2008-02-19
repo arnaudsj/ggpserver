@@ -28,27 +28,40 @@ import tud.gamecontroller.players.RandomPlayerInfo;
 import tud.gamecontroller.players.RemotePlayerInfo;
 import tud.gamecontroller.scrambling.GameScrambler;
 import tud.gamecontroller.scrambling.GameScramblerInterface;
+import tud.gamecontroller.scrambling.IdentityGameScrambler;
 
 public class GameController<
 		T extends TermInterface,
 		S extends StateInterface<T,S>
 		>{
-	public static final String GAMEDIR="games/";
-	private Match<T,S> match;
+	
+	//public static final String GAMEDIR="games/";
+	/**
+	 * defines the minimal delay in milliseconds between receiving the last reply and sending the next play message 
+	 */
+	private static final int DELAY_BEFORE_NEXT_MESSAGE=100; 
+	/**
+	 * defines the extra time in milliseconds that is added to the normal start clock and play clock before a player is said to
+	 * have timed out  
+	 */
+	private static final int EXTRA_DEADLINE_TIME=1000; 
+	
+	
+	private Match<T, S, Player<T,S>> match;
 	private GameInterface<T,S> game;
 	private S currentState;
 	private List<Player<T,S>> players;
 	private int startclock;
 	private int playclock;
-	private int goalValues[]=null;
+	private List<Integer> goalValues=null;
 	private Logger logger;
-	private Collection<GameControllerListener<T,S>> listeners;
+	private Collection<GameControllerListener<T,S,Player<T,S>>> listeners;
 	private TermFactoryInterface<T> termfactory;
 	
-	public GameController(Match<T,S> match, Collection<PlayerInfo> players, TermFactoryInterface<T> termfactory) {
-		this(match,players,termfactory,null);
+	public GameController(Match<T, S, Player<T,S>> match, Collection<PlayerInfo> playerinfos, TermFactoryInterface<T> termfactory) {
+		this(match,playerinfos,termfactory,null,null);
 	}
-	public GameController(Match<T,S> match, Collection<PlayerInfo> players, TermFactoryInterface<T> termfactory, Logger logger) {
+	public GameController(Match<T, S, Player<T,S>> match, Collection<PlayerInfo> playerinfos, TermFactoryInterface<T> termfactory, GameScramblerInterface gameScrambler, Logger logger) {
 		this.match=match;
 		this.game=match.getGame();
 		this.startclock=match.getStartclock();
@@ -58,47 +71,51 @@ public class GameController<
 		}else{
 			this.logger=logger;
 		}
+		if(gameScrambler==null){
+			gameScrambler=new IdentityGameScrambler();
+		}
 		this.termfactory=termfactory;
-		initializePlayers(players);
-		listeners=new LinkedList<GameControllerListener<T,S>>();
+		initializePlayers(playerinfos, gameScrambler);
+		match.setPlayers(players);
+		listeners=new LinkedList<GameControllerListener<T,S,Player<T,S>>>();
 	}
 
-	public void addListener(GameControllerListener<T,S> l){
+	public void addListener(GameControllerListener<T,S,Player<T,S>> l){
 		listeners.add(l);
 	}
 
-	public void removeListener(GameControllerListener<T,S> l){
+	public void removeListener(GameControllerListener<T,S,Player<T,S>> l){
 		listeners.remove(l);
 	}
 	
 	private void fireGameStart(S currentState){
-		for(GameControllerListener<T,S> l:listeners){
-			l.gameStarted(match, players, currentState);
+		for(GameControllerListener<T,S,Player<T,S>> l:listeners){
+			l.gameStarted(match, currentState);
 		}
 	}
 	private void fireGameStep(List<Move<T>> moves, S currentState){
-		for(GameControllerListener<T,S> l:listeners){
+		for(GameControllerListener<T,S,Player<T,S>> l:listeners){
 			l.gameStep(moves, currentState);
 		}
 	}
-	private void fireGameStop(S currentState, int goalValues[]){
-		for(GameControllerListener<T,S> l:listeners){
+	private void fireGameStop(S currentState, List<Integer> goalValues){
+		for(GameControllerListener<T,S,Player<T,S>> l:listeners){
 			l.gameStopped(currentState, goalValues);
 		}
 	}
 	
-	private void initializePlayers(Collection<PlayerInfo> definedplayers) {
+	private void initializePlayers(Collection<PlayerInfo> definedplayers, GameScramblerInterface gameScrambler) {
 		players=new ArrayList<Player<T,S>>();
-		goalValues=new int[game.getNumberOfRoles()];
+		goalValues=new ArrayList<Integer>();
 		for(int i=0; i<game.getNumberOfRoles(); i++){
 			players.add(null);
-			goalValues[i]=-1;
+			goalValues.add(-1);
 		}
 		for(PlayerInfo p:definedplayers){
 			if(p!=null){
 				if(p.getRoleindex()<players.size()){
 					if(players.get(p.getRoleindex())==null){
-						players.set(p.getRoleindex(),PlayerFactory. <T,S> createPlayer(p, termfactory));
+						players.set(p.getRoleindex(),PlayerFactory. <T,S> createPlayer(p, termfactory, gameScrambler));
 					}else{
 						throw new IllegalArgumentException("duplicate roleindex in given player list");
 					}
@@ -109,7 +126,7 @@ public class GameController<
 		}
 		for(int i=0; i<players.size(); i++){
 			if(players.get(i)==null){
-				players.set(i,PlayerFactory. <T,S> createPlayer(new RandomPlayerInfo(i), termfactory));
+				players.set(i,PlayerFactory. <T,S> createPlayer(new RandomPlayerInfo(i), termfactory, gameScrambler));
 			}
 		}
 	}
@@ -125,7 +142,7 @@ public class GameController<
 		gameStart();
 		while(!currentState.isTerminal()){
 			try {
-				Thread.sleep(500);
+				Thread.sleep(DELAY_BEFORE_NEXT_MESSAGE);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -138,9 +155,10 @@ public class GameController<
 			logger.info("current state:"+currentState);
 		}
 		String goalmsg="Game over! results: ";
-		for(int i=0;i<goalValues.length;i++){
-			goalValues[i]=currentState.getGoalValue(game.getRole(i+1));
-			goalmsg+=goalValues[i]+" ";
+		for(int i=0;i<goalValues.size();i++){
+			int gv=currentState.getGoalValue(game.getRole(i+1));
+			goalValues.set(i,gv);
+			goalmsg+=gv+" ";
 		}
 		logger.info(goalmsg);
 		fireGameStop(currentState, goalValues);
@@ -162,7 +180,7 @@ public class GameController<
 		Collection<PlayerThreadStart<T,S>> playerthreads=new LinkedList<PlayerThreadStart<T,S>>();
 		for(int i=0;i<players.size();i++){
 			logger.info("player "+i+": "+players.get(i));
-			playerthreads.add(new PlayerThreadStart<T,S>(i+1, players.get(i), match, startclock*1000+3000));
+			playerthreads.add(new PlayerThreadStart<T,S>(i+1, players.get(i), match, startclock*1000+EXTRA_DEADLINE_TIME));
 		}
 		logger.info("Sending start messages ...");
 		runThreads(playerthreads, Level.WARNING);
@@ -173,7 +191,7 @@ public class GameController<
 		Collection<PlayerThreadPlay<T,S>> playerthreads=new LinkedList<PlayerThreadPlay<T,S>>();
 		for(int i=0;i<players.size();i++){
 			moves.add(null);
-			playerthreads.add(new PlayerThreadPlay<T,S>(i+1, players.get(i), match, priormoves, playclock*1000+3000));
+			playerthreads.add(new PlayerThreadPlay<T,S>(i+1, players.get(i), match, priormoves, playclock*1000+EXTRA_DEADLINE_TIME));
 		}
 		logger.info("Sending play messages ...");
 		runThreads(playerthreads, Level.SEVERE);
@@ -198,14 +216,14 @@ public class GameController<
 	private void gameStop(List<Move<T>> priormoves) {
 		Collection<PlayerThreadStop<T,S>> playerthreads=new LinkedList<PlayerThreadStop<T,S>>();
 		for(int i=0;i<players.size();i++){
-			playerthreads.add(new PlayerThreadStop<T,S>(i+1, players.get(i), match, priormoves, playclock*1000+3000));
+			playerthreads.add(new PlayerThreadStop<T,S>(i+1, players.get(i), match, priormoves, playclock*1000+EXTRA_DEADLINE_TIME));
 		}
 		logger.info("Sending stop messages ...");
 		runThreads(playerthreads, Level.WARNING);
 		logger.info("Done.");
 	}
 	
-	public int[] getGoalValues() {
+	public List<Integer> getGoalValues() {
 		return goalValues;
 	}
 
@@ -328,11 +346,11 @@ public class GameController<
 			logger.setUseParentHandlers(false);
 			logger.addHandler(new UnbufferedStreamHandler(System.out, new PlainTextLogFormatter()));
 			logger.setLevel(Level.ALL);
-			GameController<Term, State> gc=new GameController<Term, State>(new Match<Term, State>(matchID, game, startclock, playclock, gameScrambler), playerinfos, new TermFactory(), logger);
+			GameController<Term, State> gc=new GameController<Term, State>(new Match<Term, State, Player<Term,State>>(matchID, game, startclock, playclock, null), playerinfos, new TermFactory(), gameScrambler, logger);
 			logger.info("match:"+matchID);
 			logger.info("game:"+argv[1]);
 			if(stylesheet!=null){
-				XMLGameStateWriter<Term, State> gsw=new XMLGameStateWriter<Term, State>(xmloutputdir, stylesheet);
+				XMLGameStateWriter<Term, State, Player<Term,State>> gsw=new XMLGameStateWriter<Term, State, Player<Term,State>>(xmloutputdir, stylesheet);
 				gc.addListener(gsw);
 			}
 			gc.runGame();

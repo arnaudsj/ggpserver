@@ -10,7 +10,7 @@ public class PlayerThreadStart<
 		S extends StateInterface<T,S>
 		> extends AbstractPlayerThread<T,S> {
 
-	public PlayerThreadStart(int roleindex, Player<T,S> player, Match<T,S> match, long deadline){
+	public PlayerThreadStart(int roleindex, Player<T,S> player, Match<T, S, Player<T,S>> match, long deadline){
 		super(roleindex, player, match, deadline);
 	}
 	public void run(){

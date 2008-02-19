@@ -14,7 +14,7 @@ public abstract class AbstractPlayer<
 		S extends StateInterface<T,S>
 		> implements Player<T,S> {
 
-	protected Match<T,S> match=null;
+	protected Match<T, S, Player<T,S>> match=null;
 	protected Role<T> role=null;
 	private String name;
 
@@ -22,7 +22,7 @@ public abstract class AbstractPlayer<
 		this.name=name;
 	}
 	
-	public void gameStart(Match<T,S> match, Role<T> role, MessageSentNotifier notifier) {
+	public void gameStart(Match<T, S, Player<T,S>> match, Role<T> role, MessageSentNotifier notifier) {
 		this.match=match;
 		this.role=role;
 	}
