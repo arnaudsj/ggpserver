@@ -1,35 +1,33 @@
-package tud.gamecontroller;
+package tud.gamecontroller.playerthreads;
 
-import tud.gamecontroller.game.Match;
-import tud.gamecontroller.game.StateInterface;
-import tud.gamecontroller.game.TermInterface;
-import tud.gamecontroller.players.Player;
+import tud.gamecontroller.MessageSentNotifier;
 
 public abstract class AbstractPlayerThread<
-		T extends TermInterface,
-		S extends StateInterface<T,S>
+		RoleType,
+		PlayerType,
+		MatchType
 		> extends Thread implements MessageSentNotifier {
 	
-	protected Player<T,S> player;
-	protected int roleindex;
-	protected Match<T, S, Player<T,S>> match;
+	protected PlayerType player;
+	protected RoleType role;
+	protected MatchType match;
 	private long deadline;
 	private long timeout;
 	private ChangeableBoolean messageSent;
 	private ChangeableBoolean deadlineSet;
 	
-	public AbstractPlayerThread(int roleindex, Player<T,S> player, Match<T, S, Player<T,S>> match, long timeout){
-		this.roleindex=roleindex;
+	public AbstractPlayerThread(RoleType role, PlayerType player, MatchType match, long timeout){
+		this.role=role;
 		this.player=player;
 		this.match=match;
 		this.timeout=timeout;
 		deadline=0;
 	}
-	public Player<T,S> getPlayer() {
+	public PlayerType getPlayer() {
 		return player;
 	}
-	public int getRoleIndex(){
-		return roleindex;
+	public RoleType getRole(){
+		return role;
 	}
 	public long getDeadLine() {
 		return deadline;

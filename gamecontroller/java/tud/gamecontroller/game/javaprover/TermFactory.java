@@ -1,12 +1,12 @@
 package tud.gamecontroller.game.javaprover;
 
-import tud.gamecontroller.game.InvalidKIFException;
+import tud.gamecontroller.aux.InvalidKIFException;
 
 import cs227b.teamIago.parser.Parser;
 import cs227b.teamIago.resolver.Connective;
 import cs227b.teamIago.resolver.ExpList;
 
-public class TermFactory implements tud.gamecontroller.game.TermFactoryInterface<Term> {
+public class TermFactory implements tud.gamecontroller.term.TermFactoryInterface<Term> {
 
 	public Term getTermFromKIF(String kif) throws InvalidKIFException {
 		Term term=null;

@@ -1,8 +1,8 @@
-package tud.gamecontroller.game;
+package tud.gamecontroller.term;
 
 import java.util.List;
 
-public interface TermInterface {
+public interface TermInterface extends GameObjectInterface {
 	/**
 	 * If the term is a function this must return the function symbol,
 	 * if it is a constant then just the constant and if it is a variable then
@@ -36,15 +36,4 @@ public interface TermInterface {
 	 */
 	public boolean isGround();
 
-	/**
-	 * @return the prefix form of this term
-	 * e.g., "f(a,g(1,2))" 
-	 */
-	String getPrefixForm();
-	
-	/**
-	 * @return the infix KIF form of this term
-	 * e.g., "(f a (g 1 2))" 
-	 */
-	String getKIFForm();
 }

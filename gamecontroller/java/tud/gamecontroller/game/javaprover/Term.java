@@ -9,8 +9,8 @@ import cs227b.teamIago.resolver.ExpList;
 import cs227b.teamIago.resolver.Expression;
 import cs227b.teamIago.resolver.Variable;
 
-import tud.gamecontroller.game.AbstractTerm;
-import tud.gamecontroller.game.TermInterface;
+import tud.gamecontroller.term.AbstractTerm;
+import tud.gamecontroller.term.TermInterface;
 
 public class Term extends AbstractTerm{
 	

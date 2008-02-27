@@ -1,19 +1,25 @@
 package tud.gamecontroller.game;
 
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
+import tud.gamecontroller.players.Player;
 
 public class Match<
-		T extends TermInterface,
-		S extends StateInterface<T,S>,
-		PlayerType
-		> {
+		RoleType,
+		GameType extends GameInterface<? extends RoleType, ?>,
+		PlayerType extends Player<?, ?, ?>
+		> implements MatchInterface<RoleType, GameType, PlayerType> {
 	private String matchID;
-	private GameInterface<T, S> game;
+	private GameType game;
 	private int startclock;
 	private int playclock;
-	private List<PlayerType> players;
+	private Map<? extends RoleType, ? extends PlayerType> players;
+	private List<PlayerType> orderedPlayers=null;
 	
-	public Match(String matchID, GameInterface<T, S> game, int startclock, int playclock, List<PlayerType> players){
+	public Match(String matchID, GameType game, int startclock, int playclock, Map<? extends RoleType, ? extends PlayerType> players){
 		this.matchID=matchID;
 		this.game=game;
 		this.startclock=startclock;
@@ -21,27 +27,58 @@ public class Match<
 		this.players=players;
 	}
 
+	/* (non-Javadoc)
+	 * @see tud.gamecontroller.game.MatchInterface#getMatchID()
+	 */
 	public String getMatchID() {
 		return matchID;
 	}
 
-	public GameInterface<T, S> getGame() {
+	/* (non-Javadoc)
+	 * @see tud.gamecontroller.game.MatchInterface#getGame()
+	 */
+	public GameType getGame() {
 		return game;
 	}
 
+	/* (non-Javadoc)
+	 * @see tud.gamecontroller.game.MatchInterface#getStartclock()
+	 */
 	public int getStartclock() {
 		return startclock;
 	}
 
+	/* (non-Javadoc)
+	 * @see tud.gamecontroller.game.MatchInterface#getPlayclock()
+	 */
 	public int getPlayclock() {
 		return playclock;
 	}
 
-	public List<PlayerType> getPlayers() {
-		return players;
+	/* (non-Javadoc)
+	 * @see tud.gamecontroller.game.MatchInterface#getPlayers()
+	 */
+	public Collection<? extends PlayerType> getPlayers() {
+		return players.values();
 	}
 
-	public void setPlayers(List<PlayerType> players) {
-		this.players = players;
+	/* (non-Javadoc)
+	 * @see tud.gamecontroller.game.MatchInterface#getOrderedPlayers()
+	 */
+	public List<? extends PlayerType> getOrderedPlayers() {
+		if(orderedPlayers!=null){
+			orderedPlayers=new LinkedList<PlayerType>();
+			for(RoleType role:game.getOrderedRoles()){
+				orderedPlayers.add(players.get(role));
+			}
+		}
+		return orderedPlayers;
+	}
+
+	/* (non-Javadoc)
+	 * @see tud.gamecontroller.game.MatchInterface#getPlayer(RoleType)
+	 */
+	public PlayerType getPlayer(RoleType role) {
+		return players.get(role);
 	}
 }

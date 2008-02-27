@@ -1,4 +1,4 @@
-package tud.gamecontroller.game;
+package tud.gamecontroller.term;
 
 import java.util.List;
 

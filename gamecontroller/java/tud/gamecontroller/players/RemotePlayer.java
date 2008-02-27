@@ -8,31 +8,29 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.List;
 import java.util.logging.Logger;
 
 import tud.gamecontroller.MessageSentNotifier;
-import tud.gamecontroller.game.InvalidKIFException;
-import tud.gamecontroller.game.Match;
-import tud.gamecontroller.game.Move;
-import tud.gamecontroller.game.Role;
-import tud.gamecontroller.game.StateInterface;
-import tud.gamecontroller.game.TermFactoryInterface;
-import tud.gamecontroller.game.TermInterface;
+import tud.gamecontroller.aux.InvalidKIFException;
+import tud.gamecontroller.game.GameInterface;
+import tud.gamecontroller.game.JointMoveInterface;
+import tud.gamecontroller.game.MatchInterface;
+import tud.gamecontroller.game.MoveFactoryInterface;
+import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.scrambling.GameScramblerInterface;
 
 public class RemotePlayer<
-		T extends TermInterface,
-		S extends StateInterface<T,S>
-		> extends AbstractPlayer<T,S> {
+		RoleType extends RoleInterface,
+		MoveType
+		> extends AbstractPlayer<RoleType, MoveType, MatchInterface<?,? extends GameInterface<?, ?>, ?>>  {
 
 	private String host;
 	private int port;
-	private TermFactoryInterface<T> termfactory;
+	private MoveFactoryInterface<MoveType> termfactory;
 	private GameScramblerInterface gameScrambler;
 	private Logger logger;
 	
-	public RemotePlayer(String name, String host, int port, TermFactoryInterface<T> termfactory, GameScramblerInterface gamescrambler) {
+	public RemotePlayer(String name, String host, int port, MoveFactoryInterface<MoveType> termfactory, GameScramblerInterface gamescrambler) {
 		super(name);
 		this.host=host;
 		this.port=port;
@@ -41,7 +39,8 @@ public class RemotePlayer<
 		this.logger=Logger.getLogger("tud.gamecontroller");
 	}
 
-	public void gameStart(Match<T, S, Player<T,S>> match, Role<T> role, MessageSentNotifier notifier) {
+	@Override
+	public void gameStart(MatchInterface<?,? extends GameInterface<?, ?>, ?> match, RoleType role, MessageSentNotifier notifier) {
 		super.gameStart(match, role, notifier);
 		String msg="(START "+
 				match.getMatchID()+" "+
@@ -51,49 +50,42 @@ public class RemotePlayer<
 		sendMsg(msg, match.getStartclock(), notifier);
 	}
 
-	public Move<T> gamePlay(List<Move<T>> priormoves, MessageSentNotifier notifier) {
-		Move<T> move=null;
+	public MoveType gamePlay(JointMoveInterface<? extends RoleType, ? extends MoveType> jointMove, MessageSentNotifier notifier) {
+		MoveType move=null;
 		String msg="(PLAY "+match.getMatchID()+" ";
-		if(priormoves==null){
-			msg+="NIL)";
+		if(jointMove==null){
+			msg+="NIL";
 		}else{
-			msg+="(";
-			for(Move<T> m:priormoves){
-				msg+=gameScrambler.scramble(m.getKIFForm()).toUpperCase()+" ";
-			}
-			msg+="))";
+			msg+=gameScrambler.scramble(jointMove.getKIFForm()).toUpperCase();
 		}
+		msg+=")";
 		String reply=sendMsg(msg, match.getPlayclock(), notifier), descrambledReply;
 		logger.info("reply from "+this.getName()+": "+reply);
 		if(reply!=null){
 			descrambledReply=gameScrambler.descramble(reply);
-			T moveterm=null;
 			try {
-				moveterm = termfactory.getTermFromKIF(descrambledReply);
+				move=termfactory.getMoveFromKIF(descrambledReply);
 			} catch (InvalidKIFException ex) {
 				logger.severe("Error parsing reply \""+reply+"\" from "+this+":"+ex.getMessage());
 			}
-			if(moveterm!=null && !moveterm.isGround()){
-				logger.severe("Reply \""+reply+"\" from "+this+" is not a ground term. (descrambled:\""+descrambledReply+"\")");
-			}else{
-				move=new Move<T>(moveterm);
-			}
+//			if(moveterm!=null && !moveterm.isGround()){
+//				logger.severe("Reply \""+reply+"\" from "+this+" is not a ground term. (descrambled:\""+descrambledReply+"\")");
+//			}else if(moveterm!=null){
+//				move=new MoveType(moveterm);
+//			}
 		}
 		return move;
 	}
 
-	public void gameStop(List<Move<T>> priormoves, MessageSentNotifier notifier) {
-		super.gameStop(priormoves, notifier);
+	@Override
+	public void gameStop(JointMoveInterface<? extends RoleType, ? extends MoveType> jointMove, MessageSentNotifier notifier) {
 		String msg="(STOP "+match.getMatchID()+" ";
-		if(priormoves==null){
-			msg+="NIL)";
+		if(jointMove==null){
+			msg+="NIL";
 		}else{
-			msg+="(";
-			for(Move<T> m:priormoves){
-				msg+=gameScrambler.scramble(m.getKIFForm()).toUpperCase()+" ";
-			}
-			msg+="))";
+			msg+=gameScrambler.scramble(jointMove.getKIFForm()).toUpperCase();
 		}
+		msg+=")";
 		sendMsg(msg, match.getPlayclock(), notifier);
 	}
 

@@ -1,41 +1,37 @@
 package tud.gamecontroller;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import tud.gamecontroller.game.GameInterface;
-import tud.gamecontroller.game.Match;
-import tud.gamecontroller.game.Move;
+import tud.gamecontroller.game.JointMove;
+import tud.gamecontroller.game.JointMoveInterface;
+import tud.gamecontroller.game.MatchInterface;
+import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.StateInterface;
-import tud.gamecontroller.game.TermFactoryInterface;
-import tud.gamecontroller.game.TermInterface;
-import tud.gamecontroller.game.javaprover.Game;
-import tud.gamecontroller.game.javaprover.State;
-import tud.gamecontroller.game.javaprover.Term;
-import tud.gamecontroller.game.javaprover.TermFactory;
-import tud.gamecontroller.logging.PlainTextLogFormatter;
-import tud.gamecontroller.logging.UnbufferedStreamHandler;
-import tud.gamecontroller.players.LegalPlayerInfo;
 import tud.gamecontroller.players.Player;
-import tud.gamecontroller.players.PlayerFactory;
-import tud.gamecontroller.players.PlayerInfo;
-import tud.gamecontroller.players.RandomPlayerInfo;
-import tud.gamecontroller.players.RemotePlayerInfo;
-import tud.gamecontroller.scrambling.GameScrambler;
-import tud.gamecontroller.scrambling.GameScramblerInterface;
-import tud.gamecontroller.scrambling.IdentityGameScrambler;
+import tud.gamecontroller.playerthreads.AbstractPlayerThread;
+import tud.gamecontroller.playerthreads.PlayerThreadPlay;
+import tud.gamecontroller.playerthreads.PlayerThreadStart;
+import tud.gamecontroller.playerthreads.PlayerThreadStop;
 
 public class GameController<
-		T extends TermInterface,
-		S extends StateInterface<T,S>
+		RoleType,
+		MoveType extends MoveInterface,
+		StateType extends StateInterface<? super RoleType, MoveType, ?, ? extends StateType>,
+		GameType extends GameInterface<? extends RoleType, ? extends StateType>,
+		MatchType extends MatchInterface<
+				RoleType,
+				GameType,
+				Player<? super RoleType, MoveType, ? super MatchInterface<RoleType, GameType, ?>>
+		>,
+		ListenerType extends GameControllerListener<?,?,? super MatchType,? super StateType>
 		>{
 	
-	//public static final String GAMEDIR="games/";
 	/**
 	 * defines the minimal delay in milliseconds between receiving the last reply and sending the next play message 
 	 */
@@ -46,95 +42,54 @@ public class GameController<
 	 */
 	private static final int EXTRA_DEADLINE_TIME=1000; 
 	
-	
-	private Match<T, S, Player<T,S>> match;
-	private GameInterface<T,S> game;
-	private S currentState;
-	private List<Player<T,S>> players;
+	private MatchType match;
+	private GameInterface<? extends RoleType, ? extends StateType> game;
+	private StateType currentState;
 	private int startclock;
 	private int playclock;
-	private List<Integer> goalValues=null;
+	private Map<RoleType, Integer> goalValues=null;
 	private Logger logger;
-	private Collection<GameControllerListener<T,S,Player<T,S>>> listeners;
-	private TermFactoryInterface<T> termfactory;
-	
-	public GameController(Match<T, S, Player<T,S>> match, Collection<PlayerInfo> playerinfos, TermFactoryInterface<T> termfactory) {
-		this(match,playerinfos,termfactory,null,null);
-	}
-	public GameController(Match<T, S, Player<T,S>> match, Collection<PlayerInfo> playerinfos, TermFactoryInterface<T> termfactory, GameScramblerInterface gameScrambler, Logger logger) {
+	private Collection<ListenerType> listeners;
+
+	public GameController(MatchType match) {
 		this.match=match;
 		this.game=match.getGame();
 		this.startclock=match.getStartclock();
 		this.playclock=match.getPlayclock();
-		if(logger==null){
-			this.logger=Logger.getLogger("tud.gamecontroller");
-		}else{
-			this.logger=logger;
-		}
-		if(gameScrambler==null){
-			gameScrambler=new IdentityGameScrambler();
-		}
-		this.termfactory=termfactory;
-		initializePlayers(playerinfos, gameScrambler);
-		match.setPlayers(players);
-		listeners=new LinkedList<GameControllerListener<T,S,Player<T,S>>>();
+		listeners=new LinkedList<ListenerType>();
+		this.logger=Logger.getLogger("tud.gamecontroller");
 	}
 
-	public void addListener(GameControllerListener<T,S,Player<T,S>> l){
+	public void addListener(ListenerType l){
 		listeners.add(l);
 	}
 
-	public void removeListener(GameControllerListener<T,S,Player<T,S>> l){
+	public void removeListener(ListenerType l){
 		listeners.remove(l);
 	}
 	
-	private void fireGameStart(S currentState){
-		for(GameControllerListener<T,S,Player<T,S>> l:listeners){
+	private void fireGameStart(StateType currentState){
+		for(ListenerType l:listeners){
 			l.gameStarted(match, currentState);
 		}
 	}
-	private void fireGameStep(List<Move<T>> moves, S currentState){
-		for(GameControllerListener<T,S,Player<T,S>> l:listeners){
-			l.gameStep(moves, currentState);
+	private void fireGameStep(JointMoveInterface<? extends RoleType, ? extends MoveType> jointMove, StateType currentState){
+		for(ListenerType l:listeners){
+			l.gameStep(jointMove, currentState);
 		}
 	}
-	private void fireGameStop(S currentState, List<Integer> goalValues){
-		for(GameControllerListener<T,S,Player<T,S>> l:listeners){
+	private void fireGameStop(StateType currentState, Map<? extends RoleType, Integer> goalValues){
+		for(ListenerType l:listeners){
 			l.gameStopped(currentState, goalValues);
 		}
 	}
 	
-	private void initializePlayers(Collection<PlayerInfo> definedplayers, GameScramblerInterface gameScrambler) {
-		players=new ArrayList<Player<T,S>>();
-		goalValues=new ArrayList<Integer>();
-		for(int i=0; i<game.getNumberOfRoles(); i++){
-			players.add(null);
-			goalValues.add(-1);
-		}
-		for(PlayerInfo p:definedplayers){
-			if(p!=null){
-				if(p.getRoleindex()<players.size()){
-					if(players.get(p.getRoleindex())==null){
-						players.set(p.getRoleindex(),PlayerFactory. <T,S> createPlayer(p, termfactory, gameScrambler));
-					}else{
-						throw new IllegalArgumentException("duplicate roleindex in given player list");
-					}
-				}else{
-					throw new IllegalArgumentException("roleindex must be between 0 and n-1 for an n-player game");
-				}
-			}
-		}
-		for(int i=0; i<players.size(); i++){
-			if(players.get(i)==null){
-				players.set(i,PlayerFactory. <T,S> createPlayer(new RandomPlayerInfo(i), termfactory, gameScrambler));
-			}
-		}
-	}
-
 	public void runGame() {
 		int step=1;
 		currentState=game.getInitialState();
-		List<Move<T>> priormoves=null;
+		JointMoveInterface<? extends RoleType, ? extends MoveType> priorJointMove=null;
+		logger.info("match:"+match.getMatchID());
+		logger.info("game:"+match.getGame().getName());
 		logger.info("starting game with startclock="+startclock+", playclock="+playclock);
 		logger.info("step:"+step);
 		logger.info("current state:"+currentState);
@@ -146,30 +101,31 @@ public class GameController<
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			final List<Move<T>> moves = gamePlay(step, priormoves);
-			currentState=currentState.getSuccessor(moves);
-			fireGameStep(moves, currentState);
-			priormoves=moves;
+			JointMoveInterface<? extends RoleType, ? extends MoveType> jointMove = gamePlay(step, priorJointMove);
+			currentState=currentState.getSuccessor(jointMove);
+			fireGameStep(jointMove, currentState);
+			priorJointMove=jointMove;
 			step++;
 			logger.info("step:"+step);
 			logger.info("current state:"+currentState);
 		}
 		String goalmsg="Game over! results: ";
-		for(int i=0;i<goalValues.size();i++){
-			int gv=currentState.getGoalValue(game.getRole(i+1));
-			goalValues.set(i,gv);
+		goalValues=new HashMap<RoleType, Integer>();
+		for(RoleType role:game.getOrderedRoles()){
+			int gv=currentState.getGoalValue(role);
+			goalValues.put(role,gv);
 			goalmsg+=gv+" ";
 		}
 		logger.info(goalmsg);
 		fireGameStop(currentState, goalValues);
-		gameStop(priormoves);
+		gameStop(priorJointMove);
 	}
 
-	private void runThreads(Collection<? extends AbstractPlayerThread<T,S>> threads, Level loglevel){
-		for(AbstractPlayerThread<T,S> t:threads){
+	private void runThreads(Collection<? extends AbstractPlayerThread<?, ?, ?>> threads, Level loglevel){
+		for(AbstractPlayerThread<?, ?, ?> t:threads){
 			t.start();
 		}
-		for(AbstractPlayerThread<T,S> t:threads){
+		for(AbstractPlayerThread<?, ?, ?> t:threads){
 			if(!t.waitUntilDeadline()){
 				logger.log(loglevel, "player "+t.getPlayer()+" timed out!");
 			}
@@ -177,187 +133,49 @@ public class GameController<
 	}
 
 	private void gameStart() {
-		Collection<PlayerThreadStart<T,S>> playerthreads=new LinkedList<PlayerThreadStart<T,S>>();
-		for(int i=0;i<players.size();i++){
-			logger.info("player "+i+": "+players.get(i));
-			playerthreads.add(new PlayerThreadStart<T,S>(i+1, players.get(i), match, startclock*1000+EXTRA_DEADLINE_TIME));
+		Collection<PlayerThreadStart<RoleType, MatchType>> playerthreads=new LinkedList<PlayerThreadStart<RoleType, MatchType>>();
+		for(RoleType role:game.getOrderedRoles()){
+			logger.info("role: "+role+" => player: "+match.getPlayer(role));
+			playerthreads.add(new PlayerThreadStart<RoleType, MatchType>(role, match.getPlayer(role), match, startclock*1000+EXTRA_DEADLINE_TIME));
 		}
 		logger.info("Sending start messages ...");
 		runThreads(playerthreads, Level.WARNING);
 	}
 
-	private List<Move<T>> gamePlay(int step, List<Move<T>> priormoves) {
-		final List<Move<T>> moves=new ArrayList<Move<T>>();
-		Collection<PlayerThreadPlay<T,S>> playerthreads=new LinkedList<PlayerThreadPlay<T,S>>();
-		for(int i=0;i<players.size();i++){
-			moves.add(null);
-			playerthreads.add(new PlayerThreadPlay<T,S>(i+1, players.get(i), match, priormoves, playclock*1000+EXTRA_DEADLINE_TIME));
+	private JointMoveInterface<? extends RoleType, ? extends MoveType> gamePlay(int step, JointMoveInterface<? extends RoleType, ? extends MoveType> priormoves) {
+		JointMoveInterface<RoleType, MoveType> jointMove=new JointMove<RoleType,MoveType>(game.getOrderedRoles());
+		Collection<PlayerThreadPlay<RoleType, MoveType>> playerthreads=new LinkedList<PlayerThreadPlay<RoleType, MoveType>>();
+		for(RoleType role:game.getOrderedRoles()){
+			playerthreads.add(new PlayerThreadPlay<RoleType, MoveType>(role, match.getPlayer(role), match, priormoves, playclock*1000+EXTRA_DEADLINE_TIME));
 		}
 		logger.info("Sending play messages ...");
 		runThreads(playerthreads, Level.SEVERE);
-		for(PlayerThreadPlay<T,S> pt:playerthreads){
-			int i=pt.getRoleIndex()-1;
-			Move<T> move=pt.getMove();
-			if(move==null || !currentState.isLegal(game.getRole(i+1), move)){
-				logger.severe("Illegal move \""+move+"\" from "+players.get(i)+ " in step "+step);
-				moves.set(i,currentState.getLegalMove(game.getRole(i+1)));
+		for(PlayerThreadPlay<RoleType, MoveType> pt:playerthreads){
+			RoleType role=pt.getRole();
+			MoveType move=pt.getMove();
+			if(move==null || !currentState.isLegal(role, move)){
+				logger.severe("Illegal move \""+move+"\" from "+match.getPlayer(role)+ " in step "+step);
+				jointMove.put(role,currentState.getLegalMove(role));
 			}else{
-				moves.set(i,move);
+				jointMove.put(role,move);
 			}
 		}
-		String movesmsg="moves: ";
-		for(Move<T> m:moves){
-			movesmsg+=m+" ";
-		}
-		logger.info(movesmsg);
-		return moves;
+		logger.info("moves: "+jointMove.getKIFForm());
+		return jointMove;
 	}
 
-	private void gameStop(List<Move<T>> priormoves) {
-		Collection<PlayerThreadStop<T,S>> playerthreads=new LinkedList<PlayerThreadStop<T,S>>();
-		for(int i=0;i<players.size();i++){
-			playerthreads.add(new PlayerThreadStop<T,S>(i+1, players.get(i), match, priormoves, playclock*1000+EXTRA_DEADLINE_TIME));
+	private void gameStop(JointMoveInterface<? extends RoleType, ? extends MoveType> priorJointMove) {
+		Collection<PlayerThreadStop<RoleType, MoveType>> playerthreads=new LinkedList<PlayerThreadStop<RoleType, MoveType>>();
+		for(RoleType role:game.getOrderedRoles()){
+			playerthreads.add(new PlayerThreadStop<RoleType, MoveType>(role, match.getPlayer(role), match, priorJointMove, playclock*1000+EXTRA_DEADLINE_TIME));
 		}
 		logger.info("Sending stop messages ...");
 		runThreads(playerthreads, Level.WARNING);
 		logger.info("Done.");
 	}
 	
-	public List<Integer> getGoalValues() {
+	public Map<? extends RoleType, Integer> getGoalValues() {
 		return goalValues;
 	}
 
-	public void setLogger(Logger logger) {
-		this.logger = logger;
-	}
-	private static int parsePlayerArguments(int index, String argv[], Game game, List<PlayerInfo> playerinfos){
-		int roleindex=0;
-		String host="", name="";
-		int port=0;
-		PlayerInfo player=null;
-		if(index<argv.length){
-			if(argv[index].equals("-remote")){
-				if(argv.length>index+4){
-					roleindex=getIntArg(argv[index+1], "roleindex");
-					if(roleindex<1 || roleindex>game.getNumberOfRoles()){
-						System.err.println("roleindex out of bounds");
-						printUsage();
-						System.exit(-1);
-					}
-					name=argv[index+2];
-					host=argv[index+3];
-					port=getIntArg(argv[index+4], "port");
-					player=new RemotePlayerInfo(roleindex-1, name, host, port);
-					index+=5;
-				}else{
-					missingArgumentsExit(argv[index]);
-				}
-			}else if(argv[index].equals("-legal") || argv[index].equals("-random")){
-				if(argv.length>index+1){
-					roleindex=getIntArg(argv[index+1], "roleindex");
-					if(roleindex<1 || roleindex>game.getNumberOfRoles()){
-						System.err.println("roleindex out of bounds");
-						printUsage();
-						System.exit(-1);
-					}
-				}else{
-					missingArgumentsExit(argv[index]);
-				}
-				if(argv[index].equals("-legal")){
-					player=new LegalPlayerInfo(roleindex-1);
-				}else{
-					player=new RandomPlayerInfo(roleindex-1);
-				}
-				index+=2;
-			}else{
-				System.err.println("invalid argument: "+argv[index]);
-				printUsage();
-				System.exit(-1);
-			}
-			if(playerinfos.get(roleindex-1)==null){
-				playerinfos.set(roleindex-1,player);
-			}else{
-				System.err.println("duplicate roleindex: "+roleindex);
-				printUsage();
-				System.exit(-1);
-			}
-		}
-		return index;
-	}
-
-	public static void printUsage(){
-		System.out.println("usage:\n java -jar gamecontroller.jar MATCHID GAMEFILE STARTCLOCK PLAYCLOCK [ -printxml OUTPUTDIR XSLT ] [-scramble WORDFILE] { -remote ROLEINDEX NAME HOST PORT | -legal ROLEINDEX | -random ROLEINDEX } ...");
-		System.out.println("example:\n java -jar gamecontroller.jar A_Tictactoe_Match tictactoe.gdl 120 30 -remote 2 MyPlayer localhost 4000");
-	}
-	public static int getIntArg(String arg, String argName){
-		try{
-			return Integer.parseInt(arg);
-		}catch(NumberFormatException ex){
-			System.err.println(argName+" argument is not an integer");
-			printUsage();
-			System.exit(-1);
-		}
-		return -1;
-	
-	}
-	public static void missingArgumentsExit(String arg){
-		System.err.println("missing arguments for "+arg);
-		printUsage();
-		System.exit(-1);
-	}
-	public static void main(String argv[]){
-		Game game=null;
-		int startclock=0, playclock=0;
-		String matchID, stylesheet=null, xmloutputdir=null;
-		int index=0;
-		GameScramblerInterface gameScrambler=null;
-		if(argv.length>=4){
-			matchID=argv[index]; ++index;
-			game=Game.readFromFile(argv[index]); ++index;
-			startclock=getIntArg(argv[index],"startclock"); ++index;
-			playclock=getIntArg(argv[index],"playclock"); ++index;
-			
-			List<PlayerInfo> playerinfos=new LinkedList<PlayerInfo>();
-			for(int i=0;i<game.getNumberOfRoles();i++){
-				playerinfos.add(null);
-			}
-			while(index<argv.length){
-				if(argv[index].equals("-printxml")){
-					if(index+2<argv.length){
-						xmloutputdir=argv[index+1];
-						stylesheet=argv[index+2];
-						index+=3;
-					}else{
-						missingArgumentsExit(argv[index]);
-					}
-				}else if(argv[index].equals("-scramble")){
-					if(index+1<argv.length){
-						gameScrambler=new GameScrambler(new File(argv[index+1]));
-						index+=2;
-					}else{
-						missingArgumentsExit(argv[index]);
-					}
-				}else{
-					index=parsePlayerArguments(index, argv, game, playerinfos);
-				}
-			}
-
-			Logger logger=Logger.getLogger("tud.gamecontroller");
-			logger.setUseParentHandlers(false);
-			logger.addHandler(new UnbufferedStreamHandler(System.out, new PlainTextLogFormatter()));
-			logger.setLevel(Level.ALL);
-			GameController<Term, State> gc=new GameController<Term, State>(new Match<Term, State, Player<Term,State>>(matchID, game, startclock, playclock, null), playerinfos, new TermFactory(), gameScrambler, logger);
-			logger.info("match:"+matchID);
-			logger.info("game:"+argv[1]);
-			if(stylesheet!=null){
-				XMLGameStateWriter<Term, State, Player<Term,State>> gsw=new XMLGameStateWriter<Term, State, Player<Term,State>>(xmloutputdir, stylesheet);
-				gc.addListener(gsw);
-			}
-			gc.runGame();
-		}else{
-			System.err.println("wrong number of arguments");
-			printUsage();
-			System.exit(-1);
-		}
-	}
 }

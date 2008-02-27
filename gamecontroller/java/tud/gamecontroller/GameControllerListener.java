@@ -1,22 +1,20 @@
 package tud.gamecontroller;
 
-import java.util.List;
+import java.util.Map;
 
-import tud.gamecontroller.game.Match;
-import tud.gamecontroller.game.Move;
-import tud.gamecontroller.game.StateInterface;
-import tud.gamecontroller.game.TermInterface;
+import tud.gamecontroller.game.JointMoveInterface;
 
 public interface GameControllerListener<
-		T extends TermInterface,
-		S extends StateInterface<T,S>,
-		PlayerType
+		RoleType,
+		MoveType,
+		MatchType,
+		StateType
 		>{
 
-	void gameStarted(Match<T, S, PlayerType> match, S currentState);
+	void gameStarted(MatchType match, StateType currentState);
 
-	void gameStep(List<Move<T>> moves, S currentState);
+	void gameStep(JointMoveInterface<? extends RoleType, ? extends MoveType> jointmove, StateType currentState);
 
-	void gameStopped(S currentState, List<Integer> goalValues);
+	void gameStopped(StateType currentState, Map<? extends RoleType, Integer> goalValues);
 
 }

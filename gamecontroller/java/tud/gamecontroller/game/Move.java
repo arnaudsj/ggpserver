@@ -1,6 +1,9 @@
 package tud.gamecontroller.game;
 
-public class Move<T extends TermInterface> extends TermDelegator<T> {
+import tud.gamecontroller.term.TermDelegator;
+import tud.gamecontroller.term.TermInterface;
+
+public class Move<T extends TermInterface> extends TermDelegator<T> implements MoveInterface {
 
 	public Move(T term) {
 		super(term);

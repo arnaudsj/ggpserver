@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -27,32 +28,47 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import tud.aux.NamedObject;
-import tud.gamecontroller.game.Fluent;
-import tud.gamecontroller.game.Match;
-import tud.gamecontroller.game.Move;
+import tud.gamecontroller.game.GameInterface;
+import tud.gamecontroller.game.JointMoveInterface;
+import tud.gamecontroller.game.MatchInterface;
+import tud.gamecontroller.game.MoveInterface;
+import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.StateInterface;
-import tud.gamecontroller.game.TermInterface;
+import tud.gamecontroller.term.TermInterface;
 
-public class XMLGameStateWriter<
-		T extends TermInterface,
-		S extends StateInterface<T,S>,
-		PlayerType extends NamedObject
-		> implements GameControllerListener<T,S,PlayerType> {
+public class XMLGameStateWriter
+//		<
+//		TermType extends TermInterface,
+//		RoleType extends RoleInterface,
+//		MoveType extends MoveInterface
+//		,
+//		Match<?, ? extends GameInterface<? extends RoleInterface, ?>, ? extends NamedObject> extends Match<?, ? extends GameInterface<? extends RoleInterface, ?>, ? extends NamedObject>
+//		>
+		implements GameControllerListener<
+			RoleInterface,
+			MoveInterface,
+			MatchInterface<
+				?,
+				? extends GameInterface<? extends RoleInterface, ?>,
+				? extends NamedObject
+			>,
+			StateInterface<?,?,? extends TermInterface,?>
+		> {
 
 	private String outputDir, matchDir;
-	private List<List<Move<T>>> moves;
+	private List<JointMoveInterface<?, ? extends MoveInterface>> moves;
 	private int step;
-	private Match<T, S, PlayerType> match;
+	private MatchInterface<?, ? extends GameInterface<? extends RoleInterface, ?>, ? extends NamedObject> match;
 	private String stylesheet;
 		
 	public XMLGameStateWriter(String outputDir, String stylesheet) {
 		this.outputDir=outputDir;
 		this.stylesheet=stylesheet;
-		this.moves=new LinkedList<List<Move<T>>>();
+		this.moves=new LinkedList<JointMoveInterface<?, ? extends MoveInterface>>();
 		this.match=null;
 	}
 
-	public void gameStarted(Match<T, S, PlayerType> match, S currentState) {
+	public void gameStarted(MatchInterface<?, ? extends GameInterface<? extends RoleInterface, ?>, ? extends NamedObject> match, StateInterface<?,?,? extends TermInterface,?> currentState) {
 		this.match=match;
 		this.step=1;
 		matchDir=outputDir+File.separator+match.getMatchID();
@@ -60,18 +76,18 @@ public class XMLGameStateWriter<
 		writeState(currentState, null);
 	}
 
-	public void gameStep(List<Move<T>> priormoves, S currentState) {
+	public void gameStep(JointMoveInterface<? extends RoleInterface, ? extends MoveInterface> jointMove, StateInterface<?,?,? extends TermInterface,?> currentState) {
 		step++;
-		moves.add(priormoves);
+		moves.add(jointMove);
 		writeState(currentState, null);
 	}
 
-	public void gameStopped(S currentState, List<Integer> goalValues) {
+	public void gameStopped(StateInterface<?,?,? extends TermInterface,?> currentState, Map<? extends RoleInterface,Integer> goalValues) {
 		writeState(currentState, goalValues);
-		this.moves=new LinkedList<List<Move<T>>>();
+		this.moves=new LinkedList<JointMoveInterface<?, ? extends MoveInterface>>();
 	}
 	
-	private void writeState(S currentState, List<Integer> goalValues) {
+	private void writeState(StateInterface<?,?,? extends TermInterface,?> currentState, Map<?, Integer> goalValues) {
 		try{
 			Document xmldoc=createXML(match, currentState, moves, goalValues, stylesheet);
 			// Serialization through Transform.
@@ -116,11 +132,9 @@ public class XMLGameStateWriter<
 	 * @return
 	 * @throws ParserConfigurationException
 	 */
-	static public
-		<T extends TermInterface,
-		 S extends StateInterface<T,S>,
-		 PlayerType extends NamedObject
-		> Document createXML(Match<T, S, PlayerType> match, S currentState, List<List<Move<T>>> moves, List<Integer> goalValues, String stylesheet) throws ParserConfigurationException {
+	static public Document createXML(MatchInterface<?, ? extends GameInterface<? extends RoleInterface, ?>, ? extends NamedObject> match, StateInterface<?,?,? extends TermInterface,?> currentState, List<JointMoveInterface<?, ? extends MoveInterface>> moves, Map<?, Integer> goalValues, String stylesheet) 
+	throws ParserConfigurationException {
+		
 		 Document xmldoc = null;
 		 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		 DocumentBuilder builder;
@@ -142,12 +156,12 @@ public class XMLGameStateWriter<
 		 e=xmldoc.createElement("match-id");
 		 e.setTextContent(match.getMatchID());
 		 root.appendChild(e);
-		 for(int i=1;i<=match.getGame().getNumberOfRoles();i++){
+		 for(RoleInterface role:match.getGame().getOrderedRoles()){
 			 e=xmldoc.createElement("role");
-			 e.setTextContent(match.getGame().getRole(i).toString());
+			 e.setTextContent(role.getPrefixForm());
 			 root.appendChild(e);
 		 }
-		 for(PlayerType p:match.getPlayers()){
+		 for(NamedObject p:match.getPlayers()){
 			 e=xmldoc.createElement("player");
 			 e.setTextContent(p.getName().toUpperCase());
 			 root.appendChild(e);
@@ -164,15 +178,15 @@ public class XMLGameStateWriter<
 			 root.appendChild(e);
 		 }
 		 root.appendChild(createHistoryElement(xmldoc, moves));
-		 if(goalValues!=null) root.appendChild(createScoresElement(xmldoc, goalValues));
+		 if(goalValues!=null) root.appendChild(createScoresElement(xmldoc, match.getGame(), goalValues));
 		 root.appendChild(createStateElement(xmldoc, currentState));
 		 return xmldoc;
 	}
 
-	private static <T extends TermInterface, S extends StateInterface<T, S>> Node createStateElement(Document xmldoc, S currentState) {
+	private static Node createStateElement(Document xmldoc, StateInterface<?, ?, ? extends TermInterface, ?> currentState) {
 		Element state=xmldoc.createElement("state");
-		Collection<Fluent<T>> fluents=currentState.getFluents();
-		for(Fluent<T> f:fluents){
+		Collection<? extends TermInterface> fluents=currentState.getFluents();
+		for(TermInterface f:fluents){
 			Element fact=xmldoc.createElement("fact");
 			Element e=xmldoc.createElement("prop-f");
 			e.setTextContent(f.getName().toUpperCase());
@@ -196,25 +210,25 @@ public class XMLGameStateWriter<
 		return state;
 	}
 
-	private static Node createScoresElement(Document xmldoc, List<Integer> goalValues) {
+	private static Node createScoresElement(Document xmldoc, GameInterface<?, ?> game, Map<?, Integer> goalValues) {
 		Element scores=xmldoc.createElement("scores");
-		for(Integer r:goalValues){
+		for(Object role:game.getOrderedRoles()){
 			Element e=xmldoc.createElement("reward");
-			e.setTextContent(r.toString());
+			e.setTextContent(goalValues.get(role).toString());
 			scores.appendChild(e);
 		}
 		return scores;
 	}
 
-	private static <T extends TermInterface> Element createHistoryElement(Document xmldoc, List<List<Move<T>>> moves) {
+	private static Element createHistoryElement(Document xmldoc, List<JointMoveInterface<?,? extends MoveInterface>> moves) {
 		Element history=xmldoc.createElement("history");
 		int s=1;
-		for(List<Move<T>> jointmove:moves){
+		for(JointMoveInterface<?,? extends MoveInterface> jointMove:moves){
 			Element step=xmldoc.createElement("step");
 			Element e=xmldoc.createElement("step-number");
 			e.setTextContent(""+s);
 			step.appendChild(e);
-			for(Move<T> move:jointmove){
+			for(MoveInterface move:jointMove.getOrderedMoves()){
 				e=xmldoc.createElement("move");
 				e.setTextContent(move.getPrefixForm());
 				step.appendChild(e);
@@ -224,5 +238,4 @@ public class XMLGameStateWriter<
 		}
 		return history;
 	}
-
 }

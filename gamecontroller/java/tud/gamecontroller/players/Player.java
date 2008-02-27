@@ -1,20 +1,15 @@
 package tud.gamecontroller.players;
 
-import java.util.List;
-
 import tud.aux.NamedObject;
 import tud.gamecontroller.MessageSentNotifier;
-import tud.gamecontroller.game.Match;
-import tud.gamecontroller.game.Move;
-import tud.gamecontroller.game.Role;
-import tud.gamecontroller.game.StateInterface;
-import tud.gamecontroller.game.TermInterface;
+import tud.gamecontroller.game.JointMoveInterface;
 
 public interface Player<
-		T extends TermInterface,
-		S extends StateInterface<T,S>
+		RoleType,
+		MoveType,
+		MatchType
 		> extends NamedObject{
-	public void gameStart(Match<T, S, Player<T,S>> match, Role<T> role, MessageSentNotifier notifier);
-	public Move<T> gamePlay(List<Move<T>> priormoves, MessageSentNotifier notifier);
-	public void gameStop(List<Move<T>> priormoves, MessageSentNotifier notifier);
+	public void gameStart(MatchType match, RoleType role, MessageSentNotifier notifier);
+	public MoveType gamePlay(JointMoveInterface<? extends RoleType, ? extends MoveType> jointMove, MessageSentNotifier notifier);
+	public void gameStop(JointMoveInterface<? extends RoleType, ? extends MoveType> jointMove, MessageSentNotifier notifier);
 }

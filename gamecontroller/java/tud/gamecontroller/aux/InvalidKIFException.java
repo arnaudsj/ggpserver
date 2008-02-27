@@ -1,4 +1,4 @@
-package tud.gamecontroller.game;
+package tud.gamecontroller.aux;
 
 public class InvalidKIFException extends Exception {
 
