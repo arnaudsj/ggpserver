@@ -19,14 +19,14 @@
 	<path location="${jar.dir}/${ant.project.name}.jar"/>
 	<fileset dir="${lib.dir}" includes="**/*.jar"/>
 	<path location="${java.home}/junit.jar"/>
-	<path location="${java.home}/xml-apis.jar"/>
+<!--	<path location="${java.home}/xml-apis.jar"/>-->
     </path>
     
     <path id="install_classpath">
 	    <path location="${install.dir}/${ant.project.name}.jar"/>
 	    <fileset dir="${install.dir}/${lib.dir}" includes="**/*.jar"/>
 	    <path location="${java.home}/junit.jar"/>
-	    <path location="${java.home}/xml-apis.jar"/>
+<!--	    <path location="${java.home}/xml-apis.jar"/>-->
     </path>
     
     <target name="clean" description="Removes the result of the last build.">

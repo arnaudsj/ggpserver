@@ -18,7 +18,7 @@ public class ConstantLinearRegressionStrategy extends AbstractLinearRegressionSt
 		return learningRate;
 	}
 
-	@Override
+//	@Override
 	public RatingSystemType getType() {
 		return CONSTANT_LINEAR_REGRESSION;
 	}

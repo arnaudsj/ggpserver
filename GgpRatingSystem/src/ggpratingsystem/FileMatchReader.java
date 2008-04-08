@@ -35,7 +35,7 @@ public class FileMatchReader implements MatchReader {
 	/* (non-Javadoc)
 	 * @see ggpratingsystem.MatchReader#readMatchSet()
 	 */
-	@Override
+//	@Override
 	public MatchSet readMatchSet() {
 		MatchSet matchSet = unreadMatchSets.get(0);
 		List<File> fileList = unreadMatches.get(matchSet);
@@ -62,7 +62,7 @@ public class FileMatchReader implements MatchReader {
 	/* (non-Javadoc)
 	 * @see ggpratingsystem.MatchReader#hasNext()
 	 */
-	@Override
+//	@Override
 	public boolean hasNext() {
 		return ! unreadMatchSets.isEmpty();
 	}

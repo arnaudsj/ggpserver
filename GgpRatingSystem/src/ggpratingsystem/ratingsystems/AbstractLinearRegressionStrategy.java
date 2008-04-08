@@ -10,7 +10,6 @@ public abstract class AbstractLinearRegressionStrategy implements RatingStrategy
 
 	protected abstract double getLearningRate(); 
 	
-	@Override
 	public void update(MatchSet matches) {
 		LinearRegressionGameInfo gameInfo = (LinearRegressionGameInfo) matches
 				.getGame().getGameInfo(this.getType());

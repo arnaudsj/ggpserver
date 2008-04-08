@@ -1,4 +1,4 @@
-GgpRatingSystem requires Java 1.6 to run 
+GgpRatingSystem requires Java 1.5 or higher to run 
 and Apache Ant to build.
 
 You can get a list of available build targets

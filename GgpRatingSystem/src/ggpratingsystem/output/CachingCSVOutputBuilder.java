@@ -2,7 +2,6 @@ package ggpratingsystem.output;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,7 +41,10 @@ public class CachingCSVOutputBuilder implements OutputBuilder {
 		super();
 		this.writer = writer;
 		this.type = null;
-		this.initialRatings = Arrays.copyOf(initialRatings, initialRatings.length) ;
+		// this.initialRatings = Arrays.copyOf(initialRatings, initialRatings.length);   // only possible in Java 1.5
+
+		this.initialRatings = new double[initialRatings.length];
+	    System.arraycopy(initialRatings, 0, this.initialRatings, 0, initialRatings.length);
 	}
 
 	public void beginMatchSet(MatchSet matchSet) {

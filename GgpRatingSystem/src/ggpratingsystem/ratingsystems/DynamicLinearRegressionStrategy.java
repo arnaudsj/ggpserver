@@ -41,7 +41,7 @@ public class DynamicLinearRegressionStrategy extends AbstractLinearRegressionStr
 		this.maxMatchSets = maxMatchSets;
 	}
 
-	@Override
+//	@Override
 	public RatingSystemType getType() {
 		return DYNAMIC_LINEAR_REGRESSION;
 	}
