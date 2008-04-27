@@ -72,33 +72,33 @@ public class CommandLineInterface extends SimpleJSAP {
     						"The directory to write output files to."),
     				
             /* Rating algorithm selection */                    
-            		// --dynamic-linear-regression-rating
+            		// --dynamic-linear-regression-rating, -d
     				new FlaggedOption(
     						OPTION_DYNAMIC_LINEAR_REGRESSION,
     						INTEGER_PARSER,
     						NO_DEFAULT,
     						NOT_REQUIRED,
-    						NO_SHORTFLAG,
+    						'd',
     						OPTION_DYNAMIC_LINEAR_REGRESSION,
     						"Enables the linear regression rating algorithm, using a dynamic learning rate. " +
     						"Expects an integer value that is bigger or equal to the maximum number of " +
     						"MatchSets that will be read."),
     						
-    				// --constant-linear-regression-rating
+    				// --constant-linear-regression-rating, -c
     				new FlaggedOption(
     						OPTION_CONSTANT_LINEAR_REGRESSION,
     						DOUBLE_PARSER,
     						NO_DEFAULT,
     						NOT_REQUIRED,
-    						NO_SHORTFLAG,
+    						'c',
     						OPTION_CONSTANT_LINEAR_REGRESSION,
     						"Enables the linear regression rating algorithm, using a constant learning rate. " +
     						"Expects a double value specifying the learning rate to be used (e.g. 1.0)."),
                     
-    				// --direct-scores-rating
+    				// --direct-scores-rating, -s
     				new Switch(
     						OPTION_DIRECT_SCORES,
-    						NO_SHORTFLAG,
+    						's',
     						OPTION_DIRECT_SCORES,
     						"Enables the direct scores rating algorithm. This is not really a rating algorithm, " +
     						"but rather sums up the scores received by the players."),
@@ -106,17 +106,17 @@ public class CommandLineInterface extends SimpleJSAP {
 					/* ****************** ADD NEW RATING SYSTEMS HERE ****************** */
             		
             /* Output selection */
-    				// --csv-output
+    				// --csv-output, -v
     				new Switch(
     						OPTION_CSV_OUTPUT,
-    						NO_SHORTFLAG,
+    						'v',
     						OPTION_CSV_OUTPUT,
     						"Enables CSV (comma separated values) output for all rating algorithms."),
 
 					/* ****************** ADD NEW OUTPUT METHODS HERE ****************** */
 
     		/* Debug level */
-            	// --debug-level, -d
+            	// --debug-level, -l
                     new FlaggedOption(
                     		OPTION_DEBUG_LEVEL,
                     		EnumeratedStringParser.getParser(
@@ -124,7 +124,7 @@ public class CommandLineInterface extends SimpleJSAP {
                     				false, false),
                     		"INFO",
                     		NOT_REQUIRED,
-                    		'd',
+                    		'l',
                     		OPTION_DEBUG_LEVEL,
                     		"Sets the level of debug output. One of the following (in order of "
                     			+ "increasing verbosity): "

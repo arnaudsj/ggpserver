@@ -112,11 +112,8 @@ java -cp "${install_classpath.unix}" ${main-class} $$*
 		    <fileset dir="${install.dir}" includes="*.sh"/>
 	    </chmod>
 	<echo>
-	
-	
 	Now run the application by typing, for example:
-	   install/ggp_rating_system.sh -i data/2007_preliminaries/ -o /tmp
-	            --dynamic-linear-regression-rating 60 --csv-output
+	   install/ggp_rating_system.sh -i data/2007_preliminaries/ -o output/ -d 60 -v
 		
 	You can get help by typing 
 	   install/ggp_rating_system.sh --help
