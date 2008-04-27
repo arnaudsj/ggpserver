@@ -262,7 +262,7 @@ player & rating & a single number reflecting the player's current rating (e.g.\ 
  & scores & the scores ($0 \dotsc 100$) achieved by each player\\ 
  & match set & the match set that this match is part of \textit{($\rightarrow$~match set)} \\ 
 \hline
-\multirow{6}{*}{match set} & match ID & the ID of this match set (e.g.\ MatchSet.385572910) \\ 
+\multirow{6}{*}{match set} & match set ID & the ID of this match set (e.g.\ MatchSet.385572910) \\ 
  & year, round, day, match set number & self-explanatory (e.g.\ 2007, 3, 2, 10) \\ 
  & game & the played game (by definition, this is identical for all played matches of a match set) \textit{($\rightarrow$~game)} \\
 \hline
@@ -315,7 +315,7 @@ The following sections will show how to update the game-specific coefficients $c
 
 The linear regression rating algorithm keeps so-called ``game information'' about each played game. This game information is just a matrix of linear regression coefficients and reflects the relationship between the role a player plays, the ratings of all players in the game and the expected score of the player in a certain game.
 
-As stated above, linear regression rating assumes that the expected score of a player playing role $target\_role$ can be approximated by a linear function of the form:
+As stated above, linear regression rating assumes that the expected score of a player playing role $r_1$ can be approximated by a linear function of the form:
 \begin{equation}
 	E[s(r_1, m)] = c_0 + c_1*q(p(r_1, m)) + c_2*q(p(r_2, m)) + c_3*q(p(r_3, m)) 
 	\label{eqn:expected_performance}
@@ -353,27 +353,157 @@ The choice of the learning rate has a big impact on the actual results of the al
 
 \section{Results}
 
+\subsection{Constant vs. Dynamic Learning Rate}
 The results for one run of both algorithms are shown in figures \ref{fig:constant_linear_regression} and \ref{fig:dynamic_linear_regression}. Figure~\ref{fig:direct_scores} shows the actual scores for comparison.
 
 \begin{figure}
  \centering
  \includegraphics[width=\textwidth]{constant_linear_regression_1_0}
- \caption{Constant linear regression ratings (Competition 2007 Preliminaries, constant learning rate = 1.0)}
+ \caption{Linear regression ratings with a \textit{constant} learning rate (Competition 2007 Preliminaries, constant learning rate = 1.0)}
  \label{fig:constant_linear_regression}
 \end{figure}
 
 \begin{figure}
  \centering
  \includegraphics[width=\textwidth]{dynamic_linear_regression_60}
- \caption{Dynamic linear regression ratings (Competition 2007 Preliminaries, dynamic learning rate = 6.0$\dotsc$1.6)}
+ \caption{Linear regression ratings with a \textit{dynamic} learning rate (Competition 2007 Preliminaries, dynamic learning rate = 6.0$\dotsc$1.6, linear descent)}
  \label{fig:dynamic_linear_regression}
 \end{figure}
 
 \begin{figure}
  \centering
  \includegraphics[width=\textwidth]{direct_scores}
- \caption{Direct scores (Competition 2007 Preliminaries; using round weights 0.25, 0.5, 0.5 and 1.0)}
+ \caption{Weighted direct scores (Competition 2007 Preliminaries; using round weights 0.25, 0.5, 0.5 and 1.0)}
  \label{fig:direct_scores}
 \end{figure}
 
+\subsection{Re-Run}
+As a quick ``sanity check'', both algorithms were re-run on the same data set, using the final player ratings to initialize the player ratings. The results are shown in figures \ref{fig:constant_linear_regression_with_initial_values} and \ref{fig:dynamic_linear_regression_with_initial_values}. As expected, the re-run produced results in the same range as the original one. The ratings are not constant, which can be partly explained by the fact that the players were under development during the competition, and so their playing strength did not remain constant. A good example is Cadia-Player, which performed moderately well during the first half of the competition, and so its rating is corrected downward during the re-run. In the second half of the competition, its playing strength greatly improved, and so the rating rises again.
+
+\begin{figure}
+ \centering
+ \includegraphics[width=\textwidth]{constant_linear_regression_1_0_with_initial_values}
+ \caption{Re-Run of linear regression ratings with a \textit{constant} learning rate}
+ \label{fig:constant_linear_regression_with_initial_values}
+\end{figure}
+
+\begin{figure}
+ \centering
+ \includegraphics[width=\textwidth]{dynamic_linear_regression_60_with_initial_values}
+ \caption{Re-Run of linear regression ratings with a \textit{dynamic} learning rate}
+ \label{fig:dynamic_linear_regression_with_initial_values}
+\end{figure}
+
+\subsection{Calculated Weights}
+To demonstrate the properties of the algorithm, some of the calculated weights will be analyzed.
+
+The results of the 8 matches of tictactoe-large\footnote{Competition 2007 preliminaries, round 3, day 1 -- or short 2007-R3D1} are shown in table~\ref{tab:outcomes_tictactoelarge}. The first two columns are the ratings of both players, the third column shows the actual outcome and the last column contains the expected outcome, calculated via the coefficients in table~\ref{tab:coefficients_tictactoelarge}.
+
+\begin{table}[htp]
+	\begin{center}
+		\begin{tabular}{rrrr}
+			\hline
+			\textbf{Rating 1} & \textbf{Rating 2} & \textbf{Outcome} & \textbf{Outcome (calc.)} \\ 
+			\hline
+			1455.0136    &	1166.2216    &	50.0         &	56.1203 \\
+			1875.7368    &	1127.6833    &	100.0        &	65.8533 \\
+			-729.6037    &	1519.9328    &	0.0          &	2.3262  \\
+			2007.6933    &	837.7279     &	50.0         &	74.7947 \\
+			1166.2216    &	1455.0136    &	50.0         &	43.8797 \\
+			1127.6833    &	1875.7368    &	0.0          &	34.1467 \\
+			1519.9328    &	-729.6037    &	100.0        &	97.6738 \\
+			837.7279     &	2007.6933    &	50.0         &	25.2053 \\
+			\hline
+		\end{tabular}
+	\end{center}
+	\caption{Player ratings, real and predicted outcomes of tictactoe-large}
+	\label{tab:outcomes_tictactoelarge}
+\end{table}
+
+\begin{table}[htp]
+	\begin{center}
+		\begin{tabular}{rrrr}
+			\hline
+			& \textbf{Best Estimate} & \textbf{SD} & \textbf{Coeff. [\%]} \\ 
+			\hline
+			$c_0$   &	50.000       &	26.5921      &	53.1841 \\
+			$c_1$   &	0.0212       &	0.0129       &	60.8856 \\
+			$c_2$   &	-0.0212      &	0.0129       &	-60.8856 \\
+			\hline
+		\end{tabular}
+	\end{center}
+	\caption{Coefficients for role 1 of tictactoe-large, $p = 0.0051$ (linear correlation coefficient probability)}
+	\label{tab:coefficients_tictactoelarge}
+\end{table}
+
+Tictactoe-large is an example where the algorithm performs well. The prediction is statistically very significant ($p = 0.0051$), and the calculated weights are in the expected range. However, there are match sets which do not give satisfying results, like Amazons (2007-R4D1). Although the higher-rated player won in seven of the eight cases (table~\ref{tab:outcomes_amazons}), the algorithm assigns a negative coefficient to both roles (table~\ref{tab:coefficients_amazons}). The reason for this is probably that the difference in ratings is huge in the ``offending'' match (number 7). Since least-squares minimization is used, the linear regression algorithm prefers many smaller errors to one huge error and picks its coefficients accordingly. As already mentioned in section~\ref{sec:updating_game_information}, these results will not be used, and instead a linear regression without the target role will be performed.
+
+\begin{table}[htp]
+	\begin{center}
+		\begin{tabular}{rrrr}
+			\hline
+			\textbf{Rating 1} & \textbf{Rating 2} & \textbf{Outcome} & \textbf{Outcome (calc.)} \\ 
+			\hline
+				1515.4385    &	710.5769     &	100.0        &	76.1431  \\
+				1210.5041    &	2291.2757    &	0.0          &	22.6747  \\
+				1939.6671    &	-732.956     &	100.0        &	123.8856 \\
+				828.5942     &	1600.0015    &	0.0          &	49.8975  \\
+				710.5769     &	1515.4385    &	0.0          &	53.7589  \\
+				2291.2757    &	1210.5041    &	100.0        &	52.7323  \\
+				-732.956     &	1939.6671    &	100.0        &	49.5567  \\
+				1600.0015    &	828.5942     &	100.0        &	71.3512  \\
+			\hline
+		\end{tabular}
+	\end{center}
+	\caption{Player ratings, real and predicted outcomes of amazons}
+	\label{tab:outcomes_amazons}
+\end{table}
+
+\begin{table}[htp]
+	\begin{center}
+		\begin{tabular}{rrrr}
+			\hline
+			& \textbf{Best Estimate} & \textbf{SD} & \textbf{Coeff. [\%]} \\ 
+			\hline
+			$c_0$   &	112.4939     &	54.0653      &	48.0607  \\
+			$c_1$   &	-0.0075      &	0.0247       &	-330.895 \\
+			$c_2$   &	-0.0353      &	0.0247       &	-69.9282 \\
+			\hline
+		\end{tabular}
+	\end{center}
+	\caption{Coefficients for role 1 of amazons, $p = 0.0541$}
+	\label{tab:coefficients_amazons}
+\end{table}
+
+
+\section{Implementation Issues}
+
+The implementation reads most of the attributes in table~\ref{tab:data_structures} directly from the match XML files, available from the game master. Specifically, these are:
+\textbf{match~id}, \textbf{roles}, \textbf{players}, and \textbf{scores}.
+
+Unfortunately, the following attributes are not available in machine-readable form, but only via the web interface:
+\textbf{game~name}, \textbf{year}, \textbf{round}, and \textbf{day}.
+
+Additionally, the concept of a \textbf{match~set} has been introduced here, which is not supported by the game master. Also, there is no direct way to access the underlying match XML files. Thus, the present process for acquiring the necessary data is a little awkward and consists of the following steps:
+\begin{enumerate}
+ \item mirror the whole games.stanford.edu website
+ \item manually move all XML files into a directory
+ \item copy-and-paste game name, year, round and day from the website into a CSV file, called matchindex.csv, in the same directory.
+\end{enumerate}
+
+In summary, the amount of manual work could be reduced significantly if 
+\begin{itemize}
+	\item the match XML files would be provided directly by the game master (e.g.\ in the form of URIs), and
+	\item the missing data would also be available in XML.
+\end{itemize}
+
+
+\section{Building and Running GgpRatingSystem}
+\subsection{Building}
+GgpRatingSystem can be built using Apache Ant. Change into the GgpRatingSystem directory and type \texttt{ant install}. This will create a new subdirectory called ``install'', build all necessary sources and move them there.
+
+\subsection{Running}
+Currently, there is only a command line interface to GgpRatingSystem. However, the program has been designed with the goal in mind to make addition of extra user interfaces (GUI, Web) as easy as possible.
+
+Just type \texttt{install/ggp\_rating\_system.sh -h} for a list of options.
 \end{document}
