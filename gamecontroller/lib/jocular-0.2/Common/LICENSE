@@ -1,0 +1,196 @@
+
+JOCULAR SOFTWARE LICENSE AGREEMENT
+
+This agreement ("Agreement") is between THE BOARD OF TRUSTEES OF THE LELAND
+STANFORD JUNIOR UNIVERSITY ("STANFORD"), a body having corporate powers under
+the laws of the State of California, and yourself (the "LICENSEE"). By
+downloading, installing, executing, or otherwise using the software described
+below, you accept all terms of this license. If you do not agree to all the
+terms in this license, you may not download, install, execute, or otherwise use
+the software described below.
+
+Effective as of the date of download ("Effective Date"), STANFORD and LICENSEE
+agree as follows:
+
+
+1. BACKGROUND
+    
+    STANFORD has an assignment of certain SOFTWARE as defined hereinafter and
+    desires to license the SOFTWARE in order that it becomes available for
+    public use and benefit.
+
+2. DEFINITIONS
+
+    "SOFTWARE" means those source code and binary files known as Jocular,
+    provided to LICENSEE pursuant to this Agreement.
+
+3. GRANT
+
+    3.1 STANFORD hereby grants and LICENSEE hereby accepts a worldwide,
+    nonexclusive, royalty-free license to use, copy, modify, and sublicense the
+    SOFTWARE. The license shall continue in perpetuity unless terminated in
+    accordance with Article 7.
+
+    3.2 LICENSEE agrees to:
+
+        (a) Maintain the quality of the SOFTWARE;
+
+        (b) Affix an appropriate notice of copyright ("(c) <year, e.g. 2007>
+        The Board of Trustees of the Leland STANFORD Junior University") to all
+        copies of the SOFTWARE.
+
+        (c) Exercise due care in protecting the SOFTWARE from unauthorized
+        disclosure to third parties, at least to the degree LICENSEE exercises
+        care in protecting its own proprietary information; and
+
+        (d) To take appropriate action with its employees, consultants, and
+        sublicensees to satisfy its obligation under this Agreement with
+        respect to maintaining the above degree of protection for SOFTWARE.
+
+        However, LICENSEE shall have no confidentiality obligations with
+        respect to any information if the same or similar information is or
+        becomes within the public domain through no act of LICENSEE in breach
+        of this Agreement, is independently developed by LICENSEE, or is
+        received unrestricted from another source who who has legitimate access
+        to the SOFTWARE and is not under an obligation of confidentiality to
+        STANFORD
+
+    3.3 LICENSEE agrees the source code is for internal use only and that when
+    sublicensing only object code in binary form will be distributed.
+    Notwithstanding for the foregoing to the contrary, if STANFORD is no longer
+    making the SOFTWARE and/or compatible updated versions available on similar
+    terms as those hereunder, LICENSEE may place the SOFTWARE in escrow with a
+    bona-fide escrow service upon written notice to STANFORD, or, upon prior
+    written permission from STANFORD, LICENSEE may distribute source code to
+    third parties on a royalty-free, non-exclusive basis.
+
+    3.4 STANFORD reserves the following rights:
+
+        (a) To use, copy, and modify the SOFTWARE;
+
+        (b) To distribute the SOFTWARE to third parties;
+
+        (c) To use SOFTWARE for its own bona fide research, including sponsored
+        research and collaborations; and
+
+        (d) To publish any information included in SOFTWARE.
+
+4. CONSIDERATION
+
+    In consideration of the rights granted herein, LICENSEE shall report to
+    STANFORD any bugs or errors in the SOFTWARE code which it may discover from
+    time-to-time. Notice of any bug or error in the SOFTWARE shall be delivered
+    via email to the Stanford Logic Group at info@logic.stanford.edu or such
+    other person(s) designated by STANFORD in, for instance, the documentation
+    distributed with the SOFTWARE.
+
+5. INDEMNITY AND DISCLAIMER OF WARRANTIES
+
+    5.1 Except as expressly set forth in this Agreement, STANFORD MAKES NO
+    REPRESENTATIONS AND EXTENDS NO WARRANTIES OF ANY KIND, EITHER EXPRESS OR
+    IMPLIED. THERE ARE NO EXPRESS OR IMPLIED WARRANTIES OF MERCHANTABILITY OR
+    FITNESS FOR A PARTICULAR PURPOSE, OR THAT SOFTWARE WILL NOT INFRINGE ANY
+    PATENT, COPYRIGHT, TRADEMARK, OR OTHER RIGHTS, OR ANY OTHER EXPRESS OR
+    IMPLIED WARRANTIES. STANFORD shall not be LIABLE for any liability or
+    damages with respect to any claim by LICENSEE or any third party on account
+    of, or arising from, the license, or any SublicenseS or use of the
+    SOFTWARE.
+
+    5.2 LICENSEE agrees to indemnify, hold harmless, and defend STANFORD and
+    STANFORD Hospitals and Clinics, and their respective trustees, officers,
+    employees, students, and agents against any and all claims for death,
+    illness, personal injury, property damage, and improper business practices
+    arising out of the possession, use, or operation of SOFTWARE by LICENSEE or
+    its customers.
+
+6. STANFORD NAMES AND MARKS
+
+    LICENSEE agrees not to identify STANFORD in any promotional advertising or
+    other promotional materials to be disseminated to the public or any portion
+    thereof or to use the name of any STANFORD faculty member, employee, or
+    student, or any trademark, service mark, trade name, or symbol of STANFORD
+    or STANFORD Hospitals and Clinics, or any that is associated with any of
+    them, without STANFORD's prior written consent. Any use of STANFORD's name
+    shall be limited to statements of fact and shall not imply endorsement of
+    LICENSEE's products or services.
+
+7. TERMINATION
+
+    7.1 This Agreement may be terminated by LICENSEE upon thirty (30) days
+    written notice to the other party. STANFORD may terminate the Agreement
+    upon thirty (30) days written notice if LICENSEE is in material breach of
+    any provision.
+
+    7.2 Surviving any termination are:
+
+        (a) The provisions of Articles 5 and 6;
+
+        (b) Any cause of action or claim, accrued or to accrue, because of any
+        breach or default by the other party; and
+
+        (c) All sublicenses delivered by LICENSEE as authorized within this
+        Agreement.
+
+8. EXPORT
+
+    Licensee warrants that licensee will not export or reexport the following,
+    directly or indirectly, to any country, individual or entity except when
+    such export or reexport is authorized in full compliance with the laws and
+    regulations of the United States of America, as applicable:
+    
+        (a)  the licensed technology or SOFTWARE, or any portion thereof, or
+
+        (b)  any foreign produced direct product (including equipment,
+        processes or services) of the licensed technology or software; or
+
+        (c)  any foreign produced direct product of a plant or major          
+        component of a plant if the direct product of the licensed          
+        technology is the plant itself or a major component of the plant.
+
+    Applicable laws and regulations may include, but are not limited to, the
+    Export Administration Regulations, the International Traffic in Arms
+    Regulations and the various economic sanctions regulations administered by
+    the U.S. Department of the Treasury.
+
+9. MISCELLANEOUS
+
+    9.1 LICENSEE shall not, without the prior written consent of STANFORD,
+    assign or extend this Agreement or any rights hereunder to another person
+    or company, except to an Affiliate or to a successor to substantially the
+    whole of LICENSEE's assets.
+
+    9.2 Any controversy arising under or related to this Agreement and any
+    disputed claim by either party against the other under this Agreement,
+    excluding any dispute relating to the copyright validity or infringement
+    arising under this Agreement, shall be settled by arbitration in accordance
+    with the JAMS Arbitration Rules and Procedures.
+    
+    9.3 None of the terms, covenants, and conditions of this Agreement can be
+    waived except by the written consent of the party waiving compliance.
+
+    9.4 This Agreement shall be construed, interpreted, and applied in
+    accordance with the laws of the State of California.
+
+    9.5 This Agreement constitutes the entire understanding between the parties
+    and no modification or amendment thereof will be binding upon either party
+    unless it will be in writing and signed by persons authorized to bind the
+    parties to the Agreement.
+
+10. NOTICES
+
+    All notices under this Agreement shall be deemed to have been fully given
+    when done in writing and addressed as follows:
+
+    All general notices to STANFORD should be e-mailed or mailed to:
+
+        Office of Technology Licensing
+        1705 El Camino Real
+        Palo Alto, CA  94306-1106
+        info@otlmail.STANFORD.edu
+
+    Either party may change its address upon written notice to the other party.
+
+    The parties waive any right to challenge the admissibility or authenticity
+    of this document in a court of law based solely on the absence of an
+    original signature.
+

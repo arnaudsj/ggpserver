@@ -1,0 +1,8 @@
+This code was developed by the Stanford Logic Group, which is headed by Michael
+Genesereth, Associate Professor of Computer Science.
+
+The majority of this code was written by David C. Haley <david@the-haleys.org>,
+with significant contributions made by Eric Schkufza <eschkufz@stanford.edu>.
+Where marked, some portions of this code are based loosely on the Camembert
+game player written by David Haley and Pierre-Yves Laligand in Spring 2006 for
+the Stanford University course on General Game Playing, CS 227b.

@@ -4,7 +4,7 @@
 <options buildIfNeeded="true" compress="true" descriptionLocation="/gamecontroller/gamecontroller-jar.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
 <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
 <selectedProjects/>
-<manifest generateManifest="false" manifestLocation="/gamecontroller/gamecontroller-Manifest" manifestVersion="1.0" reuseManifest="false" saveManifest="true" usesManifest="true">
+<manifest generateManifest="true" mainClassHandleIdentifier="=gamecontroller/&lt;tud.gamecontroller.game.jocular{GameControllerRunner.java[GameControllerRunner" manifestLocation="/gamecontroller/gamecontroller-Manifest" manifestVersion="1.0" reuseManifest="false" saveManifest="true" usesManifest="true">
 <sealing sealJar="false">
 <packagesToSeal/>
 <packagesToUnSeal/>
@@ -12,18 +12,18 @@
 </manifest>
 <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
 <file path="/gamecontroller/.classpath"/>
-<javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.game.javaprover"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.scrambling"/>
+<javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.playerthreads"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.game"/>
+<javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.cli"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.aux"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.players"/>
-<javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.resolver"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.logging"/>
-<javaElement handleIdentifier="=gamecontroller/&lt;cs227b.teamIago.parser"/>
-<javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.parser"/>
-<javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.gameProver"/>
-<javaElement handleIdentifier="=gamecontroller/&lt;tud.xmlgamestatewriter"/>
-<javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.util"/>
+<javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.term"/>
+<javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.aux"/>
+<file path="/Stanford-GGP-Common/build.xml"/>
+<javaElement handleIdentifier="=Stanford-GGP-Common/java"/>
+<javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.game.jocular"/>
 </selectedElements>
 </jardesc>
