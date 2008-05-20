@@ -287,7 +287,7 @@ $q(p)$:    & rating of player $p$ \\
 &
 \end{tabular}
 
-It seems to me that what we want to be able to express $E[s(r, m)]$ (the
+It seems to me that we want to be able to express $E[s(r, m)]$ (the
 expected value of the score of role $r$ in match $m$) in terms of $q(p(r', m))$
 for each role $r'$ in the game. One way to achieve this might be to assume
 $E[s(r, m)]$ is a linear function of these variables and perfrom least-squares
@@ -349,7 +349,7 @@ On a side remark, the player's ratings are initialized with a constant value ($1
 \subsection{Constant vs.\ dynamic learning rate}
 \label{sec:constant_dynamic}
 
-The choice of the learning rate has a big impact on the actual results of the algorithm. If the learning rate is too large, the player ratings become erratic and don't converge. If the learning rate is too small, convergation takes too long. One solution is to use a dynamic learning rate: starting off with a high learning rate and reducing it over time.
+The choice of the learning rate has a big impact on the actual results of the algorithm. If the learning rate is too large, the player ratings become erratic and don't converge. If the learning rate is too small, they take too long to converge. One solution is to use a dynamic learning rate: starting off with a high learning rate and reducing it over time.
 
 \section{Results}
 
