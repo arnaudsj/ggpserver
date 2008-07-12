@@ -55,19 +55,28 @@ public class Match {
 			XPathResult result = queryXPath(xmlFile, "/match/match-id");
 
 			Node firstResult = result.iterateNext();
-			if (firstResult == null) {
-				throw new MatchParsingException("XPath query for match id returned no results!");
+			if (firstResult != null) {
+				// competition 2007 XML format: there is a node called "match-id"
+				
+				this.matchId = firstResult.getTextContent();
+			} else {
+				// competition 2008 XML format: "id" is an attribute of node "match"
+				result = queryXPath(xmlFile, "/match");
+
+				firstResult = result.iterateNext();
+				
+				if (firstResult == null) {
+					throw new MatchParsingException("XPath query for match id returned no results!");				
+				}
+				this.matchId = firstResult.getAttributes().getNamedItem("id").getTextContent();
 			}
-			
+
 			if (result.iterateNext() != null) {
 				throw new MatchParsingException("XPath query for match id returned more than one result!");
 			}
 			
-			this.matchId = firstResult.getTextContent();
-
 			log.finest("matchId: " + matchId);
 
-			
 			/* parse roles */
 			result = queryXPath(xmlFile, "/match/role");
 			
@@ -106,11 +115,25 @@ public class Match {
 			}
 			
 			/* parse scores */
-			result = queryXPath(xmlFile, "/match/scores/reward");
-			
 			this.scores = new LinkedList<Integer>();
 
+			result = queryXPath(xmlFile, "/match/scores/reward");   // 2007 XML format
+			
+			List<Node> results = new LinkedList<Node>();
+			
 			for (Node n = result.iterateNext(); n != null; n = result.iterateNext()) {
+				results.add(n);
+			}
+			
+			if (results.size() == 0) {
+				result = queryXPath(xmlFile, "/match/rewards/reward");   // 2008 XML format
+				
+				for (Node n = result.iterateNext(); n != null; n = result.iterateNext()) {
+					results.add(n);
+				}				
+			}
+			
+			for (Node n : results) {
 				// n = <reward>100</reward>
 				Node firstChild = n.getFirstChild(); // firstChild = 100
 				
