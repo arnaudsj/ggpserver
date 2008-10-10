@@ -35,7 +35,7 @@ public class GameController<
 	/**
 	 * defines the minimal delay in milliseconds between receiving the last reply and sending the next play message 
 	 */
-	private static final int DELAY_BEFORE_NEXT_MESSAGE=100; 
+	private static final int DELAY_BEFORE_NEXT_MESSAGE=500; 
 	/**
 	 * defines the extra time in milliseconds that is added to the normal start clock and play clock before a player is said to
 	 * have timed out  
