@@ -1,19 +1,13 @@
 package tud.gamecontroller.cli;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import tud.gamecontroller.AbstractGameControllerRunner;
-import tud.gamecontroller.game.GameInterface;
-import tud.gamecontroller.game.MoveInterface;
-import tud.gamecontroller.game.RoleInterface;
-import tud.gamecontroller.game.StateInterface;
+import tud.gamecontroller.game.impl.Game;
 import tud.gamecontroller.logging.PlainTextLogFormatter;
 import tud.gamecontroller.logging.UnbufferedStreamHandler;
 import tud.gamecontroller.players.LegalPlayerInfo;
@@ -23,20 +17,10 @@ import tud.gamecontroller.players.RemotePlayerInfo;
 import tud.gamecontroller.term.TermInterface;
 
 public abstract class AbstractGameControllerCLIRunner<
-		RoleType extends RoleInterface,
-		MoveType extends MoveInterface,
-		StateType extends StateInterface<RoleType, MoveType, ? extends TermInterface, ? extends StateType>,
-		GameType extends GameInterface<? extends RoleType, StateType>
-		> extends AbstractGameControllerRunner<
-			RoleType, MoveType, StateType, GameType
+		TermType extends TermInterface,
+		ReasonerStateInfoType> extends AbstractGameControllerRunner<
+			TermType, ReasonerStateInfoType
 			>{
-
-	protected void setupLogger(Logger logger) {
-		super.setupLogger(logger);
-		logger.setUseParentHandlers(false);
-		logger.addHandler(new UnbufferedStreamHandler(System.out, new PlainTextLogFormatter()));
-		logger.setLevel(Level.ALL);
-	}
 
 	private File gameFile=null;
 	private int startClock=0, playClock=0;
@@ -48,6 +32,10 @@ public abstract class AbstractGameControllerCLIRunner<
 	private Collection<PlayerInfo> playerInfos=null;
 	
 	public AbstractGameControllerCLIRunner(){
+		Logger logger=getLogger();
+		logger.setUseParentHandlers(false);
+		logger.addHandler(new UnbufferedStreamHandler(System.out, new PlainTextLogFormatter()));
+		logger.setLevel(Level.ALL);
 	}
 	
 	public void runFromCommandLine(String argv[]){
@@ -60,7 +48,11 @@ public abstract class AbstractGameControllerCLIRunner<
 		scrambleWordList=null;
 		playerInfos=null;
 		parseCommandLine(argv);
-		run();
+		try {
+			run();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void parseCommandLine(String argv[]){
@@ -192,31 +184,13 @@ public abstract class AbstractGameControllerCLIRunner<
 		System.exit(-1);
 	}
 
-	protected GameType createGame(File gameFile){
-		StringBuffer sb = new StringBuffer();
-		try{
-		BufferedReader br = new BufferedReader(new FileReader(gameFile));
-		String line;
-
-		while((line=br.readLine())!=null){
-			line = line.trim();
-			sb.append(line + "\n"); // artificial EOLN marker
-		}
-		} catch (IOException e){
-			System.out.println(e);
-			System.exit(-1);
-		}
-		return createGame(sb.toString(), gameFile.getName());
-	}
 //	protected abstract Match<TermType,StateType,Player<TermType, StateType>> createMatch(String matchID, GameType game, int startClock, int playClock, Map<Role<TermType>, Player<TermType, StateType>> players);
-
-	protected abstract GameType createGame(String gameDescription, String gameName);
 
 	protected boolean doPrintXML() {
 		return doPrintXML;
 	}
 
-	protected GameType getGame() {
+	protected Game<TermType, ReasonerStateInfoType> getGame() {
 		return createGame(gameFile);
 	}
 

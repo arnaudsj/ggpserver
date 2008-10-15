@@ -1,34 +1,22 @@
 package tud.gamecontroller.players;
 
-import tud.gamecontroller.game.GameInterface;
-import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.MoveFactoryInterface;
-import tud.gamecontroller.game.RoleInterface;
-import tud.gamecontroller.game.StateInterface;
+import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.scrambling.GameScramblerInterface;
+import tud.gamecontroller.term.TermInterface;
 
 public class PlayerFactory {
 
-	public static <
-			RoleType extends RoleInterface,
-			MoveType> Player<RoleType, MoveType, MatchInterface<?,? extends GameInterface<?, ?>, ?>> createRemotePlayer(RemotePlayerInfo info, MoveFactoryInterface<MoveType> movefactory, GameScramblerInterface gameScrambler) {
-		return new RemotePlayer<RoleType, MoveType>(info.getName(), info.getHost(), info.getPort(), movefactory, gameScrambler);
+	public static <TermType extends TermInterface> Player<TermType> createRemotePlayer(RemotePlayerInfo info, MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory, GameScramblerInterface gameScrambler) {
+		return new RemotePlayer<TermType>(info.getName(), info.getHost(), info.getPort(), movefactory, gameScrambler);
 	}
-	public static <
-			RoleType,
-			MoveType> Player<RoleType, MoveType, MatchInterface<RoleType, ? extends GameInterface<?, ? extends StateInterface<RoleType, MoveType, ?, ?>>, ?>> createRandomPlayer(RandomPlayerInfo info) {
-		return new RandomPlayer<RoleType, MoveType>(info.getName());
+	public static <TermType extends TermInterface> Player<TermType> createRandomPlayer(RandomPlayerInfo info) {
+		return new RandomPlayer<TermType>(info.getName());
 	}
-	public static <
-			RoleType,
-			MoveType> Player<RoleType, MoveType, MatchInterface<RoleType, ? extends GameInterface<?, ? extends StateInterface<RoleType, MoveType, ?, ?>>, ?>> createLegalPlayer(LegalPlayerInfo info) {
-		return new LegalPlayer<RoleType, MoveType>(info.getName());
+	public static <TermType extends TermInterface> Player<TermType> createLegalPlayer(LegalPlayerInfo info) {
+		return new LegalPlayer<TermType>(info.getName());
 	}
-	public static <
-		RoleType extends RoleInterface,
-		MoveType,
-		MatchType extends MatchInterface<RoleType, ? extends GameInterface<?, ? extends StateInterface<RoleType, MoveType, ?, ?>>, ?>
-		> Player<? super RoleType, MoveType, ? super MatchType> createPlayer(PlayerInfo info, MoveFactoryInterface<MoveType> termfactory, GameScramblerInterface gameScrambler) {
+	public static <TermType extends TermInterface> Player<TermType> createPlayer(PlayerInfo info, MoveFactoryInterface<? extends MoveInterface<TermType>> termfactory, GameScramblerInterface gameScrambler) {
 		if(info instanceof RemotePlayerInfo){
 			return createRemotePlayer((RemotePlayerInfo)info, termfactory, gameScrambler);
 		}else if(info instanceof RandomPlayerInfo){

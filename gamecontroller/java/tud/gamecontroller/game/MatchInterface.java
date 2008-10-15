@@ -5,20 +5,20 @@ import java.util.List;
 
 import tud.gamecontroller.players.Player;
 
-public interface MatchInterface<RoleType, GameType, PlayerType extends Player<?, ?, ?>> {
+public interface MatchInterface<TermType, StateType extends StateInterface<TermType, ? extends StateType>> {
 
 	String getMatchID();
 
-	GameType getGame();
+	GameInterface<TermType,StateType> getGame();
 
 	int getStartclock();
 
 	int getPlayclock();
 
-	Collection<? extends PlayerType> getPlayers();
+	Collection<? extends Player<TermType>> getPlayers();
 
-	List<? extends PlayerType> getOrderedPlayers();
+	List<? extends Player<TermType>> getOrderedPlayers();
 
-	PlayerType getPlayer(RoleType role);
+	Player<TermType> getPlayer(RoleInterface<TermType> role);
 
 }

@@ -3,9 +3,10 @@ package tud.gamecontroller.game;
 import java.util.List;
 import java.util.Map;
 
-public interface JointMoveInterface<RoleType, MoveType> extends Map<RoleType,MoveType>{
+public interface JointMoveInterface<TermType>
+	extends Map<RoleInterface<TermType>,MoveInterface<TermType>>{
 
-	List<MoveType> getOrderedMoves();
+	List<MoveInterface<TermType>> getOrderedMoves();
 
 	String getKIFForm();
 

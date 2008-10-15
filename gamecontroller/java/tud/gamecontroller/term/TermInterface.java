@@ -14,7 +14,7 @@ public interface TermInterface extends GameObjectInterface {
 	/**
 	 * @return the list of arguments if the term is a function, null otherwise
 	 */
-	public List<TermInterface> getArgs();
+	public List<? extends TermInterface> getArgs();
 
 	/**
 	 * @return true if this Term is a constant (i.e., neither function nor variable) 

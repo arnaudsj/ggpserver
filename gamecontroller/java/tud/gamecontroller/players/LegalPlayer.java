@@ -1,14 +1,17 @@
 package tud.gamecontroller.players;
 
+import tud.gamecontroller.game.MoveInterface;
+import tud.gamecontroller.term.TermInterface;
+
 public class LegalPlayer<
-	RoleType,
-	MoveType> extends LocalPlayer<RoleType, MoveType>  {
+	TermType extends TermInterface
+	> extends LocalPlayer<TermType>  {
 
 	public LegalPlayer(String name) {
 		super(name);
 	}
 
-	public MoveType getNextMove() {
+	public MoveInterface<TermType> getNextMove() {
 		return currentState.getLegalMove(role);
 	}
 }

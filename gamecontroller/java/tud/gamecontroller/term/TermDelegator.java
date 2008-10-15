@@ -2,19 +2,19 @@ package tud.gamecontroller.term;
 
 import java.util.List;
 
-public abstract class TermDelegator<T extends TermInterface> implements TermInterface {
+public abstract class TermDelegator<TermType extends TermInterface> implements TermInterface {
 
-	private T term;
+	private TermType term;
 
-	public TermDelegator(T term) {
+	public TermDelegator(TermType term) {
 		this.term=term;
 	}
 	
-	public T getTerm(){
+	public TermType getTerm(){
 		return term;
 	}
 
-	public List<TermInterface> getArgs() {
+	public List<? extends TermInterface> getArgs() {
 		return term.getArgs();
 	}
 

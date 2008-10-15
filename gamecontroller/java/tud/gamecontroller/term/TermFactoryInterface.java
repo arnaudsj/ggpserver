@@ -2,8 +2,8 @@ package tud.gamecontroller.term;
 
 import tud.gamecontroller.aux.InvalidKIFException;
 
-public interface TermFactoryInterface<T extends TermInterface> {
+public interface TermFactoryInterface<TermType> {
 
-	public T getTermFromKIF(String kif) throws InvalidKIFException;
+	public TermType getTermFromKIF(String kif) throws InvalidKIFException;
 	
 }

@@ -1,7 +1,6 @@
 package tud.gamecontroller.game.javaprover;
 
 import tud.gamecontroller.aux.InvalidKIFException;
-
 import cs227b.teamIago.parser.Parser;
 import cs227b.teamIago.resolver.Connective;
 import cs227b.teamIago.resolver.ExpList;

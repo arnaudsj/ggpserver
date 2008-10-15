@@ -1,9 +1,18 @@
 package tud.gamecontroller.term;
 
-public abstract class AbstractTerm implements TermInterface {
+public abstract class AbstractTerm<NativeTerm> implements TermInterface {
 
 	private String kifForm=null;
 	private String prefixForm=null;
+	protected NativeTerm nativeTerm=null;
+	
+	public AbstractTerm(NativeTerm nativeTerm){
+		this.nativeTerm=nativeTerm;
+	}
+	
+	public NativeTerm getNativeTerm(){
+		return nativeTerm;
+	}
 	
 	public boolean isCompound() {
 		return !isConstant() && !isVariable();
@@ -63,6 +72,10 @@ public abstract class AbstractTerm implements TermInterface {
 
 	public int hashCode() {
 		return getKIFForm().hashCode();
+	}
+
+	public String toString(){
+		return nativeTerm.toString();
 	}
 
 }

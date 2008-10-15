@@ -3,8 +3,8 @@ package tud.gamecontroller.logging;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.logging.LogRecord;
 import java.util.logging.Formatter;
+import java.util.logging.LogRecord;
 
 public class PlainTextLogFormatter extends Formatter {
 	private static final DateFormat format = new SimpleDateFormat("HH:mm:ss.SSS");

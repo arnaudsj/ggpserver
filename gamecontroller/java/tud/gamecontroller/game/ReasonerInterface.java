@@ -4,26 +4,24 @@ import java.util.Collection;
 import java.util.List;
 
 public interface ReasonerInterface<
-	RoleType,
-	MoveType,
-	FluentType,
+	TermType,
 	ReasonerStateInfoType> {
 
-	List<? extends RoleType> GetRoles();
+	List<? extends RoleInterface<TermType>> GetRoles();
 
 	ReasonerStateInfoType getInitialState();
 
 	boolean isTerminal(ReasonerStateInfoType state);
 
-	ReasonerStateInfoType getSuccessorState(ReasonerStateInfoType state, JointMoveInterface<? extends RoleType,? extends MoveType> jointMove);
+	ReasonerStateInfoType getSuccessorState(ReasonerStateInfoType state, JointMoveInterface<TermType> jointMove);
 
-	boolean isLegal(ReasonerStateInfoType state, RoleType role, MoveType move);
+	boolean isLegal(ReasonerStateInfoType state, RoleInterface<TermType> role, MoveInterface<TermType> move);
 
-	int GetGoalValue(ReasonerStateInfoType state, RoleType role);
+	int GetGoalValue(ReasonerStateInfoType state, RoleInterface<TermType> role);
 
-	Collection<? extends MoveType> GetLegalMoves(ReasonerStateInfoType state, RoleType role);
+	Collection<? extends MoveInterface<TermType>> GetLegalMoves(ReasonerStateInfoType state, RoleInterface<TermType> role);
 
-	Collection<? extends FluentType> getFluents(ReasonerStateInfoType state);
+	Collection<? extends FluentInterface<TermType>> getFluents(ReasonerStateInfoType state);
 
 	String getKIFGameDescription();
 

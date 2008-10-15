@@ -1,32 +1,34 @@
 package tud.gamecontroller.playerthreads;
 
 import tud.gamecontroller.MessageSentNotifier;
+import tud.gamecontroller.game.MatchInterface;
+import tud.gamecontroller.game.RoleInterface;
+import tud.gamecontroller.players.Player;
+import tud.gamecontroller.term.TermInterface;
 
 public abstract class AbstractPlayerThread<
-		RoleType,
-		PlayerType,
-		MatchType
+		TermType extends TermInterface
 		> extends Thread implements MessageSentNotifier {
 	
-	protected PlayerType player;
-	protected RoleType role;
-	protected MatchType match;
+	protected Player<TermType> player;
+	protected RoleInterface<TermType> role;
+	protected MatchInterface<TermType, ?> match;
 	private long deadline;
 	private long timeout;
 	private ChangeableBoolean messageSent;
 	private ChangeableBoolean deadlineSet;
 	
-	public AbstractPlayerThread(RoleType role, PlayerType player, MatchType match, long timeout){
+	public AbstractPlayerThread(RoleInterface<TermType> role, Player<TermType> player, MatchInterface<TermType, ?> match, long timeout){
 		this.role=role;
 		this.player=player;
 		this.match=match;
 		this.timeout=timeout;
 		deadline=0;
 	}
-	public PlayerType getPlayer() {
+	public Player<TermType> getPlayer() {
 		return player;
 	}
-	public RoleType getRole(){
+	public RoleInterface<TermType> getRole(){
 		return role;
 	}
 	public long getDeadLine() {
@@ -64,13 +66,10 @@ public abstract class AbstractPlayerThread<
 		}
 	}
 	
-	public boolean waitUntilDeadline() {
+	public boolean waitUntilDeadline() throws InterruptedException {
 		synchronized (deadlineSet) {
 			while (!deadlineSet.isTrue()){
-				try {
-					deadlineSet.wait();
-				} catch (InterruptedException e) {
-				}
+				deadlineSet.wait();
 			}
 		}
 		long timeLeft=deadline-System.currentTimeMillis();

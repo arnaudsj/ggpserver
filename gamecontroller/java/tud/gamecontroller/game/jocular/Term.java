@@ -10,46 +10,45 @@ import stanfordlogic.prover.TermVariable;
 import tud.gamecontroller.term.AbstractTerm;
 import tud.gamecontroller.term.TermInterface;
 
-public class Term extends AbstractTerm {
-	private stanfordlogic.prover.Term stanfordlogicTerm;
+public class Term extends AbstractTerm<stanfordlogic.prover.Term> {
 	private SymbolTable symbolTable;
 	
 	public Term(SymbolTable symbolTable, stanfordlogic.prover.Term expr){
+		super(expr);
 		this.symbolTable=symbolTable;
-		this.stanfordlogicTerm=expr;
 	}
 
 	public String getName() {
-		if(stanfordlogicTerm instanceof TermObject){
-			return symbolTable.get(((TermObject)stanfordlogicTerm).getToken());
-		}else if(stanfordlogicTerm instanceof TermFunction){
-			return symbolTable.get(((TermFunction)stanfordlogicTerm).getName());
-		}else if(stanfordlogicTerm instanceof TermVariable){
-			return symbolTable.get(((TermVariable)stanfordlogicTerm).getName());
+		if(nativeTerm instanceof TermObject){
+			return symbolTable.get(((TermObject)nativeTerm).getToken());
+		}else if(nativeTerm instanceof TermFunction){
+			return symbolTable.get(((TermFunction)nativeTerm).getName());
+		}else if(nativeTerm instanceof TermVariable){
+			return symbolTable.get(((TermVariable)nativeTerm).getName());
 		}else{
 			return null;
 		}
 	}
 
 	public stanfordlogic.prover.Term getExpr(){
-		return stanfordlogicTerm;
+		return nativeTerm;
 	}
 	
 	public boolean isConstant() {
-		return stanfordlogicTerm instanceof stanfordlogic.prover.TermObject;
+		return nativeTerm instanceof stanfordlogic.prover.TermObject;
 	}
 
 	public boolean isVariable() {
-		return stanfordlogicTerm instanceof stanfordlogic.prover.TermVariable;
+		return nativeTerm instanceof stanfordlogic.prover.TermVariable;
 	}
 	
 	public boolean isGround() {
-		return !stanfordlogicTerm.hasVariables();
+		return !nativeTerm.hasVariables();
 	}
 
 	public List<TermInterface> getArgs() {
-		if(stanfordlogicTerm instanceof stanfordlogic.prover.TermFunction){
-			return new TermList((stanfordlogic.prover.TermFunction)stanfordlogicTerm);
+		if(nativeTerm instanceof stanfordlogic.prover.TermFunction){
+			return new TermList((stanfordlogic.prover.TermFunction)nativeTerm);
 		}else{
 			return new TermList(null);
 		}
@@ -73,7 +72,7 @@ public class Term extends AbstractTerm {
 	
 	public String toString(){
 		try{
-			return stanfordlogicTerm.toString(symbolTable);
+			return nativeTerm.toString(symbolTable);
 		}catch(Exception ex){
 			return null;
 		}

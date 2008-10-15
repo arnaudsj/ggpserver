@@ -3,46 +3,43 @@ package tud.gamecontroller.game.javaprover;
 import java.util.AbstractList;
 import java.util.List;
 
+import tud.gamecontroller.term.AbstractTerm;
+import tud.gamecontroller.term.TermInterface;
 import cs227b.teamIago.resolver.Atom;
 import cs227b.teamIago.resolver.Connective;
 import cs227b.teamIago.resolver.ExpList;
 import cs227b.teamIago.resolver.Expression;
 import cs227b.teamIago.resolver.Variable;
 
-import tud.gamecontroller.term.AbstractTerm;
-import tud.gamecontroller.term.TermInterface;
-
-public class Term extends AbstractTerm{
+public class Term extends AbstractTerm<Expression>{
 	
-	private Expression expr;
-	
-	public Term(Expression expr){
-		this.expr=expr;
+	public Term(Expression nativeTerm){
+		super(nativeTerm);
 	}
 
 	public String getName() {
-		return expr.firstOp().toString();
+		return nativeTerm.firstOp().toString();
 	}
 
 	public Expression getExpr(){
-		return expr;
+		return nativeTerm;
 	}
 	
 	public boolean isConstant() {
-		return expr instanceof Atom;
+		return nativeTerm instanceof Atom;
 	}
 
 	public boolean isVariable() {
-		return expr instanceof Variable;
+		return nativeTerm instanceof Variable;
 	}
 	
 	public boolean isGround() {
-		return expr.getVars().size()==0;
+		return nativeTerm.getVars().size()==0;
 	}
 
 	public List<TermInterface> getArgs() {
-		if(expr instanceof Connective){
-			return new TermList(((Connective)expr).getOperands());
+		if(nativeTerm instanceof Connective){
+			return new TermList(((Connective)nativeTerm).getOperands());
 		}else{
 			return new TermList(new ExpList());
 		}
@@ -63,10 +60,6 @@ public class Term extends AbstractTerm{
 			return expList.size();
 		}
 		
-	}
-	
-	public String toString(){
-		return expr.toString();
 	}
 
 }

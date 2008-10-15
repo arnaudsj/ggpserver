@@ -1,16 +1,18 @@
 package tud.gamecontroller.playerthreads;
 
 import tud.gamecontroller.game.JointMoveInterface;
+import tud.gamecontroller.game.MatchInterface;
+import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.players.Player;
+import tud.gamecontroller.term.TermInterface;
 
 public class PlayerThreadStop<
-		RoleType,
-		MoveType
-		> extends AbstractPlayerThread<RoleType, Player<? super RoleType, MoveType, ?>, Object> {
+		TermType extends TermInterface
+		> extends AbstractPlayerThread<TermType> {
 
-	private JointMoveInterface<? extends RoleType, ? extends MoveType> priormoves;
+	private JointMoveInterface<TermType> priormoves;
 	
-	public PlayerThreadStop(RoleType role, Player<? super RoleType, MoveType, ?> player, Object match, JointMoveInterface<? extends RoleType, ? extends MoveType> priormoves, long deadline){
+	public PlayerThreadStop(RoleInterface<TermType> role, Player<TermType> player, MatchInterface<TermType, ?> match, JointMoveInterface<TermType> priormoves, long deadline){
 		super(role, player, match, deadline);
 		this.priormoves=priormoves;
 	}

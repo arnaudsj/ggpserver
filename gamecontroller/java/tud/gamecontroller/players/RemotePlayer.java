@@ -12,25 +12,23 @@ import java.util.logging.Logger;
 
 import tud.gamecontroller.MessageSentNotifier;
 import tud.gamecontroller.aux.InvalidKIFException;
-import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.MoveFactoryInterface;
+import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.scrambling.GameScramblerInterface;
+import tud.gamecontroller.term.TermInterface;
 
-public class RemotePlayer<
-		RoleType extends RoleInterface,
-		MoveType
-		> extends AbstractPlayer<RoleType, MoveType, MatchInterface<?,? extends GameInterface<?, ?>, ?>>  {
+public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer<TermType>  {
 
 	private String host;
 	private int port;
-	private MoveFactoryInterface<MoveType> termfactory;
+	private MoveFactoryInterface<? extends MoveInterface<TermType>> termfactory;
 	private GameScramblerInterface gameScrambler;
 	private Logger logger;
 	
-	public RemotePlayer(String name, String host, int port, MoveFactoryInterface<MoveType> termfactory, GameScramblerInterface gamescrambler) {
+	public RemotePlayer(String name, String host, int port, MoveFactoryInterface<? extends MoveInterface<TermType>> termfactory, GameScramblerInterface gamescrambler) {
 		super(name);
 		this.host=host;
 		this.port=port;
@@ -40,7 +38,7 @@ public class RemotePlayer<
 	}
 
 	@Override
-	public void gameStart(MatchInterface<?,? extends GameInterface<?, ?>, ?> match, RoleType role, MessageSentNotifier notifier) {
+	public void gameStart(MatchInterface<TermType, ?> match, RoleInterface<TermType> role, MessageSentNotifier notifier) {
 		super.gameStart(match, role, notifier);
 		String msg="(START "+
 				match.getMatchID()+" "+
@@ -50,8 +48,8 @@ public class RemotePlayer<
 		sendMsg(msg, match.getStartclock(), notifier);
 	}
 
-	public MoveType gamePlay(JointMoveInterface<? extends RoleType, ? extends MoveType> jointMove, MessageSentNotifier notifier) {
-		MoveType move=null;
+	public MoveInterface<TermType> gamePlay(JointMoveInterface<TermType> jointMove, MessageSentNotifier notifier) {
+		MoveInterface<TermType> move=null;
 		String msg="(PLAY "+match.getMatchID()+" ";
 		if(jointMove==null){
 			msg+="NIL";
@@ -78,7 +76,7 @@ public class RemotePlayer<
 	}
 
 	@Override
-	public void gameStop(JointMoveInterface<? extends RoleType, ? extends MoveType> jointMove, MessageSentNotifier notifier) {
+	public void gameStop(JointMoveInterface<TermType> jointMove, MessageSentNotifier notifier) {
 		String msg="(STOP "+match.getMatchID()+" ";
 		if(jointMove==null){
 			msg+="NIL";

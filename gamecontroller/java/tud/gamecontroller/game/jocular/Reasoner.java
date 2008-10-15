@@ -22,13 +22,16 @@ import stanfordlogic.prover.GroundFact;
 import stanfordlogic.prover.ProofContext;
 import stanfordlogic.prover.TermVariable;
 import stanfordlogic.prover.VariableFact;
-import tud.gamecontroller.game.Fluent;
+import tud.gamecontroller.game.FluentInterface;
 import tud.gamecontroller.game.JointMoveInterface;
-import tud.gamecontroller.game.Move;
+import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.ReasonerInterface;
-import tud.gamecontroller.game.Role;
+import tud.gamecontroller.game.RoleInterface;
+import tud.gamecontroller.game.impl.Fluent;
+import tud.gamecontroller.game.impl.Move;
+import tud.gamecontroller.game.impl.Role;
 
-public class Reasoner implements ReasonerInterface<Role<Term>, Move<Term>, Fluent<Term>, ProofContext> {
+public class Reasoner implements ReasonerInterface<Term, ProofContext> {
 	private Parser parser;
 	private AbstractReasoner stanfordlogicReasoner;
 
@@ -62,8 +65,8 @@ public class Reasoner implements ReasonerInterface<Role<Term>, Move<Term>, Fluen
 	/* (non-Javadoc)
 	 * @see tud.gamecontroller.game.jocular.ReasonerInterface#GetRoles()
 	 */
-	public synchronized List<? extends Role<Term>> GetRoles() {
-		List<Role<Term>> roles=new ArrayList<Role<Term>>();
+	public synchronized List<? extends RoleInterface<Term>> GetRoles() {
+		List<RoleInterface<Term>> roles=new ArrayList<RoleInterface<Term>>();
 		Iterable<GroundFact> roleFacts = stanfordlogicReasoner.getAllAnswers(makeQuery("role", "?r"));
 		for(GroundFact roleFact:roleFacts){
 			roles.add(new Role<Term>(new Term(parser.getSymbolTable(), roleFact.getTerm(0))));
@@ -93,8 +96,8 @@ public class Reasoner implements ReasonerInterface<Role<Term>, Move<Term>, Fluen
 	/* (non-Javadoc)
 	 * @see tud.gamecontroller.game.jocular.ReasonerInterface#getSuccessorState(tud.gamecontroller.game.jocular.State, tud.gamecontroller.game.JointMove)
 	 */
-	public synchronized ProofContext getSuccessorState(ProofContext state, JointMoveInterface<? extends Role<Term>, ? extends Move<Term>> jointMove) {
-		for(Entry<? extends Role<Term>, ? extends Move<Term>> entry:jointMove.entrySet()){
+	public synchronized ProofContext getSuccessorState(ProofContext state, JointMoveInterface<Term> jointMove) {
+		for(Entry<? extends RoleInterface<Term>, ? extends MoveInterface<Term>> entry:jointMove.entrySet()){
 			GroundFact moveFact=new GroundFact(parser.TOK_DOES, entry.getKey().getTerm().getExpr(), entry.getValue().getTerm().getExpr());
         	state.getVolatileKb().setTrue(moveFact);
         }
@@ -109,14 +112,14 @@ public class Reasoner implements ReasonerInterface<Role<Term>, Move<Term>, Fluen
 	/* (non-Javadoc)
 	 * @see tud.gamecontroller.game.jocular.ReasonerInterface#isLegal(tud.gamecontroller.game.jocular.State, tud.gamecontroller.game.Role, tud.gamecontroller.game.Move)
 	 */
-	public synchronized boolean isLegal(ProofContext state, Role<Term> role, Move<Term> move) {
+	public synchronized boolean isLegal(ProofContext state, RoleInterface<Term> role, MoveInterface<Term> move) {
 		return stanfordlogicReasoner.getAnAnswer(new VariableFact(parser.TOK_LEGAL, role.getTerm().getExpr(), move.getTerm().getExpr()), state)!=null;
 	}
 
 	/* (non-Javadoc)
 	 * @see tud.gamecontroller.game.jocular.ReasonerInterface#GetGoalValue(tud.gamecontroller.game.jocular.State, tud.gamecontroller.game.Role)
 	 */
-	public synchronized int GetGoalValue(ProofContext state, Role<Term> role) {
+	public synchronized int GetGoalValue(ProofContext state, RoleInterface<Term> role) {
 		GroundFact f=stanfordlogicReasoner.getAnAnswer(new VariableFact(parser.TOK_GOAL, role.getTerm().getExpr(), TermVariable.makeTermVariable()), state);
 		return Integer.parseInt(f.getTerm(1).toString(parser.getSymbolTable()));
 	}
@@ -124,12 +127,11 @@ public class Reasoner implements ReasonerInterface<Role<Term>, Move<Term>, Fluen
 	/* (non-Javadoc)
 	 * @see tud.gamecontroller.game.jocular.ReasonerInterface#GetLegalMoves(tud.gamecontroller.game.jocular.State, tud.gamecontroller.game.Role)
 	 */
-	public synchronized Collection<Move<Term>> GetLegalMoves(ProofContext state, Role<Term> role) {
+	public synchronized Collection<? extends MoveInterface<Term>> GetLegalMoves(ProofContext state, RoleInterface<Term> role) {
 		Iterable<GroundFact> legalFacts=stanfordlogicReasoner.getAllAnswersIterable(new VariableFact(parser.TOK_LEGAL, role.getTerm().getExpr(), TermVariable.makeTermVariable()), state);
-		Collection<Move<Term>> moveslist=new LinkedList<Move<Term>>();
+		Collection<MoveInterface<Term>> moveslist=new LinkedList<MoveInterface<Term>>();
         for (GroundFact fact : legalFacts) {
-        	Move<Term> move=new Move<Term>(new Term(parser.getSymbolTable(), fact.getTerm(1)));
-			moveslist.add(move);	
+        	moveslist.add(new Move<Term>(new Term(parser.getSymbolTable(), fact.getTerm(1))));
         }
 		return moveslist;
 	}
@@ -137,8 +139,8 @@ public class Reasoner implements ReasonerInterface<Role<Term>, Move<Term>, Fluen
 	/* (non-Javadoc)
 	 * @see tud.gamecontroller.game.jocular.ReasonerInterface#getFluents(tud.gamecontroller.game.jocular.State)
 	 */
-	public synchronized Collection<Fluent<Term>> getFluents(ProofContext state) {
-		Collection<Fluent<Term>> fluents=new LinkedList<Fluent<Term>>();
+	public synchronized Collection<? extends FluentInterface<Term>> getFluents(ProofContext state) {
+		Collection<FluentInterface<Term>> fluents=new LinkedList<FluentInterface<Term>>();
         Iterable<GroundFact> trues = stanfordlogicReasoner.getAllAnswers(queryTrue,state);
         for (GroundFact init : trues) {
         	fluents.add(new Fluent<Term>(new Term(parser.getSymbolTable(), init.getTerm(0))));

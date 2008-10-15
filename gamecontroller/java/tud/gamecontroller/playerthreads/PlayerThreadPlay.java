@@ -1,22 +1,25 @@
 package tud.gamecontroller.playerthreads;
 
 import tud.gamecontroller.game.JointMoveInterface;
+import tud.gamecontroller.game.MatchInterface;
+import tud.gamecontroller.game.MoveInterface;
+import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.players.Player;
+import tud.gamecontroller.term.TermInterface;
 
 public class PlayerThreadPlay<
-		RoleType,
-		MoveType
-		> extends AbstractPlayerThread<RoleType, Player<? super RoleType, MoveType, ?>, Object> {
+		TermType extends TermInterface
+		> extends AbstractPlayerThread<TermType> {
 
-	private MoveType move;
-	private JointMoveInterface<? extends RoleType, ? extends MoveType> priormoves;
+	private MoveInterface<TermType> move;
+	private JointMoveInterface<TermType> priormoves;
 	
-	public PlayerThreadPlay(RoleType role, Player<? super RoleType, MoveType, ?> player, Object match, JointMoveInterface<? extends RoleType, ? extends MoveType> priormoves, long deadline){
+	public PlayerThreadPlay(RoleInterface<TermType> role, Player<TermType> player, MatchInterface<TermType, ?> match, JointMoveInterface<TermType> priormoves, long deadline){
 		super(role, player, match, deadline);
 		this.priormoves=priormoves;
 		this.move=null;
 	}
-	public MoveType getMove() {
+	public MoveInterface<TermType> getMove() {
 		return move;
 	}
 	public void run(){

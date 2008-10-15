@@ -3,18 +3,17 @@ package tud.gamecontroller;
 import java.util.Map;
 
 import tud.gamecontroller.game.JointMoveInterface;
+import tud.gamecontroller.game.MatchInterface;
+import tud.gamecontroller.game.RoleInterface;
+import tud.gamecontroller.game.StateInterface;
+import tud.gamecontroller.term.TermInterface;
 
-public interface GameControllerListener<
-		RoleType,
-		MoveType,
-		MatchType,
-		StateType
-		>{
+public interface GameControllerListener{
 
-	void gameStarted(MatchType match, StateType currentState);
+	void gameStarted(MatchInterface<? extends TermInterface, ?> match, StateInterface<? extends TermInterface, ?> currentState);
 
-	void gameStep(JointMoveInterface<? extends RoleType, ? extends MoveType> jointmove, StateType currentState);
+	void gameStep(JointMoveInterface<? extends TermInterface> jointmove, StateInterface<? extends TermInterface, ?> currentState);
 
-	void gameStopped(StateType currentState, Map<? extends RoleType, Integer> goalValues);
+	void gameStopped(StateInterface<? extends TermInterface, ?> currentState, Map<? extends RoleInterface<?>, Integer> goalValues);
 
 }

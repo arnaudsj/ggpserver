@@ -3,22 +3,20 @@ package tud.gamecontroller.game;
 import java.util.Collection;
 
 public interface StateInterface<
-	RoleType,
-	MoveType,
-	FluentType,
-	StateType extends StateInterface<RoleType, MoveType, FluentType, StateType>> {
+	TermType,
+	StateType extends StateInterface<TermType, StateType>> {
 
 	boolean isTerminal();
 
-	StateType getSuccessor(JointMoveInterface<? extends RoleType,? extends MoveType> jointmove);
+	StateType getSuccessor(JointMoveInterface<TermType> jointmove);
 
-	boolean isLegal(RoleType role, MoveType move);
+	boolean isLegal(RoleInterface<TermType> role, MoveInterface<TermType> move);
 
-	MoveType getLegalMove(RoleType role);
+	MoveInterface<TermType> getLegalMove(RoleInterface<TermType> role);
 
-	int getGoalValue(RoleType role);
+	int getGoalValue(RoleInterface<TermType> role);
 
-	Collection<? extends MoveType> getLegalMoves(RoleType role);
+	Collection<? extends MoveInterface<TermType>> getLegalMoves(RoleInterface<TermType> role);
 
-	Collection<? extends FluentType> getFluents();
+	Collection<? extends FluentInterface<TermType>> getFluents();
 }

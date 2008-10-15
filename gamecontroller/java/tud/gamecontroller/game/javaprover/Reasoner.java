@@ -8,11 +8,14 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
-import tud.gamecontroller.game.Fluent;
+import tud.gamecontroller.game.FluentInterface;
 import tud.gamecontroller.game.JointMoveInterface;
-import tud.gamecontroller.game.Move;
+import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.ReasonerInterface;
-import tud.gamecontroller.game.Role;
+import tud.gamecontroller.game.RoleInterface;
+import tud.gamecontroller.game.impl.Fluent;
+import tud.gamecontroller.game.impl.Move;
+import tud.gamecontroller.game.impl.Role;
 import cs227b.teamIago.gameProver.GameSimulator;
 import cs227b.teamIago.parser.PublicAxiomsWrapper;
 import cs227b.teamIago.parser.Statement;
@@ -22,7 +25,7 @@ import cs227b.teamIago.resolver.ExpList;
 import cs227b.teamIago.resolver.Predicate;
 import cs227b.teamIago.util.GameState;
 
-public class Reasoner implements ReasonerInterface<Role<Term>, Move<Term>, Fluent<Term>, GameState> {
+public class Reasoner implements ReasonerInterface<Term, GameState> {
 
 	private GameSimulator gameSim;
 	private String gameDescription; 
@@ -40,7 +43,7 @@ public class Reasoner implements ReasonerInterface<Role<Term>, Move<Term>, Fluen
 		}
 	}
 
-	public List<Role<Term>> GetRoles() {
+	public List<? extends RoleInterface<Term>> GetRoles() {
 		ExpList expList;
 		synchronized (gameSim) {
 			expList=gameSim.GetRoles();
@@ -52,9 +55,9 @@ public class Reasoner implements ReasonerInterface<Role<Term>, Move<Term>, Fluen
 		return roles;
 	}
 
-	public GameState getSuccessorState(GameState state, JointMoveInterface<? extends Role<Term>, ? extends Move<Term>> jointMove) {
+	public GameState getSuccessorState(GameState state, JointMoveInterface<Term> jointMove) {
 		ExpList movesList=new ExpList();
-		for(Entry<? extends Role<Term>, ? extends Move<Term>> entry:jointMove.entrySet()){
+		for(Entry<? extends RoleInterface<Term>, ? extends MoveInterface<Term>> entry:jointMove.entrySet()){
 			ExpList doesArgs=new ExpList();
 			doesArgs.add(entry.getKey().getTerm().getExpr());
 			doesArgs.add(entry.getValue().getTerm().getExpr());
@@ -67,7 +70,7 @@ public class Reasoner implements ReasonerInterface<Role<Term>, Move<Term>, Fluen
 		}
 	}
 
-	public boolean isLegal(GameState state, Role<Term> role, Move<Term> move) {
+	public boolean isLegal(GameState state, RoleInterface<Term> role, MoveInterface<Term> move) {
 		synchronized (gameSim) {
 			gameSim.SetGameState(state);
 			ExpList expList=new ExpList();
@@ -84,23 +87,22 @@ public class Reasoner implements ReasonerInterface<Role<Term>, Move<Term>, Fluen
 		}
 	}
 
-	public int GetGoalValue(GameState state, Role<Term> role) {
+	public int GetGoalValue(GameState state, RoleInterface<Term> role) {
 		synchronized (gameSim) {
 			gameSim.SetGameState(state);
 			return gameSim.GetGoalValue(role.getTerm().getExpr());
 		}
 	}
 
-	public Collection<Move<Term>> GetLegalMoves(GameState state, Role<Term> role) {
+	public Collection<? extends MoveInterface<Term>> GetLegalMoves(GameState state, RoleInterface<Term> role) {
 		ExpList exprlist;
 		synchronized (gameSim) {
 			gameSim.SetGameState(state);
 			exprlist=gameSim.GetLegalMoves(role.getTerm().getExpr());
 		}
-		Collection<Move<Term>> moveslist=new LinkedList<Move<Term>>();
+		Collection<MoveInterface<Term>> moveslist=new LinkedList<MoveInterface<Term>>();
 		for(int i=0;i<exprlist.size();i++){
-			Move<Term> move=new Move<Term>(new Term(((Connective)exprlist.get(i)).getOperands().get(1)));
-			moveslist.add(move);
+			moveslist.add(new Move<Term>(new Term(((Connective)exprlist.get(i)).getOperands().get(1))));
 		}
 		return moveslist;
 	}
@@ -124,8 +126,8 @@ public class Reasoner implements ReasonerInterface<Role<Term>, Move<Term>, Fluen
 	}
 
 	@SuppressWarnings("unchecked")
-	public Collection<Fluent<Term>> getFluents(GameState state) {
-		Collection<Fluent<Term>> fluents=new LinkedList<Fluent<Term>>();
+	public Collection<? extends FluentInterface<Term>> getFluents(GameState state) {
+		Collection<FluentInterface<Term>> fluents=new LinkedList<FluentInterface<Term>>();
 		Iterator<ExpList> it=state.getMap().values().iterator();
 		while(it.hasNext()){
 			ExpList el=it.next();
