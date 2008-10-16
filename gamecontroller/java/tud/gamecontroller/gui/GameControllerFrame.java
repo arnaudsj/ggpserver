@@ -1,3 +1,22 @@
+/*
+    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+
+    This file is part of GameController.
+
+    GameController is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    GameController is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GameController.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 package tud.gamecontroller.gui;
 
 import java.awt.Dimension;
@@ -21,6 +40,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.text.JTextComponent;
 
@@ -52,11 +72,17 @@ public class GameControllerFrame<
 
 	private JButton jExitButton = null;
 
+	private JButton jClearLogButton = null;
+
 	private JTextArea jLogPane = null;
 
+	private JLabel jMatchIDLabel = null;
+	
 	private JLabel jStartclockLabel = null;
 
 	private JLabel jPlayclockLabel = null;
+
+	private JTextField jMatchIDTextField = null; 
 
 	private JComboBox jStartclockComboBox = null;
 
@@ -144,19 +170,13 @@ public class GameControllerFrame<
 	 */
 	private JPanel getJClockPanel() {
 		if (jClockPanel == null) {
-			GridBagConstraints gridBagConstraints3 = new GridBagConstraints();
-			gridBagConstraints3.fill = GridBagConstraints.VERTICAL;
-			gridBagConstraints3.gridy = 1;
-			gridBagConstraints3.weightx = 1.0;
-			gridBagConstraints3.insets = new Insets(2, 2, 2, 2);
-			gridBagConstraints3.anchor = GridBagConstraints.WEST;
-			gridBagConstraints3.gridx = 1;
-			GridBagConstraints gridBagConstraints2 = new GridBagConstraints();
-			gridBagConstraints2.gridx = 0;
-			gridBagConstraints2.weightx = 1.0;
-			gridBagConstraints2.anchor = GridBagConstraints.EAST;
-			gridBagConstraints2.insets = new Insets(2, 2, 2, 2);
-			gridBagConstraints2.gridy = 1;
+			GridBagConstraints gridBagConstraints = new GridBagConstraints();
+			gridBagConstraints.gridx = 0;
+			gridBagConstraints.gridy = 0;
+			gridBagConstraints.weightx = 1.0;
+			gridBagConstraints.anchor = GridBagConstraints.EAST;
+			gridBagConstraints.insets = new Insets(2, 2, 2, 2);
+
 			GridBagConstraints gridBagConstraints1 = new GridBagConstraints();
 			gridBagConstraints1.fill = GridBagConstraints.VERTICAL;
 			gridBagConstraints1.gridx = 1;
@@ -164,22 +184,51 @@ public class GameControllerFrame<
 			gridBagConstraints1.weightx = 1.0;
 			gridBagConstraints1.anchor = GridBagConstraints.WEST;
 			gridBagConstraints1.insets = new Insets(2, 2, 2, 2);
-			GridBagConstraints gridBagConstraints = new GridBagConstraints();
-			gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-			gridBagConstraints.gridy = 0;
-			gridBagConstraints.anchor = GridBagConstraints.EAST;
-			gridBagConstraints.gridx = 0;
-			gridBagConstraints.weightx = 1.0;
-			jStartclockLabel = new JLabel();
-			jStartclockLabel.setText("Startclock");
-			jPlayclockLabel = new JLabel();
-			jPlayclockLabel.setText("Playclock");
+
+			GridBagConstraints gridBagConstraints2 = new GridBagConstraints();
+			gridBagConstraints2.gridx = 0;
+			gridBagConstraints2.gridy = 1;
+			gridBagConstraints2.weightx = 1.0;
+			gridBagConstraints2.anchor = GridBagConstraints.EAST;
+			gridBagConstraints2.insets = new Insets(2, 2, 2, 2);
+
+			GridBagConstraints gridBagConstraints3 = new GridBagConstraints();
+			gridBagConstraints3.fill = GridBagConstraints.VERTICAL;
+			gridBagConstraints3.gridx = 1;
+			gridBagConstraints3.gridy = 1;
+			gridBagConstraints3.weightx = 1.0;
+			gridBagConstraints3.anchor = GridBagConstraints.WEST;
+			gridBagConstraints3.insets = new Insets(2, 2, 2, 2);
+
+			GridBagConstraints gridBagConstraints4 = new GridBagConstraints();
+			gridBagConstraints4.fill = GridBagConstraints.VERTICAL;
+			gridBagConstraints4.gridx = 0;
+			gridBagConstraints4.gridy = 2;
+			gridBagConstraints4.weightx = 1.0;
+			gridBagConstraints4.anchor = GridBagConstraints.WEST;
+			gridBagConstraints4.insets = new Insets(2, 2, 2, 2);
+
+			GridBagConstraints gridBagConstraints5 = new GridBagConstraints();
+			gridBagConstraints5.fill = GridBagConstraints.VERTICAL;
+			gridBagConstraints5.gridx = 1;
+			gridBagConstraints5.gridy = 2;
+			gridBagConstraints5.weightx = 1.0;
+			gridBagConstraints5.anchor = GridBagConstraints.WEST;
+			gridBagConstraints5.insets = new Insets(2, 2, 2, 2);
+
+			jMatchIDLabel = new JLabel("MatchID");
+			jMatchIDTextField = new JTextField("TestMatch_1");
+			jMatchIDTextField.setPreferredSize(new Dimension(100, jMatchIDTextField.getPreferredSize().height));
+			jStartclockLabel = new JLabel("Startclock");
+			jPlayclockLabel = new JLabel("Playclock");
 			jClockPanel = new JPanel();
 			jClockPanel.setLayout(new GridBagLayout());
-			jClockPanel.add(jStartclockLabel, gridBagConstraints);
-			jClockPanel.add(getJStartclockComboBox(), gridBagConstraints1);
-			jClockPanel.add(jPlayclockLabel, gridBagConstraints2);
-			jClockPanel.add(getJPlayclockComboBox(), gridBagConstraints3);
+			jClockPanel.add(jMatchIDLabel, gridBagConstraints);
+			jClockPanel.add(jMatchIDTextField, gridBagConstraints1);
+			jClockPanel.add(jStartclockLabel, gridBagConstraints2);
+			jClockPanel.add(getJStartclockComboBox(), gridBagConstraints3);
+			jClockPanel.add(jPlayclockLabel, gridBagConstraints4);
+			jClockPanel.add(getJPlayclockComboBox(), gridBagConstraints5);
 		}
 		return jClockPanel;
 	}
@@ -196,6 +245,7 @@ public class GameControllerFrame<
 			jButtonsPanel.add(getJStartGameButton(), null);
 			jButtonsPanel.add(getJStopGameButton(), null);
 			jButtonsPanel.add(getJExitButton(), null);
+			jButtonsPanel.add(getJClearLogButton(), null);
 		}
 		return jButtonsPanel;
 	}
@@ -228,6 +278,7 @@ public class GameControllerFrame<
 			}
 			public void publish(LogRecord record) {
 				jLogPane.append(getFormatter().format(record));
+				jLogPane.setCaretPosition(jLogPane.getText().length());
 			}
 		};
 		jLogPaneAppender.setFormatter(new PlainTextLogFormatter());
@@ -236,8 +287,7 @@ public class GameControllerFrame<
 	}
 	
 	private void startGame() {
-		gcGuiRunner.setMatchID("testmatch");
-
+		gcGuiRunner.setMatchID(jMatchIDTextField.getText());
 		gcGuiRunner.setStartclock(((Integer)jStartclockComboBox.getSelectedItem()).intValue());
 		gcGuiRunner.setPlayclock(((Integer)jPlayclockComboBox.getSelectedItem()).intValue());
 
@@ -312,6 +362,24 @@ public class GameControllerFrame<
 	}
 
 	/**
+	 * This method initializes jClearLogButton	
+	 * 	
+	 * @return javax.swing.JButton	
+	 */
+	private JButton getJClearLogButton() {
+		if (jClearLogButton == null) {
+			jClearLogButton = new JButton();
+			jClearLogButton.setText("Clear Log");
+			jClearLogButton.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					jLogPane.setText(null);
+				}
+			});
+		}
+		return jClearLogButton;
+	}
+
+	/**
 	 * This method initializes jLogPane	
 	 * 	
 	 * @return javax.swing.JTextPane	
@@ -322,6 +390,7 @@ public class GameControllerFrame<
 			jLogPane.setEditable(false);
 			jLogPane.setWrapStyleWord(true);
 			jLogPane.setLineWrap(true);
+			jLogPane.setAutoscrolls(true);
 		}
 		return jLogPane;
 	}
@@ -365,6 +434,7 @@ public class GameControllerFrame<
 			jPlayersTable = new JPlayerTable(playerTableModel);
 			jPlayersTable.setShowGrid(true);
 			jPlayersTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			jPlayersTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		}
 		return jPlayersTable;
 	}
@@ -378,6 +448,8 @@ public class GameControllerFrame<
 		if (jLogScrollPane == null) {
 			jLogScrollPane = new JScrollPane();
 			jLogScrollPane.setViewportView(getJLogPane());
+			jLogScrollPane.setAutoscrolls(true);
+			jLogScrollPane.setAutoscrolls(true);
 		}
 		return jLogScrollPane;
 	}
