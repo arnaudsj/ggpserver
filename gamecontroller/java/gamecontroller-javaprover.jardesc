@@ -4,7 +4,7 @@
 <options buildIfNeeded="true" compress="true" descriptionLocation="/gamecontroller/gamecontroller-javaprover.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
 <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
 <selectedProjects/>
-<manifest generateManifest="true" mainClassHandleIdentifier="=gamecontroller/&lt;tud.gamecontroller.gui{GameControllerApp.java[GameControllerApp" manifestLocation="/gamecontroller/gamecontroller-Javaprover-Manifest" manifestVersion="1.0" reuseManifest="false" saveManifest="true" usesManifest="true">
+<manifest generateManifest="false" mainClassHandleIdentifier="=gamecontroller/&lt;tud.gamecontroller.gui{GameControllerApp.java[GameControllerApp" manifestLocation="/gamecontroller/gamecontroller-Javaprover-Manifest" manifestVersion="1.0" reuseManifest="true" saveManifest="true" usesManifest="true">
 <sealing sealJar="false">
 <packagesToSeal/>
 <packagesToUnSeal/>
@@ -15,18 +15,19 @@
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.aux{InvalidKIFException.java"/>
 <javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.parser{Tokenizer.java"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.term{TermInterface.java"/>
+<file path="/gamecontroller/LICENSE"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.scrambling{IdentityGameScrambler.java"/>
 <javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.resolver{NotOp.java"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller{XMLGameStateWriter.java"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.players{Player.java"/>
 <javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.resolver{AndOp.java"/>
-<javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.players{RandomPlayer.java"/>
 <javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.resolver{Implication.java"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.game{GameInterface.java"/>
+<javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.players{RandomPlayer.java"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.term{GameObjectInterface.java"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.players{RemotePlayerInfo.java"/>
-<javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.resolver{Association.java"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.game{RoleInterface.java"/>
+<javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.resolver{Association.java"/>
 <javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.resolver{Term.java"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.playerthreads{PlayerThreadStop.java"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.logging{PlainTextLogFormatter.java"/>
@@ -52,8 +53,8 @@
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.term{TermFactoryInterface.java"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.aux{NamedObject.java"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.players{PlayerInfo.java"/>
-<javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.game.javaprover{Term.java"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.game{StateInterface.java"/>
+<javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.game.javaprover{Term.java"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller{AbstractGameControllerRunner.java"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.players{RemotePlayer.java"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.playerthreads{PlayerThreadPlay.java"/>
@@ -72,16 +73,16 @@
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller{GameControllerListener.java"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.gui"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.players{PlayerFactory.java"/>
-<javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.game{JointMoveInterface.java"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.players{AbstractPlayer.java"/>
+<javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.game{JointMoveInterface.java"/>
 <javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.parser{Axioms.java"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.game.javaprover{GameControllerGuiRunner.java"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.players{LocalPlayer.java"/>
 <javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.util{GameState.java"/>
 <javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.resolver{ResolveMemoEntry.java"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.playerthreads{AbstractPlayerThread.java"/>
-<javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.resolver{Substitution.java"/>
 <javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.resolver{OrOp.java"/>
+<javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.resolver{Substitution.java"/>
 <javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.gameProver{GameSimulatorTest.java"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.game.javaprover{GameControllerCLIRunner.java"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.game{FluentInterface.java"/>

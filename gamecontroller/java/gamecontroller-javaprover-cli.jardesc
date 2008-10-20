@@ -4,7 +4,7 @@
 <options buildIfNeeded="true" compress="true" descriptionLocation="/gamecontroller/gamecontroller-javaprover-cli.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
 <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
 <selectedProjects/>
-<manifest generateManifest="true" mainClassHandleIdentifier="=gamecontroller/&lt;tud.gamecontroller.game.javaprover{GameControllerCLIRunner.java[GameControllerCLIRunner" manifestLocation="/gamecontroller/gamecontroller-javaprover-cli-Manifest" manifestVersion="1.0" reuseManifest="false" saveManifest="true" usesManifest="true">
+<manifest generateManifest="false" mainClassHandleIdentifier="=gamecontroller/&lt;tud.gamecontroller.game.javaprover{GameControllerCLIRunner.java[GameControllerCLIRunner" manifestLocation="/gamecontroller/gamecontroller-javaprover-cli-Manifest" manifestVersion="1.0" reuseManifest="false" saveManifest="true" usesManifest="true">
 <sealing sealJar="false">
 <packagesToSeal/>
 <packagesToUnSeal/>
@@ -13,11 +13,12 @@
 <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
 <file path="/gamecontroller/.classpath"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.game.javaprover"/>
+<file path="/gamecontroller/LICENSE"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.scrambling"/>
-<javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.game"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.playerthreads"/>
-<javaElement handleIdentifier="=gamecontroller/&lt;tud.aux"/>
+<javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.game"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.cli"/>
+<javaElement handleIdentifier="=gamecontroller/&lt;tud.aux"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller"/>
 <javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.resolver"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.players"/>
