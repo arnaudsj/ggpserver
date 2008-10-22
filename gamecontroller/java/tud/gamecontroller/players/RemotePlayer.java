@@ -23,6 +23,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -43,15 +44,15 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 
 	private String host;
 	private int port;
-	private MoveFactoryInterface<? extends MoveInterface<TermType>> termfactory;
+	private MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory;
 	private GameScramblerInterface gameScrambler;
 	private Logger logger;
 	
-	public RemotePlayer(String name, String host, int port, MoveFactoryInterface<? extends MoveInterface<TermType>> termfactory, GameScramblerInterface gamescrambler) {
+	public RemotePlayer(String name, String host, int port, MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory, GameScramblerInterface gamescrambler) {
 		super(name);
 		this.host=host;
 		this.port=port;
-		this.termfactory=termfactory;
+		this.movefactory=movefactory;
 		this.gameScrambler=gamescrambler;
 		this.logger=Logger.getLogger("tud.gamecontroller");
 	}
@@ -81,7 +82,7 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 		if(reply!=null){
 			descrambledReply=gameScrambler.descramble(reply);
 			try {
-				move=termfactory.getMoveFromKIF(descrambledReply);
+				move=movefactory.getMoveFromKIF(descrambledReply);
 			} catch (InvalidKIFException ex) {
 				logger.severe("Error parsing reply \""+reply+"\" from "+this+":"+ex.getMessage());
 			}
@@ -145,6 +146,9 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 			}
 			out.close();
 			in.close();
+		} catch (InterruptedIOException e) {
+			e.printStackTrace();
+			Thread.currentThread().interrupt();
 		} catch (UnknownHostException e) {
 			logger.severe("error: unknown host \""+ host+ "\"");
 			// call the notifier in case of an exception, otherwise 

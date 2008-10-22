@@ -35,9 +35,9 @@ public class PlayerFactory {
 	public static <TermType extends TermInterface> Player<TermType> createLegalPlayer(LegalPlayerInfo info) {
 		return new LegalPlayer<TermType>(info.getName());
 	}
-	public static <TermType extends TermInterface> Player<TermType> createPlayer(PlayerInfo info, MoveFactoryInterface<? extends MoveInterface<TermType>> termfactory, GameScramblerInterface gameScrambler) {
+	public static <TermType extends TermInterface> Player<TermType> createPlayer(PlayerInfo info, MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory, GameScramblerInterface gameScrambler) {
 		if(info instanceof RemotePlayerInfo){
-			return createRemotePlayer((RemotePlayerInfo)info, termfactory, gameScrambler);
+			return createRemotePlayer((RemotePlayerInfo)info, movefactory, gameScrambler);
 		}else if(info instanceof RandomPlayerInfo){
 			return createRandomPlayer((RandomPlayerInfo)info);
 		}else if(info instanceof LegalPlayerInfo){

@@ -24,6 +24,7 @@ import java.io.File;
 import stanfordlogic.gdl.Parser;
 import stanfordlogic.prover.ProofContext;
 import tud.gamecontroller.game.ReasonerInterface;
+import tud.gamecontroller.term.TermFactoryInterface;
 
 public class GameControllerGuiRunner extends
 		tud.gamecontroller.gui.AbstractGameControllerGuiRunner<Term, ProofContext> {
@@ -38,5 +39,10 @@ public class GameControllerGuiRunner extends
 	@Override
 	protected ReasonerInterface<Term, ProofContext> getReasoner(String gameDescription, String gameName) {
 		return new Reasoner(gameDescription, parser);
+	}
+
+	@Override
+	protected TermFactoryInterface<Term> getTermFactory() {
+		return new TermFactory(parser);
 	}
 }

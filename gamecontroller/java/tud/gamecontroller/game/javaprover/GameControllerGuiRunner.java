@@ -22,6 +22,7 @@ package tud.gamecontroller.game.javaprover;
 import java.io.File;
 
 import tud.gamecontroller.game.ReasonerInterface;
+import tud.gamecontroller.term.TermFactoryInterface;
 import cs227b.teamIago.util.GameState;
 
 public class GameControllerGuiRunner extends
@@ -34,5 +35,10 @@ public class GameControllerGuiRunner extends
 	@Override
 	protected ReasonerInterface<Term, GameState> getReasoner(String gameDescription, String gameName) {
 		return new Reasoner(gameDescription);
+	}
+
+	@Override
+	protected TermFactoryInterface<Term> getTermFactory() {
+		return new TermFactory();
 	}
 }

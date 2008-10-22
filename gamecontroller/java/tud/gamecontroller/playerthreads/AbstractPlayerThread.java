@@ -75,6 +75,7 @@ public abstract class AbstractPlayerThread<
 				try {
 					messageSent.wait();
 				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
 			}
 		}
@@ -96,11 +97,11 @@ public abstract class AbstractPlayerThread<
 			timeLeft=1;
 		}
 		if(isAlive()){
-			try {
+//			try {
 				join(timeLeft);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
 		}
 		if(isAlive()){
 			interrupt();

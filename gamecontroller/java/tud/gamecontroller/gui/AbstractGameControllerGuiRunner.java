@@ -40,7 +40,6 @@ public abstract class AbstractGameControllerGuiRunner<
 	private String styleSheet=null;
 	private String xmlOutputDir=null;
 	private String matchID=null;
-	private TermFactoryInterface<TermType> termFactory=null;
 	private int startclock=0, playclock=0;
 	private File scrambleWordListFile=null;
 	private Collection<PlayerInfo> playerInfos=null;
@@ -68,8 +67,10 @@ public abstract class AbstractGameControllerGuiRunner<
 
 	@Override
 	protected MoveFactoryInterface<? extends MoveInterface<TermType>> getMoveFactory() {
-		return new MoveFactory<TermType>(termFactory);
+		return new MoveFactory<TermType>(getTermFactory());
 	}
+
+	protected abstract TermFactoryInterface<TermType> getTermFactory();
 
 	@Override
 	protected int getStartClock() {
