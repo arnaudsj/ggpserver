@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-15"?>
 <jardesc>
-<jar path="/usr/users/iki/ss177134/GGP/workcvs/gamecontroller-javaprover.jar"/>
+<jar path="/usr/users/iki/ss177134/GGP/workcvs/gamecontroller/gamecontroller-gui.jar"/>
 <options buildIfNeeded="true" compress="true" descriptionLocation="/gamecontroller/gamecontroller-javaprover.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
 <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
 <selectedProjects/>
