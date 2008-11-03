@@ -165,7 +165,7 @@ public class XMLGameStateWriter
 			 e.setTextContent(role.getPrefixForm());
 			 root.appendChild(e);
 		 }
-		 for(NamedObject p:match.getPlayers()){
+		 for(NamedObject p:match.getOrderedPlayers()){
 			 e=xmldoc.createElement("player");
 			 e.setTextContent(p.getName().toUpperCase());
 			 root.appendChild(e);
