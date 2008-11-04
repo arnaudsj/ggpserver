@@ -55,7 +55,7 @@
             <classpath>
 		    <path refid="classpath"/>
             </classpath>
-	    <arg value="--input-dir"/> <arg path="${data.dir}/2007_preliminaries"/>
+	    <arg value="--input-dir"/> <arg path="${data.dir}/competition2007/xml"/>
 	    <arg value="--output-dir"/> <arg path="${output.dir}"/>
 	    <arg value="--dynamic-linear-regression-rating"/> <arg value="60"/>
 	    <arg value="--constant-linear-regression-rating"/> <arg value="1.0"/>
@@ -113,7 +113,7 @@ java -cp "${install_classpath.unix}" ${main-class} $$*
 	    </chmod>
 	<echo>
 	Now run the application by typing, for example:
-	   install/ggp_rating_system.sh -i data/2007_preliminaries/ -o output/ -d 60 -v
+	   install/ggp_rating_system.sh -i data/competition2007/xml/ -o output/ -c 1.0 -v
 		
 	You can get help by typing 
 	   install/ggp_rating_system.sh --help
