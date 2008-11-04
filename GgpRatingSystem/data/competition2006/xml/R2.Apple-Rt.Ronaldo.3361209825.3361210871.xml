@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R2.Apple-Rt.Ronaldo.3361209825.3361210871</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<player>Apple-Rt</player>
+	<player>Luckylemming</player>
+	<scores>
+		<reward>45</reward>
+		<reward>55</reward>
+	</scores>
+</match>

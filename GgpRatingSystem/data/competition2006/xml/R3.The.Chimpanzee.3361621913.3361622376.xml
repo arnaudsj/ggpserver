@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R3.The.Chimpanzee.3361621913.3361622376</match-id>
+	<role>role1</role>
+	<player>The</player>
+	<scores>
+		<reward>0</reward>
+	</scores>
+</match>

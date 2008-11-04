@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R1.Cluneplayer.Farmers_S.3357493442.3357495261</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<role>role3</role>
+	<player>Cluneplayer</player>
+	<player>Fluxplayer</player>
+	<player>Aidriven.Learner</player>
+	<scores>
+		<reward>100</reward>
+		<reward>0</reward>
+		<reward>0</reward>
+	</scores>
+</match>

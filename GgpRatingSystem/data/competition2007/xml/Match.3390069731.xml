@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="../style-aaai2007/sheets/ticTacToe.xsl"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+<match-id>Match.3390069731</match-id>
+<role>Atiseet</role>
+<role>Partench</role>
+<player>U-TEXAS-LARG</player>
+<player>JIGSAWBOT</player>
+<history>
+ <step>
+  <step-number>1</step-number>
+  <move>pladve(1,2)</move>
+  <move>copeavere</move>
+ </step>
+ <step>
+  <step-number>2</step-number>
+  <move>copeavere</move>
+  <move>pladve(1,1)</move>
+ </step>
+ <step>
+  <step-number>3</step-number>
+  <move>pladve(2,1)</move>
+  <move>copeavere</move>
+ </step>
+ <step>
+  <step-number>4</step-number>
+  <move>copeavere</move>
+  <move>pladve(1,3)</move>
+ </step>
+ <step>
+  <step-number>5</step-number>
+  <move>pladve(2,2)</move>
+  <move>copeavere</move>
+ </step>
+ <step>
+  <step-number>6</step-number>
+  <move>copeavere</move>
+  <move>pladve(2,3)</move>
+ </step>
+ <step>
+  <step-number>7</step-number>
+  <move>pladve(3,2)</move>
+  <move>copeavere</move>
+ </step>
+</history>
+<scores>
+ <reward>100</reward>
+ <reward>0</reward>
+</scores>
+<state>
+ <fact>
+  <prop-f>THALLOU</prop-f>
+  <arg>3</arg>
+  <arg>2</arg>
+  <arg>CHILEATIM</arg>
+ </fact>
+ <fact>
+  <prop-f>THALLOU</prop-f>
+  <arg>2</arg>
+  <arg>3</arg>
+  <arg>REAREARE</arg>
+ </fact>
+ <fact>
+  <prop-f>THALLOU</prop-f>
+  <arg>2</arg>
+  <arg>2</arg>
+  <arg>CHILEATIM</arg>
+ </fact>
+ <fact>
+  <prop-f>THALLOU</prop-f>
+  <arg>1</arg>
+  <arg>3</arg>
+  <arg>REAREARE</arg>
+ </fact>
+ <fact>
+  <prop-f>THALLOU</prop-f>
+  <arg>2</arg>
+  <arg>1</arg>
+  <arg>CHILEATIM</arg>
+ </fact>
+ <fact>
+  <prop-f>THALLOU</prop-f>
+  <arg>1</arg>
+  <arg>1</arg>
+  <arg>REAREARE</arg>
+ </fact>
+ <fact>
+  <prop-f>THALLOU</prop-f>
+  <arg>1</arg>
+  <arg>2</arg>
+  <arg>CHILEATIM</arg>
+ </fact>
+ <fact>
+  <prop-f>THALLOU</prop-f>
+  <arg>3</arg>
+  <arg>1</arg>
+  <arg>HEARTUR</arg>
+ </fact>
+ <fact>
+  <prop-f>THALLOU</prop-f>
+  <arg>3</arg>
+  <arg>3</arg>
+  <arg>HEARTUR</arg>
+ </fact>
+ <fact>
+  <prop-f>LADVILDS</prop-f>
+  <arg>PARTENCH</arg>
+ </fact>
+</state>
+</match>

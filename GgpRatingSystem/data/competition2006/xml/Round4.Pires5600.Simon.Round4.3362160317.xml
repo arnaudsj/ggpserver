@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>Round4.Pires5600.Simon.Round4.3362160317</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<player>Pires5600</player>
+	<player>Fluxplayer</player>
+	<scores>
+		<reward>70</reward>
+		<reward>30</reward>
+	</scores>
+</match>

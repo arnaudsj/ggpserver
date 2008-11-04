@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R2.Ogre.Carver_S.3359288708.3359289498</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<player>Ogre</player>
+	<player>Fluxplayer</player>
+	<scores>
+		<reward>100</reward>
+		<reward>0</reward>
+	</scores>
+</match>

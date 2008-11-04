@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R2.Apple-Rt.Brazil.3361208788.3361280317</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<player>Apple-Rt</player>
+	<player>The</player>
+	<scores>
+		<reward>100</reward>
+		<reward>0</reward>
+	</scores>
+</match>

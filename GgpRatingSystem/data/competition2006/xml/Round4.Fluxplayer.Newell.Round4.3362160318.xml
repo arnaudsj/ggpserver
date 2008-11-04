@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>Round4.Fluxplayer.Newell.Round4.3362160318</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<player>Fluxplayer</player>
+	<player>Ogre</player>
+	<scores>
+		<reward>62</reward>
+		<reward>25</reward>
+	</scores>
+</match>

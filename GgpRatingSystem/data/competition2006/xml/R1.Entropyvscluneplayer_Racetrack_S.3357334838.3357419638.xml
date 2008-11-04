@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R1.Entropyvscluneplayer_Racetrack_S.3357334838.3357419638</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<player>Entropy</player>
+	<player>Cluneplayer</player>
+	<scores>
+		<reward>0</reward>
+		<reward>100</reward>
+	</scores>
+</match>

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R1.Aidriven.Learner_Hanoi_S.3357334769.300.45.3357392535</match-id>
+	<role>role1</role>
+	<player>Aidriven.Learner</player>
+	<scores>
+		<reward>0</reward>
+	</scores>
+</match>

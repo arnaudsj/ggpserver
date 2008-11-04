@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R2.Nnrg.Hazel.Propjoe_S.3359289175.3359289498</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<role>role3</role>
+	<role>role4</role>
+	<player>Nnrg.Hazel</player>
+	<player>Apple-Rt</player>
+	<player>Pumaman800</player>
+	<player>Cluneplayer</player>
+	<scores>
+		<reward>0</reward>
+		<reward>0</reward>
+		<reward>0</reward>
+		<reward>0</reward>
+	</scores>
+</match>

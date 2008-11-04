@@ -7,6 +7,7 @@ import ggpratingsystem.ratingsystems.DynamicLinearRegressionStrategy;
 import ggpratingsystem.ratingsystems.RatingSystemType;
 
 import java.io.IOException;
+import java.util.Set;
 import java.util.logging.Level;
 
 import com.martiansoftware.jsap.CommandLineTokenizer;
@@ -24,12 +25,14 @@ public class CommandLineInterface extends SimpleJSAP {
 	public static final String APPLICATION_CALL = "ggp_rating_system.sh";
 	public static final String OPTION_INPUT_DIR = "input-dir";
 	public static final String OPTION_OUTPUT_DIR = "output-dir";
+	public static final String OPTION_PREVIOUS_RATINGS = "previous";
 	
 	public static final String OPTION_DYNAMIC_LINEAR_REGRESSION = "dynamic-linear-regression-rating";
 	public static final String OPTION_CONSTANT_LINEAR_REGRESSION = "constant-linear-regression-rating";
 	public static final String OPTION_DIRECT_SCORES = "direct-scores-rating";
 	
 	public static final String OPTION_CSV_OUTPUT = "csv-output";
+	public static final String OPTION_GNUPLOT_OUTPUT = "gnuplot-output";
 	
 	public static final String OPTION_DEBUG_LEVEL = "debug-level";
 	public static final String OPTION_HELP = "help";
@@ -71,6 +74,17 @@ public class CommandLineInterface extends SimpleJSAP {
     						OPTION_OUTPUT_DIR,
     						"The directory to write output files to."),
     				
+            /* Previous rating file */
+        	// --previous, -p
+            new FlaggedOption(
+					OPTION_PREVIOUS_RATINGS,
+					FileStringParser.getParser().setMustBeFile(true).setMustExist(true),
+					NO_DEFAULT,
+					NOT_REQUIRED,
+					'p',
+					OPTION_PREVIOUS_RATINGS,
+					"The CSV output file of the previous competition, if the previous ratings are to be used to initialize the new ratings."),
+			
             /* Rating algorithm selection */                    
             		// --dynamic-linear-regression-rating, -d
     				new FlaggedOption(
@@ -112,6 +126,13 @@ public class CommandLineInterface extends SimpleJSAP {
     						'v',
     						OPTION_CSV_OUTPUT,
     						"Enables CSV (comma separated values) output for all rating algorithms."),
+
+    				// --gnuplot-output, -g
+    				new Switch(
+    						OPTION_GNUPLOT_OUTPUT,
+    						'g',
+    						OPTION_GNUPLOT_OUTPUT,
+    						"Enables gnuplot (data file) output for all rating algorithms."),
 
 					/* ****************** ADD NEW OUTPUT METHODS HERE ****************** */
 
@@ -172,7 +193,9 @@ public class CommandLineInterface extends SimpleJSAP {
 				}
 			}
 			
-			boolean existsEnabledOutputAlgorithm = config.getBoolean(OPTION_CSV_OUTPUT);
+			boolean existsEnabledOutputAlgorithm = 
+				config.getBoolean(OPTION_CSV_OUTPUT) 
+				|| config.getBoolean(OPTION_GNUPLOT_OUTPUT);
 				/* ****************** ADD NEW OUTPUT METHODS HERE ****************** */
 
 			if (!existsEnabledOutputAlgorithm) {
@@ -222,9 +245,12 @@ public class CommandLineInterface extends SimpleJSAP {
 		MatchReader matchReader = new FileMatchReader(jsap.getFile(OPTION_INPUT_DIR));
 		configuration.setMatchReader(matchReader);
 		
-		/* set output dir */
+		/* configure output dir */
 		Configuration.setOutputDir(jsap.getFile(OPTION_OUTPUT_DIR));
 		
+		/* configure previous ratings file */
+		configuration.setPreviousRatings(jsap.getFile(OPTION_PREVIOUS_RATINGS));
+
 		/* configure rating algorithms */
 		if (jsap.contains(OPTION_DYNAMIC_LINEAR_REGRESSION)) {
 			int maxMatchSets = jsap.getInt(OPTION_DYNAMIC_LINEAR_REGRESSION);
@@ -239,10 +265,17 @@ public class CommandLineInterface extends SimpleJSAP {
 		}
 		/* ****************** ADD NEW RATING SYSTEMS HERE ****************** */
 		
+
+		/* make ignore list */
+		Set<Player> ignorePlayers = new IgnorePlayerSet(jsap.getFile(OPTION_INPUT_DIR));
+		
 		/* configure output methods */
 		for (RatingSystemType type : configuration.getEnabledRatingSystems()) {
 			if (jsap.getBoolean(OPTION_CSV_OUTPUT)) {
-				configuration.addCSVOutputBuilder(type);
+				configuration.addCSVOutputBuilder(type, ignorePlayers);
+			}
+			if (jsap.getBoolean(OPTION_GNUPLOT_OUTPUT)) {
+				configuration.addGnuplotOutputBuilder(type, ignorePlayers);
 			}
 			/* ****************** ADD NEW OUTPUT METHODS HERE ****************** */
 		}

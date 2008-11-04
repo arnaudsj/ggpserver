@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R3.Fluxplayer.Lemur.3361622143.3361622376</match-id>
+	<role>role1</role>
+	<player>Fluxplayer</player>
+	<scores>
+		<reward>100</reward>
+	</scores>
+</match>

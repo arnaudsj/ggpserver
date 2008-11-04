@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="../style-aaai2007/sheets/doubleBlocksWorld.xsl"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+<match-id>Match.3390660122</match-id>
+<role>Neagestione</role>
+<player>U-TEXAS-LARG</player>
+<history>
+ <step>
+  <step-number>1</step-number>
+  <move>themack(arguies,uponis,fornit,uponis,fornit)</move>
+ </step>
+ <step>
+  <step-number>2</step-number>
+  <move>themack(lonzabell,frownry,uponis,frownry,uponis)</move>
+ </step>
+ <step>
+  <step-number>3</step-number>
+  <move>themack(lonzabell,fornit,frownry,fornit,frownry)</move>
+ </step>
+</history>
+<scores>
+ <reward>100</reward>
+</scores>
+<state>
+ <fact>
+  <prop-f>USTEREVED</prop-f>
+  <arg>FORNIT</arg>
+  <arg>FROWNRY</arg>
+ </fact>
+ <fact>
+  <prop-f>USTEREVED</prop-f>
+  <arg>FROWNRY</arg>
+  <arg>UPONIS</arg>
+ </fact>
+ <fact>
+  <prop-f>APEAND</prop-f>
+  <arg>UPONIS</arg>
+ </fact>
+ <fact>
+  <prop-f>UNTLEGIVE</prop-f>
+  <arg>FORNIT</arg>
+ </fact>
+ <fact>
+  <prop-f>THESURT</prop-f>
+  <arg>FORNIT</arg>
+  <arg>FROWNRY</arg>
+ </fact>
+ <fact>
+  <prop-f>THESURT</prop-f>
+  <arg>FROWNRY</arg>
+  <arg>UPONIS</arg>
+ </fact>
+ <fact>
+  <prop-f>THOLDSOIL</prop-f>
+  <arg>UPONIS</arg>
+ </fact>
+ <fact>
+  <prop-f>PERVALF</prop-f>
+  <arg>FORNIT</arg>
+ </fact>
+ <fact>
+  <prop-f>SONOWN</prop-f>
+  <arg>4</arg>
+ </fact>
+</state>
+</match>

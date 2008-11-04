@@ -9,6 +9,8 @@ import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 
 public class GnuPlotRatingsWriter extends PrintWriter implements RatingsWriter {
+	private int lineNumber = 1;
+
 	public GnuPlotRatingsWriter(Writer out) {
 		super(out);
 	}
@@ -59,6 +61,9 @@ public class GnuPlotRatingsWriter extends PrintWriter implements RatingsWriter {
 
 	public void println(double[] doubles) throws IOException {
 		String[] strings = new String[doubles.length];
+		
+		print(lineNumber + " ");
+		lineNumber++;
 		
 		for (int i = 0; i < doubles.length; i++) {
 			strings[i] = String.valueOf(doubles[i]);			

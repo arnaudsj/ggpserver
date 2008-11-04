@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R2.Ogre.Bodie_S.3359288834.3359289498</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<player>Ogre</player>
+	<player>Ggp_Remote_Agent</player>
+	<scores>
+		<reward>25</reward>
+		<reward>0</reward>
+	</scores>
+</match>

@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="../style-aaai2007/sheets/stress.xsl"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+<match-id>Match.3390845715</match-id>
+<role>Inevervand</role>
+<player>W-WOLFE</player>
+<history>
+ <step>
+  <step-number>1</step-number>
+  <move>yourgun(nemostisatch)</move>
+ </step>
+ <step>
+  <step-number>2</step-number>
+  <move>yourgun(nemostisatch)</move>
+ </step>
+ <step>
+  <step-number>3</step-number>
+  <move>yourgun(nemostisatch)</move>
+ </step>
+ <step>
+  <step-number>4</step-number>
+  <move>yourgun(nemostisatch)</move>
+ </step>
+ <step>
+  <step-number>5</step-number>
+  <move>yourgun(nemostisatch)</move>
+ </step>
+ <step>
+  <step-number>6</step-number>
+  <move>yourgun(nemostisatch)</move>
+ </step>
+ <step>
+  <step-number>7</step-number>
+  <move>yourgun(nemostisatch)</move>
+ </step>
+ <step>
+  <step-number>8</step-number>
+  <move>yourgun(nemostisatch)</move>
+ </step>
+ <step>
+  <step-number>9</step-number>
+  <move>yourgun(nemostisatch)</move>
+ </step>
+</history>
+<scores>
+ <reward>0</reward>
+</scores>
+<state>
+ <fact>
+  <prop-f>ANDEREME</prop-f>
+  <arg>POODGENT</arg>
+  <arg>NEMOSTISATCH</arg>
+ </fact>
+ <fact>
+  <prop-f>ANDEREME</prop-f>
+  <arg>HOURTUR</arg>
+  <arg>NEMOSTISATCH</arg>
+ </fact>
+ <fact>
+  <prop-f>ANDEREME</prop-f>
+  <arg>NOURTHOULD</arg>
+  <arg>NEMOSTISATCH</arg>
+ </fact>
+ <fact>
+  <prop-f>ANDEREME</prop-f>
+  <arg>DRENLY</arg>
+  <arg>NEMOSTISATCH</arg>
+ </fact>
+ <fact>
+  <prop-f>ANDEREME</prop-f>
+  <arg>TORCULS</arg>
+  <arg>NEMOSTISATCH</arg>
+ </fact>
+ <fact>
+  <prop-f>ANDEREME</prop-f>
+  <arg>PUCESPEME</arg>
+  <arg>NEMOSTISATCH</arg>
+ </fact>
+ <fact>
+  <prop-f>ANDEREME</prop-f>
+  <arg>FEEDAY</arg>
+  <arg>NEMOSTISATCH</arg>
+ </fact>
+ <fact>
+  <prop-f>ANDEREME</prop-f>
+  <arg>TROWEIRE</arg>
+  <arg>NEMOSTISATCH</arg>
+ </fact>
+ <fact>
+  <prop-f>GONFASSIC</prop-f>
+  <arg>OPIRTUNT</arg>
+ </fact>
+ <fact>
+  <prop-f>ANDEREME</prop-f>
+  <arg>FLEOUCH</arg>
+  <arg>NEMOSTISATCH</arg>
+ </fact>
+ <fact>
+  <prop-f>BEARMATRE</prop-f>
+  <arg>0</arg>
+ </fact>
+</state>
+</match>

@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="../style-aaai2007/sheets/stress.xsl"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+<match-id>Match.3390838765</match-id>
+<role>Ishall</role>
+<player>W-WOLFE</player>
+<history>
+ <step>
+  <step-number>1</step-number>
+  <move>theady(bellinio)</move>
+ </step>
+ <step>
+  <step-number>2</step-number>
+  <move>theady(bellinio)</move>
+ </step>
+ <step>
+  <step-number>3</step-number>
+  <move>theady(bellinio)</move>
+ </step>
+ <step>
+  <step-number>4</step-number>
+  <move>theady(bellinio)</move>
+ </step>
+ <step>
+  <step-number>5</step-number>
+  <move>theady(bellinio)</move>
+ </step>
+ <step>
+  <step-number>6</step-number>
+  <move>theady(bellinio)</move>
+ </step>
+ <step>
+  <step-number>7</step-number>
+  <move>theady(bellinio)</move>
+ </step>
+ <step>
+  <step-number>8</step-number>
+  <move>theady(bellinio)</move>
+ </step>
+ <step>
+  <step-number>9</step-number>
+  <move>theady(bellinio)</move>
+ </step>
+</history>
+<scores>
+ <reward>0</reward>
+</scores>
+<state>
+ <fact>
+  <prop-f>ANDIES</prop-f>
+  <arg>ONGENCE</arg>
+  <arg>SHALLAND</arg>
+ </fact>
+ <fact>
+  <prop-f>ANDIES</prop-f>
+  <arg>ANDELS</arg>
+  <arg>SHALLAND</arg>
+ </fact>
+ <fact>
+  <prop-f>ANDIES</prop-f>
+  <arg>UPOMBLE</arg>
+  <arg>SHALLAND</arg>
+ </fact>
+ <fact>
+  <prop-f>ANDIES</prop-f>
+  <arg>WILEGILS</arg>
+  <arg>SHALLAND</arg>
+ </fact>
+ <fact>
+  <prop-f>ANDIES</prop-f>
+  <arg>THRIVE</arg>
+  <arg>SHALLAND</arg>
+ </fact>
+ <fact>
+  <prop-f>ANDIES</prop-f>
+  <arg>TERFERVIR</arg>
+  <arg>SHALLAND</arg>
+ </fact>
+ <fact>
+  <prop-f>ANDIES</prop-f>
+  <arg>ITHICHANG</arg>
+  <arg>SHALLAND</arg>
+ </fact>
+ <fact>
+  <prop-f>ANDIES</prop-f>
+  <arg>CRONSE</arg>
+  <arg>SHALLAND</arg>
+ </fact>
+ <fact>
+  <prop-f>THOUSTRY</prop-f>
+  <arg>CLEBANTE</arg>
+ </fact>
+ <fact>
+  <prop-f>ANDIES</prop-f>
+  <arg>THESPERE</arg>
+  <arg>SHALLAND</arg>
+ </fact>
+ <fact>
+  <prop-f>LOODGENE</prop-f>
+  <arg>0</arg>
+ </fact>
+</state>
+</match>

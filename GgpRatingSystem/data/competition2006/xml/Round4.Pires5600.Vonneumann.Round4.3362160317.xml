@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>Round4.Pires5600.Vonneumann.Round4.3362160317</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<player>Pires5600</player>
+	<player>Ogre</player>
+	<scores>
+		<reward>100</reward>
+		<reward>0</reward>
+	</scores>
+</match>

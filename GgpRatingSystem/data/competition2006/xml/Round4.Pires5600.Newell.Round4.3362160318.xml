@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>Round4.Pires5600.Newell.Round4.3362160318</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<player>Pires5600</player>
+	<player>Cluneplayer</player>
+	<scores>
+		<reward>13</reward>
+		<reward>100</reward>
+	</scores>
+</match>

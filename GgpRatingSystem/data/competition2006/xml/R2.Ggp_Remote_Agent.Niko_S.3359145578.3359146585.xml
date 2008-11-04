@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R2.Ggp_Remote_Agent.Niko_S.3359145578.3359146585</match-id>
+	<role>role1</role>
+	<player>Ggp_Remote_Agent</player>
+	<scores>
+		<reward>0</reward>
+	</scores>
+</match>

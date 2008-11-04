@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R2.Ogre.Cotedivoire.3361209557.3361210870</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<player>Ogre</player>
+	<player>Luckylemming</player>
+	<scores>
+		<reward>100</reward>
+		<reward>0</reward>
+	</scores>
+</match>

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R1.Fluxplayer_Hanoi_S.3357334769.300.45.3357392536</match-id>
+	<role>role1</role>
+	<player>Fluxplayer</player>
+	<scores>
+		<reward>100</reward>
+	</scores>
+</match>

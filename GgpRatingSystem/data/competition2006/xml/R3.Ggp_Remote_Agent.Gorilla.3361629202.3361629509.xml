@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R3.Ggp_Remote_Agent.Gorilla.3361629202.3361629509</match-id>
+	<role>role1</role>
+	<player>Ggp_Remote_Agent</player>
+	<scores>
+		<reward>0</reward>
+	</scores>
+</match>

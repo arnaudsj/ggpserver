@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>Round4.Ogre.Simon.Round4.3362160317</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<player>Ogre</player>
+	<player>Luckylemming</player>
+	<scores>
+		<reward>30</reward>
+		<reward>70</reward>
+	</scores>
+</match>

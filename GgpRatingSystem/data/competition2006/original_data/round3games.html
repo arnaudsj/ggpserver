@@ -1,0 +1,75 @@
+<HTML>
+
+<!-- Mirrored from games.stanford.edu/round3games.html by HTTrack Website Copier/3.x [XR&CO'2005], Thu, 20 Jul 2006 09:21:56 GMT -->
+<HEAD><TITLE>Round 3 Games</TITLE>
+<style type="text/css" media="all">@import "gamemaster/style/main.css";
+div.margin{
+margin-left: 10px;
+}
+</style></HEAD><BODY BGCOLOR="#FFFFCC">
+<div id="topbar">
+	<div id="logo"><img src="gamemaster/images/ggp.gif"/></div>
+</div>
+<div id="underline"></div>
+<div class="margin">
+<p>
+<h2>Chess-like games using full chess axioms</h2>
+<ul>
+<li>Brazil:
+Board is shortened by 4 rows using pawns (pawns are stuck on the far side of the board since they can only move forward).  Each side gets 2 pawns, a rook, a bishop, a knight, and a king (along with the blocking pawns).  Goal is to put the opposing king in check.  Note that if you start capturing your opponent's pawns, you may create spaces allowing pawns to move, which can result in queening a pawn.  At least 1 match of this game was lost when one player allowed the other to queen a pawn, and the queen checked the king quickly.
+<br/><a href="screenshots/brazil.png">Brazil Initial State</a>
+</li>
+<li>Argentina:
+Board is shortened by 4 rows using pawns, as above.  Each side gets 1 pawn, a bishop, a knight, and a king (along with the blocking pawns).  Goal is to put the opposing king in check.  Very similar to Brazil, but different starting configuration. 
+<br/><a href="screenshots/argentina.png">Argentina Initial State</a>
+</li>
+<li>France:  Black has 3 pawns, 1 knight, 1 bishop, and a king. White has 8 pawns boxed around the king in the center of the board, 1 knight,and 1 bishop.  Goal is to check the opposing king.
+<br/><a href="screenshots/france.png">France Initial State</a>
+</li>
+<li>Portugal: Same as France, but knights can move like bishops or knights.</li>
+<li>Italy: Each side has 1 knight, 4 pawns, a rook and a king, but kings can't move.  Goal is to check the opposing king.
+<br/><a href="screenshots/italy.png">Italy Initial State</a>
+</li>
+<li>Germany: Same as Italy, but kings can move.</li>
+</ul></p>
+<p>
+<h2>Chess-like games using "melee"-style chess axioms</h2>
+<ul>
+<li><b>Melee-style chess axioms:</b> In these axioms, there is no longer a concept of check.  You are free to move any piece, even if the move exposes your king to a threat, even if your king is already threatened, and you can move your king directly into a threatened position.  As you might imagine, these axioms are much faster to compute with, since you don't need to ensure that any potential move is legal with respect to check.</li>
+<li>Cote d'Ivoire:  White has 2 knights, a king, and a bunch of pawns which are blocked up against the end of the board.  Black has 1 knight, 1 rook, and a king, and similar pawns.  Pawns can't capture.  Goal is to capture the opposing king.
+<br/><a href="screenshots/cotedivoire.png">Cote d'Ivoire Initial State</a>
+</li>
+<li>Ghana: Same as Cote d'Ivoire, but pawns can capture.</li>
+</ul></p>
+<p>
+<h2>Checkers variants</h2>
+<ul>
+<li>Ronaldinho: Checkers with forced jumping.  You must take one of the longest jumps available (i.e. if there is any triple available, you must take it; otherwise if there is any double available, you must take it; otherwise if there is any single available, you must take it).  Goals increase for winning by a bigger margin.  There are no quadruple/quintuple/etc. jumps-- only up to triple.
+<br/><a href="screenshots/ronaldinho.png">Ronaldinho Initial State</a>
+</li>
+<li>Ronaldo: Cylinder checkers-- board topology changed so the right-hand side and left-hand side are adjacent.  No forced jumping.  Goals increase for winning by a bigger margin.</li>
+</ul></p>
+<p>
+<h2>4-player Blob Wars</h2>
+<ul>
+<li>Emerson, Fred: Blob Wars, four players.  This is a four-player variation of an existing two-player board game (lots of Flash/JavaScript versions of this game can be found <a href="http://www.google.com/search?client=safari&amp;rls=en&amp;q=blob+wars&amp;ie=UTF-8&amp;oe=UTF-8">online</a>).  This version is played on a 6 x 6 Othello-like board.  The four players are on 2 teams, a white team and a black team.  Each team has a "Jumper" and a "Duper" ("Dupe" as in "duplicate").  The Jumper can only move a piece on the board by jumping it to a square within a 3-cell radius.  The Duper can only move by duplicating an existing piece to an empty cell adjacent to that piece (this has the effect of adding a new piece to the board).  The jumping move is a capturing move-- if white jumps into a cell, all black pieces in adjacent squares to that destination cell are captured.  The goal, as in Othello, is to have more pieces than your opponents.  Team members get the same score.
+<br/><a href="screenshots/emerson.png">Emerson Initial State</a>
+</li>
+</ul></p>
+<p>
+<h2>AIPS Problems</h2>
+<ul>
+<li><b>AIPS:</b> AIPS (Conference on Artificial Intelligence Planning and Scheduling Systems) holds a biannual AI Planning competition.  These following games were generated from AIPS problem instances falling in a subset of PDDL (Planning Domain Description Language) that is directly convertable to GDL.  Problems that some players had with parsing these descriptions arose from the quirks of this automatic conversion process.  It produced GDL output that broke your parsers, but had gone unnoticed by us because our player hadn't complained.  I changed the output and the later games played used a different conversion process.</li>
+<li>Gibbon: This one broke everyone, I think.  No one played this successfully, and I threw out these matches (although since they were all 0s, this won't make any difference).  It turns out the convertor was producing invalid GDL.</li>
+<li>Lemur:  This was the same problem instance as Gibbon, but with a different conversion process.  This is a Mars Rover planning problem-- you can guide the Rover to different waypoints, collect soil and rock samples, take images, and send your data back to Earth.  The goal involves collecting and transmitting a subset of all this data.  This conversion eliminated the delete effects of all actions, so the planning here actually is in a relaxed problem.</li>
+<li>Gorilla: Same as Lemur, but with delete effects of actions.</li>
+<li>Chimpanzee: This is an AIPS problem from a different domain, PipesWorld.  The actions here consist of connecting different regions of a refinery with pipes and pumping petroleum products around.  Sounds pretty entertaining, right?  This game is MUCH larger than the Rover problem (i.e., there are 773 rules with "legal" in the head).  Unlike the Rovers problem, this game was modified from the original AIPS problem to allow nonzero goals for partial goal achievement (you can get 60 or 30 points for fulfilling some of the requirements).  Because the START message was so long (> 1,000,000 characters), it appears that many of you may not have gotten the entire message.  There were no non-zero scores for this game.  We will not be playing games this large in Boston.</li>
+</ul></p>
+<p>
+<h2>Game names</h2>
+This week, the chess-like games were named after World Cup countries.  The checkers-like and blobwars games were named after Brazilian soccer players.  The AIPS problems were named after apes (and yes, I know that a Lemur is not an ape).
+</div>
+<BR><CENTER><FONT SIZE=3><I>Comments to </I><TT><A HREF="mailto:info@games.stanford.edu">info@games.stanford.edu</A></TT>. </FONT> </CENTER></P>
+</div></body>
+<!-- Mirrored from games.stanford.edu/round3games.html by HTTrack Website Copier/3.x [XR&CO'2005], Thu, 20 Jul 2006 09:21:56 GMT -->
+</html>

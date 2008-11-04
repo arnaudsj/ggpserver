@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R2.Ggp_Remote_Agent.Bird_S.3359288923.3359289498</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<player>Ggp_Remote_Agent</player>
+	<player>Entropy</player>
+	<scores>
+		<reward>0</reward>
+		<reward>0</reward>
+	</scores>
+</match>

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R1.Ggp_Remote_Agent_Vs_Legal_Endgame_S.3357418328.3357419637</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<player>Ggp_Remote_Agent</player>
+	<player>Legal</player>
+	<scores>
+		<reward>0</reward>
+		<reward>0</reward>
+	</scores>
+</match>

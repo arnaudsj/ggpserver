@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R1.Cluneplayer_Peg_S.3357334744.600.60.3357392535</match-id>
+	<role>role1</role>
+	<player>Cluneplayer</player>
+	<scores>
+		<reward>90</reward>
+	</scores>
+</match>

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R1.Fluxplayer.Chinesecheckers4_S.3357493268.3357495261</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<role>role3</role>
+	<role>role4</role>
+	<player>Fluxplayer</player>
+	<player>Pires5600</player>
+	<player>Nnrg.Hazel</player>
+	<player>Entropy</player>
+	<scores>
+		<reward>100</reward>
+		<reward>25</reward>
+		<reward>25</reward>
+		<reward>0</reward>
+	</scores>
+</match>

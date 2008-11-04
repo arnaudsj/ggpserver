@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R1.Luckylemming_Maze_S.3357334782.20.10.3357392536</match-id>
+	<role>role1</role>
+	<player>Luckylemming</player>
+	<scores>
+		<reward>100</reward>
+	</scores>
+</match>

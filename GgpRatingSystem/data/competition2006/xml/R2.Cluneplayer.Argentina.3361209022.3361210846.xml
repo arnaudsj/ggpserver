@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R2.Cluneplayer.Argentina.3361209022.3361210846</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<player>Cluneplayer</player>
+	<player>Apple-Rt</player>
+	<scores>
+		<reward>100</reward>
+		<reward>0</reward>
+	</scores>
+</match>

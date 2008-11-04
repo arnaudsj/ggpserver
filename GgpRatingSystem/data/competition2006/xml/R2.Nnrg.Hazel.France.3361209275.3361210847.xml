@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R2.Nnrg.Hazel.France.3361209275.3361210847</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<player>Nnrg.Hazel</player>
+	<player>Luckylemming</player>
+	<scores>
+		<reward>50</reward>
+		<reward>50</reward>
+	</scores>
+</match>

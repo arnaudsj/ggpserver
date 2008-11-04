@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R2.Cluneplayer.Mcnulty_S.3359146044.3359146584</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<player>Cluneplayer</player>
+	<player>Pires5600</player>
+	<scores>
+		<reward>50</reward>
+		<reward>50</reward>
+	</scores>
+</match>

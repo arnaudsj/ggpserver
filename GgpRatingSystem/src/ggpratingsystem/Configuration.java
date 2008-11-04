@@ -1,8 +1,12 @@
 package ggpratingsystem;
 
-import ggpratingsystem.output.CachingCSVOutputBuilder;
+import ggpratingsystem.output.CSVRatingsWriter;
+import ggpratingsystem.output.CachingOutputBuilder;
+import ggpratingsystem.output.GnuPlotRatingsWriter;
 import ggpratingsystem.output.OutputBuilder;
+import ggpratingsystem.output.RatingsWriter;
 import ggpratingsystem.output.ValidatingOutputBuilder;
+import ggpratingsystem.ratingsystems.RatingFactory;
 import ggpratingsystem.ratingsystems.RatingStrategy;
 import ggpratingsystem.ratingsystems.RatingSystemType;
 
@@ -43,10 +47,44 @@ public class Configuration {
 	private Map<RatingSystemType, RatingStrategy> ratingSystems = new HashMap<RatingSystemType, RatingStrategy>();
 	private MatchReader matchReader;
 
+	private File previousRatings;
+
 	public void addRatingSystem(RatingStrategy ratingSystem) {
 		ratingSystems.put(ratingSystem.getType(), ratingSystem);
 	}
 	
+	/** Convenience method for adding a CSV Output Builder to a rating system. 
+	 * @param ignorePlayers */
+	public void addCSVOutputBuilder(RatingSystemType type, Set<Player> ignorePlayers) throws IOException {
+		Writer fileWriter = new FileWriter(new File(getOutputDir(),
+				getRatingSystem(type).idString() + ".csv"));
+			// one separate file for each RatingSystem   
+		
+		RatingsWriter ratingsWriter = new CSVRatingsWriter(fileWriter);
+		
+		OutputBuilder outputBuilder = 
+			new ValidatingOutputBuilder(
+				new CachingOutputBuilder(ratingsWriter, type, ignorePlayers));
+		
+		addOutputBuilder(type, outputBuilder);
+	}
+	
+	/** Convenience method for adding a Gnuplot Output Builder to a rating system. 
+	 * @param ignorePlayers */
+	public void addGnuplotOutputBuilder(RatingSystemType type, Set<Player> ignorePlayers) throws IOException {
+		Writer fileWriter = new FileWriter(new File(getOutputDir(),
+				getRatingSystem(type).idString() + ".dat"));
+			// one separate file for each RatingSystem   
+		
+		RatingsWriter ratingsWriter = new GnuPlotRatingsWriter(fileWriter);
+		
+		OutputBuilder outputBuilder = 
+			new ValidatingOutputBuilder(
+				new CachingOutputBuilder(ratingsWriter, type, ignorePlayers));
+		
+		addOutputBuilder(type, outputBuilder);
+	}
+
 	public void addOutputBuilder(RatingSystemType type, OutputBuilder builder) {
 		if (!isEnabled(type)) {
 			throw new IllegalArgumentException("RatingSystemType " + type + " must be enabled before adding any OutputBuilders to it!");
@@ -69,7 +107,15 @@ public class Configuration {
 		return ratingSystems.keySet();
 	}
 
-	public void run() {
+	public void run() throws IOException {
+		// initialize the ratings
+		if (previousRatings != null) {
+			for (RatingStrategy ratingSystem : ratingSystems.values()) {
+				RatingSystemType type = ratingSystem.getType();
+				RatingFactory.initializeRatings(type, previousRatings);
+			}
+		}
+		
 		if (matchReader == null) {
 			throw new IllegalStateException("setMatchReader() must be called before calling run()!");
 		}
@@ -117,24 +163,15 @@ public class Configuration {
 		return ratingSystems.get(type);
 	}
 	
-	
-	/** Convenience method for adding a CSV Output Builder to a rating system. */
-	public void addCSVOutputBuilder(RatingSystemType type) throws IOException {
-		Writer writer = new FileWriter(new File(getOutputDir(),
-				getRatingSystem(type).idString() + ".csv"));
-			// one separate file for each RatingSystem   
-
-		OutputBuilder outputBuilder = 
-			new ValidatingOutputBuilder(
-				new CachingCSVOutputBuilder(writer, type));
-		
-		addOutputBuilder(type, outputBuilder);
-	}
 
 	public void setMatchReader(MatchReader matchReader) {
 		this.matchReader = matchReader;
 	}
 
+	public void setPreviousRatings(File previousRatings) {
+		this.previousRatings = previousRatings;
+	}
+	
 	public static void setOutputDir(File outputDir) throws IOException {
 		Configuration.outputDir = outputDir;
 		

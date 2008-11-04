@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R1.Apple-Rt_Pancakes_S.3357334789.60.45.3357392536</match-id>
+	<role>role1</role>
+	<player>Apple-Rt</player>
+	<scores>
+		<reward>0</reward>
+	</scores>
+</match>

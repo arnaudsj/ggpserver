@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="../style-aaai2007/sheets/asteroids.xsl"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+<match-id>Match.3390230062</match-id>
+<role>Thesurt</role>
+<player>U-TEXAS-LARG</player>
+<history>
+ <step>
+  <step-number>1</step-number>
+  <move>hignadm(lonzabell)</move>
+ </step>
+ <step>
+  <step-number>2</step-number>
+  <move>clight</move>
+ </step>
+ <step>
+  <step-number>3</step-number>
+  <move>hignadm(lonzabell)</move>
+ </step>
+ <step>
+  <step-number>4</step-number>
+  <move>clight</move>
+ </step>
+ <step>
+  <step-number>5</step-number>
+  <move>clight</move>
+ </step>
+ <step>
+  <step-number>6</step-number>
+  <move>clight</move>
+ </step>
+ <step>
+  <step-number>7</step-number>
+  <move>hignadm(lonzabell)</move>
+ </step>
+ <step>
+  <step-number>8</step-number>
+  <move>clight</move>
+ </step>
+ <step>
+  <step-number>9</step-number>
+  <move>clight</move>
+ </step>
+ <step>
+  <step-number>10</step-number>
+  <move>clight</move>
+ </step>
+</history>
+<scores>
+ <reward>100</reward>
+</scores>
+<state>
+ <fact>
+  <prop-f>SARTUNTENT</prop-f>
+  <arg>THESER</arg>
+ </fact>
+ <fact>
+  <prop-f>THEMACK</prop-f>
+  <arg>0</arg>
+ </fact>
+ <fact>
+  <prop-f>HICLUDIS</prop-f>
+  <arg>0</arg>
+ </fact>
+ <fact>
+  <prop-f>THOLDSOIL</prop-f>
+  <arg>15</arg>
+ </fact>
+ <fact>
+  <prop-f>SONOWN</prop-f>
+  <arg>5</arg>
+ </fact>
+ <fact>
+  <prop-f>ENTERLACK</prop-f>
+  <arg>11</arg>
+ </fact>
+</state>
+</match>

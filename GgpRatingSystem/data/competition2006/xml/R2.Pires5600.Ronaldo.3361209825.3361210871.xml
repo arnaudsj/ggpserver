@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R2.Pires5600.Ronaldo.3361209825.3361210871</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<player>Pires5600</player>
+	<player>The</player>
+	<scores>
+		<reward>45</reward>
+		<reward>55</reward>
+	</scores>
+</match>

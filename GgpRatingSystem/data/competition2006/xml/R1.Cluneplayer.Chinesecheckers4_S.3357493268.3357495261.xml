@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R1.Cluneplayer.Chinesecheckers4_S.3357493268.3357495261</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<role>role3</role>
+	<role>role4</role>
+	<player>Cluneplayer</player>
+	<player>Luckylemming</player>
+	<player>Ogre</player>
+	<player>Apple-Rt</player>
+	<scores>
+		<reward>100</reward>
+		<reward>75</reward>
+		<reward>50</reward>
+		<reward>0</reward>
+	</scores>
+</match>

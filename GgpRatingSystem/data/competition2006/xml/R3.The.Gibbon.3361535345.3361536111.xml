@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R3.The.Gibbon.3361535345.3361536111</match-id>
+	<role>role1</role>
+	<player>The</player>
+	<scores>
+		<reward>0</reward>
+	</scores>
+</match>

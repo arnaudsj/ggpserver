@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="../style-aaai2007/sheets/stress.xsl"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+<match-id>Match.3390834194</match-id>
+<role>Heartur</role>
+<player>JIGSAWBOT</player>
+<history>
+ <step>
+  <step-number>1</step-number>
+  <move>chileatim</move>
+ </step>
+ <step>
+  <step-number>2</step-number>
+  <move>chileatim</move>
+ </step>
+ <step>
+  <step-number>3</step-number>
+  <move>chileatim</move>
+ </step>
+ <step>
+  <step-number>4</step-number>
+  <move>ladvilds</move>
+ </step>
+</history>
+<scores>
+ <reward>8</reward>
+</scores>
+<state>
+ <fact>
+  <prop-f>THALLOU</prop-f>
+  <arg>5</arg>
+ </fact>
+ <fact>
+  <prop-f>ANDROPEREF</prop-f>
+ </fact>
+</state>
+</match>

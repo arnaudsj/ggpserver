@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R1.Pires5600.Crisscross_S.3357493490.3357495262</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<player>Pires5600</player>
+	<player>Ogre</player>
+	<scores>
+		<reward>100</reward>
+		<reward>25</reward>
+	</scores>
+</match>

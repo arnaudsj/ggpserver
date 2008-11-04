@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R2.Entropy.Emerson.3361210163.3361210872</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<role>role3</role>
+	<role>role4</role>
+	<player>Entropy</player>
+	<player>Ggp_Remote_Agent</player>
+	<player>Legal</player>
+	<player>Random</player>
+	<scores>
+		<reward>100</reward>
+		<reward>0</reward>
+		<reward>100</reward>
+		<reward>0</reward>
+	</scores>
+</match>

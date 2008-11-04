@@ -1,0 +1,142 @@
+<?xml version='1.0'?>
+<?xml-stylesheet type='text/xsl' href='/docserver/gameserver/stylesheets/TRANSPOSITIONSMALL.xsl'?>
+<match id='Match.Aaai0822037'>
+<game>Transpositionsmall</game>
+<role>Robot</role>
+<player>Maligne</player>
+<scrambled>Yes</scrambled>
+<timed>Yes</timed>
+<startclock>180</startclock>
+<playclock>10</playclock>
+<steplimit>100</steplimit>
+<tournament>Test</tournament>
+<owner>Eschkufz</owner>
+<herstory>
+ <state>
+  <stepnum>1</stepnum>
+  <fact>
+   <relation>depth</relation>
+   <argument>level1</argument>
+  </fact>
+  <fact>
+   <relation>prev-goal</relation>
+   <argument>0</argument>
+  </fact>
+ </state>
+ <state>
+  <stepnum>2</stepnum>
+  <fact>
+   <relation>depth</relation>
+   <argument>level2</argument>
+  </fact>
+  <fact>
+   <relation>choice</relation>
+   <argument>level1</argument>
+   <argument>c3</argument>
+  </fact>
+  <fact>
+   <relation>prev-goal</relation>
+   <argument>0</argument>
+  </fact>
+ </state>
+ <state>
+  <stepnum>3</stepnum>
+  <fact>
+   <relation>choice</relation>
+   <argument>level1</argument>
+   <argument>c3</argument>
+  </fact>
+  <fact>
+   <relation>depth</relation>
+   <argument>level3</argument>
+  </fact>
+  <fact>
+   <relation>choice</relation>
+   <argument>level2</argument>
+   <argument>c1</argument>
+  </fact>
+  <fact>
+   <relation>prev-goal</relation>
+   <argument>25</argument>
+  </fact>
+ </state>
+ <state>
+  <stepnum>4</stepnum>
+  <fact>
+   <relation>choice</relation>
+   <argument>level1</argument>
+   <argument>c3</argument>
+  </fact>
+  <fact>
+   <relation>choice</relation>
+   <argument>level2</argument>
+   <argument>c1</argument>
+  </fact>
+  <fact>
+   <relation>depth</relation>
+   <argument>level4</argument>
+  </fact>
+  <fact>
+   <relation>choice</relation>
+   <argument>level3</argument>
+   <argument>c3</argument>
+  </fact>
+  <fact>
+   <relation>prev-goal</relation>
+   <argument>25</argument>
+  </fact>
+ </state>
+ <state>
+  <stepnum>5</stepnum>
+  <fact>
+   <relation>choice</relation>
+   <argument>level1</argument>
+   <argument>c3</argument>
+  </fact>
+  <fact>
+   <relation>choice</relation>
+   <argument>level2</argument>
+   <argument>c1</argument>
+  </fact>
+  <fact>
+   <relation>choice</relation>
+   <argument>level3</argument>
+   <argument>c3</argument>
+  </fact>
+  <fact>
+   <relation>depth</relation>
+   <argument>level5</argument>
+  </fact>
+  <fact>
+   <relation>choice</relation>
+   <argument>level4</argument>
+   <argument>c4</argument>
+  </fact>
+  <fact>
+   <relation>prev-goal</relation>
+   <argument>25</argument>
+  </fact>
+ </state>
+</herstory>
+<history>
+ <move>
+  <stepnum>1</stepnum>
+  <action>(move c3)</action>
+ </move>
+ <move>
+  <stepnum>2</stepnum>
+  <action>(move c1)</action>
+ </move>
+ <move>
+  <stepnum>3</stepnum>
+  <action>(move c3)</action>
+ </move>
+ <move>
+  <stepnum>4</stepnum>
+  <action>(move c4)</action>
+ </move>
+</history>
+<rewards>
+ <reward>100</reward>
+</rewards>
+</match>

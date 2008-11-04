@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R2.Fluxplayer.Cotedivoire.3361209557.3361210870</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<player>Fluxplayer</player>
+	<player>Pires5600</player>
+	<scores>
+		<reward>0</reward>
+		<reward>100</reward>
+	</scores>
+</match>

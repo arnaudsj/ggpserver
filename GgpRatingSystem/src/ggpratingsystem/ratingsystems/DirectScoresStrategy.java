@@ -55,11 +55,8 @@ public class DirectScoresStrategy implements RatingStrategy {
 		case 3:
 			return 0.5;
 
-		case 4:
-			return 1.0;
-
 		default:
-			throw new IllegalArgumentException();
+			return 1.0;
 		}
 	}
 }

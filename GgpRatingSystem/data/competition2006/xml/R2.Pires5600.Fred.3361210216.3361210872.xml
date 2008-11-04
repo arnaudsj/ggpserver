@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R2.Pires5600.Fred.3361210216.3361210872</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<role>role3</role>
+	<role>role4</role>
+	<player>Pires5600</player>
+	<player>Cluneplayer</player>
+	<player>Nnrg.Hazel</player>
+	<player>The</player>
+	<scores>
+		<reward>100</reward>
+		<reward>0</reward>
+		<reward>100</reward>
+		<reward>0</reward>
+	</scores>
+</match>

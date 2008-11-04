@@ -1,0 +1,86 @@
+<?xml version='1.0'?>
+<?xml-stylesheet type='text/xsl' href='/docserver/gameserver/stylesheets/SNAKE.xsl'?>
+<match id='Match.Aaai0811033'>
+<game>Snake</game>
+<role>Snake</role>
+<player>Centurio</player>
+<scrambled>Yes</scrambled>
+<timed>Yes</timed>
+<startclock>30</startclock>
+<playclock>10</playclock>
+<steplimit>100</steplimit>
+<tournament>Test</tournament>
+<owner>Eschkufz</owner>
+<herstory>
+ <state>
+  <stepnum>1</stepnum>
+  <fact>
+   <relation>movecount</relation>
+   <argument>0</argument>
+  </fact>
+  <fact>
+   <relation>cell</relation>
+   <argument>1</argument>
+   <argument>1</argument>
+   <argument>snake</argument>
+  </fact>
+ </state>
+ <state>
+  <stepnum>2</stepnum>
+  <fact>
+   <relation>movecount</relation>
+   <argument>1</argument>
+  </fact>
+  <fact>
+   <relation>cell</relation>
+   <argument>1</argument>
+   <argument>1</argument>
+   <argument>body</argument>
+  </fact>
+  <fact>
+   <relation>cell</relation>
+   <argument>2</argument>
+   <argument>1</argument>
+   <argument>snake</argument>
+  </fact>
+ </state>
+ <state>
+  <stepnum>3</stepnum>
+  <fact>
+   <relation>movecount</relation>
+   <argument>2</argument>
+  </fact>
+  <fact>
+   <relation>cell</relation>
+   <argument>2</argument>
+   <argument>1</argument>
+   <argument>body</argument>
+  </fact>
+  <fact>
+   <relation>cell</relation>
+   <argument>1</argument>
+   <argument>1</argument>
+   <argument>body</argument>
+  </fact>
+  <fact>
+   <relation>cell</relation>
+   <argument>1</argument>
+   <argument>1</argument>
+   <argument>snake</argument>
+  </fact>
+ </state>
+</herstory>
+<history>
+ <move>
+  <stepnum>1</stepnum>
+  <action>right</action>
+ </move>
+ <move>
+  <stepnum>2</stepnum>
+  <action>left</action>
+ </move>
+</history>
+<rewards>
+ <reward>6</reward>
+</rewards>
+</match>

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R2.Nnrg.Hazel.Locust_S.3359299013.3359299754</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<player>Nnrg.Hazel</player>
+	<player>Entropy</player>
+	<scores>
+		<reward>50</reward>
+		<reward>0</reward>
+	</scores>
+</match>

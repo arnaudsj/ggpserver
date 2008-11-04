@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R2.Entropy.Muzone_S.3359289251.3359289499</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<role>role3</role>
+	<role>role4</role>
+	<player>Entropy</player>
+	<player>Pumaman800</player>
+	<player>Apple-Rt</player>
+	<player>Ggp_Remote_Agent</player>
+	<scores>
+		<reward>0</reward>
+		<reward>0</reward>
+		<reward>0</reward>
+		<reward>0</reward>
+	</scores>
+</match>

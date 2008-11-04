@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R1.Cluneplayer_Queens_S.3357334759.180.120.3357392535</match-id>
+	<role>role1</role>
+	<player>Cluneplayer</player>
+	<scores>
+		<reward>0</reward>
+	</scores>
+</match>

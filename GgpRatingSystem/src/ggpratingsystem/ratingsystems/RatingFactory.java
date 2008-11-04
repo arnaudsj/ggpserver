@@ -2,6 +2,12 @@ package ggpratingsystem.ratingsystems;
 
 import ggpratingsystem.Player;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+
+import au.com.bytecode.opencsv.CSVReader;
+
 public class RatingFactory {
 //	private static HashMap<String, Double> initialRatings = new HashMap<String, Double>();
 //	
@@ -55,5 +61,30 @@ public class RatingFactory {
 		}
 		
 		return result;
+	}
+
+	public static void initializeRatings(RatingSystemType type, File previousRatings) throws IOException {
+		CSVReader reader;
+		reader = new CSVReader(new FileReader(previousRatings));
+
+		// first line: player names
+		String[] playerNames = reader.readNext();
+		
+		// last line: final ratings
+		String[] finalRatings = null;
+		for (String [] next = reader.readNext(); next != null; next = reader.readNext()) {
+			finalRatings = next;
+		}
+		
+		if (playerNames == null || finalRatings == null || playerNames.length != finalRatings.length) {
+			throw new IllegalArgumentException("Wrong format of revious CSV output file.");
+		}
+		
+		// set initial ratings
+		for (int i = 0; i < playerNames.length; i++) {
+			String playerName = playerNames[i];
+	    	double finalRating = Double.parseDouble(finalRatings[i]);
+			Player.getInstance(playerName).getRating(type).setCurRating(finalRating);
+		}
 	}
 }

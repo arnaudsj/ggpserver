@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>Round4.Nnrg.Hazel.Vonneumann.Round4.3362160317</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<player>Nnrg.Hazel</player>
+	<player>Entropy</player>
+	<scores>
+		<reward>50</reward>
+		<reward>50</reward>
+	</scores>
+</match>

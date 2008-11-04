@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R1.Ogre_Peg_S.3357334744.600.60.3357404725</match-id>
+	<role>role1</role>
+	<player>Ogre</player>
+	<scores>
+		<reward>50</reward>
+	</scores>
+</match>

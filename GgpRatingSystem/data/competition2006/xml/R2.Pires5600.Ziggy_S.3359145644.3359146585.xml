@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R2.Pires5600.Ziggy_S.3359145644.3359146585</match-id>
+	<role>role1</role>
+	<player>Pires5600</player>
+	<scores>
+		<reward>70</reward>
+	</scores>
+</match>

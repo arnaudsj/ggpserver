@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R2.Apple-Rt.Spiros_S.3359145732.3359146586</match-id>
+	<role>role1</role>
+	<player>Apple-Rt</player>
+	<scores>
+		<reward>0</reward>
+	</scores>
+</match>

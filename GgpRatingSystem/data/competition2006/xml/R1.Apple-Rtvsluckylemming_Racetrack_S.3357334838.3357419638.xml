@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R1.Apple-Rtvsluckylemming_Racetrack_S.3357334838.3357419638</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<player>Apple-Rt</player>
+	<player>Luckylemming</player>
+	<scores>
+		<reward>100</reward>
+		<reward>0</reward>
+	</scores>
+</match>

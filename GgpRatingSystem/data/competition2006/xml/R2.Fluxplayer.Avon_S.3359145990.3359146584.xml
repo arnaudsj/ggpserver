@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R2.Fluxplayer.Avon_S.3359145990.3359146584</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<player>Fluxplayer</player>
+	<player>Nnrg.Hazel</player>
+	<scores>
+		<reward>50</reward>
+		<reward>50</reward>
+	</scores>
+</match>

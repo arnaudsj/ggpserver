@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R2.Fluxplayer.Locust_S.3359299013.3359299754</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<player>Fluxplayer</player>
+	<player>Ggp_Remote_Agent</player>
+	<scores>
+		<reward>100</reward>
+		<reward>0</reward>
+	</scores>
+</match>

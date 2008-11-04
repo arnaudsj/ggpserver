@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R2.Entropy.Avon_S.3359145990.3359146584</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<player>Entropy</player>
+	<player>Ggp_Remote_Agent</player>
+	<scores>
+		<reward>0</reward>
+		<reward>0</reward>
+	</scores>
+</match>

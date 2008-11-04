@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R2.Pires5600.Fairfield_S.3359145873.3359146584</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<player>Pires5600</player>
+	<player>Nnrg.Hazel</player>
+	<scores>
+		<reward>100</reward>
+		<reward>10</reward>
+	</scores>
+</match>

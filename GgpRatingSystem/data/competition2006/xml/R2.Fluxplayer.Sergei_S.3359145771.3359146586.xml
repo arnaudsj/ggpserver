@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R2.Fluxplayer.Sergei_S.3359145771.3359146586</match-id>
+	<role>role1</role>
+	<player>Fluxplayer</player>
+	<scores>
+		<reward>90</reward>
+	</scores>
+</match>

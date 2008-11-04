@@ -29,14 +29,18 @@ public final class Player {
 		
 		if (instances.get(name) != null)
 			throw new IllegalStateException("Player already exists!");
-		
-		instances.put(name, this);
 	}
 
 	public static Player getInstance(String playerName) {
-		Player result = instances.get(playerName);		
-		if (result == null)
+		// convert to lower case and remove all non-alphanumeric characters 
+		// before querying
+		String queryName = playerName.toLowerCase().replaceAll("[^\\p{Alnum}]", "");
+
+		Player result = instances.get(queryName);		
+		if (result == null) {
 			result = new Player(playerName);
+			instances.put(queryName, result);
+		}
 		
 		return result;
 	}

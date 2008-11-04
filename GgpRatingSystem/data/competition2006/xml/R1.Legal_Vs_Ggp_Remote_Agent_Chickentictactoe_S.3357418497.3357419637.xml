@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R1.Legal_Vs_Ggp_Remote_Agent_Chickentictactoe_S.3357418497.3357419637</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<player>Legal</player>
+	<player>Ggp_Remote_Agent</player>
+	<scores>
+		<reward>0</reward>
+		<reward>0</reward>
+	</scores>
+</match>

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>R1.Pires5600_Pancakes_S.3357334777.1200.20.3357392535</match-id>
+	<role>role1</role>
+	<player>Pires5600</player>
+	<scores>
+		<reward>100</reward>
+	</scores>
+</match>
