@@ -30,18 +30,34 @@ public abstract class AbstractPlayer<TermType extends TermInterface> implements 
 	protected MatchInterface<TermType, ?> match=null;
 	protected RoleInterface<TermType> role=null;
 	private String name;
+	private long runtime;
+	private long startRunningTime;
 
 	public AbstractPlayer(String name){
 		this.name=name;
+		this.runtime=0;
 	}
 	
 	public void gameStart(MatchInterface<TermType, ?> match, RoleInterface<TermType> role, MessageSentNotifier notifier) {
 		this.match=match;
 		this.role=role;
+		this.runtime=0;
 	}
 
 	public void gameStop(JointMoveInterface<TermType> jointMove, MessageSentNotifier notifier) {
 		notifier.messageWasSent();
+	}
+
+	public long getTotalRuntime() {
+		return runtime;
+	}
+	
+	protected void notifyStartRunning() {
+		startRunningTime=System.currentTimeMillis();
+	}
+
+	protected void notifyStopRunning() {
+		runtime+=System.currentTimeMillis()-startRunningTime;
 	}
 
 	public String getName() {

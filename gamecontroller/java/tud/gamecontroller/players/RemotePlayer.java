@@ -60,15 +60,18 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 	@Override
 	public void gameStart(MatchInterface<TermType, ?> match, RoleInterface<TermType> role, MessageSentNotifier notifier) {
 		super.gameStart(match, role, notifier);
+		notifyStartRunning();
 		String msg="(START "+
 				match.getMatchID()+" "+
 				gameScrambler.scramble(role.getKIFForm()).toUpperCase()+
 				" ("+gameScrambler.scramble(match.getGame().getKIFGameDescription()).toUpperCase()+") "+
 				match.getStartclock()+" "+match.getPlayclock()+")";
 		sendMsg(msg, match.getStartclock(), notifier);
+		notifyStopRunning();
 	}
 
 	public MoveInterface<TermType> gamePlay(JointMoveInterface<TermType> jointMove, MessageSentNotifier notifier) {
+		notifyStartRunning();
 		MoveInterface<TermType> move=null;
 		String msg="(PLAY "+match.getMatchID()+" ";
 		if(jointMove==null){
@@ -92,11 +95,13 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 //				move=new MoveType(moveterm);
 //			}
 		}
+		notifyStopRunning();
 		return move;
 	}
 
 	@Override
 	public void gameStop(JointMoveInterface<TermType> jointMove, MessageSentNotifier notifier) {
+		notifyStartRunning();
 		String msg="(STOP "+match.getMatchID()+" ";
 		if(jointMove==null){
 			msg+="NIL";
@@ -105,6 +110,7 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 		}
 		msg+=")";
 		sendMsg(msg, match.getPlayclock(), notifier);
+		notifyStopRunning();
 	}
 
 	private String sendMsg(String msg, int timeout, MessageSentNotifier notifier) {

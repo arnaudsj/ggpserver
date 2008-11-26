@@ -117,6 +117,7 @@ public class GameController<
 			logger.info("step:"+step);
 			logger.info("current state:"+currentState);
 		}
+
 		String goalmsg="Game over! results: ";
 		goalValues=new HashMap<RoleInterface<TermType>, Integer>();
 		for(RoleInterface<TermType> role:game.getOrderedRoles()){
@@ -124,9 +125,18 @@ public class GameController<
 			goalValues.put(role,gv);
 			goalmsg+=gv+" ";
 		}
-		logger.info(goalmsg);
+
 		fireGameStop(currentState, goalValues);
 		gameStop(priorJointMove);
+
+		String runtimeMsg="runtimes (in ms): ";
+		for(RoleInterface<TermType> role:game.getOrderedRoles()){
+			long runtime=match.getPlayer(role).getTotalRuntime();
+			runtimeMsg+=runtime+" ";
+		}
+		logger.info(goalmsg);
+		logger.info(runtimeMsg);
+		logger.info("Done.");
 	}
 
 	private void runThreads(Collection<? extends AbstractPlayerThread<?>> threads, Level loglevel) throws InterruptedException{
@@ -179,7 +189,6 @@ public class GameController<
 		}
 		logger.info("Sending stop messages ...");
 		runThreads(playerthreads, Level.WARNING);
-		logger.info("Done.");
 	}
 	
 	public Map<? extends RoleInterface<TermType>, Integer> getGoalValues() {

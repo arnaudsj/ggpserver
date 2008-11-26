@@ -40,16 +40,21 @@ public abstract class LocalPlayer<
 	@Override
 	public void gameStart(MatchInterface<TermType, ?> match, RoleInterface<TermType> role, MessageSentNotifier notifier) {
 		super.gameStart(match, role, notifier);
+		notifyStartRunning();
 		notifier.messageWasSent();
 		currentState=match.getGame().getInitialState();
+		notifyStopRunning();
 	}
 
 	public MoveInterface<TermType> gamePlay(JointMoveInterface<TermType> jointMove, MessageSentNotifier notifier) {
+		notifyStartRunning();
 		notifier.messageWasSent();
 		if(jointMove!=null){
 			currentState=currentState.getSuccessor(jointMove);
 		}
-		return getNextMove();
+		MoveInterface<TermType> move=getNextMove();
+		notifyStopRunning();
+		return move;
 	}
 
 	protected abstract MoveInterface<TermType> getNextMove();

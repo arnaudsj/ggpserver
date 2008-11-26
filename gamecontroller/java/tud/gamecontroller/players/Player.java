@@ -30,4 +30,9 @@ public interface Player<TermType> extends NamedObject{
 	public void gameStart(MatchInterface<TermType, ?> match, RoleInterface<TermType> role, MessageSentNotifier notifier);
 	public MoveInterface<TermType> gamePlay(JointMoveInterface<TermType> jointMove, MessageSentNotifier notifier);
 	public void gameStop(JointMoveInterface<TermType> jointMove, MessageSentNotifier notifier);
+	/**
+	 * 
+	 * @return the total runtime of the player in milliseconds
+	 */
+	public long getTotalRuntime();
 }

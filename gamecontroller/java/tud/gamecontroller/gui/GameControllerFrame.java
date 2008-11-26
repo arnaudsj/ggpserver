@@ -205,7 +205,7 @@ public class GameControllerFrame<
 			gridBagConstraints4.gridx = 0;
 			gridBagConstraints4.gridy = 2;
 			gridBagConstraints4.weightx = 1.0;
-			gridBagConstraints4.anchor = GridBagConstraints.WEST;
+			gridBagConstraints4.anchor = GridBagConstraints.EAST;
 			gridBagConstraints4.insets = new Insets(2, 2, 2, 2);
 
 			GridBagConstraints gridBagConstraints5 = new GridBagConstraints();
