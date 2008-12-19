@@ -88,7 +88,7 @@ public class Match<
 	 * @see tud.gamecontroller.game.MatchInterface#getOrderedPlayers()
 	 */
 	public List<? extends Player<TermType>> getOrderedPlayers() {
-		if(orderedPlayers!=null){
+		if(orderedPlayers==null){
 			orderedPlayers=new LinkedList<Player<TermType>>();
 			for(RoleInterface<TermType> role:game.getOrderedRoles()){
 				orderedPlayers.add(players.get(role));
