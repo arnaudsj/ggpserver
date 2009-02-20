@@ -1,0 +1,12 @@
+<?xml version="1.0"?><!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>QUALIFY.3330029603</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<player>Cluneplayer</player>
+	<player>Random</player>
+	<scores>
+		<reward>25</reward>
+		<reward>75</reward>
+	</scores>
+</match>

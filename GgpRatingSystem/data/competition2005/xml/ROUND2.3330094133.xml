@@ -1,0 +1,12 @@
+<?xml version="1.0"?><!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>ROUND2.3330094133</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<player>Goblin</player>
+	<player>Fluxplayer</player>
+	<scores>
+		<reward>100</reward>
+		<reward>0</reward>
+	</scores>
+</match>

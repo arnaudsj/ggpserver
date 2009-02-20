@@ -1,0 +1,16 @@
+<?xml version="1.0"?><!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>FINAL.3330101476</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<player>Cluneplayer</player>
+	<player>Goblin</player>
+	<scores>
+		<reward>100</reward>
+		<reward>10</reward>
+	</scores>
+</match>
+
+
+
+

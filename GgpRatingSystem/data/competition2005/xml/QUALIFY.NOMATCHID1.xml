@@ -1,0 +1,9 @@
+<?xml version="1.0"?><!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>QUALIFY.NOMATCHID1</match-id>
+	<role>role1</role>
+	<player>York</player>
+	<scores>
+		<reward>0</reward>
+	</scores>
+</match>

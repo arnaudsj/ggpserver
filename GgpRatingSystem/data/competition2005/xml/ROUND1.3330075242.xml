@@ -1,0 +1,15 @@
+<?xml version="1.0"?><!DOCTYPE match SYSTEM "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd">
+<match>
+	<match-id>ROUND1.3330075242</match-id>
+	<role>role1</role>
+	<role>role2</role>
+	<role>role3</role>
+	<player>Utexas</player>
+	<player>Fluxplayer</player>
+	<player>Random</player>
+	<scores>
+		<reward>75</reward>
+		<reward>100</reward>
+		<reward>50</reward>
+	</scores>
+</match>
