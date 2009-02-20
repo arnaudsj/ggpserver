@@ -26,10 +26,10 @@ order=-1
 
 [item:ggp_rating_system-doc.tex]
 archive=true
-column=45
+column=0
 encoding=UTF-8
 highlight=LaTeX
-line=486
+line=228
 open=true
 order=0
 

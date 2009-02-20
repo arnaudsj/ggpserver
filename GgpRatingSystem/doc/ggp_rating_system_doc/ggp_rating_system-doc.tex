@@ -63,9 +63,9 @@
 							%
 %	acronym,		% Verwaltung von Abkuerzungen
 %	bibgerm,		% Deutsche Bibliographie, z.B. für package gerapali (German APA-like)
-	calc,				% Erweiterung der arithmetischen Funktionen in LaTeX
+% 	calc,				% Erweiterung der arithmetischen Funktionen in LaTeX
 							% wird verwendet um Titelseite zu zentrieren
-	color,			% im Laufenden Text einfach mit \color{Farbe) zwischen den 
+	color,			% im Laufenden Text einfach mit \color{Farbe) zwischen den
 							% Farben umschalten, wobei Farbe einfach 
 							% durch z.B. red, blue, black etc. ersetzt wird
 							% \textcolor{farbe){Text)
@@ -74,7 +74,7 @@
 							% gestalten (ähnlich scrpage2)
 %	fancybox,		% shadowbox, doublebox, ovalbox, Ovalbox 
 %	fancyvrb,		% verbatim Erweiterung:
-	float,			% Positionierung von Gleitobjekten genau an der Stelle, wo man möchte
+% 	float,			% Positionierung von Gleitobjekten genau an der Stelle, wo man möchte
 							% In der 'figure'- oder 'table'-Umgebung muss die 
 							% Positionierung [H] gesetzt werden
 %	glosstex,		% Glossar und Abkürzungsverzeichnis
@@ -96,13 +96,13 @@
 %	multicol,		% mehrspaltige Zeilen
 	multirow,		% mehrzeilige Spalten
 	array,
-	varioref,		% intelligent page references (``see figure 5 on page 7'', ``see figure 3.2 on the facing page''...)
+% 	varioref,		% intelligent page references (``see figure 5 on page 7'', ``see figure 3.2 on the facing page''...)
 %	endnotes,		% Fussnoten -> Endnoten
 %	rotating,		% sidewaystable und sidewaysfigure
-	natbib,			% natbib package for handling both author-year and numerical BibTeX styles
+% 	natbib,			% natbib package for handling both author-year and numerical BibTeX styles
 %	marvosym,		% Euro etc.
 % wasysym			% various symbols
-%	pstricks,		% replace text in eps figures by, e.g., math formulas
+%	pstricks,		% replace text in eps figures by, e.\,g., math formulas
 % picinpar,		% picture in paragraph: window-environment, tabwindow, figwindow etc.
 	amsmath,		% AMS math package
 	amsfonts,		% AMS math fonts
@@ -134,7 +134,7 @@
 	\usepackage[
 		pdftex=true, 						% pdftex output 
 		breaklinks=true, 				% it's ok to introduce a linebreak into links (may break some older viewers)
-		pdfpagelabels=true, 		% name pages, e.g.\ ``ii (4 of 40)'', to fix ``pdfTeX warning (ext4)'' problem
+		pdfpagelabels=true, 		% name pages, e.\,g.\ ``ii (4 of 40)'', to fix ``pdfTeX warning (ext4)'' problem
 		plainpages=false,				% use named pages as page labels, to fix ``pdfTeX warning (ext4)'' problem
 %		colorlinks=true,				% Achtung! Farbige Links werden mitgedruckt, farbige Rahmen nicht!
 		linkcolor=darkblue,
@@ -237,33 +237,36 @@ This document describes the current implementation of the GGP rating system.
 
 \section{Data structures}
 First, some words on the used data structures (ref.\ table~\ref{tab:data_structures}).
-The data structures used for player, game and match have the intuitive meaning, but there
+The data structures used for player, game and match have their intuitive meaning, but there
 is a new data structure called ``match set''. A match set simply is a collection of matches,
 all played in the same year, round and day of a competition, and all on the same game.
 All past competitions have featured such match sets, and explicit handling of match sets
 makes it possible to process all matches of such a match set in one batch.
 
-Another unusual entry is the  ``coefficients'' property of a game, which will be explained in section~\ref{sec:updating_game_information}. For now, it suffices to think of it as the information that the linear regression rating stores about a game.
+Another unusual entry is the  ``coefficients'' property of a game, which will be
+explained in section~\ref{sec:updating_game_information}. For now, it suffices
+to think of it as the information that the linear regression rating stores about
+a game.
 
 \begin{table}
 \begin{center}
-\begin{tabular}{l m{2.8cm} m{6cm}}
+\begin{tabular}{l m{2.8cm} >{\raggedright\arraybackslash}m{6cm}}
 \hline
 \textbf{class} & \textbf{property} & \textbf{description} \\
 \hline
-player & rating & a single number reflecting the player's current rating (e.g.\ $1000.0$) \\ 
+player & rating & a single number reflecting the player's current rating (e.\,g., $1000.0$) \\
 \hline
-\multirow{3}{*}{game} & name & the game name (e.g.\ chess) \\ 
- & roles & the roles of the game (e.g.\ black, white) \\ 
+\multirow{3}{*}{game} & name & the game name (e.\,g., chess) \\
+ & roles & the roles of the game (e.\,g., black, white) \\
  & coefficients &  linear-regression-specific game info \\
 \hline
-\multirow{7}{*}{match} & match ID & the ID of the match (e.g.\ Match.3390056123) \\ 
+\multirow{7}{*}{match} & match ID & the ID of the match (e.\,g., Match.3390056123) \\
  & players & the participants of the match \textit{($\rightarrow$~player)} \\ 
  & scores & the scores ($0 \dotsc 100$) achieved by each player\\ 
  & match set & the match set that this match is part of \textit{($\rightarrow$~match set)} \\ 
 \hline
-\multirow{6}{*}{match set} & match set ID & the ID of this match set (e.g.\ MatchSet.385572910) \\ 
- & year, round, day, match set number & self-explanatory (e.g.\ 2007, 3, 2, 10) \\ 
+\multirow{6}{*}{match set} & match set ID & the ID of this match set (e.\,g., MatchSet.385572910) \\
+ & year, round, day, match set number & self-explanatory (e.\,g., 2007, 3, 2, 10) \\
  & game & the played game (by definition, this is identical for all played matches of a match set) \textit{($\rightarrow$~game)} \\
 \hline
 \end{tabular}
@@ -290,7 +293,7 @@ $q(p)$:    & rating of player $p$ \\
 It seems to me that we want to be able to express $E[s(r, m)]$ (the
 expected value of the score of role $r$ in match $m$) in terms of $q(p(r', m))$
 for each role $r'$ in the game. One way to achieve this might be to assume
-$E[s(r, m)]$ is a linear function of these variables and perfrom least-squares
+$E[s(r, m)]$ is a linear function of these variables and perform least-squares
 linear regression. For a game with roles = $\{r_1, r_2, r_3\}$, this yields
 relationships such as:
 
@@ -308,28 +311,50 @@ difference between the actual outcome and the expected outcome.
 - Jim
 \end{quotation}
 
-The following sections will show how to update the game-specific coefficients $c_0, c_1, c_2, c_3$ (section~\ref{sec:updating_game_information}), how to calculate the expected scores of a player (section~\ref{sec:calculating_expected_scores}) and how to update the player ratings (section~\ref{sec:updating_player_ratings}).
+The following sections will show how to update the game-specific coefficients
+$c_0, c_1, c_2, c_3$ (section~\ref{sec:updating_game_information}), how to
+calculate the expected scores of a player
+(section~\ref{sec:calculating_expected_scores}) and how to update the player
+ratings (section~\ref{sec:updating_player_ratings}).
 
 \subsection{Updating the game information}
 \label{sec:updating_game_information}
 
-The linear regression rating algorithm keeps so-called ``game information'' about each played game. This game information is just a matrix of linear regression coefficients and reflects the relationship between the role a player plays, the ratings of all players in the game and the expected score of the player in a certain game.
+The linear regression rating algorithm keeps so-called ``game information''
+about each played game. This game information is just a matrix of linear
+regression coefficients and reflects the relationship between the role a player
+plays, the ratings of all players in the game and the expected score of the
+player in a certain game.
 
-As stated above, linear regression rating assumes that the expected score of a player playing role $r_1$ can be approximated by a linear function of the form:
+As stated above, linear regression rating assumes that the expected score of a
+player playing role $r_1$ can be approximated by a linear function of the form:
 \begin{equation}
 	E[s(r_1, m)] = c_0 + c_1*q(p(r_1, m)) + c_2*q(p(r_2, m)) + c_3*q(p(r_3, m)) 
 	\label{eqn:expected_performance}
 \end{equation} 
 
-The coefficients $c_0, \dotsc, c_3$ are updated immediately after each played match set for the whole batch of matches. (The coefficients are different for each role, so the game information for a 3-player game such as this would consist of $3 * 4 = 12$ coefficients.)
+The coefficients $c_0, \dotsc, c_3$ are updated immediately after each played
+match set for the whole batch of matches. (The coefficients are different for
+each role, so the game information for a 3-player game such as this would
+consist of $3 \cdot 4 = 12$ coefficients.)
 
-If, in a given match set, players with a high rating scored worse (on average) than players with a high rating, the coefficient associated with the target role ($c_1$ in the example above) can become negative. If this is the case, the linear regression is repeated without the target role, and the target role's coefficient is set to zero. There are no constraints on the other coefficients.
+If, in a given match set, most high-rated players scored worse (on average) than
+most low-rated players, the coefficient associated with the target role ($c_1$
+in the example above) can become negative. If this is the case, the linear
+regression is repeated without the target role, and the target role's
+coefficient is set to zero. There are no constraints on the other coefficients.
 
-If there are already known coefficients from former matches, the weighted average of the old and new coefficients is stored.
+If there are already known coefficients from former matches, the weighted
+average of the old and new coefficients is stored.
 
 \subsection{Calculating the expected scores}
 \label{sec:calculating_expected_scores}
-In the next step, the expected score of each player is calculated using formula~\ref{eqn:expected_performance}. If the calculated value is less than 0 or greater than 100, the actual expected value is set to 0 or 100, respectively. After that, the total expected scores of each player are calculated by summing up the player's expected scores in all matches that the player played in that match set, so that the total expected score can exceed 100.
+In the next step, the expected score of each player is calculated using
+formula~\ref{eqn:expected_performance}. If the calculated value is less than 0
+or greater than 100, the actual expected value is set to 0 or 100, respectively.
+After that, the total expected scores of each player are calculated by summing
+up the player's expected scores in all matches that the player played in that
+match set, so that the total expected score can exceed 100.
 
 
 \subsection{Updating the player ratings}
@@ -341,44 +366,72 @@ In a third step, the player rankings are updated according to the following form
  q'(p) \leftarrow q(p) + l * (a(p) - e(p))
 \end{equation} 
 
-where $q(p)$ and $q'(p)$ are the current and updated rating of player $p$, $l$ is the learning rate (cf.\ section~\ref{sec:constant_dynamic}), $a(p)$ is the actual and $e(p)$ the expected score. Update also takes place after each completed match set, so the player ratings are adjusted as quick as possible in order to provide more accurate information to the next game information updating step.
+where $q(p)$ and $q'(p)$ are the current and updated rating of player $p$, $l$
+is the learning rate (cf.\ section~\ref{sec:constant_dynamic}), $a(p)$ is the
+actual and $e(p)$ the expected score. Update also takes place after each
+completed match set, so the player ratings are adjusted as quick as possible in
+order to provide more accurate information to the next game information updating
+step.
 
-On a side remark, the player's ratings are initialized with a constant value ($1000$, at the moment).
+Player's ratings are carried over between competitions. New player's ratings are
+initialized with a constant value of $1000$.
 
 
 \subsection{Constant vs.\ dynamic learning rate}
 \label{sec:constant_dynamic}
 
-The choice of the learning rate has a big impact on the actual results of the algorithm. If the learning rate is too large, the player ratings become erratic and don't converge. If the learning rate is too small, they take too long to converge. One solution is to use a dynamic learning rate: starting off with a high learning rate and reducing it over time.
+The choice of the learning rate has a big impact on the actual results of the
+algorithm. If the learning rate is too large, the player ratings become erratic
+and don't converge. If the learning rate is too small, they take too long to
+converge. Experiments were done with a dynamic learning rate: starting off with
+a high learning rate and reducing it over time. However, it was decided to use a
+constant learning rate of $1.0$ for the final version of the rating system.
 
-\section{Results}
+\section{Experiments}
 
 \subsection{Constant vs. Dynamic Learning Rate}
-The results for one run of both algorithms are shown in figures \ref{fig:constant_linear_regression} and \ref{fig:dynamic_linear_regression}. Figure~\ref{fig:direct_scores} shows the actual scores for comparison.
+The results for one run of both algorithms are shown in figures
+\ref{fig:constant_linear_regression} and \ref{fig:dynamic_linear_regression}.
+Figure~\ref{fig:direct_scores} shows the actual scores for comparison.
 
 \begin{figure}
  \centering
  \includegraphics[width=\textwidth]{constant_linear_regression_1_0}
- \caption{Linear regression ratings with a \textit{constant} learning rate (Competition 2007 Preliminaries, constant learning rate = 1.0)}
+ \caption{Linear regression ratings with a \textit{constant} learning rate
+(Competition 2007 Preliminaries, constant learning rate = 1.0)}
  \label{fig:constant_linear_regression}
 \end{figure}
 
 \begin{figure}
  \centering
  \includegraphics[width=\textwidth]{dynamic_linear_regression_60}
- \caption{Linear regression ratings with a \textit{dynamic} learning rate (Competition 2007 Preliminaries, dynamic learning rate = 6.0$\dotsc$1.6, linear descent)}
+ \caption{Linear regression ratings with a \textit{dynamic} learning rate
+(Competition 2007 Preliminaries, dynamic learning rate = 6.0$\dotsc$1.6, linear
+descent)}
  \label{fig:dynamic_linear_regression}
 \end{figure}
 
 \begin{figure}
  \centering
  \includegraphics[width=\textwidth]{direct_scores}
- \caption{Weighted direct scores (Competition 2007 Preliminaries; using round weights 0.25, 0.5, 0.5 and 1.0)}
+ \caption{Weighted direct scores (Competition 2007 Preliminaries; using round
+weights 0.25, 0.5, 0.5 and 1.0)}
  \label{fig:direct_scores}
 \end{figure}
 
 \subsection{Re-Run}
-As a quick ``sanity check'', both algorithms were re-run on the same data set, using the final player ratings to initialize the player ratings. The results are shown in figures \ref{fig:constant_linear_regression_with_initial_values} and \ref{fig:dynamic_linear_regression_with_initial_values}. As expected, the re-run produced results in the same range as the original one. The ratings are not constant, which can be partly explained by the fact that the players were under development during the competition, and so their playing strength did not remain constant. A good example is Cadia-Player, which performed moderately well during the first half of the competition, and so its rating is corrected downward during the re-run. In the second half of the competition, its playing strength greatly improved, and so the rating rises again.
+As a quick ``sanity check'', both algorithms were re-run on the same data set,
+using the final player ratings of the first run to initialize the player ratings
+of the second run. The results are shown in figures
+\ref{fig:constant_linear_regression_with_initial_values} and
+\ref{fig:dynamic_linear_regression_with_initial_values}. As expected, the re-run
+produced results in the same range as the original one. The ratings are not
+constant, which can be partly explained by the fact that the players were under
+development during the competition, and so their playing strength did not remain
+constant. A good example is Cadia-Player, which performed only moderately well
+during the first half of the competition, and so its rating is corrected
+downward during the re-run. In the second half of the competition, its playing
+strength greatly improved, and so the rating rises again.
 
 \begin{figure}
  \centering
@@ -395,15 +448,23 @@ As a quick ``sanity check'', both algorithms were re-run on the same data set, u
 \end{figure}
 
 \subsection{Calculated Weights}
-To demonstrate the properties of the algorithm, some of the calculated weights will be analyzed.
+To demonstrate the properties of the algorithm, some of the calculated weights
+will be analyzed.
 
-The results of the 8 matches of tictactoe-large\footnote{Competition 2007 preliminaries, round 3, day 1 -- or short 2007-R3D1} are shown in table~\ref{tab:outcomes_tictactoelarge}. The first two columns are the ratings of both players, the third column shows the actual outcome and the last column contains the expected outcome, calculated via the coefficients in table~\ref{tab:coefficients_tictactoelarge}.
+The results of the 8 matches of tictactoe-large\footnote{Competition 2007
+preliminaries, round 3, day 1 -- or short 2007-R3D1} are shown in
+table~\ref{tab:outcomes_tictactoelarge}. The first two columns are the ratings
+of both players, the third column shows the actual outcome and the last column
+contains the expected outcome, calculated via the coefficients in
+table~\ref{tab:coefficients_tictactoelarge}.
 
 \begin{table}[htp]
+	\caption{Player ratings, real and predicted outcomes of tictactoe-large}
+	\label{tab:outcomes_tictactoelarge}
 	\begin{center}
 		\begin{tabular}{rrrr}
 			\hline
-			\textbf{Rating 1} & \textbf{Rating 2} & \textbf{Outcome} & \textbf{Outcome (calc.)} \\ 
+			\textbf{Rating 1} & \textbf{Rating 2} & \textbf{Outcome} & \textbf{Outcome (pred.)} \\
 			\hline
 			1455.0136    &	1166.2216    &	50.0         &	56.1203 \\
 			1875.7368    &	1127.6833    &	100.0        &	65.8533 \\
@@ -416,11 +477,12 @@ The results of the 8 matches of tictactoe-large\footnote{Competition 2007 prelim
 			\hline
 		\end{tabular}
 	\end{center}
-	\caption{Player ratings, real and predicted outcomes of tictactoe-large}
-	\label{tab:outcomes_tictactoelarge}
 \end{table}
 
 \begin{table}[htp]
+	\caption{Coefficients for role 1 of tictactoe-large, $p = 0.0051$ (linear
+correlation coefficient probability)}
+	\label{tab:coefficients_tictactoelarge}
 	\begin{center}
 		\begin{tabular}{rrrr}
 			\hline
@@ -432,17 +494,29 @@ The results of the 8 matches of tictactoe-large\footnote{Competition 2007 prelim
 			\hline
 		\end{tabular}
 	\end{center}
-	\caption{Coefficients for role 1 of tictactoe-large, $p = 0.0051$ (linear correlation coefficient probability)}
-	\label{tab:coefficients_tictactoelarge}
 \end{table}
 
-Tictactoe-large is an example where the algorithm performs well. The prediction is statistically very significant ($p = 0.0051$), and the calculated weights are in the expected range. However, there are match sets which do not give satisfying results, like Amazons (2007-R4D1). Although the higher-rated player won in seven of the eight cases (table~\ref{tab:outcomes_amazons}), the algorithm assigns a negative coefficient to both roles (table~\ref{tab:coefficients_amazons}). The reason for this is probably that the difference in ratings is huge in the ``offending'' match (number 7). Since least-squares minimization is used, the linear regression algorithm prefers many smaller errors to one huge error and picks its coefficients accordingly. As already mentioned in section~\ref{sec:updating_game_information}, these results will not be used, and instead a linear regression without the target role will be performed.
+Tictactoe-large is an example where the algorithm performs well. The prediction
+is statistically very significant ($p = 0.0051$), and the calculated weights are
+in the expected range. However, there are match sets which do not give
+satisfying results, like Amazons (2007-R4D1). Although the higher-rated player
+won in seven of the eight cases (table~\ref{tab:outcomes_amazons}), the
+algorithm assigns a negative coefficient to both roles
+(table~\ref{tab:coefficients_amazons}). The reason for this is probably that the
+difference in ratings is huge in the ``offending'' match (number 7). Since
+least-squares minimization is used, the linear regression algorithm prefers many
+smaller errors to one huge error and picks its coefficients accordingly. As
+already mentioned in section~\ref{sec:updating_game_information}, these results
+will not be used, and instead a linear regression without the target role will
+be performed.
 
 \begin{table}[htp]
+	\caption{Player ratings, real and predicted outcomes of amazons}
+	\label{tab:outcomes_amazons}
 	\begin{center}
 		\begin{tabular}{rrrr}
 			\hline
-			\textbf{Rating 1} & \textbf{Rating 2} & \textbf{Outcome} & \textbf{Outcome (calc.)} \\ 
+			\textbf{Rating 1} & \textbf{Rating 2} & \textbf{Outcome} & \textbf{Outcome (pred.)} \\
 			\hline
 				1515.4385    &	710.5769     &	100.0        &	76.1431  \\
 				1210.5041    &	2291.2757    &	0.0          &	22.6747  \\
@@ -455,11 +529,11 @@ Tictactoe-large is an example where the algorithm performs well. The prediction 
 			\hline
 		\end{tabular}
 	\end{center}
-	\caption{Player ratings, real and predicted outcomes of amazons}
-	\label{tab:outcomes_amazons}
 \end{table}
 
 \begin{table}[htp]
+	\caption{Coefficients for role 1 of amazons, $p = 0.0541$}
+	\label{tab:coefficients_amazons}
 	\begin{center}
 		\begin{tabular}{rrrr}
 			\hline
@@ -471,39 +545,36 @@ Tictactoe-large is an example where the algorithm performs well. The prediction 
 			\hline
 		\end{tabular}
 	\end{center}
-	\caption{Coefficients for role 1 of amazons, $p = 0.0541$}
-	\label{tab:coefficients_amazons}
 \end{table}
 
 
 \section{Implementation Issues}
 
-The implementation reads most of the attributes in table~\ref{tab:data_structures} directly from the match XML files, available from the game master. Specifically, these are:
+The implementation reads most of the attributes in
+table~\ref{tab:data_structures} directly from the match XML files, available
+from the game master. Specifically, these are:
 \textbf{match~id}, \textbf{roles}, \textbf{players}, and \textbf{scores}.
 
-Unfortunately, the following attributes are not available in machine-readable form, but only via the web interface:
+Unfortunately, the following attributes are not available in machine-readable
+form, but only via the web interface:
 \textbf{game~name}, \textbf{year}, \textbf{round}, and \textbf{day}.
 
-Additionally, the concept of a \textbf{match~set} has been introduced here, which is not supported by the game master. Also, there is no direct way to access the underlying match XML files. Thus, the present process for acquiring the necessary data is a little awkward and consists of the following steps:
+Additionally, the concept of a \textbf{match~set} has been introduced here,
+which is not supported by the game master. Also, there is no direct way to
+access the underlying match XML files. Thus, the present process for acquiring
+the necessary data is a little awkward and consists of the following steps:
 \begin{enumerate}
  \item mirror the whole games.stanford.edu website
  \item manually move all XML files into a directory
- \item copy-and-paste game name, year, round and day from the website into a CSV file, called matchindex.csv, in the same directory.
+ \item copy-and-paste game name, year, round and day from the website into a CSV
+file, called match\_index.csv, in the same directory.
 \end{enumerate}
-
 In summary, the amount of manual work could be reduced significantly if 
 \begin{itemize}
-	\item the match XML files would be provided directly by the game master (e.g.\ in the form of URIs), and
-	\item the missing data would also be available in XML.
+	\item the match XML files would be provided directly by the game master
+(e.\,g., in the form of URIs), and
+	\item the missing data, most importantly the game name, would also be included
+in the XML format.
 \end{itemize}
 
-
-\section{Building and Running GgpRatingSystem}
-\subsection{Building}
-GgpRatingSystem can be built using Apache Ant. Change into the GgpRatingSystem directory and type \texttt{ant install}. This will create a new subdirectory called ``install'', build all necessary sources and move them there.
-
-\subsection{Running}
-Currently, there is only a command line interface to GgpRatingSystem. However, the program has been designed with the goal in mind to make addition of extra user interfaces (GUI, Web) as easy as possible.
-
-Just type \texttt{install/ggp\_rating\_system.sh -h} for a list of options.
 \end{document}
