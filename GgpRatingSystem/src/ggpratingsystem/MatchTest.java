@@ -18,19 +18,17 @@ public class MatchTest extends TestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		File datadir = Util.getDataDir();
+		File matchdir = new File(Util.getDataDir(), "competition2007" + File.separator + "xml");
 
-		File matchFile = new File(datadir, 
-				"2007_final_round" + File.separator
-				+ "Match.33941143263.xml");
+		
+
+		File matchFile = new File(matchdir, "Match.33941143263.xml");
 
 		match33941143263 = new Match(new MatchSet("Breakthroughholes_2007_R5_D1", 2007, 5,
 				1, 1, Game.getInstance("Breakthroughholes")), 
 				matchFile);		
 
-		matchFile = new File(datadir,
-				"2007_preliminaries" + File.separator 
-				+ "Match.3390055120.xml");
+		matchFile = new File(matchdir, "Match.3390055120.xml");
 
 		match3390055120 = new Match(new MatchSet(
 				"Blocksworld-Obfuscated_2007_R1_D1", 2007, 1, 1, 1, 

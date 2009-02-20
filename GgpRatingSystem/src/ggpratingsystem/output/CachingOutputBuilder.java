@@ -1,15 +1,14 @@
 package ggpratingsystem.output;
 
+import ggpratingsystem.MatchSet;
+import ggpratingsystem.Player;
+import ggpratingsystem.ratingsystems.Rating;
+
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
-import ggpratingsystem.MatchSet;
-import ggpratingsystem.Player;
-import ggpratingsystem.ratingsystems.Rating;
-import ggpratingsystem.ratingsystems.RatingSystemType;
 
 /**
  * This class caches all calls in memory and then, on finish(), passes them
@@ -20,22 +19,34 @@ import ggpratingsystem.ratingsystems.RatingSystemType;
  *
  */
 public class CachingOutputBuilder implements OutputBuilder {
-	private final RatingsWriter writer;
-	private final RatingSystemType type;
 	private final Set<Player> ignorePlayers;
+
+	private final OutputBuilder decorated;
 	
+
 	private Set<Player> players = new HashSet<Player>();
 	
 	private List<MatchSet> matchSets = new LinkedList<MatchSet>();
 	private List<List<Rating>> ratingLists = new LinkedList<List<Rating>>();
 
-	public CachingOutputBuilder(final RatingsWriter writer, final RatingSystemType type, 
+	public CachingOutputBuilder(final OutputBuilder decorated, 
 			final Set<Player> ignorePlayers) {
-		this.writer = writer;
-		this.type = type;
+		this.decorated = decorated;
 		this.ignorePlayers = ignorePlayers;
 	}
 
+
+	/**
+	 * The player list can be null, because it will be ignored. The whole point of  
+	 * this class is to calculate the player list and pass it on to the decorated 
+	 * OutputBuilder.
+	 * 
+	 * @see ggpratingsystem.output.OutputBuilder#initialize(java.util.List)
+	 */
+	public void initialize(List<Player> players) throws IOException {
+		// nothing to do		
+	}
+	
 	public void beginMatchSet(MatchSet matchSet) {
 		matchSets.add(matchSet);
 		ratingLists.add(new LinkedList<Rating>());
@@ -57,16 +68,13 @@ public class CachingOutputBuilder implements OutputBuilder {
 	}
 
 	public void finish()  {
-		OutputBuilder decorated;
-		
-		
 		List<Player> playerlist = new LinkedList<Player>(players);
 		for (Player player : ignorePlayers) {
 			playerlist.remove(player);
 		}
 		
 		try {
-			decorated = new DirectOutputBuilder(writer, playerlist, type);
+			decorated.initialize(playerlist);
 			
 			int i = 0;
 			assert (matchSets.size() == ratingLists.size());

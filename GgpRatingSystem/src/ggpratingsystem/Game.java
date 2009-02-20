@@ -50,6 +50,9 @@ public final class Game {
 	}
 
 	public List<String> getRoles() {
+		if (roles == null) {
+			throw new IllegalStateException("Game.getRoles() called before setRoles()!");
+		}
 		return roles;
 	}
 

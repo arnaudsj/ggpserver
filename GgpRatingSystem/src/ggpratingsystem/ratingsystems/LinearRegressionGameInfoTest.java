@@ -30,7 +30,7 @@ public class LinearRegressionGameInfoTest extends TestCase {
 	
 	public LinearRegressionGameInfoTest() throws IOException {
 		super();
-		MatchReader matchReader = new FileMatchReader(new File(Util.getDataDir(), "2007_preliminaries"));
+		MatchReader matchReader = new FileMatchReader(new File(Util.getDataDir(), "competition2007" + File.separator + "xml"));
 		
 		matchSets = new LinkedList<MatchSet>();
 		while (matchReader.hasNext()) {

@@ -1,6 +1,10 @@
 package ggpratingsystem.output;
 
+import java.io.IOException;
+import java.util.List;
+
 import ggpratingsystem.MatchSet;
+import ggpratingsystem.Player;
 import ggpratingsystem.ratingsystems.Rating;
 
 /**
@@ -12,6 +16,7 @@ import ggpratingsystem.ratingsystems.Rating;
  */
 public class ValidatingOutputBuilder implements OutputBuilder {
 	private final OutputBuilder decorated;
+	private boolean initialized = false;
 	private boolean finished = false;
 	private MatchSet currentMatchSet;
 	
@@ -23,12 +28,24 @@ public class ValidatingOutputBuilder implements OutputBuilder {
 		this.decorated = decorated;
 	}
 
+	public void initialize(List<Player> players) throws IOException {
+		if (initialized) {
+			throw new IllegalStateException("initialize() is called a second time!");
+		}
+		initialized = true;
+		
+		decorated.initialize(players);
+	}
+	
 	/* (non-Javadoc)
 	 * @see ggpratingsystem.output.OutputBuilder#beginMatchSet(ggpratingsystem.MatchSet)
 	 */
 	public void beginMatchSet(MatchSet matchSet) {
 		if (finished) {
-			throw new IllegalStateException("finished() has been called before!");
+			throw new IllegalStateException("finish() has been called before!");
+		}
+		if (!initialized) {
+			throw new IllegalStateException("initialize() has not been called yet!");
 		}
 		if (currentMatchSet != null) {
 			throw new IllegalStateException("Old MatchSet has not been ended with endMatchSet() before calling beginMatchSet()!");
@@ -43,7 +60,7 @@ public class ValidatingOutputBuilder implements OutputBuilder {
 	 */
 	public void endMatchSet(MatchSet matchSet) {
 		if (finished) {
-			throw new IllegalStateException("finished() has been called before!");
+			throw new IllegalStateException("finish() has been called before!");
 		}
 		if (currentMatchSet == null) {
 			throw new IllegalStateException("endMatchSet() was called before calling beginMatchSet()!");
@@ -61,7 +78,7 @@ public class ValidatingOutputBuilder implements OutputBuilder {
 	 */
 	public void ratingUpdate(Rating rating) {
 		if (finished) {
-			throw new IllegalStateException("finished() has been called before!");
+			throw new IllegalStateException("finish() has been called before!");
 		}
 		if (currentMatchSet == null) {
 			throw new IllegalStateException("ratingUpdate() was called before calling beginMatchSet()!");
@@ -74,10 +91,14 @@ public class ValidatingOutputBuilder implements OutputBuilder {
 	 * @see ggpratingsystem.output.OutputBuilder#finish()
 	 */
 	public void finish() {
+		if (finished) {
+			throw new IllegalStateException("finish() is called a second time!");
+		}
+		finished = true;
+
 		if (currentMatchSet != null) {
 			throw new IllegalStateException("finish() was called before calling endMatchSet()!");
 		}
-		this.finished  = true;
 		
 		decorated.finish();
 	}

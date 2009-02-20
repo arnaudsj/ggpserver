@@ -4,6 +4,7 @@ package ggpratingsystem;
 import ggpratingsystem.ratingsystems.ConstantLinearRegressionStrategy;
 import ggpratingsystem.ratingsystems.DirectScoresStrategy;
 import ggpratingsystem.ratingsystems.DynamicLinearRegressionStrategy;
+import ggpratingsystem.ratingsystems.RatingException;
 import ggpratingsystem.ratingsystems.RatingSystemType;
 
 import java.io.IOException;
@@ -33,6 +34,7 @@ public class CommandLineInterface extends SimpleJSAP {
 	
 	public static final String OPTION_CSV_OUTPUT = "csv-output";
 	public static final String OPTION_GNUPLOT_OUTPUT = "gnuplot-output";
+	public static final String OPTION_HTML_OUTPUT = "html-output";
 	
 	public static final String OPTION_DEBUG_LEVEL = "debug-level";
 	public static final String OPTION_HELP = "help";
@@ -134,6 +136,13 @@ public class CommandLineInterface extends SimpleJSAP {
     						OPTION_GNUPLOT_OUTPUT,
     						"Enables gnuplot (data file) output for all rating algorithms."),
 
+    				// --html-output, -t
+    				new Switch(
+    						OPTION_HTML_OUTPUT,
+    						't',
+    						OPTION_HTML_OUTPUT,
+    						"Enables HTML output for all rating algorithms."),
+
 					/* ****************** ADD NEW OUTPUT METHODS HERE ****************** */
 
     		/* Debug level */
@@ -195,7 +204,8 @@ public class CommandLineInterface extends SimpleJSAP {
 			
 			boolean existsEnabledOutputAlgorithm = 
 				config.getBoolean(OPTION_CSV_OUTPUT) 
-				|| config.getBoolean(OPTION_GNUPLOT_OUTPUT);
+				|| config.getBoolean(OPTION_GNUPLOT_OUTPUT)
+				|| config.getBoolean(OPTION_HTML_OUTPUT);
 				/* ****************** ADD NEW OUTPUT METHODS HERE ****************** */
 
 			if (!existsEnabledOutputAlgorithm) {
@@ -223,7 +233,7 @@ public class CommandLineInterface extends SimpleJSAP {
 		return config;
 	}
 	
-	public static void main(String[] args) throws IOException, JSAPException {
+	public static void main(String[] args) throws JSAPException, IOException, RatingException {
 		CommandLineInterface commandLineInterface = new CommandLineInterface();
         
 		JSAPResult jsap = commandLineInterface.parse(args);
@@ -276,6 +286,9 @@ public class CommandLineInterface extends SimpleJSAP {
 			}
 			if (jsap.getBoolean(OPTION_GNUPLOT_OUTPUT)) {
 				configuration.addGnuplotOutputBuilder(type, ignorePlayers);
+			}
+			if (jsap.getBoolean(OPTION_HTML_OUTPUT)) {
+				configuration.addHtmlOutputBuilder(type, ignorePlayers);
 			}
 			/* ****************** ADD NEW OUTPUT METHODS HERE ****************** */
 		}

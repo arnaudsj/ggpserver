@@ -10,14 +10,22 @@ import ggpratingsystem.ratingsystems.RatingSystemType;
 
 public class DirectOutputBuilder implements OutputBuilder {
 	private final RatingsWriter writer;
-	private final List<Player> players;
+	private final RatingSystemType type;
+
+	private List<Player> players;
 
 	private double[] nextLine;
 
-	public DirectOutputBuilder(RatingsWriter writer, List<Player> players, RatingSystemType type) throws IOException {
+	
+	public DirectOutputBuilder(RatingsWriter writer, RatingSystemType type) {
 		this.writer = writer;
-		this.players = players;
-		
+		this.type = type;
+	}
+
+
+	
+	public void initialize(List<Player> players) throws IOException {
+		this.players = players;		
 		/* write player names as column headings to the inner writer */
 		String[] headings = new String[players.size()];
 		for (int i = 0; i < headings.length; i++) {
@@ -71,4 +79,5 @@ public class DirectOutputBuilder implements OutputBuilder {
 			}
 		}
 	}
+
 }

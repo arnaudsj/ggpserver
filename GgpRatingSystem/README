@@ -1,3 +1,17 @@
+GGP-RATING-SYSTEM
+
+last changed: 19.02.2009
+author:       Martin Günther
+
+This document contains the following sections:
+
+1. Building and Installation
+2. General Usage
+3. Adding new Data
+
+
+=== 1. BUILDING AND INSTALLATION ===
+
 GgpRatingSystem requires Java 1.5 or higher to run 
 and Apache Ant to build.
 
@@ -5,12 +19,78 @@ You can get a list of available build targets
 by executing "ant -projecthelp" in the same 
 directory as the file build.xml.
 
-
-How to build:
+To build:
 - ant install
 
-How to generate developer documentation:
+To generate developer documentation:
 - ant javadoc
 
-How to run:
+To run:
 - install/ggp_rating_system.sh
+
+
+=== 2. GENERAL USAGE ===
+
+TODO
+
+=== 3. Adding new Data ===
+
+To add the data of a new competition (say, the AAAI Competition 2029 ;-)), the following 
+steps must be executed:
+
+-- 3.1 Build and install --
+
+ant install
+
+
+-- 3.2 Prepare the data --
+
+a) Move all XML files into one directory, e.g. data/competition2029/xml/ . The files
+   MUST be named <Match ID>.xml, all case-sensitive. So, if a file contains the line
+   <match-id>Match.3391782873</match-id>, it must be called Match.3391782873.xml .
+
+b) Create a new CSV (comma separated value) file called "match_index.csv" (case-sensitive!)
+   in the data directory. For each XML file, add a line of the form
+
+      <match ID> , <game name> , <year> , <round> , <day>
+      e.g.: Match.3390055120,Blocksworld-Obfuscated,2007,1,1
+
+   I found this easiest to do using a spreadsheet program. This file is necessary because
+   the XML files do not contain this information, especially which game was played. The 
+   "year/round/day" data isn't really important, but is no real extra effort to add anyways.
+   A "match set" (a set of related matches) is identified by game name, year, round and day.
+   The ordering of the lines in the CSV file is meaningless.
+
+c) Optionally, create a file named "ignore_players.csv" in the data directory. List all
+   players that should be ignored, one player name per line, e.g.:
+
+RANDOM2
+RANDOM3
+RANDOM4
+RANDOM
+O-GRABME
+
+   Player names are case-insensitive. Also, only alphanumeric characters will be used to 
+   identify players, so O-GRABME is the same as oGrabMe. These players will still be counted 
+   during calculation of all ratings, but will be excluded from the final output file(s).
+   If ignore_players.csv is not present, all players will be counted.
+
+
+-- 3.3 Run the rating system --
+
+To generate a HTML table of the results, run:
+
+   install/ggp_rating_system.sh 
+      -i data/competition2029/xml/ 
+      -o data/competition2029/output/
+      -p data/competition2028/output/constant_linear_regression_1.0.csv  
+      -c 1.0 
+      -v
+      -t
+
+Please note that -p refers to 2028, not 2029. This will generate the file 
+data/competition2029/output/constant_linear_regression_1.0.html .
+
+-- 3.4 Troubleshooting --
+If the XML format has suddenly changed (again), you have to adjust the file Match.java 
+(which does the XML parsing).

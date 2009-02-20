@@ -2,10 +2,12 @@ package ggpratingsystem;
 
 import ggpratingsystem.output.CSVRatingsWriter;
 import ggpratingsystem.output.CachingOutputBuilder;
+import ggpratingsystem.output.DirectOutputBuilder;
 import ggpratingsystem.output.GnuPlotRatingsWriter;
+import ggpratingsystem.output.HtmlOutputBuilder;
 import ggpratingsystem.output.OutputBuilder;
-import ggpratingsystem.output.RatingsWriter;
 import ggpratingsystem.output.ValidatingOutputBuilder;
+import ggpratingsystem.ratingsystems.RatingException;
 import ggpratingsystem.ratingsystems.RatingFactory;
 import ggpratingsystem.ratingsystems.RatingStrategy;
 import ggpratingsystem.ratingsystems.RatingSystemType;
@@ -60,11 +62,13 @@ public class Configuration {
 				getRatingSystem(type).idString() + ".csv"));
 			// one separate file for each RatingSystem   
 		
-		RatingsWriter ratingsWriter = new CSVRatingsWriter(fileWriter);
+		OutputBuilder csvOutputBuilder = new ValidatingOutputBuilder(
+				new DirectOutputBuilder(new CSVRatingsWriter(fileWriter), type));
+
+		OutputBuilder outputBuilder = new CachingOutputBuilder(
+				csvOutputBuilder, ignorePlayers);
 		
-		OutputBuilder outputBuilder = 
-			new ValidatingOutputBuilder(
-				new CachingOutputBuilder(ratingsWriter, type, ignorePlayers));
+		outputBuilder.initialize(null);
 		
 		addOutputBuilder(type, outputBuilder);
 	}
@@ -76,14 +80,34 @@ public class Configuration {
 				getRatingSystem(type).idString() + ".dat"));
 			// one separate file for each RatingSystem   
 		
-		RatingsWriter ratingsWriter = new GnuPlotRatingsWriter(fileWriter);
+		OutputBuilder gnuplotOutputBuilder = new ValidatingOutputBuilder(
+				new DirectOutputBuilder(new GnuPlotRatingsWriter(fileWriter), type));
 		
-		OutputBuilder outputBuilder = 
-			new ValidatingOutputBuilder(
-				new CachingOutputBuilder(ratingsWriter, type, ignorePlayers));
+		OutputBuilder outputBuilder = new CachingOutputBuilder(
+				gnuplotOutputBuilder, ignorePlayers);
+
+		outputBuilder.initialize(null);
 		
 		addOutputBuilder(type, outputBuilder);
 	}
+	
+	public void addHtmlOutputBuilder(RatingSystemType type, Set<Player> ignorePlayers) throws IOException {
+		Writer fileWriter = new FileWriter(new File(getOutputDir(),
+				getRatingSystem(type).idString() + ".html"));
+			// one separate file for each RatingSystem   
+		
+		OutputBuilder htmlOutputBuilder = new ValidatingOutputBuilder(
+				new HtmlOutputBuilder(fileWriter, type));
+		
+		OutputBuilder outputBuilder = new CachingOutputBuilder(
+				htmlOutputBuilder, ignorePlayers);
+
+		outputBuilder.initialize(null);
+		
+		addOutputBuilder(type, outputBuilder);
+		
+	}
+
 
 	public void addOutputBuilder(RatingSystemType type, OutputBuilder builder) {
 		if (!isEnabled(type)) {
@@ -107,7 +131,7 @@ public class Configuration {
 		return ratingSystems.keySet();
 	}
 
-	public void run() throws IOException {
+	public void run() throws IOException, RatingException {
 		// initialize the ratings
 		if (previousRatings != null) {
 			for (RatingStrategy ratingSystem : ratingSystems.values()) {
@@ -195,4 +219,5 @@ public class Configuration {
 	public void setDebugLevel(Level level) {
 		Logger.getLogger("ggpratingsystem").setLevel(level);
 	}
+
 }

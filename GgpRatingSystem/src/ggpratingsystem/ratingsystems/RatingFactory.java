@@ -5,6 +5,10 @@ import ggpratingsystem.Player;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -27,6 +31,9 @@ public class RatingFactory {
 //		initialRatings.put("RANDOM", 615.7172571053981);
 //		initialRatings.put("THE-PIRATE", 380.38194444444446);
 //	}
+	
+	
+	public static Map<RatingSystemType, List<Rating>> initialRatings = new HashMap<RatingSystemType, List<Rating>>();
 	
 	public static Rating makeRating(RatingSystemType type, Player player) {
 		Rating result;
@@ -63,28 +70,48 @@ public class RatingFactory {
 		return result;
 	}
 
-	public static void initializeRatings(RatingSystemType type, File previousRatings) throws IOException {
+	public static void initializeRatings(RatingSystemType type, File previousRatings) throws IOException, RatingException {
 		CSVReader reader;
 		reader = new CSVReader(new FileReader(previousRatings));
 
 		// first line: player names
 		String[] playerNames = reader.readNext();
 		
-		// last line: final ratings
-		String[] finalRatings = null;
+		// last line: final ratings of previous competition == initial ratings of this competition
+		String[] ratings = null;
 		for (String [] next = reader.readNext(); next != null; next = reader.readNext()) {
-			finalRatings = next;
+			ratings = next;
 		}
 		
-		if (playerNames == null || finalRatings == null || playerNames.length != finalRatings.length) {
-			throw new IllegalArgumentException("Wrong format of revious CSV output file.");
+		if (playerNames == null || ratings == null || playerNames.length != ratings.length) {
+			throw new RatingException("Wrong format of previous CSV output file.");
 		}
 		
-		// set initial ratings
+		// set and store initial ratings
 		for (int i = 0; i < playerNames.length; i++) {
 			String playerName = playerNames[i];
-	    	double finalRating = Double.parseDouble(finalRatings[i]);
-			Player.getInstance(playerName).getRating(type).setCurRating(finalRating);
+	    	double curRating = Double.parseDouble(ratings[i]);
+			Rating rating = Player.getInstance(playerName).getRating(type);
+			rating.setCurRating(curRating);
+			try {
+				initialRatings(type).add((Rating) rating.clone());
+			} catch (CloneNotSupportedException e) {
+				throw new InternalError("Rating not cloneable!");
+			}		
+			
 		}
+	}
+
+	private static List<Rating> initialRatings(RatingSystemType type) {
+		List<Rating> result = initialRatings.get(type);
+		if (result == null) {
+			result = new LinkedList<Rating>();
+			initialRatings.put(type, result);
+		}
+		return result;
+	}
+	
+	public static List<Rating> getInitialRatings(RatingSystemType type) {
+		return new LinkedList<Rating>(initialRatings(type));
 	}
 }

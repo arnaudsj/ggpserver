@@ -12,29 +12,14 @@ public class FileMatchReaderTest extends TestCase {
 	/*
 	 * Test method for 'ggpratingsystem.MatchReader.readMatches(String)'
 	 */
-	public void testReadMatchesPreliminaries() throws IOException {
-		MatchReader matchReader = new FileMatchReader(new File(Util.getDataDir(), "2007_preliminaries"));
+	public void testReadMatches() throws IOException {
+		MatchReader matchReader = new FileMatchReader(new File(Util.getDataDir(), "competition2007" + File.separator + "xml"));
 		
 		int numMatchSets = 0;
 		while (matchReader.hasNext()) {
 			numMatchSets++;
 			matchReader.readMatchSet();
 		}
-		assertEquals(43, numMatchSets);
-	}
-
-	/*
-	 * Test method for 'ggpratingsystem.MatchReader.readMatches(String)'
-	 */
-	public void testReadMatchesFinals() throws IOException {
-		MatchReader matchReader = new FileMatchReader(new File(Util.getDataDir(), "2007_final_round"));
-		
-		int numMatchSets = 0;
-		while (matchReader.hasNext()) {
-			numMatchSets++;
-			matchReader.readMatchSet();
-//			System.out.println(matchReader.readMatchSet().toString());
-		}
-		assertEquals(4, numMatchSets);
+		assertEquals(47, numMatchSets);
 	}
 }

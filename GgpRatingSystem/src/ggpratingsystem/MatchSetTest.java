@@ -19,7 +19,7 @@ public class MatchSetTest extends TestCase {
 	
 	public MatchSetTest() throws IOException {
 		super();
-		MatchReader matchReader = new FileMatchReader(new File(Util.getDataDir(), "2007_preliminaries"));
+		MatchReader matchReader = new FileMatchReader(new File(Util.getDataDir(), "competition2007" + File.separator + "xml"));
 
 		matchSets = new LinkedList<MatchSet>();
 		for (int i = 0; i < 9; i++) {	// intentionally not reading all MatchSets here, are not needed

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-public final class Player {
+public final class Player implements Comparable<Player> {
 	private static final Logger log = Logger.getLogger(Player.class.getName());
     
 	static {
@@ -90,6 +90,11 @@ public final class Player {
 		return true;
 	}
 
+	public int compareTo(Player other) {
+		return name.compareTo(other.getName());
+	}
+
+	
 	public static List<Player> getAllPlayers() {
 		return new LinkedList<Player>(instances.values());
 	}

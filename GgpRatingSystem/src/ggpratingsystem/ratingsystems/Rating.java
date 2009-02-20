@@ -4,7 +4,13 @@ import ggpratingsystem.Player;
 
 import java.util.logging.Logger;
 
-public class Rating implements Cloneable {
+/**
+ * This class implements the rating of a player.
+ * 
+ * @author martin
+ * 
+ */
+public class Rating implements Cloneable, Comparable<Rating> {
 	private static final Logger log = Logger.getLogger(Rating.class.getName());
 	
 	static {
@@ -58,5 +64,44 @@ public class Rating implements Cloneable {
 		} catch (CloneNotSupportedException e) {
 			throw new InternalError();
 		}		
+	}
+	
+	
+	@Override
+	public int hashCode() {
+		final int PRIME = 31;
+		int result = 1;
+		result = PRIME * result + ((player == null) ? 0 : player.hashCode());
+		result = PRIME * result + new Double(curRating).hashCode();
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final Rating other = (Rating) obj;
+		if (player == null) {
+			if (other.player != null)
+				return false;
+		} else if (!player.equals(other.player))
+			return false;
+		if (curRating != other.curRating)
+			return false;
+		return true;
+	}
+
+	
+	public int compareTo(Rating otherRating) {
+		int curRatingCompared = Double.compare(curRating, otherRating.curRating);
+		if (curRatingCompared == 0) {
+			return player.compareTo(otherRating.player);
+		} else {
+			return curRatingCompared;
+		}
 	}
 }
