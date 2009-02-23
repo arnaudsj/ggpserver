@@ -22,12 +22,12 @@
         <javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.gameProver"/>
         <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.scrambling"/>
         <javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.resolver"/>
-        <javaElement handleIdentifier="=gamecontroller/&lt;tud.aux"/>
         <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.game.javaprover"/>
+        <javaElement handleIdentifier="=gamecontroller/&lt;tud.aux"/>
         <file path="/gamecontroller/LICENSE"/>
         <javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.util"/>
-        <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.players"/>
         <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.cli"/>
+        <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.players"/>
         <javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.parser"/>
         <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.game.impl"/>
     </selectedElements>

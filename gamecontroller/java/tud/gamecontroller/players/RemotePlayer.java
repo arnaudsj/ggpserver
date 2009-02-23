@@ -60,18 +60,19 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 	@Override
 	public void gameStart(MatchInterface<TermType, ?> match, RoleInterface<TermType> role, MessageSentNotifier notifier) {
 		super.gameStart(match, role, notifier);
-		notifyStartRunning();
 		String msg="(START "+
 				match.getMatchID()+" "+
 				gameScrambler.scramble(role.getKIFForm()).toUpperCase()+
 				" ("+gameScrambler.scramble(match.getGame().getKIFGameDescription()).toUpperCase()+") "+
 				match.getStartclock()+" "+match.getPlayclock()+")";
-		sendMsg(msg, match.getStartclock(), notifier);
+		notifyStartRunning();
+		String reply=sendMsg(msg, match.getStartclock(), notifier);
 		notifyStopRunning();
+		logger.info("reply from "+this.getName()+": "+reply+ " after "+getLastMessageRuntime()+"ms");
+			
 	}
 
 	public MoveInterface<TermType> gamePlay(JointMoveInterface<TermType> jointMove, MessageSentNotifier notifier) {
-		notifyStartRunning();
 		MoveInterface<TermType> move=null;
 		String msg="(PLAY "+match.getMatchID()+" ";
 		if(jointMove==null){
@@ -80,8 +81,11 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 			msg+=gameScrambler.scramble(jointMove.getKIFForm()).toUpperCase();
 		}
 		msg+=")";
-		String reply=sendMsg(msg, match.getPlayclock(), notifier), descrambledReply;
-		logger.info("reply from "+this.getName()+": "+reply);
+		String reply, descrambledReply;
+		notifyStartRunning();
+		reply=sendMsg(msg, match.getPlayclock(), notifier);
+		notifyStopRunning();
+		logger.info("reply from "+this.getName()+": "+reply+ " after "+getLastMessageRuntime()+"ms");
 		if(reply!=null){
 			descrambledReply=gameScrambler.descramble(reply);
 			try {
@@ -95,13 +99,11 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 //				move=new MoveType(moveterm);
 //			}
 		}
-		notifyStopRunning();
 		return move;
 	}
 
 	@Override
 	public void gameStop(JointMoveInterface<TermType> jointMove, MessageSentNotifier notifier) {
-		notifyStartRunning();
 		String msg="(STOP "+match.getMatchID()+" ";
 		if(jointMove==null){
 			msg+="NIL";
@@ -109,8 +111,10 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 			msg+=gameScrambler.scramble(jointMove.getKIFForm()).toUpperCase();
 		}
 		msg+=")";
-		sendMsg(msg, match.getPlayclock(), notifier);
-		notifyStopRunning();
+		//notifyStartRunning(); // don't count time for the stop message
+		String reply=sendMsg(msg, match.getPlayclock(), notifier);
+		//notifyStopRunning();
+		//logger.info("reply from "+this.getName()+": "+reply+ " after "+getLastMessageRuntime()+"ms");
 	}
 
 	private String sendMsg(String msg, int timeout, MessageSentNotifier notifier) {

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2008,2009 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GameController.
 
@@ -32,16 +32,19 @@ public abstract class AbstractPlayer<TermType extends TermInterface> implements 
 	private String name;
 	private long runtime;
 	private long startRunningTime;
+	private long lastMessageRuntime;
 
 	public AbstractPlayer(String name){
 		this.name=name;
 		this.runtime=0;
+		this.lastMessageRuntime=0;
 	}
 	
 	public void gameStart(MatchInterface<TermType, ?> match, RoleInterface<TermType> role, MessageSentNotifier notifier) {
 		this.match=match;
 		this.role=role;
 		this.runtime=0;
+		this.lastMessageRuntime=0;
 	}
 
 	public void gameStop(JointMoveInterface<TermType> jointMove, MessageSentNotifier notifier) {
@@ -51,13 +54,18 @@ public abstract class AbstractPlayer<TermType extends TermInterface> implements 
 	public long getTotalRuntime() {
 		return runtime;
 	}
-	
+
+	public long getLastMessageRuntime() {
+		return lastMessageRuntime;
+	}
+
 	protected void notifyStartRunning() {
 		startRunningTime=System.currentTimeMillis();
 	}
 
 	protected void notifyStopRunning() {
-		runtime+=System.currentTimeMillis()-startRunningTime;
+		lastMessageRuntime=System.currentTimeMillis()-startRunningTime;
+		runtime+=lastMessageRuntime;
 	}
 
 	public String getName() {
