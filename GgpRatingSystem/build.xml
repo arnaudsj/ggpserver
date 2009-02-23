@@ -1,4 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--    Copyright (C) 2008,2009 Martin Günther <mintar@gmx.de>
+
+    This file is part of GgpRatingSystem.
+
+    GgpRatingSystem is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    GgpRatingSystem is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GgpRatingSystem.  If not, see <http://www.gnu.org/licenses/>.  -->
+
 <project name="GgpRatingSystem" basedir="." default="main">
 
     <property name="src.dir"       value="src"/>
@@ -6,12 +23,12 @@
     <property name="data.dir"      value="data"/>
     <property name="build.dir"     value="build"/>
     <property name="install.dir"   value="install"/>
+    <property name="output.dir"    value="output"/>
     <property name="resources.dir" value="resources"/>
     <property name="classes.dir"   value="${build.dir}/classes"/>
     <property name="jar.dir"       value="${build.dir}/jar"/>
     <property name="javadoc.dir"   value="${build.dir}/javadoc"/>
     <property name="report.dir"    value="${build.dir}/junitreport"/>
-    <property name="output.dir"    value="${build.dir}/app-output"/>
 
     <property name="main-class"  value="ggpratingsystem.GgpRatingSystem"/>
 
@@ -31,6 +48,7 @@
     
     <target name="clean" description="Removes the result of the last build.">
         <delete dir="${build.dir}"/>
+        <delete dir="${output.dir}"/>
     </target>
 
     <target name="compile" description="Compiles all *.class files.">

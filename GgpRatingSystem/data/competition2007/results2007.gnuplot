@@ -1,5 +1,9 @@
-set terminal postscript eps lw 2 color
-set output "results2007.eps"
+# set terminal postscript eps lw 2 color
+set terminal svg
+
+# set output "results2007.eps"
+set output "results2007.svg"
+
 set title "GGP Competition 2007"
 set xlabel "match set"
 set ylabel "player rating"
