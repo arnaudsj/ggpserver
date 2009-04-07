@@ -35,10 +35,10 @@ public class Match<
 		ReasonerStateInfoType
 		> implements MatchInterface<TermType, State<TermType, ReasonerStateInfoType>> {
 	private String matchID;
-	private Game<TermType, ReasonerStateInfoType> game;
+	protected Game<TermType, ReasonerStateInfoType> game;
 	private int startclock;
 	private int playclock;
-	private Map<? extends RoleInterface<TermType>, ? extends Player<TermType>> players;
+	protected Map<? extends RoleInterface<TermType>, ? extends Player<TermType>> players;
 	private List<Player<TermType>> orderedPlayers=null;
 	
 	public Match(String matchID, Game<TermType, ReasonerStateInfoType> game, int startclock, int playclock, Map<? extends RoleInterface<TermType>, ? extends Player<TermType>> players){
