@@ -28,6 +28,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import tud.gamecontroller.MessageSentNotifier;
@@ -37,6 +38,7 @@ import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.MoveFactoryInterface;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
+import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.scrambling.GameScramblerInterface;
 import tud.gamecontroller.term.TermInterface;
 
@@ -91,7 +93,8 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 			try {
 				move=movefactory.getMoveFromKIF(descrambledReply);
 			} catch (InvalidKIFException ex) {
-				logger.severe("Error parsing reply \""+reply+"\" from "+this+":"+ex.getMessage());
+				String message = "Error parsing reply \""+reply+"\" from "+this+": "+ex.getMessage();
+				logger.log(Level.SEVERE, message, new GameControllerErrorMessage(GameControllerErrorMessage.PARSING_ERROR, message));
 			}
 //			if(moveterm!=null && !moveterm.isGround()){
 //				logger.severe("Reply \""+reply+"\" from "+this+" is not a ground term. (descrambled:\""+descrambledReply+"\")");
@@ -160,13 +163,15 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 			e.printStackTrace();
 			Thread.currentThread().interrupt();
 		} catch (UnknownHostException e) {
-			logger.severe("error: unknown host \""+ host+ "\"");
+			String message = "error: unknown host \""+ host+ "\"";
+			logger.log(Level.SEVERE, message, new GameControllerErrorMessage(GameControllerErrorMessage.UNKNOWN_HOST, message));
 			// call the notifier in case of an exception, otherwise 
 			// the GameController will wait forever if the exception occurred
 			// before the sending of the message
 			notifier.messageWasSent();
 		} catch (IOException e) {
-			logger.severe("error: io error for "+ this+" : "+e.getMessage());
+			String message = "error: io error for "+ this+" : "+e.getMessage();
+			logger.log(Level.SEVERE, message, new GameControllerErrorMessage(GameControllerErrorMessage.IO_ERROR, message));
 			// call the notifier in case of an exception, otherwise 
 			// the GameController will wait forever if the exception occurred
 			// before the sending of the message
