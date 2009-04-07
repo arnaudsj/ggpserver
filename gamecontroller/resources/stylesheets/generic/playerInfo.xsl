@@ -13,7 +13,7 @@
 		<xsl:param name="yPos"/>
 
 		<style type="text/css" media="all">@import 
-			url("css/main.css");
+			url("../../stylesheets/generic/css/main.css");
 		</style>
 			
 		<div id="playerInfo">

@@ -100,7 +100,7 @@
 		</xsl:if>
 
 		<style type="text/css" media="all">@import 
-			url("../../styles/css/main.css");
+			url("../../stylesheets/generic/css/main.css");
 		</style>
 		
 		<div id="playClock">
