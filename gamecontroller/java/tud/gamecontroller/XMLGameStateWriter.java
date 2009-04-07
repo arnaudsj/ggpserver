@@ -38,6 +38,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
@@ -92,11 +93,34 @@ public class XMLGameStateWriter
 	}
 	
 	private void writeState(StateInterface<? extends TermInterface,?> currentState, Map<?, Integer> goalValues) {
+		ByteArrayOutputStream os = createXMLOutputStream(match, currentState, moves, goalValues, stylesheet);
+		
+		try {
+			(new FileOutputStream(new File(matchDir+File.separator+"step_"+step+".xml"))).write(os.toByteArray());
+			if(goalValues!=null){ // write the final state twice (once as step_X.xml and once as finalstate.xml)
+				(new FileOutputStream(new File(matchDir+File.separator+"finalstate.xml"))).write(os.toByteArray());
+			}
+		} catch (FileNotFoundException ex) {
+			Logger.getLogger("tud.gamecontroller").warning("Exception occured while generation xml:"+ex.getMessage());
+		} catch (IOException ex) {
+			Logger.getLogger("tud.gamecontroller").warning("Exception occured while generation xml:"+ex.getMessage());
+		}
+	}
+
+	public static ByteArrayOutputStream createXMLOutputStream(
+			MatchInterface<? extends TermInterface, ?> match,
+			StateInterface<? extends TermInterface, ?> currentState,
+			List<JointMoveInterface<? extends TermInterface>> moves,
+			Map<?, Integer> goalValues,
+			String stylesheet)
+			throws TransformerFactoryConfigurationError,
+			IllegalArgumentException {
+		ByteArrayOutputStream os=new ByteArrayOutputStream();
 		try{
 			Document xmldoc=createXML(match, currentState, moves, goalValues, stylesheet);
 			// Serialization through Transform.
 			DOMSource domSource = new DOMSource(xmldoc);
-			ByteArrayOutputStream os=new ByteArrayOutputStream();
+			
 			StreamResult streamResult = new StreamResult(os);
 			TransformerFactory tf = TransformerFactory.newInstance();
 			Transformer serializer;
@@ -105,22 +129,14 @@ public class XMLGameStateWriter
 			serializer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM,"http://games.stanford.edu/gamemaster/xml/viewmatch.dtd");
 			serializer.setOutputProperty(OutputKeys.INDENT,"yes");
 			serializer.transform(domSource, streamResult);
-			(new FileOutputStream(new File(matchDir+File.separator+"step_"+step+".xml"))).write(os.toByteArray());
-			if(goalValues!=null){ // write the final state twice (once as step_X.xml and once as finalstate.xml)
-				(new FileOutputStream(new File(matchDir+File.separator+"finalstate.xml"))).write(os.toByteArray());
-			}
 		} catch (TransformerConfigurationException ex) {
 			Logger.getLogger("tud.gamecontroller").warning("Exception occured while generation xml:"+ex.getMessage());
 		} catch (ParserConfigurationException ex) {
 			Logger.getLogger("tud.gamecontroller").warning("Exception occured while generation xml:"+ex.getMessage());
 		} catch (TransformerException ex) {
 			Logger.getLogger("tud.gamecontroller").warning("Exception occured while generation xml:"+ex.getMessage());
-		} catch (FileNotFoundException ex) {
-			Logger.getLogger("tud.gamecontroller").warning("Exception occured while generation xml:"+ex.getMessage());
-		} catch (IOException ex) {
-			Logger.getLogger("tud.gamecontroller").warning("Exception occured while generation xml:"+ex.getMessage());
 		}
-		
+		return os;
 	}
 
 	/**
