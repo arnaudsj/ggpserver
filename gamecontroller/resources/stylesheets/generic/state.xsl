@@ -34,7 +34,7 @@
 							<span class="heading">(<xsl:value-of select="./prop-f"/></span>
 								<xsl:for-each select="./arg">
 									<xsl:text> </xsl:text>
-									<span class="content>
+									<span class="content">
 										<xsl:value-of select="."/>
 									</span>	
 								</xsl:for-each>
