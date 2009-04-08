@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app id="WebApp_ID" version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+
+	<display-name>ggpserver</display-name>
+
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+		<welcome-file>index.htm</welcome-file>
+		<welcome-file>index.jsp</welcome-file>
+		<welcome-file>default.html</welcome-file>
+		<welcome-file>default.htm</welcome-file>
+		<welcome-file>default.jsp</welcome-file>
+	</welcome-file-list>
+
+	<!-- Define the roles we want to use in the application -->
+	<security-role> 
+	    <role-name>admin</role-name> 
+	</security-role>
+	<security-role> 
+	    <role-name>member</role-name> 
+	</security-role>
+
+	<!-- Use FORM-based security -->
+	<login-config>
+		<auth-method>FORM</auth-method>
+		<form-login-config>
+			<form-login-page>/login/login.jsp</form-login-page>
+			<form-error-page>/login/fail_login.jsp</form-error-page>
+		</form-login-config>
+	</login-config>
+
+	<security-constraint> 
+	    <display-name>Security constraint for the /member folder</display-name> 
+	
+	    <!-- Define the resource, a /members folder -->
+	    <web-resource-collection> 
+	        <web-resource-name>Members Only</web-resource-name> 
+	        <url-pattern>/members/*</url-pattern> 
+	    </web-resource-collection> 
+	
+	    <!-- Only administrators and members can access this resource --> 
+	    <auth-constraint> 
+	        <role-name>admin</role-name> 
+	        <role-name>member</role-name> 
+	    </auth-constraint> 
+	</security-constraint>
+	
+	<security-constraint>
+	    <display-name>Security constraint for the /admin folder</display-name> 
+	
+	    <!-- Define the resource, a /admin folder -->
+	    <web-resource-collection> 
+	        <web-resource-name>Administration</web-resource-name> 
+	        <url-pattern>/admin/*</url-pattern> 
+	    </web-resource-collection> 
+	
+	    <!-- Only administrators can access this resource --> 
+	    <auth-constraint> 
+	        <role-name>admin</role-name> 
+	    </auth-constraint> 
+	</security-constraint> 	
+	
+	<resource-ref>
+		<description>DB Connection</description>
+		<res-ref-name>jdbc/ggpserver</res-ref-name>
+		<res-type>javax.sql.DataSource</res-type>
+		<res-auth>Container</res-auth>
+		<res-sharing-scope>Shareable</res-sharing-scope>
+	</resource-ref>
+</web-app>

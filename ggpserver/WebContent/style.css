@@ -1,0 +1,301 @@
+@CHARSET "UTF-8";
+
+body {
+    color:              #000000;
+    background-color:   #c1c1c8;
+    background-image:   url(gfx/VerlaufHintergrund.png);
+    background-repeat:  repeat-x;
+    font:               72.5%/1.6 Verdana, "Trebuchet MS", sans-serif;
+}
+
+a {
+	color:              #05087c;
+    text-decoration:    none;
+}
+
+hr {
+    margin-top:         25px;
+    margin-bottom:      25px;
+    border:             0px;
+    border-top:         1px dotted #777595;
+}
+
+p {
+    text-align:         justify;
+    padding-bottom:      10px;
+}
+
+.cimage {
+    border:             1px solid #777595;
+    display:            block;
+    margin-left:        15%;
+    margin-right:       15%;
+    width:              70%;
+}
+
+div#everything {
+    width:              900px;
+    margin:             auto;
+}
+
+div#header {
+	float:              left;
+    clear:              both;
+    margin-top:         5px;
+    margin-bottom:      10px;
+    background-image:   url(gfx/GGPHeaderBlau900.png);
+    background-repeat:  no-repeat;
+    width:              900px;
+    height:             115px;
+}
+
+div#user {
+	float:              left;
+    clear:              both;
+    margin-bottom:      10px;
+    width:              900px;
+    text-align:         right;
+}
+
+div#header h1 {
+    font-family:        'Times New Roman',Times,serif;
+    font-variant:       small-caps;
+    text-align:         center;
+    text-transform:     capitalize;
+}
+
+div#navigation {
+    float:              left;
+    line-height:        150%;
+    text-align:         left;
+    width:              15%;
+/*    background-image:   url(gfx/GGPNavigation.png);*/
+/*    background-repeat:  no-repeat;*/
+/*    background-position: top left;*/
+/*    min-height:         750px;*/
+    background-color:   #fff;
+    border:             1px solid #344e9d;
+    padding-left:       5px;
+    padding-right:      5px;
+
+}
+
+div#ntitle {
+    background-image:   url(gfx/VerlaufBlau3.png);
+    background-repeat:  repeat-x;
+    border:             1px solid #344e9d;
+    height:             30px;
+    vertical-align:     middle;
+    font-weight:        bold;
+    font-size:          medium;
+    font-weight:        bold;
+    text-transform:     capitalize;
+    font-color:         #000;
+    margin-top:         -1px;
+    margin-left:        -6px;
+    margin-right:       -6px;
+}
+
+div#navigation a {
+	margin-top:         -1px;
+	margin-bottom:      -1px;
+    border-top:         1px dotted #777595;
+    border-bottom:      1px dotted #777595;
+    display:            block;
+    color:              #000;
+    font-size:          medium;
+/*    font-weight:        bold;*/
+    text-indent:        5px;
+    line-height:        200%;
+}
+
+div#navigation a:hover {
+	margin-left:        -6px;
+    margin-right:       -6px;
+	border:             1px solid #777595;
+    background-image:   url(gfx/VerlaufGrau.png);
+    text-indent:        10px;
+    line-height:        200%;
+}
+
+
+/*div#navigation div {
+    border:             1px solid #344e9d;
+    background-color:   #FC7101;
+    margin-bottom:      5px;
+    padding-left:       2px;
+    font-weight:        bold;
+}*/
+
+div#content {
+	float:              left;
+    text-align:         left;
+    margin-left:        5%;
+    margin-bottom:      10px;
+    background-color:   #fff;
+    border:             1px solid #344e9d;
+    padding:            10px;
+    padding-top:        0px;
+    width:              76%;
+}
+
+div#ctitle {
+    background-image:   url(gfx/VerlaufBlau3.png);
+    background-repeat:  repeat-x;
+    margin-top:         -1px;
+    margin-left:        -11px;
+    margin-right:       -11px;
+    margin-bottom:      10px;
+    height:             30px;
+    border:             1px solid #344e9d;
+    vertical-align:     middle;
+    font-size:          medium;
+    font-weight:        bold;
+    text-transform:     capitalize;
+    text-indent:        1.5em;
+    color:              #ffffff;
+}
+
+
+div#content h1 {
+    font-size:          medium;
+    font-variant:       small-caps;
+    font-weight:        bold;
+    border-top:         1px dotted #777595;
+/*    margin-top:         -11px;*/    /* MG: this created problems for all following h1's */
+    padding-top:        15px;
+}
+
+div#content h1.notopborder {
+	border-top:         none;
+	padding-top:        0px;
+}
+
+div#content h2 {
+    margin-top:         2em;
+    font-size:          small;
+    font-variant:       small-caps;
+    font-weight:        bold;
+}
+
+div#content h3 {
+    font-size:          small;
+    font-weight:        bold;
+}
+
+
+div#footer {
+    clear:              both;
+    font-size:          x-small;
+    font-variant:       small-caps;
+}
+
+ul.no_deco{
+    list-style-type:    none;
+}
+
+dt {
+	font-weight: bold;
+}
+
+
+div#content table
+{
+	table-layout: auto;
+/*	border: 1px solid;*/
+	width: 70%;
+}
+
+div#content table th
+{
+    background-color:   #c1c1c8;
+	padding-left:       5px;
+	padding-right:      5px;
+}	
+
+div#content table td
+{
+	padding-left:       5px;
+	padding-right:      5px;
+}	
+
+div#content table tr.odd {
+    background-color:   #ffffff;	
+}
+
+div#content table tr.even {
+    background-color:   #e7e7ef;	
+}
+
+
+li.validationerror {
+	color:             red;
+	font-size:         small;
+}
+
+
+/**************** ICONS ****************/
+#errors {
+  background: url(icons/other/16-warning_icon.png) no-repeat;
+  display:             block;
+  height:              16px;
+  width:               16px;
+}
+/*#errors {
+  background: url(icons/sweetie/png-8/16-message-warn.png) no-repeat;
+  display:             block;
+  height:              16px;
+  width:               16px;
+}*/
+#errors a span {
+  visibility:          hidden;
+}
+
+#no_errors {
+	padding-top:       16px;
+}
+
+
+/* 
+#playerstatus-active {
+  background: url(icons/sweetie/png-8/24-arrow-next.png) no-repeat;
+  display:             block;
+  height:              24px;
+  width:               24px;
+}
+
+#playerstatus-active span {
+  visibility:          hidden;
+}
+
+#playerstatus-inactive {
+  background: url(icons/sweetie/png-8/24-control-stop.png) no-repeat;
+  display:             block;
+  height:              24px;
+  width:               24px;
+}
+
+#playerstatus-inactive span {
+  visibility:          hidden;
+}
+
+#playerstatus-new {
+  background: url(icons/sweetie/png-8/24-settings.png) no-repeat;
+  display:             block;
+  height:              24px;
+  width:               24px;
+}
+
+#playerstatus-new span {
+  visibility:          hidden;
+}
+
+
+#add-new-player {
+  background: url(icons/sweetie/png-8/24-em-plus.png) no-repeat;
+  display:             block;
+  height:              24px;
+  text-indent:         28px;
+}
+
+*/

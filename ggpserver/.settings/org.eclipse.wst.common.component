@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<project-modules id="moduleCoreId" project-version="1.5.0">
+  <wb-module deploy-name="ggpserver">
+    <wb-resource source-path="/WebContent" deploy-path="/"/>
+    <wb-resource source-path="/src" deploy-path="/WEB-INF/classes"/>
+    <property name="context-root" value="ggpserver"/>
+    <property name="java-output-path" value="build/classes"/>
+  </wb-module>
+</project-modules>
