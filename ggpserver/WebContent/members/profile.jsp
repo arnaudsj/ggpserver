@@ -51,7 +51,7 @@
 				</c:url><a href='<c:out value="${playerURL}" />'>${player.name}</a></td>
 				<td>${player.host}</td>
 				<td>${player.port}</td>
-				<td><div id="playerstatus-${player.status}"><span>${player.status}</span></div></td>
+				<td><div class="playerstatus-${player.status}"><span>${player.status}</span></div></td>
 			</tr>
 		</c:forEach>
 
@@ -65,7 +65,7 @@
 		</c:choose>
 		<tr class="${rowClass}">
 			<td colspan="4">
-				<div id="add-new-player"><a href='<%= response.encodeURL("create_player.jsp") %>'><span>Add new player</span></a></div>
+				<div class="add-new-player"><a href='<%= response.encodeURL("create_player.jsp") %>'><span>Add new player</span></a></div>
 			</td>
 		</tr>
 

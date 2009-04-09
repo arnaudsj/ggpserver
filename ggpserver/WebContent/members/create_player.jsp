@@ -34,11 +34,13 @@
 			</td>
 			<td>
 				<input type="text" name="playerName" size="20" value="${createPlayer.playerName}" maxlength="20"> <br>
-				<ul>
-			    	<c:forEach var="errormessage" items="${createPlayer.errors}">
-						<li class="validationerror">${errormessage}</li>
-			    	</c:forEach>
-	      		</ul>
+				<c:if test="<%= createPlayer.getErrors().size() > 0 %>">
+					<ul>
+				    	<c:forEach var="errormessage" items="${createPlayer.errors}">
+							<li class="validationerror">${errormessage}</li>
+				    	</c:forEach>
+		      		</ul>
+	      		</c:if>
 			</td>
 		</tr>
 		<tr>

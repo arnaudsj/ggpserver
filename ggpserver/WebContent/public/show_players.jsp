@@ -48,7 +48,7 @@
 					<a href='<c:out value="${playerURL}" />'>${player.name}</a>
 				</td>
 				<td>${player.owner.userName}</td>
-				<td><div id="playerstatus-${player.status}"><span>${player.status}</span></div></td>
+				<td><div class="playerstatus-${player.status}"><span>${player.status}</span></div></td>
 			</tr>
 	      </c:forEach>
 		</tbody>

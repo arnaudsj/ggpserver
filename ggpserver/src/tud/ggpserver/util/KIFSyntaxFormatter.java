@@ -62,7 +62,7 @@ public class KIFSyntaxFormatter {
 				// insert a "<br />\n" whenever the desired indentation level is reached
 				if ((curLevel == indentLevel)) {
 					if ((curIndex == input.length()) || (input.charAt(curIndex + 1)) != ')') {
-						output.append("<br />\n");
+						output.append("<br>\n");
 						for (int i = 0; i < indentLevel; i++) {
 							output.append("&nbsp;&nbsp;&nbsp");
 						}

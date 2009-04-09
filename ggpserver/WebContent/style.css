@@ -1,4 +1,4 @@
-@CHARSET "UTF-8";
+@charset "UTF-8";
 
 body {
     color:              #000000;
@@ -90,7 +90,7 @@ div#ntitle {
     font-size:          medium;
     font-weight:        bold;
     text-transform:     capitalize;
-    font-color:         #000;
+    color:              #000000;
     margin-top:         -1px;
     margin-left:        -6px;
     margin-right:       -6px;
@@ -185,9 +185,11 @@ div#content h3 {
 
 
 div#footer {
-    clear:              both;
+/*    clear:              both;*/
+	float:              right;
     font-size:          x-small;
     font-variant:       small-caps;
+    width:              88px;
 }
 
 ul.no_deco{
@@ -235,63 +237,63 @@ li.validationerror {
 
 
 /**************** ICONS ****************/
-#errors {
+.errors {
   background: url(icons/other/16-warning_icon.png) no-repeat;
   display:             block;
   height:              16px;
   width:               16px;
 }
-/*#errors {
+/*.errors {
   background: url(icons/sweetie/png-8/16-message-warn.png) no-repeat;
   display:             block;
   height:              16px;
   width:               16px;
 }*/
-#errors a span {
+.errors a span {
   visibility:          hidden;
 }
 
-#no_errors {
+.no_errors {
 	padding-top:       16px;
 }
 
 
 /* 
-#playerstatus-active {
+.playerstatus-active {
   background: url(icons/sweetie/png-8/24-arrow-next.png) no-repeat;
   display:             block;
   height:              24px;
   width:               24px;
 }
 
-#playerstatus-active span {
+.playerstatus-active span {
   visibility:          hidden;
 }
 
-#playerstatus-inactive {
+.playerstatus-inactive {
   background: url(icons/sweetie/png-8/24-control-stop.png) no-repeat;
   display:             block;
   height:              24px;
   width:               24px;
 }
 
-#playerstatus-inactive span {
+.playerstatus-inactive span {
   visibility:          hidden;
 }
 
-#playerstatus-new {
+.playerstatus-new {
   background: url(icons/sweetie/png-8/24-settings.png) no-repeat;
   display:             block;
   height:              24px;
   width:               24px;
 }
 
-#playerstatus-new span {
+.playerstatus-new span {
   visibility:          hidden;
 }
 
 
-#add-new-player {
+.add-new-player {
   background: url(icons/sweetie/png-8/24-em-plus.png) no-repeat;
   display:             block;
   height:              24px;

@@ -4,7 +4,6 @@
 <jsp:useBean id="register" class="tud.ggpserver.formhandlers.Register" scope="request">
 	<jsp:setProperty name="register" property="*"/>
 </jsp:useBean>
-<%-- This bean must have an identical name (register) in process.jsp and register.jsp! --%>
 
 
 <c:choose> 

@@ -3,9 +3,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-	<title>Dresden GGP Server</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<link href="<%= request.getContextPath() %>/style.css" rel="stylesheet" type="text/css" />
+	<jsp:directive.include file="/inc/headincludes.jsp" />
 </head>
 <body>
 <div id="everything">
@@ -22,7 +20,7 @@
 		<a href="<%= request.getContextPath() + response.encodeURL("/public/show_games.jsp") %>">all available games</a>,
 		<a href="<%= request.getContextPath() + response.encodeURL("/public/show_players.jsp") %>">the general game playing programs</a> and the
 		<a href="<%= request.getContextPath() + response.encodeURL("/public/show_users.jsp") %>">registered users</a> 
-		by clicking on the links on the left. <br />
+		by clicking on the links on the left. <br>
 		
 		After <a href="<%= request.getContextPath() + response.encodeURL("/register/register.jsp") %>">registration</a>, 
 		you can add your own general game player to be pitted against the existing ones.

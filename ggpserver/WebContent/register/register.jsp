@@ -1,8 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%> 
-<jsp:useBean id="register" class="tud.ggpserver.formhandlers.Register" scope="request" />
-<%-- This bean must have an identical name (register) in process.jsp and register.jsp! --%>
+<jsp:useBean id="register" class="tud.ggpserver.formhandlers.Register" scope="request">
+	<jsp:setProperty name="register" property="*"/>
+</jsp:useBean>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -26,11 +27,13 @@
 			</td>
 			<td>
 				<input type="text" name="userName" size="20" value="${register.userName}" maxlength="20"> <br>
-				<ul>
-			    	<c:forEach var="errormessage" items="${register.errorsUserName}">
-						<li class="validationerror">${errormessage}</li>
-			    	</c:forEach>
-	      		</ul>
+				<c:if test="<%= register.getErrorsUserName().size() > 0 %>">
+					<ul>
+				    	<c:forEach var="errormessage" items="${register.errorsUserName}">
+							<li class="validationerror">${errormessage}</li>
+				    	</c:forEach>
+		      		</ul>
+	      		</c:if>
 			</td>
 		</tr>
 		<tr>
@@ -39,11 +42,13 @@
 			</td>
 			<td>
 				<input type="password" name="password1" size="20" value="${register.password1}" maxlength="20"> <br>
-				<ul>
-			      <c:forEach var="errormessage" items="${register.errorsPassword1}">
-					<li class="validationerror">${errormessage}</li>
-			      </c:forEach>
-	      		</ul>
+				<c:if test="<%= register.getErrorsPassword1().size() > 0 %>">
+					<ul>
+				      <c:forEach var="errormessage" items="${register.errorsPassword1}">
+						<li class="validationerror">${errormessage}</li>
+				      </c:forEach>
+		      		</ul>
+	      		</c:if>
 			</td>
 		</tr>
 		<tr>
@@ -52,11 +57,13 @@
 			</td>
 			<td>
 				<input type="password" name="password2" size="20" value="${register.password2}" maxlength="20"> <br>
-				<ul>
-			      <c:forEach var="errormessage" items="${register.errorsPassword2}">
-					<li class="validationerror">${errormessage}</li>
-			      </c:forEach>
-	      		</ul>
+				<c:if test="<%= register.getErrorsPassword2().size() > 0 %>">
+					<ul>
+				      <c:forEach var="errormessage" items="${register.errorsPassword2}">
+						<li class="validationerror">${errormessage}</li>
+				      </c:forEach>
+		      		</ul>
+	      		</c:if>
 			</td>
 		</tr>
 		<tr>

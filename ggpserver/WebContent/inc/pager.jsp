@@ -1,7 +1,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 	<c:if test="${pager.numberOfPages != 1}">
-	<br />
+	<br>
 		<c:forEach var="i" begin="1" end="${pager.numberOfPages}">
 			<c:choose>
 				<c:when test="${i == pager.page}" >

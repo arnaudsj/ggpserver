@@ -122,10 +122,10 @@
 							<c:param name="matchID" value="${match.matchID}" />
 							<c:param name="stepNumber" value="${stepNumber}" />
 						</c:url>
-						<div id="errors"><a href='${errorURL}'><span>errors</span></a></div>
+						<div class="errors"><a href='<c:out value="${errorURL}" />'><span>errors</span></a></div>
 					</c:when>
 					<c:otherwise>
-						<div id="no_errors"></div>
+						<div class="no_errors"></div>
 					</c:otherwise>
 				</c:choose></center>
 				</td>

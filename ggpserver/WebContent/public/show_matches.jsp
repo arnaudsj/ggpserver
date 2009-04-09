@@ -80,10 +80,10 @@
 					<center>
 						<c:choose>
 							<c:when test="${match.hasErrors}">
-								<div id="errors"></div>
+								<div class="errors"></div>
 							</c:when>
 							<c:otherwise>
-								<div id="no_errors"></div>
+								<div class="no_errors"></div>
 							</c:otherwise>
 						</c:choose>
 					</center>

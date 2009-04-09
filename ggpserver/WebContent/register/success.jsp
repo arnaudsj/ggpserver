@@ -15,7 +15,7 @@
 <div id="content">
     <div id="ctitle">Success!</div>
 
-	Registration successful.<br/>
+	Registration successful.<br>
 	
 	Please click <a href="<%= request.getContextPath() %><%= response.encodeURL("/members/profile.jsp") %>">here</a> to log in and edit your profile.
 

@@ -56,12 +56,15 @@
 				Host
 			</td>
 			<td>
-				<input type="text" name="host" size="20" value="${editPlayer.host}" maxlength="255"> <br />
-				<ul>
-			    	<c:forEach var="errormessage" items="${editPlayer.errorsHost}">
-						<li class="validationerror">${errormessage}</li>
-			    	</c:forEach>
-	      		</ul>
+				<input type="text" name="host" size="20" value="${editPlayer.host}" maxlength="255"> <br>
+				<c:if test="<%= editPlayer.getErrorsHost().size() > 0 %>">
+				
+					<ul>
+				    	<c:forEach var="errormessage" items="${editPlayer.errorsHost}">
+							<li class="validationerror">${errormessage}</li>
+				    	</c:forEach>
+		      		</ul>
+				</c:if>
 			</td>
 		</tr>
 		<tr>
@@ -69,12 +72,14 @@
 				Port
 			</td>
 			<td>
-				<input type="text" name="port" size="5" value="${editPlayer.port}" maxlength="5"> <br />
-				<ul>
-			    	<c:forEach var="errormessage" items="${editPlayer.errorsPort}">
-						<li class="validationerror">${errormessage}</li>
-			    	</c:forEach>
-	      		</ul>
+				<input type="text" name="port" size="5" value="${editPlayer.port}" maxlength="5"> <br>
+				<c:if test="<%= editPlayer.getErrorsPort().size() > 0 %>">
+					<ul>
+				    	<c:forEach var="errormessage" items="${editPlayer.errorsPort}">
+							<li class="validationerror">${errormessage}</li>
+				    	</c:forEach>
+		      		</ul>
+				</c:if>
 			</td>
 		</tr>
 		<tr>

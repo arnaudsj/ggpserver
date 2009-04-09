@@ -29,15 +29,9 @@
 		<li><c:out value="${error.message}"></c:out></li>
 	</c:forEach>
 </ul>
-<table>
-	<tbody>
-	</tbody>
-</table>
 
 
-</div>
-<!--end div "content"--> <jsp:directive.include file="/inc/footer.jsp" />
-</div>
-<!-- end div "everything" -->
+</div><!--end div "content"--> <jsp:directive.include file="/inc/footer.jsp" />
+</div><!-- end div "everything" -->
 </body>
 </html>
