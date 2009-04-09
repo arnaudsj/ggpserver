@@ -31,6 +31,14 @@
 			<td><c:out value="${match.matchID}"></c:out></td>
 		</tr>
 		<tr>
+			<td><b>game</b></td>
+			<td>					
+				<c:url value="view_game.jsp" var="gameURL">
+					<c:param name="name" value="${match.game.name}" />
+				</c:url>
+				<a href='<c:out value="${gameURL}" />'>${match.game.name}</a>	
+			</td>
+		<tr>
 			<td><b>status</b></td>
 			<td><c:out value="${match.status}"></c:out></td>
 		</tr>
