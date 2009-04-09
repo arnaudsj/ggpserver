@@ -17,6 +17,11 @@
 	<jsp:directive.include file="/inc/headincludes.jsp" />
 </head>
 <body>
+	<%
+		response.setHeader("Cache-Control","private");
+		response.setHeader("Pragma","no-cache");
+	%>
+	
 <div id="everything">
 <jsp:directive.include file="/inc/header.jsp" />
 <jsp:directive.include file="/inc/navigation.jsp" />

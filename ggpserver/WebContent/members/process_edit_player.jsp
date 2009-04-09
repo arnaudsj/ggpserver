@@ -11,6 +11,11 @@
 	</c:catch>
 </jsp:useBean>
 
+<%
+	response.setHeader("Cache-Control","private");
+	response.setHeader("Pragma","no-cache");
+%>
+	
 
 <c:choose>
 	<c:when test="${!editPlayer.validPlayer}" >
