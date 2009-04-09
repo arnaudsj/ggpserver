@@ -1,4 +1,4 @@
-<%@ page contentType="text/xml" %>
+<%@ page contentType="application/xhtml+xml" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="viewState"
 	class="tud.ggpserver.formhandlers.ViewState" scope="page">
