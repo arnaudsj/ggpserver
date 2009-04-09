@@ -80,11 +80,15 @@
 					<center>
 						<c:choose>
 							<c:when test="${match.hasErrors}">
-								<div class="errors"></div>
+								<c:url value="view_errors.jsp" var="errorURL">
+									<c:param name="matchID" value="${match.matchID}" />
+									<% // <c:param name="stepNumber" value="${stepNumber}" /> %>
+								</c:url>
+								<div class="errors"><a href='<c:out value="${errorURL}" />'><span>errors</span></a></div>
 							</c:when>
 							<c:otherwise>
 								<div class="no_errors"></div>
-							</c:otherwise>
+							</c:otherwise>						
 						</c:choose>
 					</center>
 				</td>

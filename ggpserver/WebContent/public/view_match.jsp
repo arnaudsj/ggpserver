@@ -120,7 +120,7 @@
 					<c:when test="<%= !viewMatch.getErrorMessages().isEmpty() %>">
 						<c:url value="view_errors.jsp" var="errorURL">
 							<c:param name="matchID" value="${match.matchID}" />
-							<c:param name="stepNumber" value="${stepNumber}" />
+							<% // <c:param name="stepNumber" value="${stepNumber}" /> %>
 						</c:url>
 						<div class="errors"><a href='<c:out value="${errorURL}" />'><span>errors</span></a></div>
 					</c:when>
@@ -133,13 +133,6 @@
 		</c:forEach>
 	</tbody>
 </table>
-
-<h1>Tips</h1>
-<ul>
-	<li>click on the warning icon to see the detailed error messages
-	that happened before or during the execution of the corresponding joint
-	move</li>
-</ul>
 
 </div>
 <!--end div "content"--> <jsp:directive.include file="/inc/footer.jsp" />
