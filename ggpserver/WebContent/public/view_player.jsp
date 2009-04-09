@@ -21,13 +21,19 @@
 <jsp:directive.include file="/inc/navigation.jsp" /> <!-- Content -->
 <div id="content">
 <div id="ctitle">View player</div>
+<%
+if (viewPlayer.getPlayer() == null) {
+	response.sendError(404);
+	return;
+}
+%>
 
-<h1 class="notopborder">Information on player ${viewPlayer.name}</h1>
+<h1 class="notopborder">Information on player ${viewPlayer.player.name}</h1>
 <table>
 	<tbody>
 		<tr>
 			<td><b>player name</b></td>
-			<td><c:out value="${viewPlayer.name}"></c:out></td>
+			<td><c:out value="${viewPlayer.player.name}"></c:out></td>
 		</tr>
 		<tr>
 			<td><b>owner</b></td>

@@ -22,12 +22,18 @@
 <div id="content">
 <div id="ctitle">View user</div>
 
-<h1 class="notopborder">Information on user ${viewUser.userName}</h1>
+<%
+if (viewUser.getUser() == null) {
+	response.sendError(404);
+	return;
+}
+%>
+<h1 class="notopborder">Information on user ${viewUser.user.userName}</h1>
 <table>
 	<tbody>
 		<tr>
 			<td><b>user name</b></td>
-			<td><c:out value="${viewUser.userName}"></c:out></td>
+			<td><c:out value="${viewUser.user.userName}"></c:out></td>
 		</tr>
 	</tbody>
 </table>

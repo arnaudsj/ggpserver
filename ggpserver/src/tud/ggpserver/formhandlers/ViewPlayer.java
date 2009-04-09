@@ -12,18 +12,13 @@ import cs227b.teamIago.util.GameState;
 public class ViewPlayer {
 	protected final DBConnector<Term, GameState> db = new DBConnector<Term, GameState>();
 
-	private String name = "";
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
+	private PlayerInfo playerInfo = null;
+	
+	public void setName(String name) throws NamingException, SQLException {
+		playerInfo = db.getPlayerInfo(name);
 	}
 	
 	public PlayerInfo getPlayer() throws NamingException, SQLException {
-		return db.getPlayerInfo(name);
+		return playerInfo;
 	}
-
 }
