@@ -53,7 +53,7 @@ public abstract class AbstractPager {
 		
 	}
 
-	private int getRowCount() throws NamingException, SQLException {
+	protected int getRowCount() throws NamingException, SQLException {
 		return db.getRowCount(getTableName());
 	}
 

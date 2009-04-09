@@ -401,6 +401,32 @@ public class DBConnector<TermType extends TermInterface, ReasonerStateInfoType> 
 		} 
 	}
 	
+	public int getRowCountPlayerMatches(String playerName) throws NamingException, SQLException {
+		Connection con = null;
+
+		try {
+			DataSource ds = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/ggpserver"); 
+			con = ds.getConnection(); 
+
+			PreparedStatement ps = con.prepareStatement("SELECT COUNT( `m`.`match_id` ) "
+					+ "FROM `matches` AS `m`, `match_players` AS `p` " 
+					+ "WHERE `m`.`match_id` = `p`.`match_id` AND `player` = ? ;");
+			ps.setString(1, playerName);
+			ResultSet rs = ps.executeQuery();
+
+			if (rs.next()) {
+				return rs.getInt(1);				
+			} else {
+				throw new SQLException("Something went wrong.");
+			}
+		}
+		finally {
+			if ( con != null ) 
+				try { con.close(); } catch ( SQLException e ) { e.printStackTrace(); } 
+		} 
+	}
+	
+	
 	public List<Game<TermType, ReasonerStateInfoType>> getGames(int startRow, int numDisplayedRows, AbstractReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory) throws NamingException, SQLException {
 		Connection con = null;
 
@@ -553,7 +579,7 @@ public class DBConnector<TermType extends TermInterface, ReasonerStateInfoType> 
 		return result;
 	}
 	
-	public List<Match<TermType, ReasonerStateInfoType>> getMatches(int startRow, int numDisplayedRows, AbstractReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory) throws NamingException, SQLException {
+	public List<Match<TermType, ReasonerStateInfoType>> getMatches(int startRow, int numDisplayedRows, AbstractReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory, String playerName) throws NamingException, SQLException {
 		Connection con = null;
 
 		List<Match<TermType, ReasonerStateInfoType>> result = new LinkedList<Match<TermType, ReasonerStateInfoType>>();
@@ -562,9 +588,20 @@ public class DBConnector<TermType extends TermInterface, ReasonerStateInfoType> 
 			DataSource ds = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/ggpserver"); 
 			con = ds.getConnection(); 
 			
-			PreparedStatement ps = con.prepareStatement("SELECT `match_id` FROM `matches` ORDER BY `start_time` LIMIT ? , ?;");
-			ps.setInt(1, startRow);
-			ps.setInt(2, numDisplayedRows);
+			PreparedStatement ps;
+			if (playerName == null) {
+				ps = con.prepareStatement("SELECT `match_id` FROM `matches` ORDER BY `start_time` LIMIT ? , ?;");
+				ps.setInt(1, startRow);
+				ps.setInt(2, numDisplayedRows);				
+			} else {
+				ps = con.prepareStatement("SELECT `m`.`match_id` "
+					+ "FROM `matches` AS `m`, `match_players` AS `p` " 
+					+ "WHERE `m`.`match_id` = `p`.`match_id` AND `player` = ? " 
+					+ "ORDER BY `start_time` LIMIT ? , ?;");
+				ps.setString(1, playerName);
+				ps.setInt(2, startRow);
+				ps.setInt(3, numDisplayedRows);			
+			}
 			ResultSet rs = ps.executeQuery();
 			
 			while (rs.next()) {
@@ -843,6 +880,7 @@ public class DBConnector<TermType extends TermInterface, ReasonerStateInfoType> 
 				try { con.close(); } catch ( SQLException e ) { e.printStackTrace(); } 
 		} 
 	}
+
 
 
 

@@ -47,7 +47,15 @@ if (viewPlayer.getPlayer() == null) {
 			<td><b>status</b></td>
 			<td><c:out value="${viewPlayer.player.status}"></c:out></td>
 		</tr>
-
+		<tr>
+			<td><b>matches</b></td>
+			<td>
+				<c:url value="show_matches.jsp" var="playerURL">
+					<c:param name="playerName" value="${viewPlayer.player.name}" />
+				</c:url>
+				<a href='<c:out value="${playerURL}" />'>show matches</a>
+			</td>
+		</tr>
 	</tbody>
 </table>
 

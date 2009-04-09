@@ -4,6 +4,7 @@
 <jsp:useBean id="pager" class="tud.ggpserver.formhandlers.ShowMatches" scope="page">
 	<c:catch> <% // this is for catching NumberFormatExceptions and the like %>
 		<jsp:setProperty name="pager" property="page"/>
+		<jsp:setProperty name="pager" property="playerName"/>
 	</c:catch>
 </jsp:useBean>
 
