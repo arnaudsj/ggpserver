@@ -49,7 +49,7 @@ public abstract class AbstractPager {
 	}
 
 	public int getNumberOfPages() throws NamingException, SQLException {
-		return (int) Math.ceil(getRowCount() / numDisplayedRows) + 1;
+		return (getRowCount() - 1) / numDisplayedRows + 1;
 		
 	}
 
