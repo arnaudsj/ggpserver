@@ -301,7 +301,7 @@ public class DBConnector<TermType extends TermInterface, ReasonerStateInfoType> 
 			String firstPart = "Match." + game.getName();
 			String secondPart = "." + Long.toString(number);
 			if (firstPart.length() + secondPart.length() > MATCHID_MAXLENGTH) {
-				secondPart = secondPart.substring(0, MATCHID_MAXLENGTH - secondPart.length() - 2) + "..";
+				firstPart = firstPart.substring(0, MATCHID_MAXLENGTH - secondPart.length() - 2) + "..";
 			}
 			String matchID = firstPart + secondPart;
 			try {

@@ -214,7 +214,7 @@ INSERT INTO `games` (`name`, `gamedescription`) VALUES
 DROP TABLE IF EXISTS `matches`;
 CREATE TABLE IF NOT EXISTS `matches` (
   `match_id` varchar(40) NOT NULL,
-  `game` varchar(20) NOT NULL,
+  `game` varchar(40) NOT NULL,
   `start_clock` int(11) NOT NULL,
   `play_clock` int(11) NOT NULL,
   `start_time` timestamp NOT NULL default CURRENT_TIMESTAMP,
