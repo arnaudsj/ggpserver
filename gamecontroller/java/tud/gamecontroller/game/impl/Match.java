@@ -103,4 +103,32 @@ public class Match<
 	public Player<TermType> getPlayer(RoleInterface<TermType> role) {
 		return players.get(role);
 	}
+
+	@Override
+	public int hashCode() {
+		final int PRIME = 31;
+		int result = 1;
+		result = PRIME * result + ((matchID == null) ? 0 : matchID.hashCode());
+		return result;
+	}
+
+	/**
+	 * Two matches are considered equal iff their matchID is equal (i.e., matchID is a unique identifier).
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final Match other = (Match) obj;
+		if (matchID == null) {
+			if (other.matchID != null)
+				return false;
+		} else if (!matchID.equals(other.matchID))
+			return false;
+		return true;
+	}
 }
