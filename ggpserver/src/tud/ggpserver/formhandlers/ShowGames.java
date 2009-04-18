@@ -5,13 +5,12 @@ import java.util.List;
 
 import javax.naming.NamingException;
 
-import tud.gamecontroller.game.javaprover.Term;
-import tud.ggpserver.datamodel.Game;
-import cs227b.teamIago.util.GameState;
+import tud.gamecontroller.game.impl.Game;
 
 public class ShowGames extends AbstractPager {
-	public List<Game<Term, GameState>> getGames() throws NamingException, SQLException {
-		return db.getGames(startRow, numDisplayedRows, getReasonerFactory());
+	@SuppressWarnings("unchecked")
+	public List<Game> getGames() throws NamingException, SQLException {
+		return db.getGames(startRow, numDisplayedRows);
 	}
 
 	@Override

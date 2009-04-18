@@ -1,12 +1,11 @@
 package tud.ggpserver.datamodel;
 
-import tud.ggpserver.util.HashCodeUtil;
 
 public class User {
 	private final String userName;
 	
 	/**
-	 * Use DBConnector.getUser() instead
+	 * Use AbstractDBConnector.getUser() instead
 	 */
 	protected User(String userName) {
 		this.userName = userName;
@@ -17,17 +16,27 @@ public class User {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof User) {
-			User other = (User) obj;
-			return other.getUserName().equals(userName);
-		} else {
-			return false;
-		}
+	public int hashCode() {
+		final int PRIME = 31;
+		int result = 1;
+		result = PRIME * result + ((userName == null) ? 0 : userName.hashCode());
+		return result;
 	}
 
 	@Override
-	public int hashCode() {
-		return HashCodeUtil.hash(HashCodeUtil.SEED, userName);
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final User other = (User) obj;
+		if (userName == null) {
+			if (other.userName != null)
+				return false;
+		} else if (!userName.equals(other.userName))
+			return false;
+		return true;
 	}
 }

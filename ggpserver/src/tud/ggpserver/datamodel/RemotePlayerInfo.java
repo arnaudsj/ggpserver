@@ -1,7 +1,5 @@
 package tud.ggpserver.datamodel;
 
-import tud.ggpserver.util.HashCodeUtil;
-
 
 public class RemotePlayerInfo extends tud.gamecontroller.players.RemotePlayerInfo {
 	public final static String STATUS_ACTIVE = "active";
@@ -19,7 +17,7 @@ public class RemotePlayerInfo extends tud.gamecontroller.players.RemotePlayerInf
 //	}
 	
 	/**
-	 * Use DBConnector.getRemotePlayerInfo() instead
+	 * Use AbstractDBConnector.getRemotePlayerInfo() instead
 	 */
 	protected RemotePlayerInfo(int roleindex, String name, String host, int port, User owner, String status) {
 		super(roleindex, name, host, port);
@@ -28,7 +26,7 @@ public class RemotePlayerInfo extends tud.gamecontroller.players.RemotePlayerInf
 	}
 
 	/**
-	 * Use DBConnector.getRemotePlayerInfo() instead
+	 * Use AbstractDBConnector.getRemotePlayerInfo() instead
 	 */
 	protected RemotePlayerInfo(String name, String host, int port, User owner, String status) {
 		super(-1, name, host, port);
@@ -40,25 +38,6 @@ public class RemotePlayerInfo extends tud.gamecontroller.players.RemotePlayerInf
 		return owner;
 	}
 
-	/**
-	 * For now, two RemotePlayerInfos are considered equal if they have the same
-	 * name. This makes sense, since the name is also used as primary key in the
-	 * MySQL database.
-	 */
-	@Override
-	public boolean equals(Object obj) {		
-		if (obj instanceof RemotePlayerInfo) {
-			RemotePlayerInfo other = (RemotePlayerInfo) obj;
-			return other.getName().equals(getName());
-		} else {
-			return false;
-		}
-	}
-
-	@Override
-	public int hashCode() {		 
-		 return HashCodeUtil.hash(HashCodeUtil.SEED, getName());	
-	}
 
 	public String getStatus() {
 		return status;

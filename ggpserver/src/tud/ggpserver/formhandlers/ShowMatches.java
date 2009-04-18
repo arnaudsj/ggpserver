@@ -5,17 +5,16 @@ import java.util.List;
 
 import javax.naming.NamingException;
 
-import tud.gamecontroller.game.javaprover.Term;
 import tud.ggpserver.datamodel.Match;
-import cs227b.teamIago.util.GameState;
 
 public class ShowMatches extends AbstractPager {
 	private String playerName = null;
-	private List<Match<Term, GameState>> matches = null;
+	private List<Match> matches = null;
 	
-	public List<Match<Term, GameState>> getMatches() throws NamingException, SQLException {
+	@SuppressWarnings("unchecked")
+	public List<Match> getMatches() throws NamingException, SQLException {
 		if (matches == null) {
-			matches = db.getMatches(startRow, numDisplayedRows, getReasonerFactory(), playerName);
+			matches = db.getMatches(startRow, numDisplayedRows, playerName);
 		}
 		return matches;
 	}

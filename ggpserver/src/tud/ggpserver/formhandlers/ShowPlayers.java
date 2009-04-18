@@ -8,6 +8,7 @@ import javax.naming.NamingException;
 import tud.gamecontroller.players.PlayerInfo;
 
 public class ShowPlayers extends AbstractPager {
+	@SuppressWarnings("unchecked")
 	public List<PlayerInfo> getPlayers() throws NamingException, SQLException {
 		return db.getPlayerInfos(startRow, numDisplayedRows);
 	}

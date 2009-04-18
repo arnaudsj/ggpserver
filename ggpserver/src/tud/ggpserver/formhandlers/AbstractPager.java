@@ -4,17 +4,14 @@ import java.sql.SQLException;
 
 import javax.naming.NamingException;
 
-import tud.gamecontroller.game.javaprover.Term;
-import tud.ggpserver.AbstractReasonerFactory;
-import tud.ggpserver.JavaProverReasonerFactory;
-import tud.ggpserver.datamodel.DBConnector;
-import cs227b.teamIago.util.GameState;
+import tud.ggpserver.datamodel.AbstractDBConnector;
+import tud.ggpserver.datamodel.DBConnectorFactory;
 
 public abstract class AbstractPager {
 
 	protected int startRow = 0;
 	protected int numDisplayedRows = 30;
-	protected final DBConnector<Term, GameState> db = new DBConnector<Term, GameState>();
+	protected final static AbstractDBConnector db = DBConnectorFactory.getDBConnector();
 
 	public AbstractPager() {
 		super();
@@ -76,8 +73,4 @@ public abstract class AbstractPager {
 	public abstract String getTargetJsp();
 
 	protected abstract String getTableName();
-	
-	protected AbstractReasonerFactory<Term, GameState> getReasonerFactory() {
-		return JavaProverReasonerFactory.getInstance();
-	}
 }

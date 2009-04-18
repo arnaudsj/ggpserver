@@ -5,15 +5,14 @@ import java.util.List;
 
 import javax.naming.NamingException;
 
-import tud.gamecontroller.game.javaprover.Term;
-import tud.ggpserver.datamodel.DBConnector;
-import cs227b.teamIago.util.GameState;
+import tud.ggpserver.datamodel.AbstractDBConnector;
+import tud.ggpserver.datamodel.DBConnectorFactory;
 
 public class ViewState {
 	private String matchID;
 	private int stepNumber = -1;
 	
-	private DBConnector<Term, GameState> db = new DBConnector<Term, GameState>();
+	private final static AbstractDBConnector db = DBConnectorFactory.getDBConnector();
 
 
 	public void setMatchID(String matchID) {
@@ -24,8 +23,9 @@ public class ViewState {
 		this.stepNumber = stepNumber;
 	}
 
+	@SuppressWarnings("unchecked")
 	public String getXmlState() throws SQLException, NamingException {
-		List<String> states = db.getStates(matchID);
+		List<String> states = db.getMatch(matchID).getXmlStates();
 		
 		int stepNumber;
 		if (this.stepNumber < 1 || this.stepNumber > states.size()) {

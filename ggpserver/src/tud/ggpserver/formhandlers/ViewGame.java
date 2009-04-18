@@ -4,15 +4,13 @@ import java.sql.SQLException;
 
 import javax.naming.NamingException;
 
-import tud.gamecontroller.game.javaprover.Term;
-import tud.ggpserver.JavaProverReasonerFactory;
-import tud.ggpserver.datamodel.DBConnector;
-import tud.ggpserver.datamodel.Game;
+import tud.gamecontroller.game.impl.Game;
+import tud.ggpserver.datamodel.AbstractDBConnector;
+import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.util.KIFSyntaxFormatter;
-import cs227b.teamIago.util.GameState;
 
 public class ViewGame {
-	protected final DBConnector<Term, GameState> db = new DBConnector<Term, GameState>();
+	private final static AbstractDBConnector db = DBConnectorFactory.getDBConnector();
 
 	private String name = "";
 
@@ -24,8 +22,8 @@ public class ViewGame {
 		this.name = name;
 	}
 	
-	public Game<Term, GameState> getGame() throws NamingException, SQLException {
-		return db.getGame(name, JavaProverReasonerFactory.getInstance());
+	public Game getGame() throws NamingException, SQLException {
+		return db.getGame(name);
 	}
 	
 	public String getGameDescription() throws NamingException, SQLException {

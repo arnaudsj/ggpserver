@@ -1,5 +1,7 @@
 package tud.ggpserver.scheduler;
 
+import static tud.ggpserver.datamodel.DBConnectorFactory.getDBConnector;
+
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Date;
@@ -13,29 +15,31 @@ import javax.naming.NamingException;
 
 import tud.gamecontroller.GameController;
 import tud.gamecontroller.game.RoleInterface;
+import tud.gamecontroller.game.impl.Game;
 import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.players.RandomPlayerInfo;
 import tud.gamecontroller.term.TermInterface;
-import tud.ggpserver.AbstractReasonerFactory;
-import tud.ggpserver.datamodel.DBConnector;
-import tud.ggpserver.datamodel.Game;
 import tud.ggpserver.datamodel.Match;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
 
 public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface, ReasonerStateInfoType> {
+	/**
+	 * Logger for this class
+	 */
+	private static final Logger logger = Logger.getLogger(AbstractRoundRobinScheduler.class.getName());
+
 	private static final long DELAY_BETWEEN_GAMES = 2000;   // wait two seconds
 	private Thread gameThread;
 	private boolean running = false;
 	private Game<TermType, ReasonerStateInfoType> currentGame;
 	private Match<TermType, ReasonerStateInfoType> currentMatch;
 	
+	
 
 	public AbstractRoundRobinScheduler() {
 		Logger.getLogger("tud.gamecontroller").addHandler(new LoggingHandler(this));
 	}
-
-	protected abstract DBConnector<TermType, ReasonerStateInfoType> getDBConnector();
 
 	public void start() {
 		if (!running) {
@@ -50,9 +54,9 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 							currentMatch.updateErrorMessage(new GameControllerErrorMessage(GameControllerErrorMessage.ABORTED, "The match was aborted."));
 						}
 					} catch (NamingException e) {
-						e.printStackTrace();
+						logger.severe("exception: " + e); //$NON-NLS-1$
 					} catch (SQLException e) {
-						e.printStackTrace();
+						logger.severe("exception: " + e); //$NON-NLS-1$
 					}
 					setRunning(false);
 				}
@@ -73,8 +77,9 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private Match<TermType, ReasonerStateInfoType> createMatch() throws NamingException, SQLException {
-		List<Game<TermType, ReasonerStateInfoType>> allGames = getDBConnector().getAllGames(getReasonerFactory()); // TODO: this takes a looooong time!
+		List<Game<TermType, ReasonerStateInfoType>> allGames = getDBConnector().getAllGames();
 		
 		if (currentGame == null) {
 			currentGame = allGames.get(0);
@@ -86,9 +91,10 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		Map<RoleInterface<TermType>, PlayerInfo> playerinfos = createPlayerInfos(currentGame);
 		GameProperties props = GameProperties.getInstance(currentGame.getName());
 		
-		return getDBConnector().createMatch(currentGame, props.getStartClock(), props.getPlayClock(), playerinfos, new Date(), getReasonerFactory());
+		return getDBConnector().createMatch(currentGame, props.getStartClock(), props.getPlayClock(), playerinfos, new Date());
 	}
 	
+	@SuppressWarnings("unchecked")
 	private Map<RoleInterface<TermType>, PlayerInfo> createPlayerInfos(Game<TermType, ReasonerStateInfoType> game) throws NamingException, SQLException {
 		// copy players and shuffle
 		List<PlayerInfo> playerInfos = new LinkedList<PlayerInfo>(getDBConnector().getPlayerInfos(RemotePlayerInfo.STATUS_ACTIVE));
@@ -139,8 +145,6 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 	private void setRunning(boolean running) {
 		this.running = running;
 	}
-
-	protected abstract AbstractReasonerFactory<TermType, ReasonerStateInfoType> getReasonerFactory();
 
 	protected Match<TermType, ReasonerStateInfoType> getCurrentMatch() {
 		return currentMatch;

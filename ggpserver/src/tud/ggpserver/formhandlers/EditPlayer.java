@@ -6,14 +6,13 @@ import java.util.List;
 
 import javax.naming.NamingException;
 
-import tud.gamecontroller.game.javaprover.Term;
-import tud.ggpserver.datamodel.DBConnector;
+import tud.ggpserver.datamodel.AbstractDBConnector;
+import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
 import tud.ggpserver.datamodel.User;
-import cs227b.teamIago.util.GameState;
 
 public class EditPlayer {
-	private DBConnector<Term, GameState> db = new DBConnector<Term, GameState>();
+	private final static AbstractDBConnector db = DBConnectorFactory.getDBConnector();
 	private boolean correctlyUpdated = false;
 
 	private User user = null;

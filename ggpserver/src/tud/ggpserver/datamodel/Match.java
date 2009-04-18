@@ -7,8 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import javax.naming.NamingException;
+import java.util.logging.Logger;
 
 import tud.gamecontroller.GameControllerListener;
 import tud.gamecontroller.XMLGameStateWriter;
@@ -26,10 +25,14 @@ import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.scrambling.GameScramblerInterface;
 import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.scheduler.GameProperties;
-import tud.ggpserver.util.HashCodeUtil;
 
 public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 		extends tud.gamecontroller.game.impl.Match<TermType, ReasonerStateInfoType> implements GameControllerListener {
+	/**
+	 * Logger for this class
+	 */
+	private static final Logger logger = Logger.getLogger(Match.class.getName());
+
 	public static final String STATUS_NEW = "new";
 	public static final String STATUS_RUNNING = "running";
 	public static final String STATUS_FINISHED = "finished";
@@ -56,7 +59,7 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 	 * This list always has one less element than the states list.
 	 */
 	private List<JointMoveInterface<? extends TermInterface>> jointMoves = new LinkedList<JointMoveInterface<? extends TermInterface>>();   // all joint moves executed so far
-	private List<List<String>> jointMovesStrings = new LinkedList<List<String>>();   // this is an ugly hack because it's so hard to generate the correct sort of "real" joint moves from inside the DBConnector
+	private List<List<String>> jointMovesStrings = new LinkedList<List<String>>();   // this is an ugly hack because it's so hard to generate the correct sort of "real" joint moves from inside the AbstractDBConnector
 	
 	/**
 	 * - errors from the start message and first play message go to index 0
@@ -70,10 +73,10 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 	 */
 	private List<List<GameControllerErrorMessage>> errorMessages = new LinkedList<List<GameControllerErrorMessage>>();
 	
-	private DBConnector<TermInterface, ReasonerStateInfoType> db = new DBConnector<TermInterface, ReasonerStateInfoType>();
+	private final AbstractDBConnector<TermType, ReasonerStateInfoType> db;
 	
 	/**
-	 * Use DBConnector.getMatch() instead
+	 * Use AbstractDBConnector.getMatch() instead
 	 */
 	protected Match(
 			String matchID,
@@ -83,13 +86,15 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 			Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> playerinfos,
 			Date startTime,
 			MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory,
-			GameScramblerInterface gamescrambler) {
+			GameScramblerInterface gamescrambler,
+			AbstractDBConnector<TermType, ReasonerStateInfoType> db) {
 		super(matchID, game, startclock, playclock, null);
 		this.playerInfos = playerinfos;
 		this.startTime = startTime;
 		this.moveFactory = movefactory;
 		this.gameScrambler = gamescrambler;
 		this.stylesheet = GameProperties.getInstance(game.getName()).getStylesheet();
+		this.db = db;
 	}
 
 	@Override
@@ -134,7 +139,7 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 	}
 
 	public Date getStartTime() {
-		return startTime;
+		return new Date(startTime.getTime());
 	}
 
 	/**
@@ -197,9 +202,7 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 			db.setMatchStatus(this, status);
 			setStatus(status);
 		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (NamingException e) {
-			e.printStackTrace();
+			logger.severe("String - exception: " + e); //$NON-NLS-1$
 		}
 	}
 
@@ -212,9 +215,7 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 			db.setMatchGoalValues(this, goalValues);
 			setGoalValues(goalValues);
 		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (NamingException e) {
-			e.printStackTrace();
+			logger.severe("Map<? extends RoleInterface<?>,Integer> - exception: " + e); //$NON-NLS-1$
 		}
 	}
 
@@ -255,9 +256,7 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 		try {
 			db.addErrorMessage(getMatchID(), stepNumber, errorMessage);
 		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (NamingException e) {
-			e.printStackTrace();
+			logger.severe("GameControllerErrorMessage - exception: " + e); //$NON-NLS-1$
 		}
 	}
 
@@ -278,11 +277,9 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 		try {
 			db.addJointMove(getMatchID(), stepNumber, jointMove);
 		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (NamingException e) {
-			e.printStackTrace();
+			logger.severe("JointMoveInterface<? extends TermInterface> - exception: " + e); //$NON-NLS-1$
 		} catch (DuplicateInstanceException e) {
-			e.printStackTrace();
+			logger.severe("JointMoveInterface<? extends TermInterface> - exception: " + e); //$NON-NLS-1$
 		}
 	}
 	
@@ -303,27 +300,10 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 		try {
 			db.addState(getMatchID(), stepNumber, xmlState);
 		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (NamingException e) {
-			e.printStackTrace();
+			logger.severe("StateInterface<? extends TermInterface,?>, Map<? extends RoleInterface<?>,Integer> - exception: " + e); //$NON-NLS-1$
 		} catch (DuplicateInstanceException e) {
-			e.printStackTrace();
+			logger.severe("StateInterface<? extends TermInterface,?>, Map<? extends RoleInterface<?>,Integer> - exception: " + e); //$NON-NLS-1$
 		}
-	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof Match) {
-			Match other = (Match) obj;
-			return other.getMatchID().equals(getMatchID());
-		} else {
-			return false;
-		}
-	}
-
-	@Override
-	public int hashCode() {
-		return HashCodeUtil.hash(HashCodeUtil.SEED, getMatchID());
 	}
 
 	public List<List<String>> getJointMovesStrings() {

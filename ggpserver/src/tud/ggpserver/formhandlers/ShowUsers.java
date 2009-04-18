@@ -9,6 +9,7 @@ import tud.ggpserver.datamodel.User;
 
 
 public class ShowUsers extends AbstractPager {
+	@SuppressWarnings("unchecked")
 	public List<User> getUsers() throws NamingException, SQLException {
 		return db.getUsers(startRow, numDisplayedRows);
 	}

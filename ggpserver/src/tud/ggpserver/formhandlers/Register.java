@@ -6,10 +6,9 @@ import java.util.List;
 
 import javax.naming.NamingException;
 
-import tud.gamecontroller.game.javaprover.Term;
-import tud.ggpserver.datamodel.DBConnector;
+import tud.ggpserver.datamodel.AbstractDBConnector;
+import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.DuplicateInstanceException;
-import cs227b.teamIago.util.GameState;
 
 public class Register {
 //	private Hashtable<String, String> errors = new Hashtable<String, String>();
@@ -23,7 +22,7 @@ public class Register {
 	
 	private boolean correctlyCreated = false;
 	
-	private DBConnector<Term, GameState> db = new DBConnector<Term, GameState>(); 
+	private final static AbstractDBConnector db = DBConnectorFactory.getDBConnector();
 
 	public String getPassword1() {
 		return password1;

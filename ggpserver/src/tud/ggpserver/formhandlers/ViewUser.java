@@ -4,14 +4,13 @@ import java.sql.SQLException;
 
 import javax.naming.NamingException;
 
-import cs227b.teamIago.util.GameState;
-import tud.gamecontroller.game.javaprover.Term;
-import tud.ggpserver.datamodel.DBConnector;
+import tud.ggpserver.datamodel.AbstractDBConnector;
+import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.User;
 
 
 public class ViewUser {
-	private DBConnector<Term, GameState> db = new DBConnector<Term, GameState>();
+	private final static AbstractDBConnector db = DBConnectorFactory.getDBConnector();
 
 	private User user = null;
 
