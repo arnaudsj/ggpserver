@@ -21,7 +21,17 @@ permission java.net.SocketPermission "*", "connect,resolve";  // required for da
 permission java.util.PropertyPermission "file.encoding", "read";
 permission java.util.PropertyPermission "org.apache.jasper.runtime.BodyContentImpl.LIMIT_BUFFER", "read";
 permission java.util.logging.LoggingPermission "control";
+permission java.io.FilePermission "${catalina.base}${file.separator}webapps${file.separator}ggpserver${file.separator}WEB-INF${file.separator}classes${file.separator}logging.properties", "read";
+
+========================================================================================
+
+Edit the file /etc/default/tomcat5.5 to give Tomcat more memory, like this:
+
+JAVA_OPTS="-Djava.awt.headless=true -Xmx256M"
+
+The more, the better. Most memory is needed for the games. 128MB should be okay for now, but you never know...
 
 ========================================================================================
 
 After starting the web application, log in as user "admin", password "admin" and start the round robin scheduler.
+
