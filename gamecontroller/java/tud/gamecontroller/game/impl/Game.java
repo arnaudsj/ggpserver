@@ -37,12 +37,18 @@ public class Game<
 	private ReasonerInterface<TermType, ReasonerStateInfoType> reasoner;
 	private String name;
 	private List<RoleInterface<TermType>> orderedRoles=null;
+	private String stylesheet = null;  // this can remain null (no stylesheet will be used)
 		
 	public Game(String gameDescription, String name, ReasonerInterface<TermType, ReasonerStateInfoType> reasoner) {
 		this.name=name;
 		this.reasoner=reasoner;
 	}
 
+	public Game(String gameDescription, String name, ReasonerInterface<TermType, ReasonerStateInfoType> reasoner, String stylesheet) {
+		this(gameDescription, name, reasoner);
+		this.stylesheet = stylesheet;
+	}
+	
 	public State<TermType, ReasonerStateInfoType> getInitialState() {
 		return new State<TermType,ReasonerStateInfoType>(reasoner, reasoner.getInitialState());
 	}
@@ -99,5 +105,9 @@ public class Game<
 		} else if (!name.equals(other.name))
 			return false;
 		return true;
+	}
+
+	public String getStylesheet() {
+		return stylesheet ;
 	}
 }
