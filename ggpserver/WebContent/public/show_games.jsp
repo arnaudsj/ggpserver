@@ -27,6 +27,7 @@
 			<tr>
 				<th>name</th>
 				<th>number of players</th>
+				<th>stylesheet</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -46,7 +47,8 @@
 					</c:url>
 					<a href='<c:out value="${gameURL}" />'>${game.name}</a>				
 				</td>
-				<td>${game.numberOfRoles}</td>
+				<td><c:out value="${game.numberOfRoles}"></c:out></td>
+				<td><c:out value="${game.stylesheet}"></c:out></td>
 			</tr>
 	      </c:forEach>
 		</tbody>

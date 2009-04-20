@@ -201,15 +201,16 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	}
 
 	public Game<TermType, ReasonerStateInfoType> createGame(String gameDescription,
-			String name) throws DuplicateInstanceException,
+			String name, String stylesheet) throws DuplicateInstanceException,
 			SQLException {
 		
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		try {
-			ps = con.prepareStatement("INSERT INTO `games` (`name` , `gamedescription`) VALUES (?, ?);");
+			ps = con.prepareStatement("INSERT INTO `games` (`name` , `gamedescription` , `stylesheet`) VALUES (?, ?, ?);");
 			ps.setString(1, name);
 			ps.setString(2, gameDescription);
+			ps.setString(3, stylesheet);
 			
 			ps.executeUpdate();
 		} catch (MySQLIntegrityConstraintViolationException e) {
@@ -222,11 +223,8 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				try {ps.close();} catch (SQLException e) {}
 		} 
 
-
-
-
 		logger.info("String, String - Creating new game: " + name); //$NON-NLS-1$
-		return new Game<TermType, ReasonerStateInfoType>(gameDescription, name, getReasoner(gameDescription, name));
+		return new Game<TermType, ReasonerStateInfoType>(gameDescription, name, getReasoner(gameDescription, name), stylesheet);
 	}
 
 	public Game<TermType, ReasonerStateInfoType> getGame(String name) throws SQLException {
@@ -237,15 +235,16 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		Game<TermType,ReasonerStateInfoType> result = null;
 		
 		try { 
-			
-			ps = con.prepareStatement("SELECT `gamedescription` FROM `games` WHERE `name` = ?;");
+			ps = con.prepareStatement("SELECT `gamedescription` , `stylesheet` FROM `games` WHERE `name` = ?;");
 			ps.setString(1, name);
 			rs = ps.executeQuery();
 			
 			if (rs.next()) {
 				String gameDescription = rs.getString("gamedescription");
+				String stylesheet = rs.getString("stylesheet");
+				
 				logger.info("String - Returning new game: " + name); //$NON-NLS-1$
-				result = new Game<TermType, ReasonerStateInfoType>(gameDescription , name, getReasoner(gameDescription, name));
+				result = new Game<TermType, ReasonerStateInfoType>(gameDescription , name, getReasoner(gameDescription, name), stylesheet);
 				
 			} else {
 				result = null;

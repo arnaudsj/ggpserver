@@ -26,11 +26,11 @@ public class CreatePlayer {
 		if (playerName.equals("")) {
 			errors.add("player name must not be empty");
 		}
-		if (playerName.equals("Legal")) {
+		if (playerName.equalsIgnoreCase("Legal")) {
 			errors.add("player name can not be \"Legal\"");
 		}
-		if (playerName.equals("Random")) {
-			errors.add("player name can not be \"Legal\"");
+		if (playerName.equalsIgnoreCase("Random")) {
+			errors.add("player name can not be \"Random\"");
 		}
 		if (playerName.length() > 20) {
 			errors.add("player name must not be longer than 20 characters");

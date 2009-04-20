@@ -1,5 +1,7 @@
 package tud.ggpserver.formhandlers;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,6 +49,31 @@ public class EditPlayer {
 		if (!host.matches( "[a-zA-Z0-9._-]*" )) {
 			errorsHost.add("host must only contain the following characters: a-z A-Z 0-9 . _ -");
 			// underscore not actually legal following RFC 952 and RFC 1123, but widely used
+		}
+		
+		try {
+			InetAddress hostAddress = InetAddress.getByName(host);
+			if (hostAddress.isSiteLocalAddress()) {
+				// 10.0.0.0    - 10.255.255.255  (10/8 prefix)
+				// 172.16.0.0  - 172.31.255.255  (172.16/12 prefix)
+				// 192.168.0.0 - 192.168.255.255 (192.168/16 prefix)
+				errorsHost.add("private ip addresses not allowed for security reasons");
+			} else if (hostAddress.isAnyLocalAddress()) {
+				// 0.0.0.0
+				errorsHost.add("wildcard ip address not allowed for security reasons");
+			} else if (hostAddress.isLinkLocalAddress()) {
+				// 169.254.0.0 - 169.254.255.255 (169.254/16 prefix)
+				errorsHost.add("link-local ip addresses not allowed for security reasons");
+			} else if (hostAddress.isLoopbackAddress()) {
+				// 127.0.0.0 - 127.255.255.255 (127/8 prefix)
+				// e.g. 127.0.0.1, "localhost", "thales" (when run on host thales)
+				errorsHost.add("loopback ip addresses not allowed for security reasons");
+			} else if (hostAddress.isMulticastAddress()) {
+				// 224.0.0.0 - 239.255.255.255
+				errorsHost.add("multicast ip addresses not allowed for security reasons");
+			}
+		} catch (UnknownHostException e) {
+			errorsHost.add("DNS error, unknown host: the IP address of this host could not be determined");
 		}
 		
 		if (port < 0 || port > 65535) {

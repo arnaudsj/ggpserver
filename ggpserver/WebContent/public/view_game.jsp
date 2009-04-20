@@ -33,6 +33,10 @@
 			<td><b>number of roles</b></td>
 			<td><c:out value="${viewGame.game.numberOfRoles}"></c:out></td>
 		</tr>
+		<tr>
+			<td><b>stylesheet</b></td>
+			<td><c:out value="${viewGame.game.stylesheet}"></c:out></td>
+		</tr>
 	</tbody>
 </table>
 

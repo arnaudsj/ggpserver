@@ -24,7 +24,6 @@ import tud.gamecontroller.players.PlayerFactory;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.scrambling.GameScramblerInterface;
 import tud.gamecontroller.term.TermInterface;
-import tud.ggpserver.scheduler.GameProperties;
 
 public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 		extends tud.gamecontroller.game.impl.Match<TermType, ReasonerStateInfoType> implements GameControllerListener {
@@ -47,7 +46,6 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 	private String status = STATUS_NEW;
 	private Map<? extends RoleInterface<?>, Integer> goalValues;
 	private List<Integer> orderedGoalValues;
-	private String stylesheet = null;   // this can remain null (no stylesheet will be used)
 	
 	/**
 	 * State 0 = initial state, State 1 = state after first joint move, ..., State n = final state
@@ -93,7 +91,6 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 		this.startTime = startTime;
 		this.moveFactory = movefactory;
 		this.gameScrambler = gamescrambler;
-		this.stylesheet = GameProperties.getInstance(game.getName()).getStylesheet();
 		this.db = db;
 	}
 
@@ -292,7 +289,7 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 	}
 	
 	protected void updateXmlState(StateInterface<? extends TermInterface, ?> currentState, Map<? extends RoleInterface<?>, Integer> goalValues) {
-		String xmlState = XMLGameStateWriter.createXMLOutputStream(this, currentState, jointMoves, goalValues, stylesheet).toString();
+		String xmlState = XMLGameStateWriter.createXMLOutputStream(this, currentState, jointMoves, goalValues, game.getStylesheet()).toString();
 		xmlStates.add(xmlState);
 		
 		int stepNumber = xmlStates.size();

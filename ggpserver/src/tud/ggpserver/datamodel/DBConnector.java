@@ -1,11 +1,15 @@
 package tud.ggpserver.datamodel;
 
+import static org.apache.commons.collections.map.AbstractReferenceMap.SOFT;
+import static org.apache.commons.collections.map.AbstractReferenceMap.WEAK;
+
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.naming.NamingException;
+
+import org.apache.commons.collections.map.ReferenceMap;
 
 import tud.gamecontroller.game.MoveFactoryInterface;
 import tud.gamecontroller.game.ReasonerInterface;
@@ -21,6 +25,15 @@ import cs227b.teamIago.util.GameState;
 
 public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	private static DBConnector instance;
+	
+//	private static Map<String, Game<Term, GameState>> games = new HashMap<String, Game<Term, GameState>>();
+//	private static Map<String, Match<Term, GameState>> matches = new HashMap<String, Match<Term,GameState>>();
+//	private static Map<String, PlayerInfo> playerInfos = new HashMap<String, PlayerInfo>();
+//	private static Map<String, User> users = new HashMap<String, User>();
+	private static Map<String, Game<Term, GameState>> games = new ReferenceMap(WEAK, SOFT, false);
+	private static Map<String, Match<Term, GameState>> matches = new ReferenceMap(WEAK, SOFT, false);
+	private static Map<String, PlayerInfo> playerInfos = new ReferenceMap(WEAK, SOFT, false);
+	private static Map<String, User> users = new ReferenceMap(WEAK, SOFT, false);
 
 	private DBConnector() {
 		super();
@@ -45,12 +58,10 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	}
 
 	/////////////////// GAME ///////////////////
-	private static Map<String, Game<Term, GameState>> games = new HashMap<String, Game<Term, GameState>>();
-
 	@Override
-	public Game<Term, GameState> createGame(String gameDescription, String name)
+	public Game<Term, GameState> createGame(String gameDescription, String name, String stylesheet)
 			throws DuplicateInstanceException, SQLException {
-		Game<Term, GameState> result = super.createGame(gameDescription, name);
+		Game<Term, GameState> result = super.createGame(gameDescription, name, stylesheet);
 		games.put(name, result);
 		return result;
 	}
@@ -69,8 +80,6 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	}
 
 	/////////////////// MATCH ///////////////////
-	private static Map<String, Match<Term, GameState>> matches = new HashMap<String, Match<Term,GameState>>();
-	
 	@Override
 	public Match<Term, GameState> createMatch(
 			String matchID,
@@ -101,8 +110,6 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	}
 
 	/////////////////// PLAYERINFO ///////////////////
-	private static Map<String, PlayerInfo> playerInfos = new HashMap<String, PlayerInfo>();
-
 	@Override
 	public RemotePlayerInfo createPlayerInfo(String name, String host,
 			int port, User owner, String status) throws NamingException,
@@ -135,8 +142,6 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	}
 
 	/////////////////// USER ///////////////////
-	private static Map<String, User> users = new HashMap<String, User>();
-
 	@Override
 	public User createUser(String userName, String password)
 			throws DuplicateInstanceException, SQLException {
