@@ -23,7 +23,8 @@
 				</c:when>
 				<c:otherwise>
 					You are logged in as <b>${userName}</b>. 
-					You can <a href="<%= request.getContextPath() + response.encodeURL("/members/profile.jsp") %>">edit your players</a> 
+					You can <a href="<%= request.getContextPath() + response.encodeURL("/members/profile.jsp") %>">edit your players</a>, 
+					<a href="<%= request.getContextPath() + response.encodeURL("/members/create_game.jsp") %>">create a new game</a> 
 					or <a href="<%= request.getContextPath() + response.encodeURL("/login/logout.jsp") %>">logout</a>.
 				</c:otherwise>
 			</c:choose>

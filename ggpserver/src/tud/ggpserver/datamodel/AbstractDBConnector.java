@@ -304,8 +304,6 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				try {ps.close();} catch (SQLException e) {}
 		} 
 
-
-
 		logger.info("String, Game<TermType,ReasonerStateInfoType>, int, int, Map<? extends RoleInterface<TermType>,? extends PlayerInfo>, Date - Creating new match: " + matchID); //$NON-NLS-1$
 		return new Match<TermType, ReasonerStateInfoType>(matchID, game, startclock, playclock,
 				playerinfos, startTime, getMoveFactory(), gamescrambler, this);
