@@ -10,10 +10,16 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import cs227b.teamIago.resolver.ExpList;
 
 public class Axioms {
+	/**
+	 * Logger for this class
+	 */
+	private static final Logger logger = Logger.getLogger(Axioms.class.getName());
+
 	ArrayList Statements = new ArrayList();
 
 
@@ -26,8 +32,7 @@ public class Axioms {
 			if (s.parse(tk))
 				Statements.add(s);
 			else {
-				System.err.println("Error parsing token: " + tk.next()
-					+ " at line " + tk.sourceLine());
+				logger.severe("String - Error parsing token: " + tk.next() + " at line " + tk.sourceLine() + " - exception: " + null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				parseSuccess = false;
 			}
 		}
@@ -53,7 +58,7 @@ public static String loadStringFromFile(String filename){
 		sb.append(line + "\n"); // artificial EOLN marker
 	}
 	} catch (IOException e){
-		System.out.println(e);
+		logger.severe("String - " + e); //$NON-NLS-1$
 		System.exit(-1);
 	}
 	return sb.toString();
