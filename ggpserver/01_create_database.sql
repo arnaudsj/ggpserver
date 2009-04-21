@@ -13,6 +13,10 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 -- Datenbank: `ggpserver`
 --
 
+CREATE DATABASE IF NOT EXISTS `ggpserver` ;
+
+USE `ggpserver` ;
+
 -- --------------------------------------------------------
 
 --
