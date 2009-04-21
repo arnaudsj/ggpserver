@@ -3,6 +3,7 @@
 	<name>ggpserver</name>
 	<comment></comment>
 	<projects>
+		<project>gamecontroller</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

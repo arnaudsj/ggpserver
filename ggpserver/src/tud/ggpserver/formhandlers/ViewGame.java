@@ -26,6 +26,7 @@ public class ViewGame {
 		return db.getGame(name);
 	}
 	
+	// TODO: description from db
 	public String getGameDescription() throws NamingException, SQLException {
 		return new KIFSyntaxFormatter(getGame().getKIFGameDescription()).getFormattedGameDescription();
 	}

@@ -15,7 +15,7 @@ import tud.ggpserver.datamodel.Match;
 public class ViewMatch {
 	private final static AbstractDBConnector db = DBConnectorFactory.getDBConnector();
 	
-	private Match match;
+	private Match<?, ?> match;
 	private int stepNumber = 1;
 
 	public int getStepNumber() {
@@ -34,19 +34,17 @@ public class ViewMatch {
 		return match;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public List<String> getMoves() {
 		if ((stepNumber < 1) || stepNumber > (match.getNumberOfStates() - 1)) {  // -1, because there is one less jointmove than states
 			return new LinkedList<String>();
 		}
-		return (List) match.getJointMovesStrings().get(stepNumber - 1);
+		return match.getJointMovesStrings().get(stepNumber - 1);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public List<GameControllerErrorMessage> getErrorMessages() {
 		if ((stepNumber < 1) || (stepNumber > match.getNumberOfStates())) {
 			return new LinkedList<GameControllerErrorMessage>();
 		}
-		return (List) match.getErrorMessages().get(stepNumber - 1);
+		return match.getErrorMessages().get(stepNumber - 1);
 	}
 }

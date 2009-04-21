@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. -->
+<project basedir="." default="build" name="ggpserver">
+    <property environment="env"/>
+    <property name="ECLIPSE_HOME" value="/usr/lib/eclipse"/>
+    <property name="junit.output.dir" value="junit"/>
+    <property name="gamecontroller.location" value="../gamecontroller"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.6"/>
+    <property name="source" value="1.6"/>
+    <import file="ant_create_war.xml"/>
+    <path id="gamecontroller.classpath">
+        <pathelement location="${gamecontroller.location}/bin"/>
+        <pathelement location="${gamecontroller.location}/lib/BenderNG/lib/antlr.jar"/>
+        <pathelement location="${gamecontroller.location}/lib/BenderNG/lib/asm-attrs.jar"/>
+        <pathelement location="${gamecontroller.location}/lib/BenderNG/lib/asm.jar"/>
+        <pathelement location="${gamecontroller.location}/lib/BenderNG/lib/cglib-full.jar"/>
+        <pathelement location="${gamecontroller.location}/lib/BenderNG/lib/commons-collections.jar"/>
+        <pathelement location="${gamecontroller.location}/lib/BenderNG/lib/commons-logging.jar"/>
+        <pathelement location="${gamecontroller.location}/lib/BenderNG/lib/dom4j.jar"/>
+        <pathelement location="${gamecontroller.location}/lib/BenderNG/lib/ehcache.jar"/>
+        <pathelement location="${gamecontroller.location}/lib/BenderNG/lib/hibernate3.jar"/>
+        <pathelement location="${gamecontroller.location}/lib/BenderNG/lib/hsqldb.jar"/>
+        <pathelement location="${gamecontroller.location}/lib/BenderNG/lib/java-cup.jar"/>
+        <pathelement location="${gamecontroller.location}/lib/BenderNG/lib/JFlex.jar"/>
+        <pathelement location="${gamecontroller.location}/lib/BenderNG/lib/jgraph.jar"/>
+        <pathelement location="${gamecontroller.location}/lib/BenderNG/lib/jta.jar"/>
+        <pathelement location="${gamecontroller.location}/lib/BenderNG/lib/junit-4.1.jar"/>
+        <pathelement location="${gamecontroller.location}/lib/BenderNG/lib/log4j-1.2.14.jar"/>
+        <pathelement location="${gamecontroller.location}/lib/BenderNG/lib/shiftone-jrat.jar"/>
+        <pathelement location="${gamecontroller.location}/lib/BenderNG/lib/trove.jar"/>
+    </path>
+    <path id="Apache Tomcat v5.5 [Apache Tomcat v5.5].libraryclasspath">
+        <pathelement location="../../../../../../usr/share/tomcat5.5/common/lib/jasper-runtime.jar"/>
+        <pathelement location="../../../../../../usr/share/tomcat5.5/common/lib/standard.jar"/>
+        <pathelement location="../../../../../../usr/share/tomcat5.5/common/lib/servlet-api.jar"/>
+        <pathelement location="../../../../../../usr/share/tomcat5.5/common/lib/mysql-connector-java.jar"/>
+        <pathelement location="../../../../../../usr/share/tomcat5.5/common/lib/commons-dbcp.jar"/>
+        <pathelement location="../../../../../../usr/share/tomcat5.5/common/lib/commons-el.jar"/>
+        <pathelement location="../../../../../../usr/share/tomcat5.5/common/lib/commons-pool.jar"/>
+        <pathelement location="../../../../../../usr/share/tomcat5.5/common/lib/commons-collections3.jar"/>
+        <pathelement location="../../../../../../usr/share/tomcat5.5/common/lib/jstl.jar"/>
+        <pathelement location="../../../../../../usr/share/tomcat5.5/common/lib/jasper-compiler.jar"/>
+        <pathelement location="../../../../../../usr/share/tomcat5.5/common/lib/jsp-api.jar"/>
+        <pathelement location="../../../../../../usr/share/tomcat5.5/common/lib/naming-resources.jar"/>
+        <pathelement location="../../../../../../usr/share/tomcat5.5/common/lib/jasper-compiler-jdt.jar"/>
+        <pathelement location="../../../../../../usr/share/tomcat5.5/common/lib/naming-factory.jar"/>
+    </path>
+    <path id="JUnit 4.libraryclasspath">
+        <pathelement location="${ECLIPSE_HOME}/plugins/org.junit4_4.1.0.1/junit-4.1.jar"/>
+    </path>
+    <path id="Web App Libraries.libraryclasspath">
+        <pathelement location="WebContent/WEB-INF/lib/catalina.jar"/>
+    </path>
+    <path id="ggpserver.classpath">
+        <pathelement location="build/classes"/>
+        <path refid="gamecontroller.classpath"/>
+        <path refid="Apache Tomcat v5.5 [Apache Tomcat v5.5].libraryclasspath"/>
+        <path refid="JUnit 4.libraryclasspath"/>
+        <path refid="Web App Libraries.libraryclasspath"/>
+    </path>
+    <target name="init">
+        <mkdir dir="build/classes"/>
+        <copy includeemptydirs="false" todir="build/classes">
+            <fileset dir="src" excludes="**/*.launch, **/*.java"/>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="build/classes"/>
+    </target>
+    <target depends="clean" name="cleanall">
+        <ant antfile="${gamecontroller.location}/build.xml" inheritAll="false" target="clean"/>
+    </target>
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects">
+        <ant antfile="${gamecontroller.location}/build.xml" inheritAll="false" target="build-project"/>
+    </target>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="build/classes" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="ggpserver.classpath"/>
+        </javac>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+    <target name="GameControllerServerRunnerTest">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <test name="tud.ggpserver.GameControllerServerRunnerTest" todir="${junit.output.dir}"/>
+            <classpath refid="ggpserver.classpath"/>
+        </junit>
+    </target>
+    <target name="junitreport">
+        <junitreport todir="${junit.output.dir}">
+            <fileset dir="${junit.output.dir}">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="frames" todir="${junit.output.dir}"/>
+        </junitreport>
+    </target>
+</project>

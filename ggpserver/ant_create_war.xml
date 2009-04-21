@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?eclipse.ant.import?>
+
+<project basedir="." default="war" name="ant_create_war">
+	<target depends="build" name="war">
+		<war destfile="ggpserver.war" webxml="WebContent/WEB-INF/web.xml">
+		<classes dir="build/classes"/>
+		<lib file="${gamecontroller.location}/gamecontroller.jar"/>
+		<fileset dir="WebContent"/>
+		</war>
+	</target>
+</project>

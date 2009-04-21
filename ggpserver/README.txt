@@ -54,5 +54,38 @@ The more, the better. Most memory is needed for the games. 128MB should be okay 
 
 ========================================================================================
 
+Export the WAR file. There are two ways to do this:
+
+--- OPTION 1 (the Eclipse way) ---
+1. Install the following Eclipse plugins:
+     - J2EE Standard Tools (JST) Project
+     - Web Standard Tools (WST) Project
+   Depending on your version of Eclipse, you may have to click "Add Required" to automatically add additional dependencies, such as:
+     - Eclipse Modeling Framework (EMF) Runtime
+     - EMF Service Data Objects (SDO) Runtime
+     - Graphical Editing Framework
+     - Visual Editor (Java EMF Model)
+   
+2. Right-click on the ggpserver project --> Export --> WAR file
+
+
+--- OPTION 2 (the Ant way) ---
+
+sudo apt-get install ant
+ant -f my-build.xml cleanall war
+
+# BTW, the file build.xml can be re-generated from Eclipse by selecting Export -> Ant Buildfiles. The file my-build.xml is a modified version of that.
+
+========================================================================================
+
+Start the Tomcat application server and log in to the Tomcat Manager.
+
+If there is an old instance of ggpserver running, click "remove".
+
+Upload your newly created ggpserver.war file.
+
+
+========================================================================================
+
 # After starting the web application, log in as user "admin", password "admin" and start the round robin scheduler.
 

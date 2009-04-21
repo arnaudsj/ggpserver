@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="build" name="gamecontroller">
+    <property environment="env"/>
+    <property name="ggpserver.location" value="../ggpserver"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.6"/>
+    <property name="source" value="1.6"/>
+    <path id="gamecontroller.classpath">
+        <pathelement location="bin"/>
+        <pathelement location="lib/BenderNG/lib/antlr.jar"/>
+        <pathelement location="lib/BenderNG/lib/asm-attrs.jar"/>
+        <pathelement location="lib/BenderNG/lib/asm.jar"/>
+        <pathelement location="lib/BenderNG/lib/cglib-full.jar"/>
+        <pathelement location="lib/BenderNG/lib/commons-collections.jar"/>
+        <pathelement location="lib/BenderNG/lib/commons-logging.jar"/>
+        <pathelement location="lib/BenderNG/lib/dom4j.jar"/>
+        <pathelement location="lib/BenderNG/lib/ehcache.jar"/>
+        <pathelement location="lib/BenderNG/lib/hibernate3.jar"/>
+        <pathelement location="lib/BenderNG/lib/hsqldb.jar"/>
+        <pathelement location="lib/BenderNG/lib/java-cup.jar"/>
+        <pathelement location="lib/BenderNG/lib/JFlex.jar"/>
+        <pathelement location="lib/BenderNG/lib/jgraph.jar"/>
+        <pathelement location="lib/BenderNG/lib/jta.jar"/>
+        <pathelement location="lib/BenderNG/lib/junit-4.1.jar"/>
+        <pathelement location="lib/BenderNG/lib/log4j-1.2.14.jar"/>
+        <pathelement location="lib/BenderNG/lib/shiftone-jrat.jar"/>
+        <pathelement location="lib/BenderNG/lib/trove.jar"/>
+    </path>
+    <target name="init">
+        <mkdir dir="bin"/>
+	</target>
+    <target name="clean">
+        <delete dir="bin"/>
+        <delete file="gamecontroller.jar"/>
+    </target>
+    <target depends="build" name="jar">
+		<jar destfile="gamecontroller.jar" basedir="bin"/>
+    </target>
+    <target depends="clean" name="cleanall"/>
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects"/>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+            <src path="lib/BenderNG/source"/>
+            <classpath refid="gamecontroller.classpath"/>
+        </javac>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+            <src path="lib/BenderNG/tests"/>
+            <classpath refid="gamecontroller.classpath"/>
+        </javac>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+            <src path="lib/JavaProver"/>
+            <classpath refid="gamecontroller.classpath"/>
+        </javac>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+            <src path="lib/jocular-0.2/Common/src/java"/>
+            <classpath refid="gamecontroller.classpath"/>
+        </javac>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+            <src path="lib/jocular-0.2/Jocular/src/java"/>
+            <classpath refid="gamecontroller.classpath"/>
+        </javac>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+            <src path="java"/>
+            <classpath refid="gamecontroller.classpath"/>
+        </javac>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+            <src path="."/>
+            <exclude name="java/"/>
+            <exclude name="lib/BenderNG/source/"/>
+            <exclude name="lib/BenderNG/tests/"/>
+            <exclude name="lib/JavaProver/"/>
+            <exclude name="lib/jocular-0.2/Common/src/java/"/>
+            <exclude name="lib/jocular-0.2/Jocular/src/java/"/>
+            <classpath refid="gamecontroller.classpath"/>
+        </javac>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects">
+        <ant antfile="${ggpserver.location}/my-build.xml" inheritAll="false" target="clean"/>
+        <ant antfile="${ggpserver.location}/my-build.xml" inheritAll="false" target="build"/>
+    </target>
+    <target name="GameControllerApp">
+        <java classname="tud.gamecontroller.gui.GameControllerApp" failonerror="true" fork="yes">
+            <classpath refid="gamecontroller.classpath"/>
+        </java>
+    </target>
+</project>
