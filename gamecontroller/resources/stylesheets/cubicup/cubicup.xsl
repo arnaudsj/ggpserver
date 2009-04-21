@@ -27,18 +27,18 @@
 				</xsl:call-template>	
 
 				<xsl:call-template name="playClock">
-					<xsl:with-param name="xPos">310px</xsl:with-param>
+					<xsl:with-param name="xPos">340px</xsl:with-param>
 					<xsl:with-param name="yPos">110px</xsl:with-param>
 				</xsl:call-template>				
 
 				<xsl:call-template name="playerInfo">
-					<xsl:with-param name="xPos">310px</xsl:with-param>
+					<xsl:with-param name="xPos">340px</xsl:with-param>
 					<xsl:with-param name="yPos">160px</xsl:with-param>
 				</xsl:call-template>
 
 				<xsl:call-template name="history">
-					<xsl:with-param name="xPos">310px</xsl:with-param>
-					<xsl:with-param name="yPos">260px</xsl:with-param>
+					<xsl:with-param name="xPos">340px</xsl:with-param>
+					<xsl:with-param name="yPos">300px</xsl:with-param>
 				</xsl:call-template>
 
 				<style type="text/css" media="all">
@@ -46,11 +46,15 @@
 						position: absolute;
 						left:     10px;
 						top:      110px;
-						width:    280px;
-						height:   490px;
+						width:    320px;
+						height:   330px;
 						padding: 0px;
 					}
-
+					#count{
+						position: absolute;
+						left:     10px;
+						top:      450px;
+					}
 				</style>
 
 				<xsl:for-each select="match/state">
@@ -65,7 +69,7 @@
 							<xsl:variable name="xCoord" select="arg[2]"/>
 			
 							<xsl:variable name="yCell" select="$yCoord * 37 - $zCoord * 19"/>
-							<xsl:variable name="xCell" select="($xCoord * 38 + (6 - $yCoord) * 19) - $zCoord*19"/>
+							<xsl:variable name="xCell" select="($xCoord * 38 + (7 - $yCoord) * 19) - $zCoord*19"/>
 							
 							<div>
 								<xsl:attribute name="style">
@@ -76,21 +80,25 @@
 									<xsl:attribute name="src">
 										<xsl:text>../../stylesheets/cubicup/</xsl:text>
 										<xsl:choose>
-											<xsl:when test="arg[4]='YELLOW'">
-												<xsl:text>yellow</xsl:text>
-											</xsl:when>
-											<xsl:when test="arg[4]='RED'">
-												<xsl:text>red</xsl:text>
-											</xsl:when>
 											<xsl:when test="arg[4]='BASE'">
 												<xsl:text>gray</xsl:text>
 											</xsl:when>
+											<xsl:otherwise>
+												<xsl:variable name="up" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
+												<xsl:variable name="lo" select="'abcdefghijklmnopqrstuvwxyz'"/>
+												<xsl:value-of select="translate(arg[4],$up,$lo)"/>
+											</xsl:otherwise>
 										</xsl:choose>
 										<xsl:text>_cube.png</xsl:text>
 									</xsl:attribute>
 								</img>
 							</div>
 						
+						</xsl:for-each>
+					</div>
+					<div id="count">
+						<xsl:for-each select="/match/state/fact[prop-f='CUBES']">
+							<xsl:value-of select="arg[1]"/>: <xsl:value-of select="arg[2]"/> <br/>
 						</xsl:for-each>
 					</div>
 				</xsl:for-each>

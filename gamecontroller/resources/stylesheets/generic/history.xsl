@@ -31,7 +31,14 @@
 				<xsl:for-each select="match/history/step">
 					<tr>
 						<td>
-							<span class="heading"><xsl:value-of select="./step-number"/>.</span>
+							<span class="heading">
+							<a>
+								<xsl:attribute name="href">
+									step_<xsl:value-of select="./step-number"/>.xml
+								</xsl:attribute>
+								<xsl:value-of select="./step-number"/>.
+							</a>
+							</span>
 						</td>
 						<xsl:for-each select="./move">
 							<td>
