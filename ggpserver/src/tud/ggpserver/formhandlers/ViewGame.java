@@ -7,7 +7,6 @@ import javax.naming.NamingException;
 import tud.gamecontroller.game.impl.Game;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
-import tud.ggpserver.util.KIFSyntaxFormatter;
 
 public class ViewGame {
 	private final static AbstractDBConnector db = DBConnectorFactory.getDBConnector();
@@ -26,8 +25,11 @@ public class ViewGame {
 		return db.getGame(name);
 	}
 	
-	// TODO: description from db
 	public String getGameDescription() throws NamingException, SQLException {
-		return new KIFSyntaxFormatter(getGame().getKIFGameDescription()).getFormattedGameDescription();
+//		return new KIFSyntaxFormatter(getGame().getKIFGameDescription()).getFormattedGameDescription();
+//		return HTMLEntityEncoder.escapeHtmlFull(db.getGameDescription(name)).toString().replace("\n", "<br>");
+		return db.getGameDescription(name).replace("\n", "<br>");
+		
+		// TODO: escaping (especially '<')
 	}
 }

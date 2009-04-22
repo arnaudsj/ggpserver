@@ -11,7 +11,7 @@ import tud.ggpserver.datamodel.RemotePlayerInfo;
 import tud.ggpserver.datamodel.User;
 
 public class Profile {
-	private final static AbstractDBConnector db = DBConnectorFactory.getDBConnector();
+	private final static AbstractDBConnector<?, ?> db = DBConnectorFactory.getDBConnector();
 	
 	private User user = null;
 	private List<RemotePlayerInfo> players = null;
@@ -27,7 +27,6 @@ public class Profile {
 		user = db.getUser(userName);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<RemotePlayerInfo> getPlayers() throws NamingException, SQLException {
 		assert (user != null);
 		
@@ -37,7 +36,4 @@ public class Profile {
 		
 		return players;
 	}
-	
-
-	
 }

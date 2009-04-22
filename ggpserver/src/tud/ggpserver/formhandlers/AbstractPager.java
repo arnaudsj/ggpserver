@@ -4,15 +4,12 @@ import java.sql.SQLException;
 
 import javax.naming.NamingException;
 
-import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 
 public abstract class AbstractPager {
-
 	protected int startRow = 0;
 	protected int numDisplayedRows = 30;
-	protected final static AbstractDBConnector db = DBConnectorFactory.getDBConnector();
-
+	
 	public AbstractPager() {
 		super();
 	}
@@ -51,7 +48,7 @@ public abstract class AbstractPager {
 	}
 
 	protected int getRowCount() throws NamingException, SQLException {
-		return db.getRowCount(getTableName());
+		return DBConnectorFactory.getDBConnector().getRowCount(getTableName());
 	}
 
 	public int getPage() {

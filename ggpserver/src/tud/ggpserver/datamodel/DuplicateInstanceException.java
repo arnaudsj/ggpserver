@@ -8,7 +8,6 @@ package tud.ggpserver.datamodel;
  * @author martin
  */
 public class DuplicateInstanceException extends Exception {
-
 	private static final long serialVersionUID = 385501759945166543L;
 
 	public DuplicateInstanceException() {
@@ -25,5 +24,4 @@ public class DuplicateInstanceException extends Exception {
 	public DuplicateInstanceException(String message, Throwable cause) {
 		super(message, cause);
 	}
-
 }

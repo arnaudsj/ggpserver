@@ -3,6 +3,7 @@ package tud.ggpserver.formhandlers;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.naming.NamingException;
 
@@ -13,6 +14,11 @@ import tud.ggpserver.datamodel.Match;
 
 
 public class ViewMatch {
+	/**
+	 * Logger for this class
+	 */
+	private static final Logger logger = Logger.getLogger(ViewMatch.class.getName());
+
 	private final static AbstractDBConnector db = DBConnectorFactory.getDBConnector();
 	
 	private Match<?, ?> match;
@@ -44,6 +50,10 @@ public class ViewMatch {
 	public List<GameControllerErrorMessage> getErrorMessages() {
 		if ((stepNumber < 1) || (stepNumber > match.getNumberOfStates())) {
 			return new LinkedList<GameControllerErrorMessage>();
+		}
+		if (match.getNumberOfStates() > match.getErrorMessages().size()) {
+			logger.severe("getErrorMessages().size() smaller than getNumberOfStates()! Causing match: " + match.toString());        //$NON-NLS-1$s
+			throw new InternalError("getErrorMessages().size() smaller than getNumberOfStates()!");
 		}
 		return match.getErrorMessages().get(stepNumber - 1);
 	}

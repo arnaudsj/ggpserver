@@ -21,6 +21,7 @@ import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.players.RandomPlayerInfo;
 import tud.gamecontroller.term.TermInterface;
+import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.Match;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
 
@@ -80,7 +81,8 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 
 	@SuppressWarnings("unchecked")
 	private Match<TermType, ReasonerStateInfoType> createMatch() throws NamingException, SQLException {
-		List<Game<TermType, ReasonerStateInfoType>> allGames = getDBConnector().getAllGames();
+		AbstractDBConnector db = getDBConnector();
+		List<Game<TermType, ReasonerStateInfoType>> allGames = db.getAllGames();
 		
 		if (currentGame == null) {
 			currentGame = allGames.get(0);
@@ -96,13 +98,13 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		int playclock = ((int) (new Random().nextDouble() * 12 + 1)) * 5;
 		int startclock = 6 * playclock;
 		
-		return getDBConnector().createMatch(currentGame, startclock, playclock, playerinfos, new Date());
+		return db.createMatch(currentGame, startclock, playclock, playerinfos, new Date());
 	}
 	
-	@SuppressWarnings("unchecked")
 	private Map<RoleInterface<TermType>, PlayerInfo> createPlayerInfos(Game<TermType, ReasonerStateInfoType> game) throws NamingException, SQLException {
 		// copy players and shuffle
-		List<PlayerInfo> playerInfos = new LinkedList<PlayerInfo>(getDBConnector().getPlayerInfos(RemotePlayerInfo.STATUS_ACTIVE));
+		AbstractDBConnector<?, ?> db = getDBConnector();
+		List<PlayerInfo> playerInfos = new LinkedList<PlayerInfo>(db.getPlayerInfos(RemotePlayerInfo.STATUS_ACTIVE));
 		Collections.shuffle(playerInfos);
 		
 		int numberOfPlayers = playerInfos.size();

@@ -5,11 +5,14 @@ import java.util.List;
 
 import javax.naming.NamingException;
 
+import tud.ggpserver.datamodel.AbstractDBConnector;
+import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.User;
 
 
 public class ShowUsers extends AbstractPager {
-	@SuppressWarnings("unchecked")
+	protected AbstractDBConnector<?, ?> db = DBConnectorFactory.getDBConnector();
+
 	public List<User> getUsers() throws NamingException, SQLException {
 		return db.getUsers(startRow, numDisplayedRows);
 	}

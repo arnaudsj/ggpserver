@@ -42,7 +42,7 @@
 
 <h1>Game Description</h1>
 <p style="font-family: monospace; font-size:medium">
-${viewGame.gameDescription}
+<code>${viewGame.gameDescription}</code>
 </p> 
 
 

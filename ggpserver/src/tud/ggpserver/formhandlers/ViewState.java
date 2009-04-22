@@ -11,9 +11,6 @@ import tud.ggpserver.datamodel.DBConnectorFactory;
 public class ViewState {
 	private String matchID;
 	private int stepNumber = -1;
-	
-	private final static AbstractDBConnector db = DBConnectorFactory.getDBConnector();
-
 
 	public void setMatchID(String matchID) {
 		this.matchID = matchID;
@@ -23,8 +20,8 @@ public class ViewState {
 		this.stepNumber = stepNumber;
 	}
 
-	@SuppressWarnings("unchecked")
 	public String getXmlState() throws SQLException, NamingException {
+		AbstractDBConnector<?, ?> db = DBConnectorFactory.getDBConnector();
 		List<String> states = db.getMatch(matchID).getXmlStates();
 		
 		int stepNumber;

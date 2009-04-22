@@ -1,7 +1,6 @@
 package tud.ggpserver.datamodel;
 
 import static org.apache.commons.collections.map.AbstractReferenceMap.SOFT;
-import static org.apache.commons.collections.map.AbstractReferenceMap.WEAK;
 
 import java.sql.SQLException;
 import java.util.Date;
@@ -30,10 +29,10 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 //	private static Map<String, Match<Term, GameState>> matches = new HashMap<String, Match<Term,GameState>>();
 //	private static Map<String, PlayerInfo> playerInfos = new HashMap<String, PlayerInfo>();
 //	private static Map<String, User> users = new HashMap<String, User>();
-	private static Map<String, Game<Term, GameState>> games = new ReferenceMap(WEAK, SOFT, false);
-	private static Map<String, Match<Term, GameState>> matches = new ReferenceMap(WEAK, SOFT, false);
-	private static Map<String, PlayerInfo> playerInfos = new ReferenceMap(WEAK, SOFT, false);
-	private static Map<String, User> users = new ReferenceMap(WEAK, SOFT, false);
+	private static Map<String, Game<Term, GameState>> games = new ReferenceMap(SOFT, SOFT, false);
+	private static Map<String, Match<Term, GameState>> matches = new ReferenceMap(SOFT, SOFT, false);
+	private static Map<String, PlayerInfo> playerInfos = new ReferenceMap(SOFT, SOFT, false);
+	private static Map<String, User> users = new ReferenceMap(SOFT, SOFT, false);
 
 	private DBConnector() {
 		super();

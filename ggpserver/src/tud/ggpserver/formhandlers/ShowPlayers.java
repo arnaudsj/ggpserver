@@ -6,9 +6,12 @@ import java.util.List;
 import javax.naming.NamingException;
 
 import tud.gamecontroller.players.PlayerInfo;
+import tud.ggpserver.datamodel.AbstractDBConnector;
+import tud.ggpserver.datamodel.DBConnectorFactory;
 
 public class ShowPlayers extends AbstractPager {
-	@SuppressWarnings("unchecked")
+	protected final static AbstractDBConnector<?, ?> db = DBConnectorFactory.getDBConnector();
+
 	public List<PlayerInfo> getPlayers() throws NamingException, SQLException {
 		return db.getPlayerInfos(startRow, numDisplayedRows);
 	}

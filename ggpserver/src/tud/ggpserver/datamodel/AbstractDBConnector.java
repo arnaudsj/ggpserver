@@ -261,6 +261,37 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return result;
 	}
 	
+	public String getGameDescription(String gameName) throws SQLException {
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		String result = null;
+		
+		try { 
+			ps = con.prepareStatement("SELECT `gamedescription` FROM `games` WHERE `name` = ?;");
+			ps.setString(1, gameName);
+			rs = ps.executeQuery();
+			
+			if (rs.next()) {
+				result = rs.getString("gamedescription");
+				
+				logger.info("String - Returning new game description for game: " + gameName); //$NON-NLS-1$
+			} else {
+				result = null;
+			}
+		} finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+			if (rs != null)
+				try {rs.close();} catch (SQLException e) {}
+		} 
+
+		return result;
+	}
+	
 	public Match<TermType, ReasonerStateInfoType> createMatch(String matchID, Game<TermType, ReasonerStateInfoType> game,
 			int startclock, int playclock, Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> playerinfos,
 			Date startTime) throws DuplicateInstanceException,
@@ -372,8 +403,6 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 					playerinfos.put(role, playerInfo);
 					goalValues.put(role, rs_roles.getInt("goal_value"));
 				}				
-				
-
 
 				logger.info("String - Returning new match: " + matchID); //$NON-NLS-1$
 
