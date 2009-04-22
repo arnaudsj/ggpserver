@@ -331,7 +331,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 
 INSERT INTO `users` (`user_name`, `user_pass`) VALUES
 ('martin', '5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8'),
-('admin', 'd033e22ae348aeb5660fc2140aec35850c4da997');
+('admin', '64acb644acc172824a5c0aa3bf1c6686d09ada13');
 
 -- --------------------------------------------------------
 

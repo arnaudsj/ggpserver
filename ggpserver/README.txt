@@ -100,4 +100,4 @@ ant -f my-build.xml cleanall war
 ========================================================================================
 
 # the GGPServer should now be reachable at http://hostname:8180/ggpserver/
-# After starting the web application, log in as user "admin", password "admin" and start the round robin scheduler.
+# After starting the web application, log in as user "admin", password "eu4uo5Ha" and start the round robin scheduler.
