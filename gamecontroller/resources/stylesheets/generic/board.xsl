@@ -4,7 +4,6 @@
 	- Widget for printing a rectangular board of fixed size
 	- For use within <body>.
 	- Accepts args: xPos and yPos which specify absolute position.
-	- assumes that there is a template with name "make_cell_content" which prints the contents of each cell
 -->
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
@@ -21,7 +20,8 @@
 			<!-- no - all cells have light background
 			      light - the first cell has light background
 			      dark - the first cell has dark background -->
-		
+		<xsl:param name="LightCellColor">#CCCCCC</xsl:param>
+		<xsl:param name="DarkCellColor">#AAAAAA</xsl:param>
 
 		<style type="text/css" media="all">@import 
 			url("../../stylesheets/generic/css/main.css");
@@ -29,8 +29,8 @@
 			div.board
 			{
 				position: absolute;
-				left:     <xsl:value-of select="$xPos"/>;
-				top:      <xsl:value-of select="$yPos"/>;
+				left:     <xsl:value-of select="$xPos"/>px;
+				top:      <xsl:value-of select="$yPos"/>px;
 			}
 			div.cellLight
 			{
@@ -38,7 +38,7 @@
 				height: <xsl:value-of select="$CellHeight - 4"/>px;
 				float:	left;
 				border: 2px solid #FFC;
-				background-color: #CCCCCC;
+				background-color: <xsl:value-of select="$LightCellColor"/>;
 			}
 			div.cellDark
 			{
@@ -46,29 +46,17 @@
 				height: <xsl:value-of select="$CellHeight - 4"/>px;
 				float:	left;
 				border: 2px solid #FFC;
-				background-color: #AAAAAA;
+				background-color: <xsl:value-of select="$DarkCellColor"/>;
 			}
 			
 		</style>
 		
-		<div id="board">
-
-			<xsl:attribute name="style">
-				position:absolute;
-				left: <xsl:value-of select="$xPos"/>;
-				top:  <xsl:value-of select="$yPos"/>;
-			</xsl:attribute>
-			
+		<div class="board">
 			<xsl:call-template name="row-loop">
 				<xsl:with-param name="width" select="$Width"/>
 				<xsl:with-param name="height" select="$Height"/>
 				<xsl:with-param name="checkered" select="$checkered"/>
 			</xsl:call-template>
-
-			<xsl:for-each select="/match/state/fact[prop-f=$CellFluentName]">
-				<xsl:call-template name="make_cell_content"/>
-			</xsl:for-each>
-
 		</div>
 
 	</xsl:template>
@@ -127,4 +115,4 @@
 		</xsl:if>
 	</xsl:template>
 
-</xsl:stylesheet>	
+</xsl:stylesheet>
