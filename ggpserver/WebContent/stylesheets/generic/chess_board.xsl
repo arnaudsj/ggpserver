@@ -151,7 +151,7 @@
 
 		<img width="44" height="44">
 			<xsl:attribute name="src">
-				<xsl:text>../../stylesheets/generic/chess_images/Chess_</xsl:text>
+				<xsl:text>../stylesheets/generic/chess_images/Chess_</xsl:text>
 				<xsl:value-of select="$piece"/>
 				<xsl:value-of select="substring($background,1,1)"/>
 				<xsl:text>44.png</xsl:text>

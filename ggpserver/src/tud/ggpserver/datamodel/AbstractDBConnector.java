@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -412,7 +413,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				if (status.equals(Match.STATUS_FINISHED)) {
 					result.setGoalValues(goalValues);
 				}
-				List<String> states = getStates(matchID);
+				List<String> states = getStates(game.getStylesheet(), matchID);
 				result.setXmlStates(states);
 				result.setErrorMessages(getErrorMessages(matchID, states.size()));
 				result.setJointMovesStrings(getJointMovesStrings(matchID));				
@@ -909,12 +910,15 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return result;
 	}
 
-	private List<String> getStates(String matchID) throws SQLException {
+	private List<String> getStates(String styleSheet, String matchID) throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
 		List<String> result = new LinkedList<String>();
+
+		Pattern styleSheetPattern=Pattern.compile("<\\?xml-stylesheet type=\"text/xsl\" href=\"[^\"]*\"\\?>");
+		String styleSheetReplacement="<?xml-stylesheet type=\"text/xsl\" href=\""+styleSheet+"\"?>";
 		
 		try {
 			ps = con.prepareStatement("SELECT `step_number`, `state` FROM `states` where `match_id` = ? ORDER BY `step_number`;");
@@ -924,7 +928,11 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			int stepNumber = 1;
 			while (rs.next()) {
 				assert(rs.getInt("step_number") == stepNumber);
-				result.add(rs.getString("state"));
+				String xmlState=rs.getString("state");
+				// this is a hack to show old matches with the right stylesheets (e.g., if the stylesheet for a game was changed after the match)
+				// we just replace the stylesheet information with the current one  
+				xmlState=styleSheetPattern.matcher(xmlState).replaceFirst(styleSheetReplacement);
+				result.add(xmlState);
 				stepNumber++;
 			}
 		} finally { 

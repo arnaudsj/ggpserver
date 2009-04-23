@@ -29,9 +29,13 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 //	private static Map<String, Match<Term, GameState>> matches = new HashMap<String, Match<Term,GameState>>();
 //	private static Map<String, PlayerInfo> playerInfos = new HashMap<String, PlayerInfo>();
 //	private static Map<String, User> users = new HashMap<String, User>();
+	@SuppressWarnings("unchecked")
 	private static Map<String, Game<Term, GameState>> games = new ReferenceMap(SOFT, SOFT, false);
+	@SuppressWarnings("unchecked")
 	private static Map<String, Match<Term, GameState>> matches = new ReferenceMap(SOFT, SOFT, false);
+	@SuppressWarnings("unchecked")
 	private static Map<String, PlayerInfo> playerInfos = new ReferenceMap(SOFT, SOFT, false);
+	@SuppressWarnings("unchecked")
 	private static Map<String, User> users = new ReferenceMap(SOFT, SOFT, false);
 
 	private DBConnector() {
