@@ -8,19 +8,22 @@
 
 	<xsl:import href="../generic/template.xsl"/>
 	<xsl:import href="../generic/chess_board.xsl"/>
+	<xsl:import href="../generic/state.xsl"/>
 
 	<xsl:template name="print_state">
+		
 		<!-- paint board -->
 		<xsl:call-template name="chess_board">
 			<xsl:with-param name="Width">6</xsl:with-param>
 			<xsl:with-param name="Height">5</xsl:with-param>
 			<xsl:with-param name="DefaultCellContent">no</xsl:with-param>
+			<xsl:with-param name="CellFluentName" select="'CELL'"/>
 		</xsl:call-template>
 
-		<!-- Write move info -->
-		<p>
-			<span class="heading">Move Count: </span><span class="content"><xsl:value-of select="/match/state/fact[prop-f='MOVECOUNT']/arg[1]"/></span>
-		</p>
+		<!-- show remaining fluents -->
+		<xsl:call-template name="state">
+			<xsl:with-param name="excludeFluent" select="'CELL'"/>
+		</xsl:call-template>
 	</xsl:template>
 
 	<xsl:template name="make_cell_content">

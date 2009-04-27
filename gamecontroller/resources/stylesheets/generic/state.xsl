@@ -10,12 +10,13 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 	<xsl:template name="state">
+		<xsl:param name="excludeFluent"/>
 
 		<span class="heading">State: </span>
 		<div class="underline" style="width:150px"></div>
 
 		<table>
-			<xsl:for-each select="fact">
+			<xsl:for-each select="fact[prop-f!=$excludeFluent]">
 				<xsl:sort select="."/>
 
 				<tr>

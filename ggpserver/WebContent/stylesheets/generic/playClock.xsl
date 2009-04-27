@@ -7,7 +7,7 @@
 		<match><playclock>...
 		<match><timestamp>...
 	- For use within <body>.
-	- needs css/main.css
+	- needs css/main.css and sitespecific.xsl
 -->
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
@@ -59,9 +59,11 @@
 				// -->
 			]]>
 
-			<xsl:text disable-output-escaping="yes">nextState="step_</xsl:text>
-			<xsl:value-of select="$currentStep+1"/>
-			<xsl:text disable-output-escaping="yes">.xml";</xsl:text>
+			<xsl:text disable-output-escaping="yes">nextState="</xsl:text>
+			<xsl:call-template name="makeStepLinkURL">
+				<xsl:with-param name="step" select="$currentStep+1"/>
+			</xsl:call-template>
+			<xsl:text disable-output-escaping="yes">";</xsl:text>
 
 			<xsl:choose>
 				<!-- Case: no history found ie. the game hasn't started) -->

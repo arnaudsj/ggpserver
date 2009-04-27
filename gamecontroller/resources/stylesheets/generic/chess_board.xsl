@@ -4,6 +4,8 @@
 	- Widget for printing a rectangular chess board of fixed size
 	- For use within <body>.
 	- needs a template with name "make_cell_content" which prints the content of a cell, if the cell has an unusual value
+	
+	TODO: add a template that prints all detected boards in the state (e.g. for parallel games)
 -->
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
@@ -15,7 +17,20 @@
 		<xsl:param name="Height"/> <!-- the number of cells per row -->
 		<xsl:param name="checkered">light</xsl:param>
 		<xsl:param name="DefaultCellContent">yes</xsl:param> <!-- use the default img for cell content and only call make_cell_content if value was not recognized -->
+		<xsl:param name="CellFluentName">?</xsl:param> <!-- use the default img for cell content and only call make_cell_content if value was not recognized -->
 
+		<xsl:variable name="internalCellFluentName">
+			<xsl:choose>
+				<xsl:when test="$CellFluentName!='?'"><xsl:value-of select="$CellFluentName"/></xsl:when>
+				<xsl:when test="fact[prop-f='CELL' and count(./arg)=3]">CELL</xsl:when>
+				<xsl:when test="fact[prop-f='LOCATION' and count(./arg)=3]">LOCATION</xsl:when>
+				<xsl:when test="fact[count(./arg)=3]">
+					<xsl:value-of select="fact[count(arg)=3]/prop-f"/>
+				</xsl:when>
+				<xsl:otherwise></xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
 		<style type="text/css" media="all">
 			div.chesscellcontent
 			{
@@ -40,18 +55,7 @@
 				<xsl:with-param name="DarkCellColor">#d18b47</xsl:with-param>
 			</xsl:call-template>
 
-			<xsl:variable name="CellFluentName">
-				<xsl:choose>
-					<xsl:when test="fact[prop-f='CELL' and count(./arg)=3]">CELL</xsl:when>
-					<xsl:when test="fact[prop-f='LOCATION' and count(./arg)=3]">LOCATION</xsl:when>
-					<xsl:when test="fact[count(./arg)=3]">
-						<xsl:value-of select="fact[count(arg)=3]/prop-f"/>
-					</xsl:when>
-					<xsl:otherwise>NONE</xsl:otherwise>
-				</xsl:choose>
-			</xsl:variable>
-
-			<xsl:for-each select="fact[prop-f=$CellFluentName]">
+			<xsl:for-each select="fact[prop-f=$internalCellFluentName]">
 				<xsl:variable name="xArg" select="./arg[1]"/>
 				<xsl:variable name="yArg" select="./arg[2]"/>
 				<xsl:variable name="content" select="./arg[3]"/>
@@ -112,6 +116,27 @@
 							<xsl:when test="$content='BLACKBISHOP' or $content='BB'">bd</xsl:when>
 							<xsl:when test="$content='BLACKQUEEN' or $content='BQ'">qd</xsl:when>
 							<xsl:when test="$content='BLACKKING' or $content='BK'">kd</xsl:when>
+							<xsl:when test="$content='BLACK'">O0</xsl:when>
+							<xsl:when test="$content='WHITE'">O1</xsl:when>
+							<xsl:when test="$content='RED'">O2</xsl:when>
+							<xsl:when test="$content='GREEN'">O3</xsl:when>
+							<xsl:when test="$content='BLUE'">O4</xsl:when>
+							<xsl:when test="$content='CYAN'">O5</xsl:when>
+							<xsl:when test="$content='YELLOW'">O6</xsl:when>
+							<xsl:when test="$content='PINK'">O7</xsl:when>
+							<xsl:when test="$content='BROWN'">O8</xsl:when>
+							<xsl:when test="$content='MAGENTA'">O9</xsl:when>
+							<xsl:when test="$content='1'">x1</xsl:when>
+							<xsl:when test="$content='2'">x2</xsl:when>
+							<xsl:when test="$content='3'">x3</xsl:when>
+							<xsl:when test="$content='4'">x4</xsl:when>
+							<xsl:when test="$content='5'">x5</xsl:when>
+							<xsl:when test="$content='6'">x6</xsl:when>
+							<xsl:when test="$content='7'">x7</xsl:when>
+							<xsl:when test="$content='8'">x8</xsl:when>
+							<xsl:when test="$content='9'">x9</xsl:when>
+							<xsl:when test="$content='X'">xx</xsl:when>
+							<xsl:when test="$content='O'">xo</xsl:when>
 						</xsl:choose>
 					</xsl:variable>
 

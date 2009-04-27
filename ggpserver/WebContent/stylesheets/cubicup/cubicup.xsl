@@ -2,19 +2,22 @@
 
 <!--
 	Cubicup
+	
+	TODO: detect size automatically
 -->
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 	<xsl:import href="../generic/template.xsl"/>
+	<xsl:import href="../generic/state.xsl"/>
 	
 	<xsl:template name="print_state">
 				
 		<style type="text/css" media="all">
 			.board{
 				position: relative;
-				width:    280px;
-				height:   280px;
+				width:    320px;
+				height:   320px;
 				padding:  0px;
 			}
 			.cube{
@@ -65,11 +68,10 @@
 			</xsl:for-each>
 		</div>
 
-		<p>
-			<xsl:for-each select="fact[prop-f='CUBES']">
-				<xsl:value-of select="arg[1]"/>: <xsl:value-of select="arg[2]"/> <br/>
-			</xsl:for-each>
-		</p>
+		<!-- show remaining fluents -->
+		<xsl:call-template name="state">
+			<xsl:with-param name="excludeFluent" select="'CUBE'"/>
+		</xsl:call-template>
 	
 	</xsl:template>
 

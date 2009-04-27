@@ -47,6 +47,7 @@
 				<xsl:with-param name="Width">6</xsl:with-param>
 				<xsl:with-param name="Height">6</xsl:with-param>
 				<xsl:with-param name="checkered">no</xsl:with-param>
+				<xsl:with-param name="CellFluentName"/>
 			</xsl:call-template>
 
 			<div class="pentago_vertical_line"/>
