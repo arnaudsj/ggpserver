@@ -6,104 +6,71 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-	<xsl:import href="../generic/title.xsl"/>
-	<xsl:import href="../generic/header.xsl"/>
-	<xsl:import href="../generic/history.xsl"/>
-	<xsl:import href="../generic/playerInfo.xsl"/>
-	<xsl:import href="../generic/playClock.xsl"/>
+	<xsl:import href="../generic/template.xsl"/>
+	
+	<xsl:template name="print_state">
+				
+		<style type="text/css" media="all">
+			.board{
+				position: relative;
+				width:    280px;
+				height:   280px;
+				padding:  0px;
+			}
+			.cube{
+				position: absolute;
+				height:   57px;
+				width:    39px;
+				background-color: transparent;
+			}
+		</style>
 
-	<xsl:template name="main" match="/">
-		<html>
-		
-			<head>
-				<xsl:call-template name="title"/>
-			</head>	
+		<div class="board">
+			<xsl:for-each select="fact[prop-f='CUBE']">
+				<xsl:sort select="arg[1]" order="ascending"/>
+				<xsl:sort select="arg[3]" order="ascending"/>
+				<xsl:sort select="arg[2]" order="ascending"/>
 
-			<body style="color: #111; background: #ffc;">
+				<xsl:variable name="zCoord" select="arg[3]"/>
+				<xsl:variable name="yCoord" select="arg[1]"/>
+				<xsl:variable name="xCoord" select="arg[2]"/>
 
-				<xsl:call-template name="header">	
-					<xsl:with-param name="xPos">10px</xsl:with-param>
-					<xsl:with-param name="yPos">10px</xsl:with-param>
-				</xsl:call-template>	
-
-				<xsl:call-template name="playClock">
-					<xsl:with-param name="xPos">340px</xsl:with-param>
-					<xsl:with-param name="yPos">110px</xsl:with-param>
-				</xsl:call-template>				
-
-				<xsl:call-template name="playerInfo">
-					<xsl:with-param name="xPos">340px</xsl:with-param>
-					<xsl:with-param name="yPos">160px</xsl:with-param>
-				</xsl:call-template>
-
-				<xsl:call-template name="history">
-					<xsl:with-param name="xPos">340px</xsl:with-param>
-					<xsl:with-param name="yPos">300px</xsl:with-param>
-				</xsl:call-template>
-
-				<style type="text/css" media="all">
-					#main{
-						position: absolute;
-						left:     10px;
-						top:      110px;
-						width:    320px;
-						height:   330px;
-						padding: 0px;
-					}
-					#count{
-						position: absolute;
-						left:     10px;
-						top:      450px;
-					}
-				</style>
-
-				<xsl:for-each select="match/state">
-					<div id="main">
-						<xsl:for-each select="/match/state/fact[prop-f='CUBE']">
-							<xsl:sort select="arg[1]" order="ascending"/>
-							<xsl:sort select="arg[3]" order="ascending"/>
-							<xsl:sort select="arg[2]" order="ascending"/>
+				<xsl:variable name="yCell" select="$yCoord * 37 - $zCoord * 19"/>
+				<xsl:variable name="xCell" select="$xCoord * 38 + (7 - $yCoord) * 19 - $zCoord*19"/>
+				
+				<div class="cube">
+					<xsl:attribute name="style">
+						<xsl:value-of select="concat('left:', $xCell ,'px; top:', $yCell ,'px;')"/>
+					</xsl:attribute>
+					
+					<img width="39px" height="57px">
+						<xsl:attribute name="src">
+							<xsl:value-of select="$stylesheetURL"/>
+							<xsl:text>/cubicup/</xsl:text>
+							<xsl:choose>
+								<xsl:when test="arg[4]='BASE'">
+									<xsl:text>gray</xsl:text>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:variable name="up" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
+									<xsl:variable name="lo" select="'abcdefghijklmnopqrstuvwxyz'"/>
+									<xsl:value-of select="translate(arg[4],$up,$lo)"/>
+								</xsl:otherwise>
+							</xsl:choose>
+							<xsl:text>_cube.png</xsl:text>
+						</xsl:attribute>
+					</img>
+				</div>
 			
-							<xsl:variable name="zCoord" select="arg[3]"/>
-							<xsl:variable name="yCoord" select="arg[1]"/>
-							<xsl:variable name="xCoord" select="arg[2]"/>
-			
-							<xsl:variable name="yCell" select="$yCoord * 37 - $zCoord * 19"/>
-							<xsl:variable name="xCell" select="($xCoord * 38 + (7 - $yCoord) * 19) - $zCoord*19"/>
-							
-							<div>
-								<xsl:attribute name="style">
-									<xsl:value-of select="concat('position:absolute; left:', $xCell ,'px; top:', $yCell ,'px; height: 57px; width:39px; background-color: transparent')"/>
-								</xsl:attribute>
-								
-								<img width="39px" height="57px">
-									<xsl:attribute name="src">
-										<xsl:text>../stylesheets/cubicup/</xsl:text>
-										<xsl:choose>
-											<xsl:when test="arg[4]='BASE'">
-												<xsl:text>gray</xsl:text>
-											</xsl:when>
-											<xsl:otherwise>
-												<xsl:variable name="up" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
-												<xsl:variable name="lo" select="'abcdefghijklmnopqrstuvwxyz'"/>
-												<xsl:value-of select="translate(arg[4],$up,$lo)"/>
-											</xsl:otherwise>
-										</xsl:choose>
-										<xsl:text>_cube.png</xsl:text>
-									</xsl:attribute>
-								</img>
-							</div>
-						
-						</xsl:for-each>
-					</div>
-					<div id="count">
-						<xsl:for-each select="/match/state/fact[prop-f='CUBES']">
-							<xsl:value-of select="arg[1]"/>: <xsl:value-of select="arg[2]"/> <br/>
-						</xsl:for-each>
-					</div>
-				</xsl:for-each>
-			</body>
-		
-		</html>
+			</xsl:for-each>
+		</div>
+
+		<p>
+			<xsl:for-each select="fact[prop-f='CUBES']">
+				<xsl:value-of select="arg[1]"/>: <xsl:value-of select="arg[2]"/> <br/>
+			</xsl:for-each>
+		</p>
+	
 	</xsl:template>
+
 </xsl:stylesheet>
