@@ -44,6 +44,7 @@
         <pathelement location="/usr/share/tomcat5.5/common/lib/naming-resources.jar"/>
         <pathelement location="/usr/share/tomcat5.5/common/lib/jasper-compiler-jdt.jar"/>
         <pathelement location="/usr/share/tomcat5.5/common/lib/naming-factory.jar"/>
+        <pathelement location="/usr/share/tomcat5.5/common/lib/commons-lang.jar"/>
     </path>
     <path id="JUnit 4.libraryclasspath">
         <pathelement location="${ECLIPSE_HOME}/plugins/org.junit4_4.1.0.1/junit-4.1.jar"/>

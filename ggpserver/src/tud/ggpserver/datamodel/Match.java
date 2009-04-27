@@ -201,6 +201,7 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 		assert(currentState.isTerminal());
 		
 		updateGoalValues(goalValues);
+		errorMessages.add(new LinkedList<GameControllerErrorMessage>());
 		updateXmlState(currentState, goalValues);
 		updateStatus(STATUS_FINISHED);
 	}
