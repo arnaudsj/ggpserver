@@ -3,14 +3,11 @@
 <!--
 	- Widget for printing a rectangular board of fixed size
 	- For use within <body>.
-	- Accepts args: xPos and yPos which specify absolute position.
 -->
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	<xsl:template name="board">
-	
-		<xsl:param name="xPos"/>
-		<xsl:param name="yPos"/>
+
 		<xsl:param name="Width"/> <!-- the number of cells per column -->
 		<xsl:param name="Height"/> <!-- the number of cells per row -->
 		<xsl:param name="CellWidth">40</xsl:param> <!-- the width of each cell in px -->
@@ -23,14 +20,12 @@
 		<xsl:param name="LightCellColor">#CCCCCC</xsl:param>
 		<xsl:param name="DarkCellColor">#AAAAAA</xsl:param>
 
-		<style type="text/css" media="all">@import 
-			url("../../stylesheets/generic/css/main.css");
-			
+		<style type="text/css" media="all">
+
 			div.board
 			{
-				position: absolute;
-				left:     <xsl:value-of select="$xPos"/>px;
-				top:      <xsl:value-of select="$yPos"/>px;
+				width:  <xsl:value-of select="$Width*$CellWidth"/>px;
+				height: <xsl:value-of select="$Height*$CellHeight"/>px;
 			}
 			div.cellLight
 			{
@@ -48,9 +43,9 @@
 				border: 2px solid #FFC;
 				background-color: <xsl:value-of select="$DarkCellColor"/>;
 			}
-			
+
 		</style>
-		
+
 		<div class="board">
 			<xsl:call-template name="row-loop">
 				<xsl:with-param name="width" select="$Width"/>
@@ -60,7 +55,7 @@
 		</div>
 
 	</xsl:template>
-	
+
 	<xsl:template name="row-loop">
 		<xsl:param name="row">1</xsl:param>
 		<xsl:param name="width"/>
@@ -73,7 +68,7 @@
 			<xsl:with-param name="checkered" select="$checkered"/>
 		</xsl:call-template>
 		<br/>
-		
+
 		<!-- loop -->
 		<xsl:if test="$row &lt; $height">
 			<xsl:call-template name="row-loop">
@@ -103,7 +98,7 @@
 				</xsl:choose>
 			</xsl:attribute>
 		</div>
-		
+
 		<!-- loop -->
 		<xsl:if test="$col &lt; $width">
 			<xsl:call-template name="col-loop">

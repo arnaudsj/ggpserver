@@ -1,245 +1,51 @@
 /* css released under Creative Commons ShareAlike License v1.0 - http://creativecommons.org/licenses/sa/1.0/  */
 
 
-/* basic elements */
-body { 
-	color: #fff111; 
-	background: #fffffc; 
+body {
+	color: #111;
+	background: #ffc;
 	margin: 0px;
 	}
-/* specific divs */
-div.title {
-	font: bold 17pt georgia;
-	letter-spacing: 1px; 
-	color: #039;
+
+div.bartab{
+	float: left;
+	font: 12pt/16pt georgia;
+	background: #ffc;
+	text-align: center;
+	vertical-align: middle;
+	padding: 10px;
 }
+
+div.bartab a:link {
+	font-weight: bold;
+	text-decoration: none;
+	color: #006;
+	}
+
+div.bartab a:visited {
+	font-weight: bold;
+	text-decoration: none;
+	color: #039;
+	}
+
+div.bartab a:hover, a:active {
+	text-decoration: underline;
+	color: #009;
+	}
+
 span.heading {
 	font: bold 10pt georgia;
-	letter-spacing: 1px; 
+	letter-spacing: 1px;
 	color: #000;
 }
 span.content {
 	font: 10pt georgia;
-	letter-spacing: 1px; 
+	letter-spacing: 1px;
 	color: #000;
-}	
-span.tt {
-	font: bold 14pt geneva;
 }
-#topbar {
-	background: #ffc;
-	width: 744px;
-	height: 87px;
-}
-#logo {
-	width: 744px;
-	height: 65px;
-}
-div.bartab{
-	float: left;
-	font: 12pt/16pt georgia; 
-	background: #ffc;
-	text-align: center;
-}
-div.h_bartab{
-	float: left;
-	font: 12pt/16pt georgia;
-	text-align: center;
-	background: #369;
-	border-bottom: 1px solid #369;
-}
-div.thread {
-	font: 10pt georgia;
-	margin: 25px;
-	padding-left: 5px;
-}
-div.post {
-	font: 10pt georgia;
-	margin-top: 15px;
-	margin-bottom: 15px;
-	margin-left: 25px;
-	border-left: 1px dotted #aaa;
-	padding-left: 5px;
-}
-div.author {
-	font: 8pt georgia;
-	padding-left: 15px;
-	margin: 2px;
-}
-div.post-title {
-	font: 10pt georgia;
-	padding-left: 5px;
-}
-div.content {
-	width: 400px;
-	font: 10pt georgia;
-	margin: 2px;
-	padding: 5px;
-	border: 1px solid #369;
-}
-div.input-content {
-	font: 8pt georgia;
-	margin: 2px;
-	padding: 5px;
-}
-div.lastreply {
-	font: 8pt georgia;
-	padding-left: 15px;
-}
-#home{
-	width: 100px;
-	height: 21px;
-}
-#spectator,#player,#director,#profile{
-	width: 99px;
-	height: 21px;
-	border-left: 1px dotted #369;
-	}
-#analyzer,#forum{
-	width: 99px;
-	height: 21px;
-	border-left: 1px dotted #369;
-	}
-div.bartab a:link { 
-	font-weight: bold; 
-	text-decoration: none; 
-	color: #006;
-	}
-div.bartab a:visited { 
-	font-weight: bold; 
-	text-decoration: none; 
-	color: #039;
-	}
-div.bartab a:hover, a:active { 
-	text-decoration: underline; 
-	color: #009;
-	}
-div.h_bartab a:link { 
-	font-weight: bold; 
-	text-decoration: none; 
-	color: #ff6;
-	}
-div.h_bartab a:visited { 
-	font-weight: bold; 
-	text-decoration: none; 
-	color: #ff9;
-	}
-div.h_bartab a:hover, a:active { 
-	text-decoration: underline; 
-	color: #ff3;
-	}
-div.nextbutton{
-	font: 16pt georgia;
-	width: 100px;
-	position: absolute;
-	left: 500px;
-	top: 0px;
-	text-align: center;
-	border: 2px dashed #369;
-	background: #ff9;
-	}
-#underline {
+
+div.underline {
 	height: 0px;
-	width: 700px;
 	border-bottom: 2px solid #369;
 }
-#footer {
-	float: left;
-	width: 750px;
-	border-top: 1px solid #369;
-	color: #000;
-	padding: 2px 0px 0px 5px;
-	font: 9pt georgia;
-	clear: both;
-}
-#news { 
-	width: 287px;
-	float: left;
-	background: #ffc;
-	font: 10pt georgia;
-	color: #000; 	
-	border-right: 1px dotted #369;
-	padding: 5px 5px 10px 8px;
-	}
-#other {
-	float: left;
-	width: 433px;
-	font: 10pt georgia;
-	background: #ffc;
-	color: #000; 
-	padding: 5px 5px 10px 8px;
-}
-#fullw {
-	float: left;
-	width: 733px;
-	background: #ffc;
-	font: 10pt georgia;
-	color: #000; 
-	padding: 5px 5px 10px 8px;
-	}
-#fullw li {
-	padding: 3px 0px 5px 0px;
-}
-div.cpelement {
-	position: relative;
-	float: left;
-	width: 160px;
-	font: 12pt times;
-	margin-top: 5px;
-	clear: right;
-}
-div.cpstatus {
-	position: relative;
-	float: left;	
-	width: 250px;
-	font: 12pt times;
-	margin-top: 5px;
-}
-div.cpaction {
-	position: relative;
-	float: left;
-	width: 200px;
-	font: 12pt times;
-	margin-top: 5px;
-}
-div.cpinfo {
-	height: 20px;
-	margin: 15px;
-	clear: right;
-}
 
-.container {
-    width: 95%;
-    margin: 10px auto;
-}
-.wrapper {
-    border: 1px solid gray;
-    padding-bottom: 1em;
-    clear: both;
-}
-.tourneymatches {
-
-}
-.tourneyactive, .tourneyready, .tourneyterminal {
-}
-.tourneyplayers {
-}
-.tourneyadmin {
-    border: 1px solid gray;
-    padding-bottom: 1em;
-}
-.floatleft {
-    float: left;
-    margin-left: 10px;
-    margin-top: 10px;
-    padding-left: 10px;
-    margin-right: 10px;
-    border-left: 2px solid blue;
-}
-.last {
-    width: 100%;
-    clear: both;
-}
-.footer {
-     clear: both;
-}

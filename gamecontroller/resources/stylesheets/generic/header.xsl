@@ -3,108 +3,78 @@
 <!--
 	- Widget for drawing the generic game-master header.
 	- For use within <body>.
-	- Accepts args: xPos and yPos which specify absolute position.
+	- needs css/main.css and sitespecific.xsl
 -->
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
 	<xsl:template name="header">
-
-		<xsl:param name="xPos"/>
-		<xsl:param name="yPos"/>
-
-		<style type="text/css" media="all">@import 
-			url("../../stylesheets/generic/css/main.css");
-		</style>
-		
-		<div id="header">
-		
-			<xsl:attribute name="style">
-				position:absolute;
-				left: <xsl:value-of select="$xPos"/>;
-				top:  <xsl:value-of select="$yPos"/>;
-			</xsl:attribute>
-			
-<!--
-			<div id="topbar">
- 				<div id="logo">
-					<img src="http://games.stanford.edu/gamemaster/images/ggp.gif"/>
-				</div>
-				<div class="bartab" id="home">
-					<a href="/">Home</a>
-				</div>
-				<div class="bartab" id="spectator">
-					<a href="/spectator/displayclass?class=match">Spectator</a>
-				</div>
-				<div class="bartab" id="player">
-					<a href="/player/displayclass?class=playable">Player</a>
-				</div>
-				<div class="bartab" id="director">
-					<a href="/director/displayclass?class=runnable">Director</a>
-				</div>
-				<div class="bartab" id="profile">
-					<a href="/profiler/profile?">Profile</a>
-				</div>
-			</div>
--->
+		<div class="header">
 			<xsl:variable name="currentStep" select="count(/match/history/step)+1"/>
-
-			<div id="topbar">
-				<span class="heading">Match:</span><span class="content"><xsl:value-of select="/match/match-id"/></span>
-				<br/><br/>
-				<xsl:choose>
-					<xsl:when test="not(/match/history/step)"><!-- this is the initial state => don't link to initial and previous state -->
-						<div class="bartab">
-							<img src="../../stylesheets/generic/images/leftarrow.png" width="20" height="20"/> Initial State
-						</div>
-						<div class="bartab">
-							<img src="../../stylesheets/generic/images/leftarrow.png" width="20" height="20"/> Previous State
-						</div>
-					</xsl:when>
-					<xsl:otherwise>
-						<div class="bartab">
-							<a href="step_1.xml">
-								<img src="../../stylesheets/generic/images/leftarrow.png" width="20" height="20"/> Initial State
-							</a>
-						</div>
-						<div class="bartab">
-							<a>
-							<xsl:attribute name="href">
-								step_<xsl:value-of select="$currentStep - 1"/>.xml
-							</xsl:attribute>
-								<img src="../../stylesheets/generic/images/leftarrow.png" width="20" height="20"/> Previous State
-							</a>
-						</div>
-					</xsl:otherwise>
-				</xsl:choose>
-
-				<xsl:choose>
-					<xsl:when test="/match/scores/reward"><!-- this is the final state => don't link to next and final state -->
-						<div class="bartab">
-							<img src="../../stylesheets/generic/images/rightarrow.png" width="20" height="20"/> Next State
-						</div>
-						<div class="bartab">
-							<img src="../../stylesheets/generic/images/rightarrow.png" width="20" height="20"/> Final State
-						</div>
-					</xsl:when>
-					<xsl:otherwise>
-						<div class="bartab">
-							<a>
-							<xsl:attribute name="href">
-								step_<xsl:value-of select="$currentStep + 1"/>.xml
-							</xsl:attribute>
-								<img src="../../stylesheets/generic/images/rightarrow.png" width="20" height="20"/> Next State
-							</a>
-						</div>
-						<div class="bartab">
-							<a href="finalstate.xml">
-								<img src="../../stylesheets/generic/images/rightarrow.png" width="20" height="20"/> Final State
-							</a>
-						</div>
-					</xsl:otherwise>
-				</xsl:choose>
-			</div>
-			<div id="underline"/>
-		</div>	
-	
+			<span class="heading">Match:</span><span class="content"><xsl:value-of select="/match/match-id"/></span>
+			<br/>
+			<xsl:call-template name="make_tab">
+				<xsl:with-param name="which">initial</xsl:with-param>
+				<xsl:with-param name="currentStep" select="$currentStep"/>
+			</xsl:call-template>
+			<xsl:call-template name="make_tab">
+				<xsl:with-param name="which">previous</xsl:with-param>
+				<xsl:with-param name="currentStep" select="$currentStep"/>
+			</xsl:call-template>
+			<xsl:call-template name="make_tab">
+				<xsl:with-param name="which">next</xsl:with-param>
+				<xsl:with-param name="currentStep" select="$currentStep"/>
+			</xsl:call-template>
+			<xsl:call-template name="make_tab">
+				<xsl:with-param name="which">final</xsl:with-param>
+				<xsl:with-param name="currentStep" select="$currentStep"/>
+			</xsl:call-template>
+			<div class="underline" style="clear:left;"/>
+		</div>
 	</xsl:template>
+
+	<xsl:template name="make_tab">
+		<xsl:param name="which"/>
+		<xsl:param name="currentStep"/>
+
+		<div class="bartab">
+			<a>
+				<xsl:if test="(($which='initial' or $which='previous') and $currentStep != 1) or (($which='final' or $which='next') and not (/match/scores/reward))">
+
+					<xsl:variable name="linkStep">
+						<xsl:choose>
+							<xsl:when test="$which='initial'">1</xsl:when>
+							<xsl:when test="$which='previous'"><xsl:value-of select="$currentStep - 1"/></xsl:when>
+							<xsl:when test="$which='next'"><xsl:value-of select="$currentStep + 1"/></xsl:when>
+							<xsl:when test="$which='final'">final</xsl:when>
+						</xsl:choose>
+					</xsl:variable>
+
+					<xsl:attribute name="href">
+						<xsl:call-template name="makeStepLinkURL">
+							<xsl:with-param name="step" select="$linkStep"/>
+						</xsl:call-template>
+					</xsl:attribute>
+				</xsl:if>
+
+				<xsl:attribute name="title">
+					<xsl:value-of select="$which"/> state
+				</xsl:attribute>
+
+				<xsl:variable name="imageName">
+					<xsl:choose>
+						<xsl:when test="$which='initial'">gnome-go-first</xsl:when>
+						<xsl:when test="$which='previous'">gnome-go-previous</xsl:when>
+						<xsl:when test="$which='next'">gnome-go-next</xsl:when>
+						<xsl:when test="$which='final'">gnome-go-last</xsl:when>
+					</xsl:choose>
+				</xsl:variable>
+
+				<img width="30" height="30">
+					<xsl:attribute name="src"><xsl:value-of select="$stylesheetURL"/>/generic/images/<xsl:value-of select="normalize-space($imageName)"/>.png</xsl:attribute>
+				</img>
+			</a>
+		</div>
+	</xsl:template>
+
 </xsl:stylesheet>
