@@ -157,20 +157,32 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 	}
 
 	/**
-	 * The actual order of calls and START / PLAY / STOP messages is like this:<br>
+	 * The actual order of calls and START / PLAY / STOP messages is like this (if the initial state is not terminal):<br>
 	 * 
-	 * gameStarted() --- adds errorMessages(0)<br>
+	 * gameStarted() --- adds errorMessages(0), xmlStates(0)<br>
 	 * START         --- all errors go to errorMessages(0)<br>
 	 * PLAY          --- all errors go to errorMessages(0)<br>
-	 * gameStep()    --- adds errorMessages(1), xmlStates(0), jointMoves(0), jointMovesStrings(0)<br>
+	 * gameStep()    --- adds errorMessages(1), xmlStates(1), jointMoves(0), jointMovesStrings(0)<br>
 	 * PLAY          --- all errors go to errorMessages(1)<br>
+	 * gameStep()...
 	 * ...<br>
-	 * gameStep()    --- adds errorMessages(n), xmlStates(n-1), jointMoves(n-1), jointMovesStrings(n-1)<br>
-	 * PLAY          --- all errors go to errorMessages(n)<br>
-	 * gameStopped() --- adds xmlStates(n)<br>
+	 * PLAY          --- all errors go to errorMessages(n-1)<br>
+	 * gameStep()    --- adds jointMoves(n-1), jointMovesStrings(n-1), DOES NOT add errorMessages(n), xmlStates(n) (because terminal) <br>
+	 * gameStopped() --- adds errorMessages(n), xmlStates(n)<br>
 	 * STOP          --- all errors go to errorMessages(n)<br>
 	 * 
 	 * So finally, errorMessages and xmlStates will have size n, while jointMoves and jointMovesStrings will have size (n-1).
+	 * 
+	 * ===============
+	 * 
+	 * If the initial state is terminal, the order will be like this:
+	 * 
+	 * gameStarted() --- adds errorMessages(0), DOES NOT ADD xmlStates(0)<br>
+	 * START         --- all errors go to errorMessages(0)<br>
+	 * gameStopped() --- adds xmlStates(0), DOES NOT ADD errorMessages(1)<br>
+	 * STOP          --- all errors go to errorMessages(n)<br>
+	 * 
+	 * Like above, errorMessages and xmlStates will have size n [== 1], while jointMoves and jointMovesStrings will have size (n-1) [== 0].
 	 */
 	public void gameStarted(MatchInterface<? extends TermInterface, ?> match, StateInterface<? extends TermInterface, ?> currentState) {
 		updateStatus(STATUS_RUNNING);
@@ -201,7 +213,13 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 		assert(currentState.isTerminal());
 		
 		updateGoalValues(goalValues);
-		errorMessages.add(new LinkedList<GameControllerErrorMessage>());
+		
+		if (errorMessages.size() > 1) {
+			// This can only happen if the initial state is terminal. In this
+			// case, we MUST NOT add another errormessages-list. see comment
+			// above gameStarted().
+			errorMessages.add(new LinkedList<GameControllerErrorMessage>());
+		}
 		updateXmlState(currentState, goalValues);
 		updateStatus(STATUS_FINISHED);
 	}
