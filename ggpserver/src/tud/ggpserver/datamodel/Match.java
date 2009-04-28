@@ -63,11 +63,9 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 	 * - errors from the start message and first play message go to index 0
 	 * - errors from the second play message go to index 1
 	 * - ...
-	 * - errors from the last (n-1^th) play message go to index n-1
+	 * - errors from the last (n^th) play message go to index n-1
 	 * - errors from the stop message go to index n
-	 * 
-	 * ==> the errorMessages list has the same number of elements as the
-	 *     states list, one more than the jointMoves list.
+	 * The match has n+1 states, n play messages and the stop message, therefore there is an entry in errorMessages for each state.
 	 */
 	private List<List<GameControllerErrorMessage>> errorMessages = new LinkedList<List<GameControllerErrorMessage>>();
 	
@@ -167,11 +165,11 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 	 * gameStep()...
 	 * ...<br>
 	 * PLAY          --- all errors go to errorMessages(n-1)<br>
-	 * gameStep()    --- adds jointMoves(n-1), jointMovesStrings(n-1), DOES NOT add errorMessages(n), xmlStates(n) (because terminal) <br>
-	 * gameStopped() --- adds errorMessages(n), xmlStates(n)<br>
+	 * gameStep()    --- adds errorMessages(n), jointMoves(n-1), jointMovesStrings(n-1), currentState is terminal -> state is not added <br>
+	 * gameStopped() --- adds xmlStates(n)<br>
 	 * STOP          --- all errors go to errorMessages(n)<br>
 	 * 
-	 * So finally, errorMessages and xmlStates will have size n, while jointMoves and jointMovesStrings will have size (n-1).
+	 * So finally, errorMessages and xmlStates will have size n+1, while jointMoves and jointMovesStrings will have size (n).
 	 * 
 	 * ===============
 	 * 
@@ -179,10 +177,10 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 	 * 
 	 * gameStarted() --- adds errorMessages(0), DOES NOT ADD xmlStates(0)<br>
 	 * START         --- all errors go to errorMessages(0)<br>
-	 * gameStopped() --- adds xmlStates(0), DOES NOT ADD errorMessages(1)<br>
-	 * STOP          --- all errors go to errorMessages(n)<br>
+	 * gameStopped() --- adds xmlStates(0)<br>
+	 * STOP          --- all errors go to errorMessages(0)<br>
 	 * 
-	 * Like above, errorMessages and xmlStates will have size n [== 1], while jointMoves and jointMovesStrings will have size (n-1) [== 0].
+	 * Like above, errorMessages and xmlStates will have size n+1 [== 1], while jointMoves and jointMovesStrings will have size (n) [== 0].
 	 */
 	public void gameStarted(MatchInterface<? extends TermInterface, ?> match, StateInterface<? extends TermInterface, ?> currentState) {
 		updateStatus(STATUS_RUNNING);
@@ -199,11 +197,11 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 
 	public void gameStep(JointMoveInterface<? extends TermInterface> jointMove, StateInterface<? extends TermInterface, ?> currentState) {
 		updateJointMove(jointMove); // this has to be done BEFORE storing the state (because updateXmlState reads jointMoves)
+
+		// prepare the error messages list for new entries  
+		errorMessages.add(new LinkedList<GameControllerErrorMessage>());
 		
 		if (!currentState.isTerminal()) {
-			// prepare the error messages list for new entries  
-			errorMessages.add(new LinkedList<GameControllerErrorMessage>());
-			
 			// only store the non-terminal states, because the terminal state will be stored in gameStopped()
 			updateXmlState(currentState, null);
 		}		
@@ -213,13 +211,6 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 		assert(currentState.isTerminal());
 		
 		updateGoalValues(goalValues);
-		
-		if (errorMessages.size() > 1) {
-			// This can only happen if the initial state is terminal. In this
-			// case, we MUST NOT add another errormessages-list. see comment
-			// above gameStarted().
-			errorMessages.add(new LinkedList<GameControllerErrorMessage>());
-		}
 		updateXmlState(currentState, goalValues);
 		updateStatus(STATUS_FINISHED);
 	}

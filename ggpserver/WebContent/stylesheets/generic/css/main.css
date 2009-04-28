@@ -1,47 +1,34 @@
 /* css released under Creative Commons ShareAlike License v1.0 - http://creativecommons.org/licenses/sa/1.0/  */
 
-
 body {
-	color: #111;
-	background: #ffc;
-	margin: 0px;
+    color:              #000000;
+	background-color:   #fff;
+    font:               72.5%/1.6 Verdana, "Trebuchet MS", sans-serif;
 	}
+
+a {
+	color:              #05087c;
+    text-decoration:    none;
+}
+
+a:hover {
+	color:              #777595;
+    text-decoration:    underline;
+}
 
 div.bartab{
 	float: left;
-	font: 12pt/16pt georgia;
-	background: #ffc;
 	text-align: center;
 	vertical-align: middle;
 	padding: 10px;
 }
 
-div.bartab a:link {
-	font-weight: bold;
-	text-decoration: none;
-	color: #006;
-	}
-
-div.bartab a:visited {
-	font-weight: bold;
-	text-decoration: none;
-	color: #039;
-	}
-
-div.bartab a:hover, a:active {
-	text-decoration: underline;
-	color: #009;
-	}
-
 span.heading {
-	font: bold 10pt georgia;
-	letter-spacing: 1px;
-	color: #000;
+	font-weight: bold;
+	font-variant: small-caps;
+	letter-spacing: 2px;
 }
 span.content {
-	font: 10pt georgia;
-	letter-spacing: 1px;
-	color: #000;
 }
 
 div.underline {
@@ -49,3 +36,24 @@ div.underline {
 	border-bottom: 2px solid #369;
 }
 
+div.header {
+	padding: 10px;
+}
+
+div.footer {
+	position: fixed;
+	bottom: 0px;
+	padding: 10px;
+	font-size: smaller;
+}
+
+div.history {
+}
+
+/*div.history table td {
+	border-top: 1px solid  #369;
+}*/
+
+div.history table th {
+	border-bottom: 1px solid  #369;
+}

@@ -16,4 +16,7 @@
 		<xsl:value-of select="$step"/>
 	</xsl:template>
 
+	<xsl:template name="webmaster">
+		<a href="http://www.inf.tu-dresden.de/index.php?node_id=1373&amp;ln=en">Stephan Schiffel</a>
+	</xsl:template>
 </xsl:stylesheet>

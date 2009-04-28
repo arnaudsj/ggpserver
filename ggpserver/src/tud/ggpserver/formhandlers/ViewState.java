@@ -27,7 +27,7 @@ public class ViewState {
 		int stepNumber;
 		if (this.stepNumber < 1 || this.stepNumber > states.size()) {
 			// return the last/final state
-			stepNumber = states.size(); 
+			stepNumber = states.size();
 		} else {
 			stepNumber = this.stepNumber;
 		}

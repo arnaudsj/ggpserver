@@ -60,9 +60,9 @@
 			]]>
 
 			<xsl:text disable-output-escaping="yes">nextState="</xsl:text>
-			<xsl:call-template name="makeStepLinkURL">
-				<xsl:with-param name="step" select="$currentStep+1"/>
-			</xsl:call-template>
+				<xsl:call-template name="makeStepLinkURL">
+					<xsl:with-param name="step" select="$currentStep+1"/>
+				</xsl:call-template>
 			<xsl:text disable-output-escaping="yes">";</xsl:text>
 
 			<xsl:choose>

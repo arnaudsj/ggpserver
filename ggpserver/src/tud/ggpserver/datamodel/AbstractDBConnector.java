@@ -353,7 +353,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		Match<TermType, ReasonerStateInfoType> match = null;
 		
 		while (match == null) {
-			String firstPart = "Match." + game.getName();
+			String firstPart = /*"Match." +*/ game.getName();
 			String secondPart = "." + Long.toString(number);
 			if (firstPart.length() + secondPart.length() > MATCHID_MAXLENGTH) {
 				firstPart = firstPart.substring(0, MATCHID_MAXLENGTH - secondPart.length() - 2) + "..";

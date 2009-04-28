@@ -12,8 +12,11 @@
 	<xsl:template name="state">
 		<xsl:param name="excludeFluent"/>
 
-		<span class="heading">State: </span>
-		<div class="underline" style="width:150px"></div>
+		<span class="heading">
+			<xsl:if test="$excludeFluent!=''">Remaining </xsl:if>
+			State:
+		</span>
+		<div class="underline"/>
 
 		<table>
 			<xsl:for-each select="fact[prop-f!=$excludeFluent]">
@@ -22,12 +25,12 @@
 				<tr>
 					<td>
 						<span class="heading">(<xsl:value-of select="./prop-f"/></span>
+						<span class="content">
 							<xsl:for-each select="./arg">
 								<xsl:text> </xsl:text>
-								<span class="content">
-									<xsl:value-of select="."/>
-								</span>
+								<xsl:value-of select="."/>
 							</xsl:for-each>
+						</span>
 						<span class="heading">)</span>
 					</td>
 				</tr>
