@@ -852,6 +852,10 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			
 			while (rs.next()) {
 				int errorMsgStepNumber = rs.getInt("step_number");   // step number counting starts with 1 
+				if (errorMsgStepNumber > numberOfStates) {
+					logger.severe("errorMsgStepNumber bigger than numberOfStates! Causing match id: " + matchID);        //$NON-NLS-1$s
+					throw new InternalError("errorMsgStepNumber bigger than numberOfStates! Causing match id: " + matchID);					
+				}
 				GameControllerErrorMessage errorMessage = new GameControllerErrorMessage(rs.getString("type"), rs.getString("message"));
 				result.get(errorMsgStepNumber - 1).add(errorMessage);
 			}

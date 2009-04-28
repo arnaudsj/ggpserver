@@ -53,7 +53,7 @@ public class ViewMatch {
 		}
 		if (match.getNumberOfStates() > match.getErrorMessages().size()) {
 			logger.severe("getErrorMessages().size() smaller than getNumberOfStates()! Causing match: " + match.toString());        //$NON-NLS-1$s
-			throw new InternalError("getErrorMessages().size() smaller than getNumberOfStates()!");
+			throw new InternalError("getErrorMessages().size() smaller than getNumberOfStates()! Causing match: " + match.toString());
 		}
 		return match.getErrorMessages().get(stepNumber - 1);
 	}
