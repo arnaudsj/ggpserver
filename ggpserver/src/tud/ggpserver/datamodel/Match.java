@@ -63,11 +63,11 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 	 * - errors from the start message and first play message go to index 0
 	 * - errors from the second play message go to index 1
 	 * - ...
-	 * - errors from the last (n^th) play message and the stop message go to
-	 *   index n
+	 * - errors from the last (n-1^th) play message go to index n-1
+	 * - errors from the stop message go to index n
 	 * 
 	 * ==> the errorMessages list has the same number of elements as the
-	 *     jointMoves list, one less than the states list.
+	 *     states list, one more than the jointMoves list.
 	 */
 	private List<List<GameControllerErrorMessage>> errorMessages = new LinkedList<List<GameControllerErrorMessage>>();
 	
