@@ -21,7 +21,10 @@
 <div id="content">
     <div id="ctitle">Show players</div>
 
-	<h1 class="notopborder">Showing page ${pager.page} (players ${pager.startRow + 1} to ${pager.endRow + 1})</h1>
+	<!-- pager -->
+	<jsp:directive.include file="/inc/pager_title.jsp" />
+	<jsp:directive.include file="/inc/pager.jsp" />
+
 	<table>
 		<thead>
 			<tr>

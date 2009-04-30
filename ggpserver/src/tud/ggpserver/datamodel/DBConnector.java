@@ -82,6 +82,13 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 		return result;
 	}
 
+	@Override
+	public void updateGameInfo(String name, String gameDescription, String stylesheet) throws SQLException {
+		super.updateGameInfo(name, gameDescription, stylesheet);
+		// delete cached result, so it will read again on next request
+		games.remove(name);
+	}
+
 	/////////////////// MATCH ///////////////////
 	@Override
 	public Match<Term, GameState> createMatch(

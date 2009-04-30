@@ -39,8 +39,12 @@ public class ShowMatches extends AbstractPager {
 		this.playerName = playerName;
 	}
 
+	public String getPlayerName() {
+		return playerName;
+	}
+
 	@Override
-	protected String getTableName() {
+	public String getTableName() {
 		return "matches";
 	}
 

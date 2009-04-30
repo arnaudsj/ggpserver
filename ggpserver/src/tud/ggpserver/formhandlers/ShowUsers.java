@@ -18,7 +18,7 @@ public class ShowUsers extends AbstractPager {
 	}
 	
 	@Override
-	protected String getTableName() {
+	public String getTableName() {
 		return "users";
 	}
 

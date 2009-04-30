@@ -14,6 +14,7 @@ public class ViewGame {
 	private final static AbstractDBConnector db = DBConnectorFactory.getDBConnector();
 
 	private String name = "";
+	private Game game = null;
 
 	public String getName() {
 		return name;
@@ -24,13 +25,17 @@ public class ViewGame {
 	}
 	
 	public Game getGame() throws NamingException, SQLException {
-		return db.getGame(name);
+		if(game == null){
+			game = db.getGame(name);
+		}
+		return game;
 	}
 	
 	public String getGameDescription() throws NamingException, SQLException {
+		
 		//		return new KIFSyntaxFormatter(getGame().getKIFGameDescription()).getFormattedGameDescription();
-		return StringEscapeUtils.escapeHtml(db.getGameDescription(name))
+		return StringEscapeUtils.escapeHtml(getGame().getGameDescription())
 			.replaceAll(" ", "&nbsp;")
-			.replace("\n", "<br>");
+			.replace("\n", "<br/>");
 	}
 }

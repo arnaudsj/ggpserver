@@ -14,8 +14,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
-
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
@@ -155,8 +153,6 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			if (ps != null)
 				try {ps.close();} catch (SQLException e) {}
 		} 
-		
-
 
 		logger.info("String, String, int, User, String - Creating new RemotePlayerInfo: " + name); //$NON-NLS-1$
 		return new RemotePlayerInfo(name, host, port, owner, status);
@@ -245,39 +241,8 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				String stylesheet = rs.getString("stylesheet");
 				
 				logger.info("String - Returning new game: " + name); //$NON-NLS-1$
-				result = new Game<TermType, ReasonerStateInfoType>(gameDescription , name, getReasoner(gameDescription, name), stylesheet);
+				result = new Game<TermType, ReasonerStateInfoType>(gameDescription, name, getReasoner(gameDescription, name), stylesheet);
 				
-			} else {
-				result = null;
-			}
-		} finally { 
-			if (con != null)
-				try {con.close();} catch (SQLException e) {}
-			if (ps != null)
-				try {ps.close();} catch (SQLException e) {}
-			if (rs != null)
-				try {rs.close();} catch (SQLException e) {}
-		} 
-
-		return result;
-	}
-	
-	public String getGameDescription(String gameName) throws SQLException {
-		Connection con = getConnection();
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
-		String result = null;
-		
-		try { 
-			ps = con.prepareStatement("SELECT `gamedescription` FROM `games` WHERE `name` = ?;");
-			ps.setString(1, gameName);
-			rs = ps.executeQuery();
-			
-			if (rs.next()) {
-				result = rs.getString("gamedescription");
-				
-				logger.info("String - Returning new game description for game: " + gameName); //$NON-NLS-1$
 			} else {
 				result = null;
 			}
@@ -413,7 +378,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				if (status.equals(Match.STATUS_FINISHED)) {
 					result.setGoalValues(goalValues);
 				}
-				List<String> states = getStates(game.getStylesheet(), matchID);
+				List<String> states = getStates(matchID);
 				result.setXmlStates(states);
 				result.setErrorMessages(getErrorMessages(matchID, states.size()));
 				result.setJointMovesStrings(getJointMovesStrings(matchID));				
@@ -914,16 +879,13 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return result;
 	}
 
-	private List<String> getStates(String styleSheet, String matchID) throws SQLException {
+	private List<String> getStates(String matchID) throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
 		List<String> result = new LinkedList<String>();
 
-		Pattern styleSheetPattern=Pattern.compile("<\\?xml-stylesheet type=\"text/xsl\" href=\"[^\"]*\"\\?>");
-		String styleSheetReplacement="<?xml-stylesheet type=\"text/xsl\" href=\""+styleSheet+"\"?>";
-		
 		try {
 			ps = con.prepareStatement("SELECT `step_number`, `state` FROM `states` where `match_id` = ? ORDER BY `step_number`;");
 			ps.setString(1, matchID);
@@ -932,11 +894,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			int stepNumber = 1;
 			while (rs.next()) {
 				assert(rs.getInt("step_number") == stepNumber);
-				String xmlState=rs.getString("state");
-				// this is a hack to show old matches with the right stylesheets (e.g., if the stylesheet for a game was changed after the match)
-				// we just replace the stylesheet information with the current one  
-				xmlState=styleSheetPattern.matcher(xmlState).replaceFirst(styleSheetReplacement);
-				result.add(xmlState);
+				result.add(rs.getString("state"));
 				stepNumber++;
 			}
 		} finally { 
@@ -958,7 +916,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		try { 
 			ps = con.prepareStatement("UPDATE `ggpserver`.`players` "
 							+ "SET `host` = ?, `port` = ?, `owner` = ?, `status` = ? "
-							+ "WHERE `players`.`name` = ? LIMIT 1 ;");
+							+ "WHERE `name` = ? LIMIT 1 ;");
 			ps.setString(1, host);
 			ps.setInt(2, port);
 			ps.setString(3, user.getUserName());
@@ -973,6 +931,25 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		} 
 	}
 
+	public void updateGameInfo(String gameName, String gameDescription, String stylesheet) throws SQLException {
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+
+		try { 
+			ps = con.prepareStatement("UPDATE `ggpserver`.`games` "
+							+ "SET `gamedescription` = ?, `stylesheet` = ? "
+							+ "WHERE `name` = ? LIMIT 1 ;");
+			ps.setString(1, gameDescription);
+			ps.setString(2, stylesheet);
+			ps.setString(3, gameName);
+			ps.executeUpdate(); 
+		} finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+		}
+	}
 	
 	private static Connection getConnection() throws SQLException {
 		if (datasource == null) {
@@ -985,6 +962,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		}
 		return datasource.getConnection();
 	}
+
 	
 // /**
 // * Similar to PHP's mysql_real_escape_string(). Escapes the following

@@ -69,5 +69,5 @@ public abstract class AbstractPager {
 
 	public abstract String getTargetJsp();
 
-	protected abstract String getTableName();
+	public abstract String getTableName();
 }

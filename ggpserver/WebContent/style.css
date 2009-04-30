@@ -235,8 +235,21 @@ li.validationerror {
 	font-size:         small;
 }
 
+span.highlight {
+	background-color: #ffec44;
+}
 
 /**************** ICONS ****************/
+.edit {
+  background: url(icons/other/22-edit.png) no-repeat;
+  display:             block;
+  height:              22px;
+  width:               22px;
+}
+.edit a span {
+  visibility:          hidden;
+}
+
 .errors {
   background: url(icons/other/16-warning_icon.png) no-repeat;
   display:             block;

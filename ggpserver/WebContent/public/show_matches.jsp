@@ -20,9 +20,16 @@
 
 <!-- Content -->
 <div id="content">
-    <div id="ctitle">Show matches</div>
+    <div id="ctitle">Show matches
+    <c:if test="${ pager.playerName != null }">
+     for ${pager.playerName}
+    </c:if>
+     </div>
 
-	<h1 class="notopborder">Showing page ${pager.page} (matches ${pager.startRow + 1} to ${pager.endRow + 1})</h1>
+	<!-- pager -->
+	<jsp:directive.include file="/inc/pager_title.jsp" />
+	<jsp:directive.include file="/inc/pager.jsp" />
+
 	<table>
 		<thead>
 			<tr>
@@ -56,23 +63,40 @@
 				<td>${match.status}</td>
 				<td>${match.startclock}</td>
 				<td>${match.playclock}</td>
-<!--				<td>${match.startTime}</td>-->
+<%--				<td>${match.startTime}</td> --%>
 				<td>
 					<c:forEach var="playerinfo" items="${match.orderedPlayerInfos}">
 						<c:url value="view_player.jsp" var="playerURL">
 							<c:param name="name" value="${playerinfo.name}" />
 						</c:url>
-						<a href='<c:out value="${playerURL}" />'>${playerinfo.name}</a>
+						<a href='<c:out value="${playerURL}" />'>
+							<c:choose>
+								<c:when test="${ playerinfo.name == pager.playerName}">
+									<span class="highlight">${playerinfo.name}</span>
+								</c:when>
+								<c:otherwise>
+									${playerinfo.name}
+								</c:otherwise>
+							</c:choose>
+						</a><br/>
 					</c:forEach>
 				</td>
 				<td>
 					<c:choose>
-						<c:when test="${match.orderedGoalValues == null}">
+						<c:when test="${match.goalValues == null}">
 							---
 						</c:when>
 						<c:otherwise>
-							<c:forEach var="goalvalue" items="${match.orderedGoalValues}">
-								${goalvalue}
+							<c:forEach var="roleindex" begin="0" end="${match.game.numberOfRoles - 1}">
+								<c:choose>
+									<c:when test="${ match.orderedPlayerInfos[roleindex].name == pager.playerName }">
+										<span class="highlight">${match.orderedGoalValues[roleindex]}</span>
+									</c:when>
+									<c:otherwise>
+										${match.orderedGoalValues[roleindex]}
+									</c:otherwise>
+								</c:choose>
+								<br/>
 							</c:forEach>
 						</c:otherwise>
 					</c:choose>

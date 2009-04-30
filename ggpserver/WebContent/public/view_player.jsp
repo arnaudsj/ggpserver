@@ -28,30 +28,30 @@ if (viewPlayer.getPlayer() == null) {
 }
 %>
 
-<h1 class="notopborder">Information on player ${viewPlayer.player.name}</h1>
+<h1 class="notopborder">Information on player ${viewPlayer.name}</h1>
 <table>
 	<tbody>
 		<tr>
 			<td><b>player name</b></td>
-			<td><c:out value="${viewPlayer.player.name}"></c:out></td>
+			<td><c:out value="${viewPlayer.name}"></c:out></td>
 		</tr>
 		<tr>
 			<td><b>owner</b></td>
 			<td>
 				<c:url value="view_user.jsp" var="userURL">
-					<c:param name="userName" value="${viewPlayer.player.owner.userName}" />
-				</c:url> <a href='<c:out value="${userURL}" />'>${viewPlayer.player.owner.userName}</a>
+					<c:param name="userName" value="${viewPlayer.owner.userName}" />
+				</c:url> <a href='<c:out value="${userURL}" />'>${viewPlayer.owner.userName}</a>
 			</td>
 		</tr>
 		<tr>
 			<td><b>status</b></td>
-			<td><c:out value="${viewPlayer.player.status}"></c:out></td>
+			<td><c:out value="${viewPlayer.status}"></c:out></td>
 		</tr>
 		<tr>
 			<td><b>matches</b></td>
 			<td>
 				<c:url value="show_matches.jsp" var="playerURL">
-					<c:param name="playerName" value="${viewPlayer.player.name}" />
+					<c:param name="playerName" value="${viewPlayer.name}" />
 				</c:url>
 				<a href='<c:out value="${playerURL}" />'>show matches</a>
 			</td>
