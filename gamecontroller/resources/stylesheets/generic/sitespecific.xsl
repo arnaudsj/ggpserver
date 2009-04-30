@@ -10,13 +10,13 @@
 
 	<xsl:template name="makeStepLinkURL">
 		<xsl:param name="step"/> <!-- an integer number >=1 or 'final' -->
-		<xsl:variable name="linkStepName">
-			<xsl:choose>
-				<xsl:when test="$step='final'">finalstate</xsl:when>
-				<xsl:otherwise>step_<xsl:value-of select="$step"/></xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable>
-		<xsl:value-of select="normalize-space($linkStepName)"/>.xml
+		<xsl:choose>
+			<xsl:when test="$step='final'">finalstate.xml</xsl:when>
+			<xsl:otherwise>step_<xsl:value-of select="$step"/>.xml</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 
+	<xsl:template name="webmaster">
+		<a href="http://www.inf.tu-dresden.de/index.php?node_id=1373&amp;ln=en">Stephan Schiffel</a>
+	</xsl:template>
 </xsl:stylesheet>

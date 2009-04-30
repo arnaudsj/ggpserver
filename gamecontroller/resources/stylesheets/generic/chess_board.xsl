@@ -77,7 +77,7 @@
 				<xsl:variable name="y">
 					<xsl:choose>
 						<xsl:when test="string-length($yArg)>1">
-							<xsl:value-of select="translate($xArg, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '')"/>
+							<xsl:value-of select="translate($yArg, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '')"/>
 						</xsl:when>
 						<xsl:otherwise>
 							<xsl:value-of select="translate($yArg,$COORDINATES,$NUMBERS)"/>
@@ -99,6 +99,11 @@
 						left: <xsl:value-of select="$xPosCell"/>px;
 						top: <xsl:value-of select="$yPosCell"/>px;
 					</xsl:attribute>
+					
+					<xsl:comment>
+						x: <xsl:value-of select="$xArg"/> -&gt; <xsl:value-of select="$x"/>
+						y: <xsl:value-of select="$yArg"/> -&gt; <xsl:value-of select="$y"/>
+					</xsl:comment>
 
 					<xsl:variable name="piece">
 						<xsl:choose>

@@ -18,6 +18,7 @@
 	
 	<xsl:import href="title.xsl"/>
 	<xsl:import href="header.xsl"/>
+	<xsl:import href="footer.xsl"/>
 	<xsl:import href="history.xsl"/>
 	<xsl:import href="playerInfo.xsl"/>
 	<xsl:import href="playClock.xsl"/>
@@ -35,9 +36,7 @@
 			</head>
 
 			<body>
-				<p style="padding: 10px;">
-					<xsl:call-template name="header"/>
-				</p>
+				<xsl:call-template name="header"/>
 
 				<table>
 					<tr>
@@ -50,13 +49,15 @@
 						</td>
 						<td style="padding: 10px; vertical-align: top;">
 							<xsl:call-template name="playClock"/>
-							<br/>
+							<!--<br/>-->
 							<xsl:call-template name="playerInfo"/>
-							<br/>
+							<!--<br/>-->
 							<xsl:call-template name="history"/>
 						</td>
 					</tr>
 				</table>
+				
+				<xsl:call-template name="footer"/>
 			</body>
 		</html>
 

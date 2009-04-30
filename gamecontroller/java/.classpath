@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path=""/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/JavaProver"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/JavaProver"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/GGP-Common"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

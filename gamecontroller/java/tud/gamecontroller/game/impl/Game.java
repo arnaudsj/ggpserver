@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2008,2009 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GameController.
 
@@ -38,10 +38,12 @@ public class Game<
 	private String name;
 	private List<RoleInterface<TermType>> orderedRoles=null;
 	private String stylesheet = null;  // this can remain null (no stylesheet will be used)
+	private String gameDescription = null;
 		
 	public Game(String gameDescription, String name, ReasonerInterface<TermType, ReasonerStateInfoType> reasoner) {
 		this.name=name;
 		this.reasoner=reasoner;
+		this.gameDescription=gameDescription;
 	}
 
 	public Game(String gameDescription, String name, ReasonerInterface<TermType, ReasonerStateInfoType> reasoner, String stylesheet) {
@@ -77,6 +79,14 @@ public class Game<
 
 	public String getKIFGameDescription() {
 		return reasoner.getKIFGameDescription();
+	}
+
+	/**
+	 * 
+	 * @return the rules of the game including comments and whitespace
+	 */
+	public String getGameDescription() {
+		return gameDescription ;
 	}
 
 	@Override

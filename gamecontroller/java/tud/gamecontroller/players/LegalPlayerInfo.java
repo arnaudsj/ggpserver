@@ -19,7 +19,7 @@
 
 package tud.gamecontroller.players;
 
-public class LegalPlayerInfo extends PlayerInfo {
+public class LegalPlayerInfo extends LocalPlayerInfo {
 
 	public LegalPlayerInfo(int roleindex) {
 		super(roleindex, "Legal");

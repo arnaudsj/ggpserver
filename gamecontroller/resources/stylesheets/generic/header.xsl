@@ -11,8 +11,10 @@
 	<xsl:template name="header">
 		<div class="header">
 			<xsl:variable name="currentStep" select="count(/match/history/step)+1"/>
+			
 			<span class="heading">Match:</span><span class="content"><xsl:value-of select="/match/match-id"/></span>
 			<br/>
+			<span class="heading">Step:</span><span class="content"><xsl:value-of select="$currentStep"/></span>
 			<xsl:call-template name="make_tab">
 				<xsl:with-param name="which">initial</xsl:with-param>
 				<xsl:with-param name="currentStep" select="$currentStep"/>
@@ -39,17 +41,17 @@
 
 		<div class="bartab">
 			<a>
+				
+				<xsl:variable name="linkStep">
+					<xsl:choose>
+						<xsl:when test="$which='initial'">1</xsl:when>
+						<xsl:when test="$which='previous'"><xsl:value-of select="$currentStep - 1"/></xsl:when>
+						<xsl:when test="$which='next'"><xsl:value-of select="$currentStep + 1"/></xsl:when>
+						<xsl:when test="$which='final'">final</xsl:when>
+					</xsl:choose>
+				</xsl:variable>
+				
 				<xsl:if test="(($which='initial' or $which='previous') and $currentStep != 1) or (($which='final' or $which='next') and not (/match/scores/reward))">
-
-					<xsl:variable name="linkStep">
-						<xsl:choose>
-							<xsl:when test="$which='initial'">1</xsl:when>
-							<xsl:when test="$which='previous'"><xsl:value-of select="$currentStep - 1"/></xsl:when>
-							<xsl:when test="$which='next'"><xsl:value-of select="$currentStep + 1"/></xsl:when>
-							<xsl:when test="$which='final'">final</xsl:when>
-						</xsl:choose>
-					</xsl:variable>
-
 					<xsl:attribute name="href">
 						<xsl:call-template name="makeStepLinkURL">
 							<xsl:with-param name="step" select="$linkStep"/>
@@ -58,7 +60,11 @@
 				</xsl:if>
 
 				<xsl:attribute name="title">
-					<xsl:value-of select="$which"/> state
+					<xsl:choose>
+						<xsl:when test="$which='initial'">initial state</xsl:when>
+						<xsl:when test="$which='final'">final state</xsl:when>
+						<xsl:otherwise>state <xsl:value-of select="$linkStep"/></xsl:otherwise>
+					</xsl:choose>
 				</xsl:attribute>
 
 				<xsl:variable name="imageName">

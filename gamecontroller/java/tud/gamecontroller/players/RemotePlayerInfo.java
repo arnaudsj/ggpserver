@@ -19,7 +19,7 @@
 
 package tud.gamecontroller.players;
 
-public class RemotePlayerInfo extends PlayerInfo {
+public class RemotePlayerInfo extends LocalPlayerInfo {
 
 	private String host;
 	private int port;
