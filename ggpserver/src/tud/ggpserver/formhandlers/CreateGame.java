@@ -52,8 +52,8 @@ public class CreateGame extends Handler {
 		if (gameName.length() > 40) {
 			errorsGameName.add("game name must not be longer than 40 characters");
 		}
-		if (!gameName.matches("[a-zA-Z][a-zA-Z0-9._-]*")) {
-			errorsGameName.add("game name must begin with a letter and only contain the following characters: a-z A-Z 0-9 . _ -");
+		if (!gameName.matches("[a-zA-Z0-9._-]*")) {
+			errorsGameName.add("game name must only contain the following characters: a-z A-Z 0-9 . _ -");
 		} else if (db.getGame(gameName) != null) {
 			// this is an "else if" such that only valid names are checked to prevent SQL injection
 			errorsGameName.add("game name already exists, please pick a different one");
