@@ -1,18 +1,14 @@
 package tud.ggpserver.scheduler;
 
-import static tud.ggpserver.datamodel.DBConnectorFactory.getDBConnector;
-
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.logging.Logger;
-
-import javax.naming.NamingException;
 
 import tud.gamecontroller.GameController;
 import tud.gamecontroller.game.RoleInterface;
@@ -32,31 +28,43 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 	private static final Logger logger = Logger.getLogger(AbstractRoundRobinScheduler.class.getName());
 
 	private static final long DELAY_BETWEEN_GAMES = 2000;   // wait two seconds
-	private Thread gameThread;
 	private boolean running = false;
-	private Game<TermType, ReasonerStateInfoType> currentGame;
-	private Match<TermType, ReasonerStateInfoType> currentMatch;
-	
-	
+	private final AbstractDBConnector dbConnector;
 
-	public AbstractRoundRobinScheduler() {
-		Logger.getLogger("tud.gamecontroller").addHandler(new LoggingHandler(this));
+	private Game<TermType, ReasonerStateInfoType> currentGame;
+	private Thread gameThread;
+
+	private List<Match<TermType, ReasonerStateInfoType>> currentMatches;
+	private List<Thread> matchThreads;
+		
+	public AbstractRoundRobinScheduler(AbstractDBConnector dbConnector) {
+		Logger.getLogger("tud.gamecontroller").addHandler(new LoggingHandler());
+		this.dbConnector = dbConnector;
 	}
 
 	public void start() {
 		if (!running) {
 			setRunning(true);
+			
+			// TODO: clean out "new" and "running" matches
+			
+			
 			gameThread=new Thread(){
 				public void run() {
 					try {
 						runMatches();
 					} catch (InterruptedException e) {
-						if (currentMatch != null) {
-							currentMatch.updateStatus(Match.STATUS_ABORTED);
-							currentMatch.updateErrorMessage(new GameControllerErrorMessage(GameControllerErrorMessage.ABORTED, "The match was aborted."));
+						// abort all current matches
+						if (matchThreads != null) {
+							try {
+								for (Thread matchThread : matchThreads) {
+									matchThread.interrupt();
+									matchThread.join();
+								}
+							} catch (InterruptedException e1) {
+								logger.severe("exception: " + e1); //$NON-NLS-1$
+							}
 						}
-					} catch (NamingException e) {
-						logger.severe("exception: " + e); //$NON-NLS-1$
 					} catch (SQLException e) {
 						logger.severe("exception: " + e); //$NON-NLS-1$
 					}
@@ -67,66 +75,106 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		}
 	}
 	
-	private void runMatches() throws InterruptedException, NamingException, SQLException {
+	private void runMatches() throws InterruptedException, SQLException {
 		while (true) {
-			currentMatch = createMatch();
+			currentMatches = createMatches();
 			
-			GameController<TermType, ReasonerStateInfoType> gameController = new GameController<TermType, ReasonerStateInfoType>(currentMatch);
-			gameController.addListener(currentMatch);
-
-			gameController.runGame();
+			matchThreads = new LinkedList<Thread>();
+			
+			for (final Match<TermType, ReasonerStateInfoType> currentMatch : currentMatches) {
+				Thread thread = new Thread(){
+					public void run() {
+						Match<TermType, ReasonerStateInfoType> match = currentMatch;
+						
+						logger.info("Thread for match " + match.getMatchID() + " - START");						
+						try {
+							GameController<TermType, ReasonerStateInfoType> gameController = new GameController<TermType, ReasonerStateInfoType>(match);
+							gameController.addListener(match);
+							gameController.runGame();
+						} catch (InterruptedException e) {
+							logger.info("Thread for match " + match.getMatchID() + " - INTERRUPT");
+							match.updateStatus(Match.STATUS_ABORTED);
+							match.updateErrorMessage(new GameControllerErrorMessage(GameControllerErrorMessage.ABORTED, "The match was aborted."));
+						}
+						logger.info("Thread for match " + match.getMatchID() + " - END");
+					}
+				};
+				thread.start();
+				matchThreads.add(thread);
+			}
+			
+			// wait for all matches to complete
+			for (Thread thread : matchThreads) {
+				thread.join();
+			}
+			
+			matchThreads = null;
+			
 			Thread.sleep(DELAY_BETWEEN_GAMES);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private Match<TermType, ReasonerStateInfoType> createMatch() throws NamingException, SQLException {
-		AbstractDBConnector db = getDBConnector();
-		List<Game<TermType, ReasonerStateInfoType>> allGames = db.getAllGames();
+	private List<Match<TermType, ReasonerStateInfoType>> createMatches() throws SQLException {
+		pickNextGame();
+		
+		// pick playclock (5, 10, ..., 60 seconds)
+//		int playclock = ((int) (new Random().nextDouble() * 12 + 1)) * 5;
+//		int startclock = 6 * playclock;
+		// TODO: only changed for debugging
+		int playclock = 3;
+		int startclock = 3;
+		
+		List<Match<TermType, ReasonerStateInfoType>> result = new LinkedList<Match<TermType,ReasonerStateInfoType>>();
+		
+		List<Map<RoleInterface<TermType>, PlayerInfo>> allPlayerInfos = createPlayerInfos(currentGame);
+		for (Map<RoleInterface<TermType>, PlayerInfo> playerInfos : allPlayerInfos) {
+			result.add(getDBConnector().createMatch(currentGame, startclock, playclock, playerInfos, new Date()));
+		}
+		return result;
+	}
+
+	@SuppressWarnings("unchecked")
+	private void pickNextGame() throws SQLException {
+		List<Game<TermType, ReasonerStateInfoType>> allGames = getDBConnector().getAllGames();
 		
 		if (currentGame == null) {
+			// TODO: start first game with fewest matches (to evenly distribute matches among games)
 			currentGame = allGames.get(0);
 		} else {
 			int nextGameIndex = (allGames.indexOf(currentGame) + 1) % allGames.size();
 			currentGame = allGames.get(nextGameIndex);
 		}
-		
-		Map<RoleInterface<TermType>, PlayerInfo> playerinfos = createPlayerInfos(currentGame);
-		
-		
-		// pick playclock (5, 10, ..., 60 seconds)
-		int playclock = ((int) (new Random().nextDouble() * 12 + 1)) * 5;
-		int startclock = 6 * playclock;
-		
-		return db.createMatch(currentGame, startclock, playclock, playerinfos, new Date());
 	}
 	
-	private Map<RoleInterface<TermType>, PlayerInfo> createPlayerInfos(Game<TermType, ReasonerStateInfoType> game) throws NamingException, SQLException {
-		// copy players and shuffle
+	private List<Map<RoleInterface<TermType>, PlayerInfo>> createPlayerInfos(Game<TermType, ReasonerStateInfoType> game) throws SQLException {
 		AbstractDBConnector<?, ?> db = getDBConnector();
-		List<PlayerInfo> playerInfos = new LinkedList<PlayerInfo>(db.getPlayerInfos(RemotePlayerInfo.STATUS_ACTIVE));
-		Collections.shuffle(playerInfos);
-		
-		int numberOfPlayers = playerInfos.size();
+		List<PlayerInfo> activePlayerInfos = db.getPlayerInfos(RemotePlayerInfo.STATUS_ACTIVE);		
 		int numberOfRoles = game.getNumberOfRoles();
-
-		if (numberOfPlayers > numberOfRoles) {
-			// truncate player list to number of roles
-			playerInfos.subList(numberOfRoles, numberOfPlayers).clear();
-		} else {
-			// fill up with random players and shuffle again
-			for (int i = numberOfPlayers; i < numberOfRoles; i++) {
-				playerInfos.add(new RandomPlayerInfo(-1));
+				
+		// add enough random players so that the players are divisible among the matches without remainder 
+		int numberOfSurplusPlayers = activePlayerInfos.size() % numberOfRoles;		
+		if (numberOfSurplusPlayers > 0) {
+			int numberOfRandomPlayers = numberOfRoles - numberOfSurplusPlayers;
+			for (int i = 0; i < numberOfRandomPlayers; i++) {
+				activePlayerInfos.add(new RandomPlayerInfo(-1));
 			}
-			Collections.shuffle(playerInfos);
 		}
 		
-		// make result  
-		Map<RoleInterface<TermType>, PlayerInfo> result = new HashMap<RoleInterface<TermType>, PlayerInfo>();
-		
-		for (int i = 0; i < numberOfRoles; i++) {
-			playerInfos.get(i).setRoleindex(i);
-			result.put(game.getOrderedRoles().get(i), playerInfos.get(i));
+		Collections.shuffle(activePlayerInfos);
+
+		int numberOfMatches = activePlayerInfos.size() / numberOfRoles;
+		List<Map<RoleInterface<TermType>, PlayerInfo>> result = new ArrayList<Map<RoleInterface<TermType>, PlayerInfo>>(numberOfMatches);		
+		for (int i = 0; i < numberOfMatches; i++) {
+			List<PlayerInfo> playerInfos = activePlayerInfos.subList(i * numberOfRoles, (i + 1) * numberOfRoles);
+			
+			Map<RoleInterface<TermType>, PlayerInfo> roleMap = new HashMap<RoleInterface<TermType>, PlayerInfo>();
+			
+			for (int j = 0; j < numberOfRoles; j++) {
+				playerInfos.get(j).setRoleindex(j);
+				roleMap.put(game.getOrderedRoles().get(j), playerInfos.get(j));
+			}
+			result.add(roleMap);
 		}
 		
 		return result;
@@ -141,7 +189,7 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 			} catch (InterruptedException e) {
 			}
 		}
-		currentMatch = null;
+		currentMatches = null;
 		setRunning(false);
 	}
 
@@ -153,7 +201,7 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		this.running = running;
 	}
 
-	protected Match<TermType, ReasonerStateInfoType> getCurrentMatch() {
-		return currentMatch;
+	private AbstractDBConnector getDBConnector() {
+		return dbConnector;
 	}
 }
