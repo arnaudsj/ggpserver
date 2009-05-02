@@ -571,7 +571,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		ResultSet rs = null;
 
 		List<PlayerInfo> result = new LinkedList<PlayerInfo>();
-			// it is important that only a COPY of a list is returned here,
+			// it is important that a new list is returned here,
 			// since the result of this method will be shuffled in
 			// AbstractRoundRobinScheduler.createPlayerInfos()
 		
@@ -601,9 +601,6 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		ResultSet rs = null;
 
 		List<RemotePlayerInfo> result = new LinkedList<RemotePlayerInfo>();
-			// it is important that only a COPY of a list is returned here,
-			// since the result of this method will be shuffled in
-			// AbstractRoundRobinScheduler.createPlayerInfos()
 		
 		try {
 			ps = con.prepareStatement("SELECT `name` FROM `players` where `owner` = ?;");
