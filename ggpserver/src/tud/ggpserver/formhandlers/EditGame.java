@@ -24,6 +24,9 @@ import tud.ggpserver.datamodel.DBConnectorFactory;
 public class EditGame extends Handler {
 	// These fields must either be initialized with a non-null value, or we need
 	// to explicitly do an if-check for != null inside isValid() (see assertions).
+	//
+	// For example, gameDescription would remain "null" if setGameName() is
+	// called with a non-existing game name.
 	private String gameName = "";
 	private String gameDescription = "";
 	private String stylesheet = "../stylesheets/generic/generic.xsl";
