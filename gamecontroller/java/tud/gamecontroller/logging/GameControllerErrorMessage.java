@@ -35,6 +35,7 @@ public class GameControllerErrorMessage {
 	private String type;
 	private String message;
 	private MatchInterface<?, ?> match = null;
+	private String playerName = null;
 	
 	public GameControllerErrorMessage(String type) {
 		this(type, "");
@@ -48,9 +49,16 @@ public class GameControllerErrorMessage {
 		this.message = message;
 	}
 
-	public GameControllerErrorMessage(String type, String message, MatchInterface<?, ?> match) {
+	public GameControllerErrorMessage(String type, String message,
+			MatchInterface<?, ?> match) {
 		this(type, message);
 		this.match = match;
+	}
+
+	public GameControllerErrorMessage(String type, String message,
+			MatchInterface<?, ?> match, String playerName) {
+		this(type, message, match);
+		this.playerName = playerName;
 	}
 
 	/**
@@ -84,5 +92,9 @@ public class GameControllerErrorMessage {
 
 	public MatchInterface<?, ?> getMatch() {
 		return match;
+	}
+
+	public String getPlayerName() {
+		return playerName;
 	}
 }

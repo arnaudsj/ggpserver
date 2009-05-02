@@ -94,7 +94,7 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 				move=movefactory.getMoveFromKIF(descrambledReply);
 			} catch (InvalidKIFException ex) {
 				String message = "Error parsing reply \""+reply+"\" from "+this+": "+ex.getMessage();
-				logger.log(Level.SEVERE, message, new GameControllerErrorMessage(GameControllerErrorMessage.PARSING_ERROR, message, match));
+				logger.log(Level.SEVERE, message, new GameControllerErrorMessage(GameControllerErrorMessage.PARSING_ERROR, message, match, this.getName()));
 			}
 //			if(moveterm!=null && !moveterm.isGround()){
 //				logger.severe("Reply \""+reply+"\" from "+this+" is not a ground term. (descrambled:\""+descrambledReply+"\")");
@@ -164,14 +164,14 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 			Thread.currentThread().interrupt();
 		} catch (UnknownHostException e) {
 			String message = "error: unknown host \""+ host+ "\"";
-			logger.log(Level.SEVERE, message, new GameControllerErrorMessage(GameControllerErrorMessage.UNKNOWN_HOST, message, match));
+			logger.log(Level.SEVERE, message, new GameControllerErrorMessage(GameControllerErrorMessage.UNKNOWN_HOST, message, match, this.getName()));
 			// call the notifier in case of an exception, otherwise 
 			// the GameController will wait forever if the exception occurred
 			// before the sending of the message
 			notifier.messageWasSent();
 		} catch (IOException e) {
 			String message = "error: io error for "+ this+" : "+e.getMessage();
-			logger.log(Level.SEVERE, message, new GameControllerErrorMessage(GameControllerErrorMessage.IO_ERROR, message, match));
+			logger.log(Level.SEVERE, message, new GameControllerErrorMessage(GameControllerErrorMessage.IO_ERROR, message, match, this.getName()));
 			// call the notifier in case of an exception, otherwise 
 			// the GameController will wait forever if the exception occurred
 			// before the sending of the message
