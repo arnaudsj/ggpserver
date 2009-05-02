@@ -22,9 +22,11 @@ import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 
 public class EditGame extends Handler {
-	private String gameName = null;
-	private String gameDescription = null;
-	private String stylesheet = null;
+	// These fields must either be initialized with a non-null value, or we need
+	// to explicitly check for != null below.
+	private String gameName = "";
+	private String gameDescription = "";
+	private String stylesheet = "../stylesheets/generic/generic.xsl";
 
 	private List<String> errorsGameName = new LinkedList<String>();
 	private List<String> errorsDescription = new LinkedList<String>();
@@ -50,8 +52,8 @@ public class EditGame extends Handler {
 		if (gameName.length() > 40) {
 			errorsGameName.add("game name must not be longer than 40 characters");
 		}
-		if (!gameName.matches("[a-zA-Z][a-zA-Z0-9._-]*")) {
-			errorsGameName.add("game name must begin with a letter and only contain the following characters: a-z A-Z 0-9 . _ -");
+		if (!gameName.matches("[a-zA-Z0-9._-]*")) {
+			errorsGameName.add("game name must only contain the following characters: a-z A-Z 0-9 . _ -");
 		}
 		if (db.getGame(gameName) == null) {
 			// the game has to exist already
