@@ -23,7 +23,7 @@ import tud.ggpserver.datamodel.DBConnectorFactory;
 
 public class EditGame extends Handler {
 	// These fields must either be initialized with a non-null value, or we need
-	// to explicitly check for != null below.
+	// to explicitly do an if-check for != null inside isValid() (see assertions).
 	private String gameName = "";
 	private String gameDescription = "";
 	private String stylesheet = "../stylesheets/generic/generic.xsl";
@@ -46,6 +46,9 @@ public class EditGame extends Handler {
 	public boolean isValid() throws SQLException {
 		///// game name ////
 		errorsGameName.clear();
+		
+		assert (gameName != null);
+		
 		if (gameName.equals("")) {
 			errorsGameName.add("game name must not be empty");
 		}
@@ -63,6 +66,9 @@ public class EditGame extends Handler {
 		//// game description////
 		errorsDescription.clear();
 		parseLogRecords.clear();
+		
+		assert(gameDescription != null);
+		
 		if (gameDescription.equals("")) {
 			errorsDescription.add("description must not be empty");
 		}
@@ -101,6 +107,8 @@ public class EditGame extends Handler {
 		//// stylesheet ////
 		errorsStylesheet.clear();
 		try {
+			assert (stylesheet != null);
+			
 			// only use the path element (throw away scheme, user info, host, port, query and fragment)
 			stylesheet = new URI(stylesheet).normalize().getPath();
 
