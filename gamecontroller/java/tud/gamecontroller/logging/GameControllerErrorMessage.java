@@ -1,4 +1,25 @@
+/*
+    Copyright (C) 2009 Martin Günther <mintar@gmx.de>, Stephan Schiffel <stephan.schiffel@gmx.de>
+
+    This file is part of GameController.
+
+    GameController is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    GameController is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GameController.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 package tud.gamecontroller.logging;
+
+import tud.gamecontroller.game.MatchInterface;
 
 public class GameControllerErrorMessage {
 	public static final String TIMEOUT = "timeout";
@@ -13,6 +34,7 @@ public class GameControllerErrorMessage {
 
 	private String type;
 	private String message;
+	private MatchInterface<?, ?> match = null;
 	
 	public GameControllerErrorMessage(String type) {
 		this(type, "");
@@ -24,6 +46,11 @@ public class GameControllerErrorMessage {
 		}
 		this.type = type;
 		this.message = message;
+	}
+
+	public GameControllerErrorMessage(String type, String message, MatchInterface<?, ?> match) {
+		this(type, message);
+		this.match = match;
 	}
 
 	/**
@@ -53,5 +80,9 @@ public class GameControllerErrorMessage {
 		else {
 			return message;
 		}
+	}
+
+	public MatchInterface<?, ?> getMatch() {
+		return match;
 	}
 }

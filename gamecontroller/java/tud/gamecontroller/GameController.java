@@ -147,7 +147,7 @@ public class GameController<
 		for(AbstractPlayerThread<?> t:threads){
 			if(!t.waitUntilDeadline()){
 				String message = "player "+t.getPlayer()+" timed out!";
-				logger.log(loglevel, message, new GameControllerErrorMessage(GameControllerErrorMessage.TIMEOUT, message));
+				logger.log(loglevel, message, new GameControllerErrorMessage(GameControllerErrorMessage.TIMEOUT, message, match));
 			}
 		}
 	}
@@ -175,7 +175,7 @@ public class GameController<
 			MoveInterface<TermType> move=pt.getMove();
 			if(move==null || !currentState.isLegal(role, move)){
 				String message = "Illegal move \""+move+"\" from "+match.getPlayer(role)+ " in step "+step;
-				logger.log(Level.SEVERE, message, new GameControllerErrorMessage(GameControllerErrorMessage.ILLEGAL_MOVE, message));
+				logger.log(Level.SEVERE, message, new GameControllerErrorMessage(GameControllerErrorMessage.ILLEGAL_MOVE, message, match));
 				jointMove.put(role,currentState.getLegalMove(role));
 			}else{
 				jointMove.put(role,move);
