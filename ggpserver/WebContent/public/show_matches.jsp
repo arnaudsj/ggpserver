@@ -78,7 +78,7 @@
 									${playerinfo.name}
 								</c:otherwise>
 							</c:choose>
-						</a><br/>
+						</a><br>
 					</c:forEach>
 				</td>
 				<td>
@@ -96,7 +96,7 @@
 										${match.orderedGoalValues[roleindex]}
 									</c:otherwise>
 								</c:choose>
-								<br/>
+								<br>
 							</c:forEach>
 						</c:otherwise>
 					</c:choose>
@@ -105,11 +105,23 @@
 					<center>
 						<c:choose>
 							<c:when test="${match.hasErrors}">
+								<c:choose>
+									<c:when test="${pager.playerName == null}">
+										<c:set var="errorclass" value="errors"></c:set>
+									</c:when>
+									<c:when test="${pager.playerName != null && match.hasErrorsAllPlayers[pager.playerName]}">
+										<c:set var="errorclass" value="errors"></c:set>
+									</c:when>
+									<c:otherwise>
+										<c:set var="errorclass" value="errors_bw"></c:set>
+									</c:otherwise>
+								</c:choose>
+								
 								<c:url value="view_errors.jsp" var="errorURL">
 									<c:param name="matchID" value="${match.matchID}" />
 									<% // <c:param name="stepNumber" value="${stepNumber}" /> %>
 								</c:url>
-								<div class="errors"><a href='<c:out value="${errorURL}" />'><span>errors</span></a></div>
+								<div class="${errorclass}"><a href='<c:out value="${errorURL}" />'><span>errors</span></a></div>
 							</c:when>
 							<c:otherwise>
 								<div class="no_errors"></div>
@@ -124,6 +136,12 @@
 	
 	<!-- pager -->
 	<jsp:directive.include file="/inc/pager.jsp" />
+	
+	<c:if test="${pager.playerName != null}">
+		<h1>Legend</h1>
+		<div class="errors"></div> &ndash; some players produced errors, including player ${pager.playerName} <br>
+		<div class="errors_bw"></div> &ndash; some other players produced errors
+	</c:if>
 </div>  <!--end div "content"-->
 
 <jsp:directive.include file="/inc/footer.jsp" />
