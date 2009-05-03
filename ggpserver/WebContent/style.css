@@ -240,9 +240,19 @@ span.highlight {
 }
 
 /**************** ICONS ****************/
+.view {
+  background: url(icons/sweetie/png-8/24-zoom.png) no-repeat;
+  display:             inline-block;
+  height:              22px;
+  width:               22px;
+}
+.view a span {
+  visibility:          hidden;
+}
+
 .edit {
   background: url(icons/other/22-edit.png) no-repeat;
-  display:             block;
+  display:             inline-block;
   height:              22px;
   width:               22px;
 }
@@ -252,17 +262,27 @@ span.highlight {
 
 .errors {
   background: url(icons/other/16-warning_icon.png) no-repeat;
-  display:             block;
+  display:             inline-block;
   height:              16px;
   width:               16px;
 }
 /*.errors {
   background: url(icons/sweetie/png-8/16-message-warn.png) no-repeat;
-  display:             block;
+  display:             inline-block;
   height:              16px;
   width:               16px;
 }*/
 .errors a span {
+  visibility:          hidden;
+}
+
+.errors_bw {
+  background: url(icons/other/16-warning_icon_bw.png) no-repeat;
+  display:             inline-block;
+  height:              16px;
+  width:               16px;
+}
+.errors_bw a span {
   visibility:          hidden;
 }
 
@@ -274,7 +294,7 @@ span.highlight {
 /* 
 .playerstatus-active {
   background: url(icons/sweetie/png-8/24-arrow-next.png) no-repeat;
-  display:             block;
+  display:             inline-block;
   height:              24px;
   width:               24px;
 }
@@ -285,7 +305,7 @@ span.highlight {
 
 .playerstatus-inactive {
   background: url(icons/sweetie/png-8/24-control-stop.png) no-repeat;
-  display:             block;
+  display:             inline-block;
   height:              24px;
   width:               24px;
 }
@@ -296,7 +316,7 @@ span.highlight {
 
 .playerstatus-new {
   background: url(icons/sweetie/png-8/24-settings.png) no-repeat;
-  display:             block;
+  display:             inline-block;
   height:              24px;
   width:               24px;
 }
@@ -308,7 +328,7 @@ span.highlight {
 
 .add-new-player {
   background: url(icons/sweetie/png-8/24-em-plus.png) no-repeat;
-  display:             block;
+  display:             inline-block;
   height:              24px;
   text-indent:         28px;
 }

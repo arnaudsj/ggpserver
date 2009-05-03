@@ -50,7 +50,7 @@
 					</c:url>
 					<a href='<c:out value="${playerURL}" />'>${player.name}</a>
 				</td>
-				<td>${player.owner.userName}</td>
+				<td>${player.owner.userName}</td> <% // FIXME: player is not necessarily a RemotePlayerInfo, can also be random/legal, which have no "owner" %>
 				<td><div class="playerstatus-${player.status}"><span>${player.status}</span></div></td>
 			</tr>
 	      </c:forEach>
