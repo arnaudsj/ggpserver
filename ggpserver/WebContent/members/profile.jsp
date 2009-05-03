@@ -33,6 +33,7 @@
 			<th>host</th>
 			<th>port</th>
 			<th>status</th>
+			<th colspan="2">actions</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -46,12 +47,27 @@
 				</c:otherwise>
 			</c:choose>
 			<tr class="${rowClass}">
-				<td><c:url value="edit_player.jsp" var="playerURL">
-					<c:param name="playerName" value="${player.name}" />
-				</c:url><a href='<c:out value="${playerURL}" />'>${player.name}</a></td>
+				<td>
+<%--				<c:url value="edit_player.jsp" var="playerURL">--%>
+<%--					<c:param name="playerName" value="${player.name}" />--%>
+<%--				</c:url><a href='<c:out value="${playerURL}" />'>${player.name}</a>--%>
+					<c:out value="${player.name}" />
+				</td>
 				<td>${player.host}</td>
 				<td>${player.port}</td>
 				<td><div class="playerstatus-${player.status}"><span>${player.status}</span></div></td>
+				<td>
+					<c:url value="../public/view_player.jsp" var="viewURL">
+						<c:param name="name" value="${player.name}" />
+					</c:url>
+					<div class="view"><a href='<c:out value="${viewURL}" />'><span>view</span></a></div>
+				</td>
+				<td>
+					<c:url value="edit_player.jsp" var="editURL">
+						<c:param name="playerName" value="${player.name}" />
+					</c:url>
+					<div class="edit"><a href='<c:out value="${editURL}" />'><span>edit</span></a></div>
+				</td>
 			</tr>
 		</c:forEach>
 
@@ -64,19 +80,29 @@
 			</c:otherwise>
 		</c:choose>
 		<tr class="${rowClass}">
-			<td colspan="4">
+			<td colspan="6">
 				<div class="add-new-player"><a href='<%= response.encodeURL("create_player.jsp") %>'><span>Add new player</span></a></div>
 			</td>
 		</tr>
-
 	</tbody>
 </table>
 
 <h1>Tips</h1>
+A player can be in one of two states:
 <ul>
-	<li>Click on a player name to edit</li>
+	<li><b>active</b> - the player will take part in the round-robin tournament, 
+	i.e., the GGP Server will schedule it for matches against other active players.</li>
+	<li><b>inactive</b> - the opposite of active: the GGP Server will not send 
+	any messages to the player. </li>
 </ul>
 
+<p>If an active player doesn't send a single legal move back for three matches in a row, it is assumed that this 
+player has crashed, and its status is automatically set to "inactive" by the 
+GGP Server. If this has happened to your player, the last error message of the 
+last match that the player played will say so.</p>
+
+<p>The GGP Server will never set a player's status back to "active". You have to
+do so manually.</p>
 
 
 </div>
