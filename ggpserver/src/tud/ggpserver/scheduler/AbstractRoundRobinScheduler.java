@@ -2,6 +2,7 @@ package tud.ggpserver.scheduler;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,7 +37,12 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 
 	private List<Match<TermType, ReasonerStateInfoType>> currentMatches;
 	private List<Thread> matchThreads;
-		
+
+	private final Map<PlayerInfo, Integer> numErrorMatches = Collections.synchronizedMap(new HashMap<PlayerInfo, Integer>());
+	
+	private static final int MAX_ERROR_MATCHES = 2;
+
+	
 	public AbstractRoundRobinScheduler(AbstractDBConnector dbConnector) {
 		Logger.getLogger("tud.gamecontroller").addHandler(new LoggingHandler());
 		this.dbConnector = dbConnector;
@@ -91,6 +97,7 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 							GameController<TermType, ReasonerStateInfoType> gameController = new GameController<TermType, ReasonerStateInfoType>(match);
 							gameController.addListener(match);
 							gameController.runGame();
+							checkDeadPlayers(match);
 						} catch (InterruptedException e) {
 							logger.info("Thread for match " + match.getMatchID() + " - INTERRUPT");
 							match.updateStatus(Match.STATUS_ABORTED);
@@ -149,7 +156,7 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 	
 	private List<Map<RoleInterface<TermType>, PlayerInfo>> createPlayerInfos(Game<TermType, ReasonerStateInfoType> game) throws SQLException {
 		AbstractDBConnector<?, ?> db = getDBConnector();
-		List<PlayerInfo> activePlayerInfos = db.getPlayerInfos(RemotePlayerInfo.STATUS_ACTIVE);		
+		List<PlayerInfo> activePlayerInfos = db.getPlayerInfos(RemotePlayerInfo.STATUS_ACTIVE);
 		int numberOfRoles = game.getNumberOfRoles();
 				
 		// add enough random players so that the players are divisible among the matches without remainder 
@@ -203,5 +210,75 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 
 	private AbstractDBConnector getDBConnector() {
 		return dbConnector;
+	}
+	
+	/**
+	 * For each player, the number of matches where the player produced any
+	 * error ON EACH STATE is recorded here. If there is at least one state in
+	 * the game without an error, the match does not count as an "error match".
+	 * Also, only matches in a row are counted, i.e. whenever the player plays a
+	 * non-error match, this number is reset to "0". <br>
+	 * 
+	 * When a player has played MAX_ERROR_MATCHES in a row, its status is set  
+	 * to "inactive".
+	 */
+	private void checkDeadPlayers(Match<TermType, ReasonerStateInfoType> match) {
+		Collection<RemotePlayerInfo> remotePlayerInfos = new LinkedList<RemotePlayerInfo>();
+		
+		for (PlayerInfo info : match.getPlayerInfos()) {
+			if (info instanceof RemotePlayerInfo) {
+				remotePlayerInfos.add((RemotePlayerInfo) info);
+			}
+		}
+		
+		for (RemotePlayerInfo playerInfo : remotePlayerInfos) {
+			if (isPlayerDead(match, playerInfo)) {
+				Integer oldNumErrorMatches = numErrorMatches.get(playerInfo);
+				if (oldNumErrorMatches == null) {
+					oldNumErrorMatches = 0;
+				}
+				Integer newNumErrorMatches = oldNumErrorMatches + 1;
+				numErrorMatches.put(playerInfo, newNumErrorMatches);
+				
+				if (newNumErrorMatches > MAX_ERROR_MATCHES) {
+					// update player status --> inactive
+					try {
+						dbConnector.updatePlayerInfo(playerInfo.getName(),
+								playerInfo.getHost(), playerInfo.getPort(),
+								playerInfo.getOwner(),
+								RemotePlayerInfo.STATUS_INACTIVE);
+					} catch (SQLException e) {
+						logger.severe("exception: " + e);
+					}
+					
+					// add an informative error message to the match
+					String message = "The status of player "
+							+ playerInfo.getName()
+							+ " was set to INACTIVE because it produced"
+							+ " an error in each state of more than "
+							+ MAX_ERROR_MATCHES + " matches in a row.";
+					match.updateErrorMessage(new GameControllerErrorMessage(
+							GameControllerErrorMessage.PLAYER_DISABLED,
+							message, match, playerInfo.getName()));					
+					logger.warning(message);
+				}
+			} else {
+				numErrorMatches.put(playerInfo, 0);
+			}
+		}
+	}
+
+	private boolean isPlayerDead(Match<TermType, ReasonerStateInfoType> match, PlayerInfo playerInfo) {
+		List<List<GameControllerErrorMessage>> errorMessages = match.getErrorMessagesForPlayer(playerInfo);
+		
+		assert (errorMessages.size() == match.getNumberOfStates());
+		
+		for (int i = 0; i < match.getNumberOfStates(); i++) {
+			if (errorMessages.get(i).size() == 0) {
+				// no error messages for this state
+				return false;
+			}
+		}
+		return true;
 	}
 }
