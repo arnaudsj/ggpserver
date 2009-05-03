@@ -380,7 +380,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				}
 				List<String> states = getStates(matchID);
 				result.setXmlStates(states);
-				result.setErrorMessages(getErrorMessages(matchID, states.size()));
+				result.setErrorMessages(getErrorMessages(result, states.size()));
 				result.setJointMovesStrings(getJointMovesStrings(matchID));				
 			} else {
 				result = null;
@@ -709,11 +709,12 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		PreparedStatement ps = null;
 
 		try {
-			ps = con.prepareStatement("INSERT INTO `errormessages` (`match_id` , `step_number`, `type`, `message`) VALUES (?, ?, ?, ?);");
+			ps = con.prepareStatement("INSERT INTO `errormessages` (`match_id` , `step_number`, `type`, `message`, `player`) VALUES (?, ?, ?, ?, ?);");
 			ps.setString(1, matchID);
 			ps.setInt(2, stepNumber);
 			ps.setString(3, errorMessage.getType());
 			ps.setString(4, errorMessage.getMessage());
+			ps.setString(5, errorMessage.getPlayerName());
 			
 			ps.executeUpdate();
 //		this shouldn't happen because we use a generated primary key:		
@@ -796,7 +797,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	 * on. Unfortunately, step number counting starts with 1, so to get the
 	 * error messages for step number i, use result.get(i - 1).
 	 */
-	private List<List<GameControllerErrorMessage>> getErrorMessages(String matchID, int numberOfStates) throws SQLException {
+	private List<List<GameControllerErrorMessage>> getErrorMessages(Match<TermType, ReasonerStateInfoType> match, int numberOfStates) throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -808,17 +809,18 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		}
 		
 		try {
-			ps = con.prepareStatement("SELECT `step_number`, `type`, `message` FROM `errormessages` where `match_id` = ? ORDER BY `step_number`;");
-			ps.setString(1, matchID);
+			ps = con.prepareStatement("SELECT `step_number`, `type`, `message`, `player` FROM `errormessages` where `match_id` = ? ORDER BY `step_number`;");
+			ps.setString(1, match.getMatchID());
 			rs = ps.executeQuery();
 			
 			while (rs.next()) {
 				int errorMsgStepNumber = rs.getInt("step_number");   // step number counting starts with 1 
 				if (errorMsgStepNumber > numberOfStates) {
-					logger.severe("errorMsgStepNumber bigger than numberOfStates! Causing match id: " + matchID);        //$NON-NLS-1$s
-					throw new InternalError("errorMsgStepNumber bigger than numberOfStates! Causing match id: " + matchID);					
+					String message = "errorMsgStepNumber bigger than numberOfStates! Causing match id: " + match.getMatchID();
+					logger.severe(message);        //$NON-NLS-1$s
+					throw new InternalError(message);					
 				}
-				GameControllerErrorMessage errorMessage = new GameControllerErrorMessage(rs.getString("type"), rs.getString("message"));
+				GameControllerErrorMessage errorMessage = new GameControllerErrorMessage(rs.getString("type"), rs.getString("message"), match, rs.getString("player"));
 				result.get(errorMsgStepNumber - 1).add(errorMessage);
 			}
 		} finally { 
