@@ -71,20 +71,19 @@ public class CreateGame extends Handler {
 		try {
 			Reasoner reasoner = new Reasoner(gameDescription);
 			
-			List<? extends RoleInterface<Term>> roles = reasoner.GetRoles();
-			if (roles == null || roles.isEmpty()) {
-				errorsDescription.add("there was a syntax error in your game description (could not determine number of roles)");
-			}
-			
 			GameState initialState = reasoner.getInitialState();
 			if (initialState == null) {
 				errorsDescription.add("there was a syntax error in your game description (could not get initial state)");
 			}
-			
-			for (RoleInterface<Term> role : roles) {
-				Collection<? extends MoveInterface<Term>> legalMoves = reasoner.GetLegalMoves(initialState, role);
-				if (legalMoves == null || legalMoves.isEmpty()) {
-					errorsDescription.add("there was a syntax error in your game description (could not get legal moves)");
+			List<? extends RoleInterface<Term>> roles = reasoner.GetRoles();
+			if (roles == null || roles.isEmpty()) {
+				errorsDescription.add("there was a syntax error in your game description (could not determine number of roles)");
+			} else {
+				for (RoleInterface<Term> role : roles) {
+					Collection<? extends MoveInterface<Term>> legalMoves = reasoner.GetLegalMoves(initialState, role);
+					if (legalMoves == null || legalMoves.isEmpty()) {
+						errorsDescription.add("there was a syntax error in your game description (could not get legal moves)");
+					}
 				}
 			}
 		} catch (RuntimeException e1) {
