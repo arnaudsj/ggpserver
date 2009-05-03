@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.logging.Logger;
 
 import tud.gamecontroller.GameController;
@@ -126,11 +127,8 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		pickNextGame();
 		
 		// pick playclock (5, 10, ..., 60 seconds)
-//		int playclock = ((int) (new Random().nextDouble() * 12 + 1)) * 5;
-//		int startclock = 6 * playclock;
-		// TODO: only changed for debugging
-		int playclock = 3;
-		int startclock = 3;
+		int playclock = ((int) (new Random().nextDouble() * 12 + 1)) * 5;
+		int startclock = 6 * playclock;
 		
 		List<Match<TermType, ReasonerStateInfoType>> result = new LinkedList<Match<TermType,ReasonerStateInfoType>>();
 		
