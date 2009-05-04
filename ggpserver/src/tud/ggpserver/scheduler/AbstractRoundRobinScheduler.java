@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import tud.gamecontroller.GameController;
@@ -126,9 +127,24 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 	private List<Match<TermType, ReasonerStateInfoType>> createMatches() throws SQLException {
 		pickNextGame();
 		
-		// pick playclock (5, 10, ..., 60 seconds)
-		int playclock = ((int) (new Random().nextDouble() * 12 + 1)) * 5;
-		int startclock = 6 * playclock;
+		int playclock;
+		int startclock;
+		
+		if (logger.isLoggable(Level.CONFIG)) {
+			// debug mode -- you can change this by editing the
+			// logging.properties file (and starting the VM with special
+			// arguments).
+			// For now, this only really makes sense when executing
+			// RoundRobinSchedulerTest. The reason to reduce start and play
+			// clock is to speed up games.
+			playclock = 5;
+			startclock = 5;
+		} else {
+			// pick playclock (5, 10, ..., 60 seconds)
+			playclock = ((int) (new Random().nextDouble() * 12 + 1)) * 5;
+			startclock = 6 * playclock;
+		}
+		
 		
 		List<Match<TermType, ReasonerStateInfoType>> result = new LinkedList<Match<TermType,ReasonerStateInfoType>>();
 		
