@@ -23,7 +23,6 @@ import tud.gamecontroller.game.MoveFactoryInterface;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.ReasonerInterface;
 import tud.gamecontroller.game.RoleInterface;
-import tud.gamecontroller.game.impl.Game;
 import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.LegalPlayerInfo;
 import tud.gamecontroller.players.PlayerInfo;
@@ -198,16 +197,17 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	}
 
 	public Game<TermType, ReasonerStateInfoType> createGame(String gameDescription,
-			String name, String stylesheet) throws DuplicateInstanceException,
+			String name, String stylesheet, boolean enabled) throws DuplicateInstanceException,
 			SQLException {
 		
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		try {
-			ps = con.prepareStatement("INSERT INTO `games` (`name` , `gamedescription` , `stylesheet`) VALUES (?, ?, ?);");
+			ps = con.prepareStatement("INSERT INTO `games` (`name` , `gamedescription` , `stylesheet`, `enabled`) VALUES (?, ?, ?, ?);");
 			ps.setString(1, name);
 			ps.setString(2, gameDescription);
 			ps.setString(3, stylesheet);
+			ps.setBoolean(4, enabled);
 			
 			ps.executeUpdate();
 		} catch (MySQLIntegrityConstraintViolationException e) {
@@ -221,7 +221,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		} 
 
 		logger.info("String, String - Creating new game: " + name); //$NON-NLS-1$
-		return new Game<TermType, ReasonerStateInfoType>(gameDescription, name, getReasoner(gameDescription, name), stylesheet);
+		return new Game<TermType, ReasonerStateInfoType>(gameDescription, name, getReasoner(gameDescription, name), stylesheet, enabled);
 	}
 
 	public Game<TermType, ReasonerStateInfoType> getGame(String name) throws SQLException {
@@ -232,16 +232,17 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		Game<TermType,ReasonerStateInfoType> result = null;
 		
 		try { 
-			ps = con.prepareStatement("SELECT `gamedescription` , `stylesheet` FROM `games` WHERE `name` = ?;");
+			ps = con.prepareStatement("SELECT `gamedescription` , `stylesheet`, `enabled` FROM `games` WHERE `name` = ?;");
 			ps.setString(1, name);
 			rs = ps.executeQuery();
 			
 			if (rs.next()) {
 				String gameDescription = rs.getString("gamedescription");
 				String stylesheet = rs.getString("stylesheet");
+				boolean enabled = rs.getBoolean("enabled");
 				
 				logger.info("String - Returning new game: " + name); //$NON-NLS-1$
-				result = new Game<TermType, ReasonerStateInfoType>(gameDescription, name, getReasoner(gameDescription, name), stylesheet);
+				result = new Game<TermType, ReasonerStateInfoType>(gameDescription, name, getReasoner(gameDescription, name), stylesheet, enabled);
 				
 			} else {
 				result = null;
@@ -483,7 +484,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return result;
 	}
 	
-	public List<Game<TermType, ReasonerStateInfoType>> getAllGames() throws SQLException {
+	public List<Game<TermType, ReasonerStateInfoType>> getAllEnabledGames() throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -491,7 +492,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		List<Game<TermType,ReasonerStateInfoType>> result = new LinkedList<Game<TermType,ReasonerStateInfoType>>();
 		
 		try {
-			ps = con.prepareStatement("SELECT `name` FROM `games`;");
+			ps = con.prepareStatement("SELECT `name` FROM `games` WHERE `enabled`=TRUE;");
 			rs = ps.executeQuery();
 			
 			while (rs.next()) {
@@ -508,7 +509,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 
 		return result;
 	}
-	
+
 	public List<User> getUsers(int startRow, int numDisplayedRows) throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
@@ -930,17 +931,18 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		} 
 	}
 
-	public void updateGameInfo(String gameName, String gameDescription, String stylesheet) throws SQLException {
+	public void updateGameInfo(String gameName, String gameDescription, String stylesheet, boolean enabled) throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 
 		try { 
 			ps = con.prepareStatement("UPDATE `ggpserver`.`games` "
-							+ "SET `gamedescription` = ?, `stylesheet` = ? "
+							+ "SET `gamedescription` = ?, `stylesheet` = ?, `enabled` = ? "
 							+ "WHERE `name` = ? LIMIT 1 ;");
 			ps.setString(1, gameDescription);
 			ps.setString(2, stylesheet);
-			ps.setString(3, gameName);
+			ps.setBoolean(3, enabled);
+			ps.setString(4, gameName);
 			ps.executeUpdate(); 
 		} finally { 
 			if (con != null)

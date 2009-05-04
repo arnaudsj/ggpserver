@@ -6,6 +6,7 @@
 		<jsp:setProperty name="createGame" property="gameName"/>
 		<jsp:setProperty name="createGame" property="gameDescription"/>
 		<jsp:setProperty name="createGame" property="stylesheet"/>
+		<jsp:setProperty name="createGame" property="enabled"/>
 	</c:catch>
 </jsp:useBean>
 
@@ -57,6 +58,21 @@
 				    	</c:forEach>
 		      		</ul>
 	      		</c:if>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" align="right">
+				Enabled (for round-robin scheduler)
+			</td>
+			<td>
+				<c:choose>
+					<c:when test="${createGame.enabled}">
+						<input type="checkbox" name="enabled" value="true" checked="checked">
+					</c:when>
+					<c:otherwise>
+						<input type="checkbox" name="enabled" value="true">
+					</c:otherwise>
+				</c:choose>
 			</td>
 		</tr>
 		<tr>

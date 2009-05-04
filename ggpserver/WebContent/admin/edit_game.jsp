@@ -6,6 +6,7 @@
 		<jsp:setProperty name="editGame" property="gameName"/>
 		<jsp:setProperty name="editGame" property="gameDescription"/>
 		<jsp:setProperty name="editGame" property="stylesheet"/>
+		<jsp:setProperty name="editGame" property="enabled"/>
 	</c:catch>
 </jsp:useBean>
 
@@ -59,6 +60,21 @@
 				    	</c:forEach>
 		      		</ul>
 	      		</c:if>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" align="right">
+				Enabled (for round-robin scheduler)
+			</td>
+			<td>
+				<c:choose>
+					<c:when test="${editGame.enabled}">
+						<input type="checkbox" name="enabled" value="true" checked="checked">
+					</c:when>
+					<c:otherwise>
+						<input type="checkbox" name="enabled" value="true">
+					</c:otherwise>
+				</c:choose>
 			</td>
 		</tr>
 		<tr>

@@ -6,6 +6,9 @@
 		<jsp:setProperty name="createGame" property="gameName"/>
 		<jsp:setProperty name="createGame" property="gameDescription"/>
 		<jsp:setProperty name="createGame" property="stylesheet"/>
+		<%-- setting enabled to false is necessary because the enabled property is only send with the request if the checkbox is checked --%>
+		<jsp:setProperty name="createGame" property="enabled" value="false"/>
+		<jsp:setProperty name="createGame" property="enabled"/>
 	</c:catch>
 </jsp:useBean>
 

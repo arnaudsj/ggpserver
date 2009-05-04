@@ -14,12 +14,12 @@ import java.util.logging.Logger;
 
 import tud.gamecontroller.GameController;
 import tud.gamecontroller.game.RoleInterface;
-import tud.gamecontroller.game.impl.Game;
 import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.players.RandomPlayerInfo;
 import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
+import tud.ggpserver.datamodel.Game;
 import tud.ggpserver.datamodel.Match;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
 
@@ -141,7 +141,7 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 
 	@SuppressWarnings("unchecked")
 	private void pickNextGame() throws SQLException {
-		List<Game<TermType, ReasonerStateInfoType>> allGames = getDBConnector().getAllGames();
+		List<Game<TermType, ReasonerStateInfoType>> allGames = getDBConnector().getAllEnabledGames();
 		
 		if (currentGame == null) {
 			// TODO: start first game with fewest matches (to evenly distribute matches among games)

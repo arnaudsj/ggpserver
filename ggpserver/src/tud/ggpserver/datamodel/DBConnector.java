@@ -13,7 +13,6 @@ import org.apache.commons.collections.map.ReferenceMap;
 import tud.gamecontroller.game.MoveFactoryInterface;
 import tud.gamecontroller.game.ReasonerInterface;
 import tud.gamecontroller.game.RoleInterface;
-import tud.gamecontroller.game.impl.Game;
 import tud.gamecontroller.game.impl.Move;
 import tud.gamecontroller.game.impl.MoveFactory;
 import tud.gamecontroller.game.javaprover.Reasoner;
@@ -62,9 +61,9 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 
 	/////////////////// GAME ///////////////////
 	@Override
-	public Game<Term, GameState> createGame(String gameDescription, String name, String stylesheet)
+	public Game<Term, GameState> createGame(String gameDescription, String name, String stylesheet, boolean enabled)
 			throws DuplicateInstanceException, SQLException {
-		Game<Term, GameState> result = super.createGame(gameDescription, name, stylesheet);
+		Game<Term, GameState> result = super.createGame(gameDescription, name, stylesheet, enabled);
 		games.put(name, result);
 		return result;
 	}
@@ -83,8 +82,8 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	}
 
 	@Override
-	public void updateGameInfo(String name, String gameDescription, String stylesheet) throws SQLException {
-		super.updateGameInfo(name, gameDescription, stylesheet);
+	public void updateGameInfo(String name, String gameDescription, String stylesheet, boolean enabled) throws SQLException {
+		super.updateGameInfo(name, gameDescription, stylesheet, enabled);
 		// delete cached result, so it will read again on next request
 		games.remove(name);
 	}

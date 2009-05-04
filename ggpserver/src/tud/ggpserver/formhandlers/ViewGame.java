@@ -6,9 +6,9 @@ import javax.naming.NamingException;
 
 import org.apache.commons.lang.StringEscapeUtils;
 
-import tud.gamecontroller.game.impl.Game;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
+import tud.ggpserver.datamodel.Game;
 
 public class ViewGame {
 	private final static AbstractDBConnector db = DBConnectorFactory.getDBConnector();

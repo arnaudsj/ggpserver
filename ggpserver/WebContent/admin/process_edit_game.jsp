@@ -6,6 +6,9 @@
 		<jsp:setProperty name="editGame" property="gameName"/>
 		<jsp:setProperty name="editGame" property="gameDescription"/>
 		<jsp:setProperty name="editGame" property="stylesheet"/>
+		<%-- setting enabled to false is necessary because the enabled property is only send with the request if the checkbox is checked --%>
+		<jsp:setProperty name="editGame" property="enabled" value="false"/> 
+		<jsp:setProperty name="editGame" property="enabled"/>
 	</c:catch>
 </jsp:useBean>
 

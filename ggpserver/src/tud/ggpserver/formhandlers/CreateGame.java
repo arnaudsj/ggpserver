@@ -27,6 +27,7 @@ public class CreateGame extends Handler {
 	private String gameName = "";
 	private String gameDescription = "";
 	private String stylesheet = "../stylesheets/generic/generic.xsl";
+	private boolean enabled = false;
 
 	private List<String> errorsGameName = new LinkedList<String>();
 	private List<String> errorsDescription = new LinkedList<String>();
@@ -142,7 +143,7 @@ public class CreateGame extends Handler {
 	public void create() throws NamingException, SQLException {
 		assert(isValid());
 		try {
-			db.createGame(gameDescription, gameName, stylesheet);
+			db.createGame(gameDescription, gameName, stylesheet, enabled);
 			correctlyCreated = true;
 		} catch (DuplicateInstanceException e) {
 			errorsGameName.add("game name already exists, please pick a different one");
@@ -176,6 +177,14 @@ public class CreateGame extends Handler {
 
 	public void setStylesheet(String stylesheet) {
 		this.stylesheet = stylesheet;
+	}
+
+	public boolean getEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
 	}
 
 	public List<String> getErrorsDescription() {

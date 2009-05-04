@@ -5,9 +5,9 @@ import java.util.List;
 
 import javax.naming.NamingException;
 
-import tud.gamecontroller.game.impl.Game;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
+import tud.ggpserver.datamodel.Game;
 
 public class ShowGames extends AbstractPager {
 	protected AbstractDBConnector db = DBConnectorFactory.getDBConnector();

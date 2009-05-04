@@ -47,6 +47,19 @@
 			<td><b>stylesheet</b></td>
 			<td><c:out value="${viewGame.game.stylesheet}"></c:out></td>
 		</tr>
+		<tr>
+			<td><b>enabled</b></td>
+			<td>
+				<c:choose>
+					<c:when test="${viewGame.game.enabled}">
+						<input type="checkbox" name="enabled" checked disabled>
+					</c:when>
+					<c:otherwise>
+						<input type="checkbox" name="enabled" disabled>
+					</c:otherwise>
+				</c:choose>
+			</td>
+		</tr>
 	</tbody>
 </table>
 

@@ -15,11 +15,11 @@ import cs227b.teamIago.util.GameState;
 
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
-import tud.gamecontroller.game.impl.Game;
 import tud.gamecontroller.game.javaprover.Reasoner;
 import tud.gamecontroller.game.javaprover.Term;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
+import tud.ggpserver.datamodel.Game;
 
 public class EditGame extends Handler {
 	// These fields must either be initialized with a non-null value, or we need
@@ -30,6 +30,7 @@ public class EditGame extends Handler {
 	private String gameName = "";
 	private String gameDescription = "";
 	private String stylesheet = "../stylesheets/generic/generic.xsl";
+	private boolean enabled = false;
 
 	private List<String> errorsGameName = new LinkedList<String>();
 	private List<String> errorsDescription = new LinkedList<String>();
@@ -136,10 +137,6 @@ public class EditGame extends Handler {
 			result = false;
 		}
 		if (errorsDescription.size() > 0) {
-			// don't do that here. If the user spent half an hour typing in a
-			// game description and we set it to "", they will kill us.
-			// gameDescription = "";
-			
 			result = false;
 		}
 		if (errorsStylesheet.size() > 0) {
@@ -152,7 +149,7 @@ public class EditGame extends Handler {
 	public void updateGame() throws SQLException {
 		assert(isValid());
 		// TODO: fill in
-		db.updateGameInfo(gameName, gameDescription, stylesheet);
+		db.updateGameInfo(gameName, gameDescription, stylesheet, enabled);
 		correctlyUpdated = true;
 	}
 	
@@ -177,9 +174,10 @@ public class EditGame extends Handler {
 	 */  
 	public void setGameName(String gameName) throws SQLException {
 		Game game = db.getGame(gameName);
-		this.gameName=gameName;
-		this.gameDescription=game.getGameDescription();
-		this.stylesheet=game.getStylesheet();
+		this.gameName = gameName;
+		this.gameDescription = game.getGameDescription();
+		this.stylesheet = game.getStylesheet();
+		this.enabled = game.isEnabled();
 	}
 
 	public String getStylesheet() {
@@ -188,6 +186,14 @@ public class EditGame extends Handler {
 
 	public void setStylesheet(String stylesheet) {
 		this.stylesheet = stylesheet;
+	}
+
+	public boolean getEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
 	}
 
 	public List<String> getErrorsDescription() {

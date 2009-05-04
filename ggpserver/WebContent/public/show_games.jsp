@@ -31,6 +31,7 @@
 				<th>name</th>
 				<th>number of players</th>
 				<th>stylesheet</th>
+				<th>enabled</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -52,6 +53,16 @@
 				</td>
 				<td><c:out value="${game.numberOfRoles}"></c:out></td>
 				<td><c:out value="${game.stylesheet}"></c:out></td>
+				<td>
+					<c:choose>
+						<c:when test="${game.enabled}">
+							<input type="checkbox" name="enabled" checked disabled>
+						</c:when>
+						<c:otherwise>
+							<input type="checkbox" name="enabled" disabled>
+						</c:otherwise>
+					</c:choose>
+				</td>
 			</tr>
 	      </c:forEach>
 		</tbody>

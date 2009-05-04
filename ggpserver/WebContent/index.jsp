@@ -24,6 +24,12 @@
 		
 		After <a href="<%= request.getContextPath() + response.encodeURL("/register/register.jsp") %>">registration</a>, 
 		you can add your own general game player to be pitted against the existing ones.
+	
+	<h1 class="notopborder">Recent changes</h1>
+		<ul>
+			<li>The server now runs serveral matches in parallel. (Every player still plays just one match at a time.)</li>
+			<li>A player that does not submit a legal move for three matches in a row is set to inactive and has to be reactivated manually.</li>
+		</ul>
 
 
 </div>  <!--end div "content"-->
