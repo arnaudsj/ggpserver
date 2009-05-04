@@ -4,6 +4,12 @@
 	- Widget for printing a rectangular chess board of fixed size
 	- For use within <body>.
 	- needs a template with name "make_cell_content" which prints the content of a cell, if the cell has an unusual value
+	  make_cell_content can take the following arguments:
+	  	* xArg
+	  	* yArg
+	  	* content (the three arguments of the cell fluent)
+	  	* piece (the piece name detected automatically)
+	  	* background ("light" or "dark" according to the position and if the board is checkered)
 	
 	TODO: add a template that prints all detected boards in the state (e.g. for parallel games)
 -->
@@ -13,11 +19,15 @@
 	<xsl:import href="board.xsl"/>
 
 	<xsl:template name="chess_board">
-		<xsl:param name="Width"/> <!-- the number of cells per column -->
-		<xsl:param name="Height"/> <!-- the number of cells per row -->
+		<xsl:param name="Width">?</xsl:param> <!-- the number of cells per column, if "?" try to detect the width automatically -->
+		<xsl:param name="Height">?</xsl:param> <!-- the number of cells per row, if "?" try to detect the height automatically -->
 		<xsl:param name="checkered">light</xsl:param>
 		<xsl:param name="DefaultCellContent">yes</xsl:param> <!-- use the default img for cell content and only call make_cell_content if value was not recognized -->
-		<xsl:param name="CellFluentName">?</xsl:param> <!-- use the default img for cell content and only call make_cell_content if value was not recognized -->
+		<xsl:param name="CellFluentName">?</xsl:param> <!-- if "?" try to detect the cell fluent name automatically -->
+		<xsl:param name="xArgIdx">1</xsl:param>
+		<xsl:param name="yArgIdx">2</xsl:param>
+		<xsl:param name="contentArgIdx">3</xsl:param>
+		<xsl:param name="DefaultCell">yes</xsl:param>
 
 		<xsl:variable name="internalCellFluentName">
 			<xsl:choose>
@@ -28,6 +38,30 @@
 					<xsl:value-of select="fact[count(arg)=3]/prop-f"/>
 				</xsl:when>
 				<xsl:otherwise></xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
+		<xsl:variable name="internalWidth">
+			<xsl:choose>
+				<xsl:when test="$Width!='?'"><xsl:value-of select="$Width"/></xsl:when>
+				<xsl:otherwise>
+					<xsl:variable name="ARow">
+						<xsl:value-of select="fact[prop-f=$internalCellFluentName]/arg[number($yArgIdx)]"/>
+					</xsl:variable>
+					<xsl:value-of select="count(fact[prop-f=$internalCellFluentName and arg[number($yArgIdx)]=$ARow])"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
+		<xsl:variable name="internalHeight">
+			<xsl:choose>
+				<xsl:when test="$Height!='?'"><xsl:value-of select="$Height"/></xsl:when>
+				<xsl:otherwise>
+					<xsl:variable name="ACol">
+						<xsl:value-of select="fact[prop-f=$internalCellFluentName]/arg[number($xArgIdx)]"/>
+					</xsl:variable>
+					<xsl:value-of select="count(fact[prop-f=$internalCellFluentName and arg[number($xArgIdx)]=$ACol])"/>
+				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
 		
@@ -47,18 +81,19 @@
 		<div class="chess_board">
 
 			<xsl:call-template name="board">
-				<xsl:with-param name="Width" select="$Width"/>
-				<xsl:with-param name="Height" select="$Height"/>
+				<xsl:with-param name="Width" select="$internalWidth"/>
+				<xsl:with-param name="Height" select="$internalHeight"/>
 				<xsl:with-param name="CellWidth">48</xsl:with-param>
 				<xsl:with-param name="checkered" select="$checkered"/>
 				<xsl:with-param name="LightCellColor">#ffce9e</xsl:with-param>
 				<xsl:with-param name="DarkCellColor">#d18b47</xsl:with-param>
+				<xsl:with-param name="DefaultCell" select="$DefaultCell"/>
 			</xsl:call-template>
 
 			<xsl:for-each select="fact[prop-f=$internalCellFluentName]">
-				<xsl:variable name="xArg" select="./arg[1]"/>
-				<xsl:variable name="yArg" select="./arg[2]"/>
-				<xsl:variable name="content" select="./arg[3]"/>
+				<xsl:variable name="xArg" select="./arg[number($xArgIdx)]"/>
+				<xsl:variable name="yArg" select="./arg[number($yArgIdx)]"/>
+				<xsl:variable name="content" select="./arg[number($contentArgIdx)]"/>
 
 				<xsl:variable name="COORDINATES" select="'12345678ABCDEFGH'"/>
 				<xsl:variable name="NUMBERS" select="'1234567812345678'"/>
@@ -66,10 +101,10 @@
 				<xsl:variable name="x">
 					<xsl:choose>
 						<xsl:when test="string-length($xArg)>1">
-							<xsl:value-of select="translate($xArg, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '')"/>
+							<xsl:value-of select="number(translate($xArg, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', ''))"/>
 						</xsl:when>
 						<xsl:otherwise>
-							<xsl:value-of select="translate($xArg,$COORDINATES,$NUMBERS)"/>
+							<xsl:value-of select="number(translate($xArg,$COORDINATES,$NUMBERS))"/>
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:variable>
@@ -77,19 +112,20 @@
 				<xsl:variable name="y">
 					<xsl:choose>
 						<xsl:when test="string-length($yArg)>1">
-							<xsl:value-of select="translate($yArg, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '')"/>
+							<xsl:value-of select="number(translate($yArg, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', ''))"/>
 						</xsl:when>
 						<xsl:otherwise>
-							<xsl:value-of select="translate($yArg,$COORDINATES,$NUMBERS)"/>
+							<xsl:value-of select="number(translate($yArg,$COORDINATES,$NUMBERS))"/>
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:variable>
 
 				<xsl:variable name="xPosCell" select="48 * ($x - 1) + 2"/>
-				<xsl:variable name="yPosCell" select="48 * ($Height - $y) + 2"/>
+				<xsl:variable name="yPosCell" select="48 * ($internalHeight - $y) + 2"/>
 				<xsl:variable name="CellColor">
 					<xsl:choose>
-						<xsl:when test="($checkered='dark' and ($x mod 2) + (($Height + 1 - $y) mod 2) != 1) or ($checkered='light' and ($x mod 2) + (($Height + 1 - $y) mod 2) = 1)">dark</xsl:when>
+						<xsl:when test="($checkered='dark' and ($x mod 2) + (($internalHeight + 1 - $y) mod 2) != 1) or ($checkered='light' and ($x mod 2) + (($internalHeight + 1 - $y) mod 2) = 1)">dark</xsl:when>
+						<xsl:when test="$checkered='alldark'">dark</xsl:when>
 						<xsl:otherwise>light</xsl:otherwise>
 					</xsl:choose>
 				</xsl:variable>
@@ -107,7 +143,7 @@
 
 					<xsl:variable name="piece">
 						<xsl:choose>
-							<xsl:when test="not ($DefaultCellContent = 'yes')"/> <!-- empty value -->
+							<xsl:when test="../fact[prop-f=$internalCellFluentName and arg[number($xArgIdx)]=$xArg and arg[number($yArgIdx)]=$yArg and arg[number($contentArgIdx)]!=$content]">MULTIPLE</xsl:when>
 							<xsl:when test="$content='B' or $content='BLANK'">BLANK</xsl:when>
 							<xsl:when test="$content='KNIGHT' or $content='WHITEKNIGHT' or $content='WN'">nl</xsl:when>
 							<xsl:when test="$content='PAWN' or $content='WHITEPAWN' or $content='WP'">pl</xsl:when>
@@ -146,13 +182,17 @@
 					</xsl:variable>
 
 					<xsl:choose>
-						<xsl:when test="$piece='BLANK'"/> <!-- empty cell -->
-						<xsl:when test="$piece=''">
+						<xsl:when test="$DefaultCellContent!='yes' or $piece=''">
 							<xsl:call-template name="make_cell_content">
+								<xsl:with-param name="xArg" select="$xArg"/>
+								<xsl:with-param name="yArg" select="$yArg"/>
 								<xsl:with-param name="content" select="$content"/>
+								<xsl:with-param name="piece" select="$piece"/>
 								<xsl:with-param name="background" select="$CellColor"/>
 							</xsl:call-template>
 						</xsl:when>
+						<xsl:when test="$piece='BLANK'"/> <!-- empty cell -->
+						<xsl:when test="$piece='MULTIPLE'"><b>?</b></xsl:when> <!-- multiple elements in cell -->
 						<xsl:otherwise>
 							<xsl:call-template name="make_chess_img">
 								<xsl:with-param name="piece" select="$piece"/>
@@ -166,8 +206,8 @@
 	</xsl:template>
 
 
-
-	<!-- valid pieces are:
+	<!--
+		valid pieces are:
 			[abcdefghkmnpqrsz][dl] - (piecename+color)
 			O[0..9]                - circles in different colors
 			x[1..9]                - numbers 1 to 9
@@ -176,12 +216,15 @@
 			[jD][01]			   - single and double checkers pieces in black and white
 		background is either 'light' or 'dark'
 	-->
-
 	<xsl:template name="make_chess_img">
 		<xsl:param name="piece"/>
 		<xsl:param name="background">light</xsl:param>
-
-		<img width="44" height="44">
+		<xsl:param name="imgWidth">44</xsl:param>
+		<xsl:param name="imgHeight">44</xsl:param>
+		
+		<img>
+			<xsl:attribute name="width"><xsl:value-of select="$imgWidth"/></xsl:attribute>
+			<xsl:attribute name="height"><xsl:value-of select="$imgHeight"/></xsl:attribute>
 			<xsl:attribute name="src">
 				<xsl:value-of select="$stylesheetURL"/>
 				<xsl:text>/generic/chess_images/Chess_</xsl:text>

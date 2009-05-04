@@ -26,8 +26,6 @@
 		<!-- paint board -->
 		
 		<xsl:call-template name="chess_board">
-			<xsl:with-param name="Width">8</xsl:with-param>
-			<xsl:with-param name="Height">8</xsl:with-param>
 			<xsl:with-param name="CellFluentName" select="$CellFluentName"/>
 		</xsl:call-template>
 		
