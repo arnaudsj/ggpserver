@@ -25,37 +25,31 @@ import tud.ggpserver.datamodel.Match;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
 
 public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface, ReasonerStateInfoType> {
-	/**
-	 * Logger for this class
-	 */
 	private static final Logger logger = Logger.getLogger(AbstractRoundRobinScheduler.class.getName());
 
-	private static final long DELAY_BETWEEN_GAMES = 2000;   // wait two seconds
 	private boolean running = false;
 	private final AbstractDBConnector dbConnector;
 
-	private Game<TermType, ReasonerStateInfoType> currentGame;
 	private Thread gameThread;
-
-	private List<Match<TermType, ReasonerStateInfoType>> currentMatches;
 	private List<Thread> matchThreads;
 
 	private final Map<PlayerInfo, Integer> numErrorMatches = Collections.synchronizedMap(new HashMap<PlayerInfo, Integer>());
+
+	private GamePicker<TermType, ReasonerStateInfoType> gamePicker;
 	
+	private static final long DELAY_BETWEEN_GAMES = 2000;   // wait two seconds
 	private static final int MAX_ERROR_MATCHES = 2;
 
 	
 	public AbstractRoundRobinScheduler(AbstractDBConnector dbConnector) {
 		Logger.getLogger("tud.gamecontroller").addHandler(new LoggingHandler());
 		this.dbConnector = dbConnector;
+		this.gamePicker = new GamePicker<TermType, ReasonerStateInfoType>(dbConnector);
 	}
 
 	public void start() {
 		if (!running) {
 			setRunning(true);
-			
-			// TODO: clean out "new" and "running" matches
-			
 			
 			gameThread=new Thread(){
 				public void run() {
@@ -83,9 +77,28 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		}
 	}
 	
+	public void stop() {
+		if (running) {
+			gameThread.interrupt();
+			try {
+				gameThread.join();
+			} catch (InterruptedException e) {
+			}
+			setRunning(false);
+		}
+	}
+
+	public boolean isRunning() {
+		return running;
+	}
+
+	private void setRunning(boolean running) {
+		this.running = running;
+	}
+
 	private void runMatches() throws InterruptedException, SQLException {
 		while (true) {
-			currentMatches = createMatches();
+			List<Match<TermType, ReasonerStateInfoType>> currentMatches = createMatches();
 			
 			matchThreads = new LinkedList<Thread>();
 			
@@ -125,8 +138,6 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 
 	@SuppressWarnings("unchecked")
 	private List<Match<TermType, ReasonerStateInfoType>> createMatches() throws SQLException {
-		pickNextGame();
-		
 		int playclock;
 		int startclock;
 		
@@ -148,26 +159,15 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		
 		List<Match<TermType, ReasonerStateInfoType>> result = new LinkedList<Match<TermType,ReasonerStateInfoType>>();
 		
-		List<Map<RoleInterface<TermType>, PlayerInfo>> allPlayerInfos = createPlayerInfos(currentGame);
+		Game<TermType, ReasonerStateInfoType> nextGame = gamePicker.pickNextGame();
+		
+		List<Map<RoleInterface<TermType>, PlayerInfo>> allPlayerInfos = createPlayerInfos(nextGame);
 		for (Map<RoleInterface<TermType>, PlayerInfo> playerInfos : allPlayerInfos) {
-			result.add(getDBConnector().createMatch(currentGame, startclock, playclock, playerInfos, new Date()));
+			result.add(getDBConnector().createMatch(nextGame, startclock, playclock, playerInfos, new Date()));
 		}
 		return result;
 	}
 
-	@SuppressWarnings("unchecked")
-	private void pickNextGame() throws SQLException {
-		List<Game<TermType, ReasonerStateInfoType>> allGames = getDBConnector().getAllEnabledGames();
-		
-		if (currentGame == null) {
-			// TODO: start first game with fewest matches (to evenly distribute matches among games)
-			currentGame = allGames.get(0);
-		} else {
-			int nextGameIndex = (allGames.indexOf(currentGame) + 1) % allGames.size();
-			currentGame = allGames.get(nextGameIndex);
-		}
-	}
-	
 	private List<Map<RoleInterface<TermType>, PlayerInfo>> createPlayerInfos(Game<TermType, ReasonerStateInfoType> game) throws SQLException {
 		AbstractDBConnector<?, ?> db = getDBConnector();
 		List<PlayerInfo> activePlayerInfos = db.getPlayerInfos(RemotePlayerInfo.STATUS_ACTIVE);
@@ -201,27 +201,6 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		return result;
 	}
 	
-
-	public void stop() {
-		if (running) {
-			gameThread.interrupt();
-			try {
-				gameThread.join();
-			} catch (InterruptedException e) {
-			}
-		}
-		currentMatches = null;
-		setRunning(false);
-	}
-
-	public boolean isRunning() {
-		return running;
-	}
-
-	private void setRunning(boolean running) {
-		this.running = running;
-	}
-
 	private AbstractDBConnector getDBConnector() {
 		return dbConnector;
 	}
