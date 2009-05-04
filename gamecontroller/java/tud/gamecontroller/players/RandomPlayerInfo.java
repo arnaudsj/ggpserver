@@ -19,7 +19,7 @@
 
 package tud.gamecontroller.players;
 
-public class RandomPlayerInfo extends PlayerInfo {
+public class RandomPlayerInfo extends LocalPlayerInfo {
 
 	public RandomPlayerInfo(int roleindex) {
 		super(roleindex, "Random");
