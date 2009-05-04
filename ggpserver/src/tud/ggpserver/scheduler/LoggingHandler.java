@@ -9,7 +9,7 @@ import tud.ggpserver.datamodel.Match;
 
 public class LoggingHandler extends Handler {
 	@Override
-	public void close() throws SecurityException {
+	public void close() {
 		// nothing to do
 	}
 
