@@ -95,11 +95,11 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 			Game<Term, GameState> game,
 			int startclock,
 			int playclock,
-			Map<? extends RoleInterface<Term>, ? extends PlayerInfo> playerinfos,
+			Map<? extends RoleInterface<Term>, ? extends PlayerInfo> rolesToPlayers,
 			Date startTime) throws DuplicateInstanceException,
 			SQLException {
 		
-		Match<Term, GameState> result = super.createMatch(matchID, game, startclock, playclock, playerinfos, startTime);
+		Match<Term, GameState> result = super.createMatch(matchID, game, startclock, playclock, rolesToPlayers, startTime);
 		matches.put(matchID, result);
 		return result;
 	}

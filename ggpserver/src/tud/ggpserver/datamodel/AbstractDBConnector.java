@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -52,9 +53,11 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	public static final int MATCHID_MAXLENGTH = 40;
 
 //	private final AbstractReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory;
-	private final static GameScramblerInterface gamescrambler;
+	private static final GameScramblerInterface gamescrambler;
 
 	private static DataSource datasource;
+	
+	private Collection<PlayerStatusListener<TermType, ReasonerStateInfoType>> playerStatusListeners = new ArrayList<PlayerStatusListener<TermType, ReasonerStateInfoType>>();
 	
 	static {
 		gamescrambler = new IdentityGameScrambler();    // we don't do any scrambling (yet)
@@ -154,7 +157,12 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		} 
 
 		logger.info("String, String, int, User, String - Creating new RemotePlayerInfo: " + name); //$NON-NLS-1$
-		return new RemotePlayerInfo(name, host, port, owner, status);
+		RemotePlayerInfo result = new RemotePlayerInfo(name, host, port, owner, status);
+		
+		for (PlayerStatusListener<TermType, ReasonerStateInfoType> listener : playerStatusListeners) {
+			listener.notifyStatusChange(result);
+		}
+		return result;
 	}
 	
 	public PlayerInfo getPlayerInfo(String name) throws SQLException {
@@ -260,7 +268,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	}
 	
 	public Match<TermType, ReasonerStateInfoType> createMatch(String matchID, Game<TermType, ReasonerStateInfoType> game,
-			int startclock, int playclock, Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> playerinfos,
+			int startclock, int playclock, Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayers,
 			Date startTime) throws DuplicateInstanceException,
 			SQLException {
 		
@@ -285,7 +293,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			
 			Integer roleindex = 0;
 			for (RoleInterface<TermType> role : game.getOrderedRoles()) {
-				ps.setString(2, playerinfos.get(role).getName());
+				ps.setString(2, rolesToPlayers.get(role).getName());
 				ps.setString(3, roleindex.toString());
 		
 				ps.executeUpdate();
@@ -304,14 +312,14 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 
 		logger.info("String, Game<TermType,ReasonerStateInfoType>, int, int, Map<? extends RoleInterface<TermType>,? extends PlayerInfo>, Date - Creating new match: " + matchID); //$NON-NLS-1$
 		return new Match<TermType, ReasonerStateInfoType>(matchID, game, startclock, playclock,
-				playerinfos, startTime, getMoveFactory(), gamescrambler, this);
+				rolesToPlayers, startTime, getMoveFactory(), gamescrambler, this);
 	}
 	
 	/**
 	 * Creates a match with a generated match ID.
 	 */
 	public Match<TermType, ReasonerStateInfoType> createMatch(Game<TermType, ReasonerStateInfoType> game,
-			int startclock, int playclock, Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> playerinfos,
+			int startclock, int playclock, Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayers,
 			Date startTime) throws SQLException {
 		
 		long number = System.currentTimeMillis();
@@ -326,7 +334,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			}
 			String matchID = firstPart + secondPart;
 			try {
-				match = createMatch(matchID, game, startclock, playclock, playerinfos, startTime);
+				match = createMatch(matchID, game, startclock, playclock, rolesToPlayers, startTime);
 			} catch (DuplicateInstanceException e) {
 				number++;
 			}
@@ -922,7 +930,12 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			ps.setString(3, user.getUserName());
 			ps.setString(4, status);
 			ps.setString(5, playerName);
-			ps.executeUpdate(); 
+			ps.executeUpdate();
+			
+			RemotePlayerInfo playerInfo = (RemotePlayerInfo) getPlayerInfo(playerName);
+			for (PlayerStatusListener<TermType, ReasonerStateInfoType> listener : playerStatusListeners) {
+				listener.notifyStatusChange(playerInfo);
+			}			
 		} finally { 
 			if (con != null)
 				try {con.close();} catch (SQLException e) {}
@@ -952,6 +965,10 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		}
 	}
 	
+	public void addPlayerStatusListener(PlayerStatusListener<TermType, ReasonerStateInfoType> listener) {
+		playerStatusListeners.add(listener);
+	}
+	
 	private static Connection getConnection() throws SQLException {
 		if (datasource == null) {
 			try {
@@ -963,47 +980,4 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		}
 		return datasource.getConnection();
 	}
-
-	
-// /**
-// * Similar to PHP's mysql_real_escape_string(). Escapes the following
-//	 * characters using a backslash ('\'):
-//	 * 
-//	 * Backslash:
-//	 * \\   : backslash
-//	 * 
-//	 * These can all terminate a quoted value:
-//	 * \x00 : null-byte 
-//	 * \n   : newline
-//	 * \r   : carriage return
-//	 * '    : single quote
-//	 * "    : double quote
-//	 * \x1a : ^Z, DOS end-of-file
-//	 *
-//	 * These are also replaced for some reason in some implementations:
-//	 * \b   : backspace
-//	 * \t   : tab
-//	 * 
-//	 * These are used as wildcards in "LIKE" String comparisons:
-//	 * _    : underscore
-//	 * %    : percentage
-//	 * 
-//	 * All of this is specific to MySQL, because some other databases do the 
-//	 * escaping differently.
-//	 * 
-//	 * Alternatively, one can simply use PreparedStatements, in which case 
-//	 * the JDBC driver will escape all data for us, for the specific database 
-//	 * that we're using. EXCEPT _ and % in LIKE-Clauses.
-//	 * 
-//	 */
-//	private String mySqlRealEscapeString(String unescaped) {
-//		// The backslash must be handled first, otherwise the other escape sequences would be affected
-//		return unescaped.replace("\\", "\\\\").replace("\u0000", "\\0")
-//				.replace("\n", "\\n").replace("\r", "\\r").replace("'", "\\'")
-//				.replace("\"", "\\\"").replace("\u001A", "\\Z").replace("\b",
-//						"\\b").replace("\t", "\\t").replace("%", "\\%")
-//				.replace("_", "\\_");
-//	}
-//	
-
 }

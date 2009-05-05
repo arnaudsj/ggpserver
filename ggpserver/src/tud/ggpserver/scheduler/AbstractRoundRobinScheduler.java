@@ -22,10 +22,12 @@ import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.Game;
 import tud.ggpserver.datamodel.Match;
-import tud.ggpserver.datamodel.RemotePlayerInfo;
+import tud.ggpserver.datamodel.PlayerStatusTracker;
 
 public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface, ReasonerStateInfoType> {
 	private static final Logger logger = Logger.getLogger(AbstractRoundRobinScheduler.class.getName());
+	private static final Random random = new Random();
+	private static final long DELAY_BETWEEN_GAMES = 2000;   // wait two seconds
 
 	private boolean running = false;
 	private final AbstractDBConnector dbConnector;
@@ -33,18 +35,15 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 	private Thread gameThread;
 	private List<Thread> matchThreads;
 
-	private final Map<PlayerInfo, Integer> numErrorMatches = Collections.synchronizedMap(new HashMap<PlayerInfo, Integer>());
-
-	private GamePicker<TermType, ReasonerStateInfoType> gamePicker;
-	
-	private static final long DELAY_BETWEEN_GAMES = 2000;   // wait two seconds
-	private static final int MAX_ERROR_MATCHES = 2;
+	private final GamePicker<TermType, ReasonerStateInfoType> gamePicker;
+	private final PlayerStatusTracker<TermType, ReasonerStateInfoType> playerStatusTracker;
 
 	
 	public AbstractRoundRobinScheduler(AbstractDBConnector dbConnector) {
 		Logger.getLogger("tud.gamecontroller").addHandler(new LoggingHandler());
 		this.dbConnector = dbConnector;
 		this.gamePicker = new GamePicker<TermType, ReasonerStateInfoType>(dbConnector);
+		this.playerStatusTracker = new PlayerStatusTracker<TermType, ReasonerStateInfoType>(dbConnector);
 	}
 
 	public void start() {
@@ -112,7 +111,7 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 							GameController<TermType, ReasonerStateInfoType> gameController = new GameController<TermType, ReasonerStateInfoType>(match);
 							gameController.addListener(match);
 							gameController.runGame();
-							checkDeadPlayers(match);
+							playerStatusTracker.updateDeadPlayers(match);
 						} catch (InterruptedException e) {
 							logger.info("Thread for match " + match.getMatchID() + " - INTERRUPT");
 							match.updateStatus(Match.STATUS_ABORTED);
@@ -137,11 +136,11 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<Match<TermType, ReasonerStateInfoType>> createMatches() throws SQLException {
+	private List<Match<TermType, ReasonerStateInfoType>> createMatches() throws SQLException, InterruptedException {
 		int playclock;
 		int startclock;
 		
-		if (logger.isLoggable(Level.CONFIG)) {
+//		if (logger.isLoggable(Level.CONFIG)) {
 			// debug mode -- you can change this by editing the
 			// logging.properties file (and starting the VM with special
 			// arguments).
@@ -150,44 +149,44 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 			// clock is to speed up games.
 			playclock = 5;
 			startclock = 5;
-		} else {
-			// pick playclock (5, 10, ..., 60 seconds)
-			playclock = ((int) (new Random().nextDouble() * 12 + 1)) * 5;
-			startclock = 6 * playclock;
-		}
-		
+//		} else {
+//			// pick playclock (5, 10, ..., 60 seconds)
+//			playclock = ((int) (random.nextDouble() * 12 + 1)) * 5;
+//			startclock = 6 * playclock;
+//		}
 		
 		List<Match<TermType, ReasonerStateInfoType>> result = new LinkedList<Match<TermType,ReasonerStateInfoType>>();
 		
 		Game<TermType, ReasonerStateInfoType> nextGame = gamePicker.pickNextGame();
+		Collection<? extends PlayerInfo> activePlayers = playerStatusTracker.waitForActivePlayers();
 		
-		List<Map<RoleInterface<TermType>, PlayerInfo>> allPlayerInfos = createPlayerInfos(nextGame);
-		for (Map<RoleInterface<TermType>, PlayerInfo> playerInfos : allPlayerInfos) {
-			result.add(getDBConnector().createMatch(nextGame, startclock, playclock, playerInfos, new Date()));
+		List<Map<RoleInterface<TermType>, PlayerInfo>> matchesToRolesToPlayers = createPlayerInfos(nextGame, activePlayers);
+		
+		for (Map<RoleInterface<TermType>, PlayerInfo> rolesToPlayers : matchesToRolesToPlayers) {
+			result.add(getDBConnector().createMatch(nextGame, startclock, playclock, rolesToPlayers, new Date()));
 		}
 		return result;
 	}
 
-	private List<Map<RoleInterface<TermType>, PlayerInfo>> createPlayerInfos(Game<TermType, ReasonerStateInfoType> game) throws SQLException {
-		AbstractDBConnector<?, ?> db = getDBConnector();
-		List<PlayerInfo> activePlayerInfos = db.getPlayerInfos(RemotePlayerInfo.STATUS_ACTIVE);
+	private List<Map<RoleInterface<TermType>, PlayerInfo>> createPlayerInfos(Game<TermType, ReasonerStateInfoType> game, Collection<? extends PlayerInfo> activePlayers) throws SQLException {
+		List<PlayerInfo> allPlayerInfos = new LinkedList<PlayerInfo>(activePlayers);
 		int numberOfRoles = game.getNumberOfRoles();
-				
+		
 		// add enough random players so that the players are divisible among the matches without remainder 
-		int numberOfSurplusPlayers = activePlayerInfos.size() % numberOfRoles;		
+		int numberOfSurplusPlayers = allPlayerInfos.size() % numberOfRoles;		
 		if (numberOfSurplusPlayers > 0) {
 			int numberOfRandomPlayers = numberOfRoles - numberOfSurplusPlayers;
 			for (int i = 0; i < numberOfRandomPlayers; i++) {
-				activePlayerInfos.add(new RandomPlayerInfo(-1));
+				allPlayerInfos.add(new RandomPlayerInfo(-1));
 			}
 		}
 		
-		Collections.shuffle(activePlayerInfos);
+		Collections.shuffle(allPlayerInfos);
 
-		int numberOfMatches = activePlayerInfos.size() / numberOfRoles;
+		int numberOfMatches = allPlayerInfos.size() / numberOfRoles;
 		List<Map<RoleInterface<TermType>, PlayerInfo>> result = new ArrayList<Map<RoleInterface<TermType>, PlayerInfo>>(numberOfMatches);		
 		for (int i = 0; i < numberOfMatches; i++) {
-			List<PlayerInfo> playerInfos = activePlayerInfos.subList(i * numberOfRoles, (i + 1) * numberOfRoles);
+			List<PlayerInfo> playerInfos = allPlayerInfos.subList(i * numberOfRoles, (i + 1) * numberOfRoles);
 			
 			Map<RoleInterface<TermType>, PlayerInfo> roleMap = new HashMap<RoleInterface<TermType>, PlayerInfo>();
 			
@@ -200,78 +199,8 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		
 		return result;
 	}
-	
+
 	private AbstractDBConnector getDBConnector() {
 		return dbConnector;
-	}
-	
-	/**
-	 * For each player, the number of matches where the player produced any
-	 * error ON EACH STATE is recorded here. If there is at least one state in
-	 * the game without an error, the match does not count as an "error match".
-	 * Also, only matches in a row are counted, i.e. whenever the player plays a
-	 * non-error match, this number is reset to "0". <br>
-	 * 
-	 * When a player has played MAX_ERROR_MATCHES in a row, its status is set  
-	 * to "inactive".
-	 */
-	private void checkDeadPlayers(Match<TermType, ReasonerStateInfoType> match) {
-		Collection<RemotePlayerInfo> remotePlayerInfos = new LinkedList<RemotePlayerInfo>();
-		
-		for (PlayerInfo info : match.getPlayerInfos()) {
-			if (info instanceof RemotePlayerInfo) {
-				remotePlayerInfos.add((RemotePlayerInfo) info);
-			}
-		}
-		
-		for (RemotePlayerInfo playerInfo : remotePlayerInfos) {
-			if (isPlayerDead(match, playerInfo)) {
-				Integer oldNumErrorMatches = numErrorMatches.get(playerInfo);
-				if (oldNumErrorMatches == null) {
-					oldNumErrorMatches = 0;
-				}
-				Integer newNumErrorMatches = oldNumErrorMatches + 1;
-				numErrorMatches.put(playerInfo, newNumErrorMatches);
-				
-				if (newNumErrorMatches > MAX_ERROR_MATCHES) {
-					// update player status --> inactive
-					try {
-						dbConnector.updatePlayerInfo(playerInfo.getName(),
-								playerInfo.getHost(), playerInfo.getPort(),
-								playerInfo.getOwner(),
-								RemotePlayerInfo.STATUS_INACTIVE);
-					} catch (SQLException e) {
-						logger.severe("exception: " + e);
-					}
-					
-					// add an informative error message to the match
-					String message = "The status of player "
-							+ playerInfo.getName()
-							+ " was set to INACTIVE because it produced"
-							+ " an error in each state of more than "
-							+ MAX_ERROR_MATCHES + " matches in a row.";
-					match.updateErrorMessage(new GameControllerErrorMessage(
-							GameControllerErrorMessage.PLAYER_DISABLED,
-							message, match, playerInfo.getName()));					
-					logger.warning(message);
-				}
-			} else {
-				numErrorMatches.put(playerInfo, 0);
-			}
-		}
-	}
-
-	private boolean isPlayerDead(Match<TermType, ReasonerStateInfoType> match, PlayerInfo playerInfo) {
-		List<List<GameControllerErrorMessage>> errorMessages = match.getErrorMessagesForPlayer(playerInfo);
-		
-		assert (errorMessages.size() == match.getNumberOfStates());
-		
-		for (int i = 0; i < match.getNumberOfStates(); i++) {
-			if (errorMessages.get(i).size() == 0) {
-				// no error messages for this state
-				return false;
-			}
-		}
-		return true;
 	}
 }
