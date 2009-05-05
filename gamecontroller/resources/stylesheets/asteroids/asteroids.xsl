@@ -11,9 +11,41 @@
 	<xsl:import href="../generic/state.xsl"/>
 	
 	<xsl:template name="print_state">
+		<xsl:call-template name="print_asteroids_universes"/>
+		
+		<!-- show remaining fluents -->
+		<xsl:call-template name="state"/>
+	</xsl:template>
+	
+	<xsl:template name="print_asteroids_universes">
+		<xsl:for-each select="fact">
+			<xsl:sort select="prop-f"/>
+			<xsl:if test="not(prop-f=preceding::fact/prop-f)">
+				<xsl:if test="starts-with(prop-f, 'NORTH-SPEED')">
+					<xsl:variable name="ID" select="substring-after(prop-f, 'NORTH-SPEED')"/>
+					<xsl:if test="../fact[prop-f=concat('EAST-SPEED',$ID)] and ../fact[prop-f=concat('HEADING',$ID)] and ../fact[prop-f=concat('X',$ID)] and ../fact[prop-f=concat('Y',$ID)]">
+						<xsl:for-each select="..">
+							<xsl:call-template name="print_asteroids_universe">
+								<xsl:with-param name="ID" select="$ID"/>
+							</xsl:call-template>
+						</xsl:for-each>
+					</xsl:if>
+				</xsl:if>
+			</xsl:if>
+		</xsl:for-each>
+	</xsl:template>
+	
+	<xsl:template name="print_asteroids_universe">
+		<xsl:param name="ID"/>
+		<xsl:param name="shipXFluent" select="concat('X',$ID)"/>
+		<xsl:param name="shipYFluent" select="concat('Y',$ID)"/>
+		<xsl:param name="headingFluent" select="concat('HEADING',$ID)"/>
+		<xsl:param name="northSpeedFluent" select="concat('NORTH-SPEED',$ID)"/>
+		<xsl:param name="eastSpeedFluent" select="concat('EAST-SPEED',$ID)"/>
 
+		
 		<style type="text/css" media="all">
-			div.asteroidsBoard {
+			div.asteroidsUniverse {
 				position:relative;
 			}
 			div.asteroidsShip {
@@ -32,7 +64,7 @@
 			}
 		</style>
 		
-		<div class="asteroidsBoard">
+		<div class="asteroidsUniverse">
 			<!-- draw board (with planet) -->
 			<xsl:call-template name="board">
 				<xsl:with-param name="Width">20</xsl:with-param>
@@ -42,10 +74,10 @@
 				<xsl:with-param name="LightCellColor">#CCCCCC</xsl:with-param>
 				<xsl:with-param name="DefaultCell">no</xsl:with-param>
 			</xsl:call-template>
-			
+			<p style="text-align:center;">Universe <xsl:value-of select="$ID"/></p>
 			<!-- Grab Ship Data -->
-			<xsl:variable name="xShip" select="2 + (fact[prop-f='X']/arg[1] - 1) * 20"/>
-			<xsl:variable name="yShip" select="2 + (20 - fact[prop-f='Y']/arg[1]) * 20"/>
+			<xsl:variable name="xShip" select="2 + (fact[prop-f=$shipXFluent]/arg[1] - 1) * 20"/>
+			<xsl:variable name="yShip" select="2 + (20 - fact[prop-f=$shipYFluent]/arg[1]) * 20"/>
 	
 			<!-- Draw ship -->
 			<div class="asteroidsShip">
@@ -58,26 +90,27 @@
 			<!-- Draw heading -->
 			<div class="asteroidsHeading">
 				<xsl:attribute name="style">
+					<xsl:variable name="heading" select="fact[prop-f=$headingFluent]/arg[1]"/>
 					<xsl:choose>
-						<xsl:when test="fact[prop-f='HEADING']/arg[1]='NORTH'">
+						<xsl:when test="contains($heading,'NORTH')">
 							top: <xsl:value-of select="$yShip - 11"/>px;
 							left: <xsl:value-of select="$xShip + 6"/>px;
 							height: 20px;
 							width:  4px;
 						</xsl:when>
-						<xsl:when test="fact[prop-f='HEADING']/arg[1]='SOUTH'">
+						<xsl:when test="contains($heading,'SOUTH')">
 							top: <xsl:value-of select="$yShip + 9"/>px;
 							left: <xsl:value-of select="$xShip + 6"/>px;
 							height: 20px;
 							width:  4px;
 						</xsl:when>
-						<xsl:when test="fact[prop-f='HEADING']/arg[1]='EAST'">
+						<xsl:when test="contains($heading,'EAST')">
 							top: <xsl:value-of select="$yShip + 6"/>px;
 							left: <xsl:value-of select="$xShip + 9"/>px;
 							height: 4px;
 							width:  20px;
 						</xsl:when>
-						<xsl:when test="fact[prop-f='HEADING']/arg[1]='WEST'">
+						<xsl:when test="contains($heading,'WEST')">
 							top: <xsl:value-of select="$yShip + 6"/>px;
 							left: <xsl:value-of select="$xShip - 11"/>px;
 							height: 4px;
@@ -88,7 +121,7 @@
 			</div>
 			
 			<!-- Draw north-south velocity -->				
-			<xsl:variable name="deltaY" select="number(fact[prop-f='NORTH-SPEED']/arg[1])"/>
+			<xsl:variable name="deltaY" select="number(fact[prop-f=$northSpeedFluent]/arg[1])"/>
 			<xsl:if test="$deltaY != 0">
 				<xsl:variable name="yVectorLen" select="number(translate(string($deltaY * 20 + 1),'-',''))"/>
 				<div class="asteroidsVelocity">
@@ -105,7 +138,7 @@
 			</xsl:if>
 			
 			<!-- Draw east-west velocity -->				
-			<xsl:variable name="deltaX" select="number(fact[prop-f='EAST-SPEED']/arg[1])"/>
+			<xsl:variable name="deltaX" select="number(fact[prop-f=$eastSpeedFluent]/arg[1])"/>
 			<xsl:if test="$deltaX != 0">
 				<xsl:variable name="xVectorLen" select="number(translate(string($deltaX * 20 + 1),'-',''))"/>
 				<div class="asteroidsVelocity">
@@ -121,16 +154,6 @@
 				</div>
 			</xsl:if>
 		</div>
-		
-		<!-- show remaining fluents -->
-		<xsl:call-template name="state">
-			<xsl:with-param name="excludeFluent" select="'HEADING'"/>
-			<xsl:with-param name="excludeFluent2" select="'X'"/>
-			<xsl:with-param name="excludeFluent3" select="'Y'"/>
-			<xsl:with-param name="excludeFluent4" select="'NORTH-SPEED'"/>
-			<xsl:with-param name="excludeFluent5" select="'EAST-SPEED'"/>
-		</xsl:call-template>
-		
 	</xsl:template>
 	
 	<xsl:template name="make_cell">

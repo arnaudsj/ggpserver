@@ -20,15 +20,46 @@
 		<xsl:param name="excludeFluent8"/>
 		<xsl:param name="excludeFluent9"/>
 		<xsl:param name="excludeFluent10"/>
+		<xsl:param name="excludePattern" select="';'"/>
+		<xsl:param name="excludePattern2" select="';'"/>
+		<xsl:param name="excludePattern3" select="';'"/>
+		<xsl:param name="excludePattern4" select="';'"/>
+		<xsl:param name="excludePattern5" select="';'"/>
+		<xsl:param name="excludePattern6" select="';'"/>
+		<xsl:param name="excludePattern7" select="';'"/>
+		<xsl:param name="excludePattern8" select="';'"/>
+		<xsl:param name="excludePattern9" select="';'"/>
+		<xsl:param name="excludePattern10" select="';'"/>
 
 		<span class="heading">
-			<xsl:if test="$excludeFluent!=''">Remaining </xsl:if>
+			<xsl:if test="$excludeFluent!='' or $excludePattern!=';'">Remaining </xsl:if>
 			State:
 		</span>
 		<div class="underline"/>
 
 		<table>
-			<xsl:for-each select="fact[prop-f!=$excludeFluent and prop-f!=$excludeFluent2 and prop-f!=$excludeFluent3 and prop-f!=$excludeFluent4 and prop-f!=$excludeFluent5 and prop-f!=$excludeFluent6 and prop-f!=$excludeFluent7 and prop-f!=$excludeFluent8 and prop-f!=$excludeFluent9 and prop-f!=$excludeFluent10]">
+			<xsl:for-each select="fact[
+				prop-f!=$excludeFluent and
+				prop-f!=$excludeFluent2 and
+				prop-f!=$excludeFluent3 and
+				prop-f!=$excludeFluent4 and
+				prop-f!=$excludeFluent5 and
+				prop-f!=$excludeFluent6 and
+				prop-f!=$excludeFluent7 and
+				prop-f!=$excludeFluent8 and
+				prop-f!=$excludeFluent9 and
+				prop-f!=$excludeFluent10 and
+				not(contains(prop-f, $excludePattern)) and
+				not(contains(prop-f, $excludePattern2)) and
+				not(contains(prop-f, $excludePattern3)) and
+				not(contains(prop-f, $excludePattern4)) and
+				not(contains(prop-f, $excludePattern5)) and
+				not(contains(prop-f, $excludePattern6)) and
+				not(contains(prop-f, $excludePattern7)) and
+				not(contains(prop-f, $excludePattern8)) and
+				not(contains(prop-f, $excludePattern9)) and
+				not(contains(prop-f, $excludePattern10))
+				]">
 				<xsl:sort select="."/>
 
 				<tr>

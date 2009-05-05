@@ -28,6 +28,8 @@
 		<xsl:param name="yArgIdx">2</xsl:param>
 		<xsl:param name="contentArgIdx">3</xsl:param>
 		<xsl:param name="DefaultCell">yes</xsl:param>
+		<xsl:param name="CellWidth">48</xsl:param>
+		<xsl:param name="CellHeight" select="$CellWidth"/>
 
 		<xsl:variable name="internalCellFluentName">
 			<xsl:choose>
@@ -69,8 +71,8 @@
 			div.chesscellcontent
 			{
 				position: absolute;
-				width:44px;
-				height:44px;
+				width:    <xsl:value-of select="$CellWidth - 4"/>px;
+				height:   <xsl:value-of select="$CellHeight - 4"/>px;
 			}
 			div.chess_board
 			{
@@ -83,7 +85,8 @@
 			<xsl:call-template name="board">
 				<xsl:with-param name="Width" select="$internalWidth"/>
 				<xsl:with-param name="Height" select="$internalHeight"/>
-				<xsl:with-param name="CellWidth">48</xsl:with-param>
+				<xsl:with-param name="CellWidth" select="$CellWidth"/>
+				<xsl:with-param name="CellHeight" select="$CellHeight"/>
 				<xsl:with-param name="checkered" select="$checkered"/>
 				<xsl:with-param name="LightCellColor">#ffce9e</xsl:with-param>
 				<xsl:with-param name="DarkCellColor">#d18b47</xsl:with-param>
@@ -120,8 +123,8 @@
 					</xsl:choose>
 				</xsl:variable>
 
-				<xsl:variable name="xPosCell" select="48 * ($x - 1) + 2"/>
-				<xsl:variable name="yPosCell" select="48 * ($internalHeight - $y) + 2"/>
+				<xsl:variable name="xPosCell" select="$CellWidth * ($x - 1) + 2"/>
+				<xsl:variable name="yPosCell" select="$CellHeight * ($internalHeight - $y) + 2"/>
 				<xsl:variable name="CellColor">
 					<xsl:choose>
 						<xsl:when test="($checkered='dark' and ($x mod 2) + (($internalHeight + 1 - $y) mod 2) != 1) or ($checkered='light' and ($x mod 2) + (($internalHeight + 1 - $y) mod 2) = 1)">dark</xsl:when>
@@ -197,6 +200,8 @@
 							<xsl:call-template name="make_chess_img">
 								<xsl:with-param name="piece" select="$piece"/>
 								<xsl:with-param name="background" select="$CellColor"/>
+								<xsl:with-param name="imgWidth" select="$CellWidth-4"/>
+								<xsl:with-param name="imgHeight" select="$CellHeight-4"/>
 							</xsl:call-template>
 						</xsl:otherwise>
 					</xsl:choose>
