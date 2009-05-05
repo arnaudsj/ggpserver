@@ -140,7 +140,7 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		int playclock;
 		int startclock;
 		
-//		if (logger.isLoggable(Level.CONFIG)) {
+		if (logger.isLoggable(Level.CONFIG)) {
 			// debug mode -- you can change this by editing the
 			// logging.properties file (and starting the VM with special
 			// arguments).
@@ -149,11 +149,11 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 			// clock is to speed up games.
 			playclock = 5;
 			startclock = 5;
-//		} else {
-//			// pick playclock (5, 10, ..., 60 seconds)
-//			playclock = ((int) (random.nextDouble() * 12 + 1)) * 5;
-//			startclock = 6 * playclock;
-//		}
+		} else {
+			// pick playclock (5, 10, ..., 60 seconds)
+			playclock = ((int) (random.nextDouble() * 12 + 1)) * 5;
+			startclock = 6 * playclock;
+		}
 		
 		List<Match<TermType, ReasonerStateInfoType>> result = new LinkedList<Match<TermType,ReasonerStateInfoType>>();
 		

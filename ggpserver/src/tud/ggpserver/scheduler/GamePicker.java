@@ -23,7 +23,7 @@ public class GamePicker<TermType extends TermInterface, ReasonerStateInfoType> {
 	@SuppressWarnings("unchecked")
 	private void initCurrentGame() throws SQLException {
 		List<Game<TermType, ReasonerStateInfoType>> allGames = getDBConnector().getAllEnabledGames();
-		// TODO: start first game with fewest matches (to evenly distribute matches among games)
+		// TODO: start first game with fewest matches (to evenly distribute matches among games), OR store the last played game in DB and resume
 		this.currentGame = allGames.get(0);
 	}
 	
