@@ -1,3 +1,22 @@
+/*
+    Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+
+    This file is part of GGP Server.
+
+    GGP Server is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    GGP Server is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GGP Server.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 package tud.ggpserver.scheduler;
 
 import java.sql.SQLException;
@@ -51,6 +70,7 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 			setRunning(true);
 			
 			gameThread=new Thread(){
+				@Override
 				public void run() {
 					try {
 						runMatches();
@@ -91,11 +111,11 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		return running;
 	}
 
-	private void setRunning(boolean running) {
+	void setRunning(boolean running) {
 		this.running = running;
 	}
 
-	private void runMatches() throws InterruptedException, SQLException {
+	void runMatches() throws InterruptedException, SQLException {
 		while (true) {
 			List<Match<TermType, ReasonerStateInfoType>> currentMatches = createMatches();
 			
@@ -103,6 +123,7 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 			
 			for (final Match<TermType, ReasonerStateInfoType> currentMatch : currentMatches) {
 				Thread thread = new Thread(){
+					@Override
 					public void run() {
 						Match<TermType, ReasonerStateInfoType> match = currentMatch;
 						
@@ -168,7 +189,7 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		return result;
 	}
 
-	private List<Map<RoleInterface<TermType>, PlayerInfo>> createPlayerInfos(Game<TermType, ReasonerStateInfoType> game, Collection<? extends PlayerInfo> activePlayers) throws SQLException {
+	private List<Map<RoleInterface<TermType>, PlayerInfo>> createPlayerInfos(Game<TermType, ReasonerStateInfoType> game, Collection<? extends PlayerInfo> activePlayers) {
 		List<PlayerInfo> allPlayerInfos = new LinkedList<PlayerInfo>(activePlayers);
 		int numberOfRoles = game.getNumberOfRoles();
 		

@@ -1,3 +1,22 @@
+/*
+    Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+
+    This file is part of GGP Server.
+
+    GGP Server is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    GGP Server is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GGP Server.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 package tud.ggpserver.datamodel;
 
 import static org.apache.commons.collections.map.AbstractReferenceMap.SOFT;
@@ -5,8 +24,6 @@ import static org.apache.commons.collections.map.AbstractReferenceMap.SOFT;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Map;
-
-import javax.naming.NamingException;
 
 import org.apache.commons.collections.map.ReferenceMap;
 
@@ -121,8 +138,8 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	/////////////////// PLAYERINFO ///////////////////
 	@Override
 	public RemotePlayerInfo createPlayerInfo(String name, String host,
-			int port, User owner, String status) throws NamingException,
-			DuplicateInstanceException, SQLException {
+			int port, User owner, String status)
+			throws DuplicateInstanceException, SQLException {
 		RemotePlayerInfo result = super.createPlayerInfo(name, host, port, owner, status);
 		playerInfos.put(name, result);
 		return result;

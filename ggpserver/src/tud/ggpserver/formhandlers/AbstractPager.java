@@ -1,8 +1,25 @@
+/*
+    Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+
+    This file is part of GGP Server.
+
+    GGP Server is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    GGP Server is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GGP Server.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 package tud.ggpserver.formhandlers;
 
 import java.sql.SQLException;
-
-import javax.naming.NamingException;
 
 import tud.ggpserver.datamodel.DBConnectorFactory;
 
@@ -30,7 +47,7 @@ public abstract class AbstractPager {
 		this.startRow = startRow;
 	}
 
-	public int getEndRow() throws NamingException, SQLException {
+	public int getEndRow() throws SQLException {
 		int numReallyDisplayedRows;
 		
 		if (getPage() == getNumberOfPages()) {   // last page
@@ -42,12 +59,12 @@ public abstract class AbstractPager {
 		
 	}
 
-	public int getNumberOfPages() throws NamingException, SQLException {
+	public int getNumberOfPages() throws SQLException {
 		return (getRowCount() - 1) / numDisplayedRows + 1;
 		
 	}
 
-	protected int getRowCount() throws NamingException, SQLException {
+	protected int getRowCount() throws SQLException {
 		return DBConnectorFactory.getDBConnector().getRowCount(getTableName());
 	}
 
@@ -57,10 +74,8 @@ public abstract class AbstractPager {
 
 	/**
 	 * starts with 1
-	 * @throws SQLException 
-	 * @throws NamingException 
 	 */
-	public void setPage(int page) throws NamingException, SQLException {
+	public void setPage(int page) throws SQLException {
 		if (page < 0 || page > getNumberOfPages()) {
 			throw new IllegalArgumentException("Page negative or > number of pages.");
 		}

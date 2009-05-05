@@ -1,3 +1,22 @@
+/*
+    Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+
+    This file is part of GGP Server.
+
+    GGP Server is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    GGP Server is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GGP Server.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 package tud.ggpserver.formhandlers;
 
 import java.net.InetAddress;
@@ -5,8 +24,6 @@ import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
-
-import javax.naming.NamingException;
 
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
@@ -28,7 +45,7 @@ public class EditPlayer {
 	private List<String> errorsPort = new LinkedList<String>();
 
 
-	public boolean isValid() throws NamingException, SQLException {
+	public boolean isValid() {
 		errorsHost.clear();
 		errorsPort.clear();
 		
@@ -94,7 +111,7 @@ public class EditPlayer {
 		return result;
 	}
 
-	public void updatePlayer() throws NamingException, SQLException {
+	public void updatePlayer() throws SQLException {
 		assert (isValidPlayer());
 		assert (isValid());
 		
@@ -139,7 +156,7 @@ public class EditPlayer {
 		return player.getName();
 	}
 
-	public void setPlayerName(String playerName) throws NamingException, SQLException {
+	public void setPlayerName(String playerName) throws SQLException {
 		if (playerName.equals("Legal") || playerName.equals("Random")) {
 			throw new IllegalArgumentException("player cannot be Legal or Random!");
 		}
@@ -178,7 +195,7 @@ public class EditPlayer {
 		return user.getUserName();
 	}
 
-	public void setUserName(String userName) throws NamingException, SQLException {
+	public void setUserName(String userName) throws SQLException {
 		user = db.getUser(userName);
 	}
 

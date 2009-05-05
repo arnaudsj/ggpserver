@@ -1,3 +1,22 @@
+/*
+    Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+
+    This file is part of GGP Server.
+
+    GGP Server is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    GGP Server is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GGP Server.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 package tud.ggpserver.datamodel;
 
 import java.security.NoSuchAlgorithmException;
@@ -128,8 +147,8 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	}
 	
 	public RemotePlayerInfo createPlayerInfo(String name, String host,
-			int port, User owner, String status) throws NamingException,
-			DuplicateInstanceException, SQLException {
+			int port, User owner, String status)
+			throws DuplicateInstanceException, SQLException {
 		
 		assert(!name.equals("Legal"));
 		assert(!name.equals("Random"));
@@ -189,8 +208,6 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			if (rs.next()) {
 				logger.info("String - Returning new RemotePlayerInfo: " + name); //$NON-NLS-1$
 				result = new RemotePlayerInfo(name, rs.getString("host"), rs.getInt("port"), getUser(rs.getString("owner")), rs.getString("status"));
-			} else {
-				result = null;
 			}
 		} finally { 
 			if (con != null)
@@ -252,8 +269,6 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				logger.info("String - Returning new game: " + name); //$NON-NLS-1$
 				result = new Game<TermType, ReasonerStateInfoType>(gameDescription, name, getReasoner(gameDescription, name), stylesheet, enabled);
 				
-			} else {
-				result = null;
 			}
 		} finally { 
 			if (con != null)
@@ -391,8 +406,6 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				result.setXmlStates(states);
 				result.setErrorMessages(getErrorMessages(result, states.size()));
 				result.setJointMovesStrings(getJointMovesStrings(matchID));				
-			} else {
-				result = null;
 			}
 		} finally { 
 			if (con != null)
@@ -421,9 +434,8 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			
 			if (rs.next()) {
 				return rs.getInt(1);				
-			} else {
-				throw new SQLException("Something went wrong.");
-			}
+			} 
+			throw new SQLException("Something went wrong.");
 		} finally { 
 			if (con != null)
 				try {con.close();} catch (SQLException e) {}
@@ -449,9 +461,8 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 
 			if (rs.next()) {
 				return rs.getInt(1);				
-			} else {
-				throw new SQLException("Something went wrong.");
-			}
+			} 
+			throw new SQLException("Something went wrong.");
 		} finally { 
 			if (con != null)
 				try {con.close();} catch (SQLException e) {}
@@ -740,9 +751,6 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 
 	/**
 	 * @param stepNumber counting starts from 1
-	 * @throws SQLException 
-	 * @throws NamingException 
-	 * @throws DuplicateInstanceException 
 	 */
 	protected void addJointMove(String matchID, int stepNumber, JointMoveInterface<? extends TermInterface> jointMove) throws SQLException, DuplicateInstanceException {
 		Connection con = getConnection();
@@ -774,9 +782,6 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 
 	/**
 	 * @param stepNumber counting starts from 1
-	 * @throws SQLException 
-	 * @throws NamingException 
-	 * @throws DuplicateInstanceException 
 	 */
 	protected void addState(String matchID, int stepNumber, String xmlState) throws SQLException, DuplicateInstanceException {
 		Connection con = getConnection();
@@ -867,6 +872,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 					}
 					jointMove = new LinkedList<String>();
 				}
+				assert(jointMove != null);
 				jointMove.add(rs.getString("move"));
 
 				assert(rs.getInt("step_number") == stepNumber);
