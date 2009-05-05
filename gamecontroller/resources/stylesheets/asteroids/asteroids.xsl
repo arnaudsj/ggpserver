@@ -20,7 +20,8 @@
 	<xsl:template name="print_asteroids_universes">
 		<xsl:for-each select="fact">
 			<xsl:sort select="prop-f"/>
-			<xsl:if test="not(prop-f=preceding::fact/prop-f)">
+			<!--<xsl:value-of select="prop-f"/> - <xsl:value-of select="preceding-sibling::fact[1]/prop-f"/><br/>-->
+			<xsl:if test="not(prop-f = preceding-sibling::fact[1]/prop-f)">
 				<xsl:if test="starts-with(prop-f, 'NORTH-SPEED')">
 					<xsl:variable name="ID" select="substring-after(prop-f, 'NORTH-SPEED')"/>
 					<xsl:if test="../fact[prop-f=concat('EAST-SPEED',$ID)] and ../fact[prop-f=concat('HEADING',$ID)] and ../fact[prop-f=concat('X',$ID)] and ../fact[prop-f=concat('Y',$ID)]">
@@ -75,6 +76,10 @@
 				<xsl:with-param name="DefaultCell">no</xsl:with-param>
 			</xsl:call-template>
 			<p style="text-align:center;">Universe <xsl:value-of select="$ID"/></p>
+			<xsl:comment>
+				<xsl:value-of select="$shipXFluent"/>, <xsl:value-of select="$shipYFluent"/>, <xsl:value-of select="$headingFluent"/>, <xsl:value-of select="$northSpeedFluent"/>, <xsl:value-of select="$eastSpeedFluent"/>
+			</xsl:comment>
+			
 			<!-- Grab Ship Data -->
 			<xsl:variable name="xShip" select="2 + (fact[prop-f=$shipXFluent]/arg[1] - 1) * 20"/>
 			<xsl:variable name="yShip" select="2 + (20 - fact[prop-f=$shipYFluent]/arg[1]) * 20"/>

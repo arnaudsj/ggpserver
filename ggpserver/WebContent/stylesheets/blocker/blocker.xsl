@@ -11,9 +11,8 @@
 
 	<xsl:template name="print_state">
 		
-		<!-- paint board -->
-		<xsl:call-template name="chess_board">
-			<xsl:with-param name="CellFluentName" select="'CELL'"/>
+		<!-- paint board(s) -->
+		<xsl:call-template name="print_all_chess_boards">
 			<xsl:with-param name="checkered" select="'no'"/>
 		</xsl:call-template>
 

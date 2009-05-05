@@ -25,7 +25,8 @@
 	<xsl:template name="print_blocksworlds">
 		<xsl:for-each select="fact">
 			<xsl:sort select="prop-f"/>
-			<xsl:if test="not(prop-f=preceding::fact/prop-f)">
+			<!--<xsl:value-of select="prop-f"/> - <xsl:value-of select="preceding-sibling::fact[1]/prop-f"/><br/>-->
+			<xsl:if test="not(prop-f = preceding-sibling::fact[1]/prop-f)">
 				<xsl:if test="starts-with(prop-f, 'CLEAR')">
 					<xsl:variable name="tableID" select="substring-after(prop-f, 'CLEAR')"/>
 					<xsl:choose>
@@ -36,7 +37,7 @@
 								</xsl:call-template>
 							</xsl:for-each>
 						</xsl:when>
-						<xsl:when test="contains(../fact[prop-f=concat('ON',$tableID)]/arg[2], 'TABLE')">
+						<xsl:when test="../fact[prop-f=concat('ON',$tableID) and contains(arg[2], 'TABLE')]">
 							<xsl:for-each select="..">
 								<xsl:call-template name="print_blocksworld">
 									<xsl:with-param name="tableID" select="$tableID"/>
@@ -44,7 +45,7 @@
 								</xsl:call-template>
 							</xsl:for-each>
 						</xsl:when>
-						<xsl:when test="contains(../fact[prop-f=concat('ON',$tableID)]/arg[1], 'TABLE')">
+						<xsl:when test="../fact[prop-f=concat('ON',$tableID) and contains(arg[1], 'TABLE')]">
 							<xsl:for-each select="..">
 								<xsl:call-template name="print_blocksworld">
 									<xsl:with-param name="tableID" select="$tableID"/>

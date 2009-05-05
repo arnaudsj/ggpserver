@@ -10,14 +10,102 @@
 	  	* content (the three arguments of the cell fluent)
 	  	* piece (the piece name detected automatically)
 	  	* background ("light" or "dark" according to the position and if the board is checkered)
-	
-	TODO: add a template that prints all detected boards in the state (e.g. for parallel games)
 -->
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 	<xsl:import href="board.xsl"/>
+	<xsl:import href="state.xsl"/>
 
+	<xsl:template name="print_all_chess_boards">
+		<xsl:param name="Width">?</xsl:param> <!-- the number of cells per column, if "?" try to detect the width automatically -->
+		<xsl:param name="Height">?</xsl:param> <!-- the number of cells per row, if "?" try to detect the height automatically -->
+		<xsl:param name="checkered">light</xsl:param>
+		<xsl:param name="DefaultCellContent">yes</xsl:param> <!-- use the default img for cell content and only call make_cell_content if value was not recognized -->
+		<xsl:param name="xArgIdx">1</xsl:param>
+		<xsl:param name="yArgIdx">2</xsl:param>
+		<xsl:param name="contentArgIdx">3</xsl:param>
+		<xsl:param name="DefaultCell">yes</xsl:param>
+		<xsl:param name="CellWidth">48</xsl:param>
+		<xsl:param name="CellHeight" select="$CellWidth"/>
+		
+		<xsl:for-each select="fact">
+			<xsl:sort select="prop-f"/>
+			<!--<xsl:value-of select="prop-f"/> - <xsl:value-of select="preceding-sibling::fact[1]/prop-f"/><br/>-->
+			<xsl:if test="not(prop-f = preceding-sibling::fact[1]/prop-f)">
+				<xsl:if test="starts-with(prop-f, 'CELL') and count(arg)=3">
+					<xsl:variable name="CellFluentName" select="prop-f"/>
+					<xsl:for-each select="..">
+						<xsl:call-template name="chess_board">
+							<xsl:with-param name="CellFluentName" select="$CellFluentName"/>
+							<xsl:with-param name="Width" select="$Width"/>
+							<xsl:with-param name="Height" select="$Height"/>
+							<xsl:with-param name="checkered" select="$checkered"/>
+							<xsl:with-param name="DefaultCellContent" select="$DefaultCellContent"/>
+							<xsl:with-param name="xArgIdx" select="$xArgIdx"/>
+							<xsl:with-param name="yArgIdx" select="$yArgIdx"/>
+							<xsl:with-param name="contentArgIdx" select="$contentArgIdx"/>
+							<xsl:with-param name="DefaultCell" select="$DefaultCell"/>
+							<xsl:with-param name="CellWidth" select="$CellWidth"/>
+							<xsl:with-param name="CellHeight" select="$CellHeight"/>
+							<xsl:with-param name="BoardName">
+								<xsl:if test="$CellFluentName!='CELL'"><xsl:value-of select="substring-after($CellFluentName, 'CELL')"/></xsl:if>
+							</xsl:with-param>
+						</xsl:call-template>
+					</xsl:for-each>
+				</xsl:if>
+			</xsl:if>
+		</xsl:for-each>
+
+	</xsl:template>
+	
+	<xsl:template name="print_chess_state">
+		<xsl:param name="Width">?</xsl:param> <!-- the number of cells per column, if "?" try to detect the width automatically -->
+		<xsl:param name="Height">?</xsl:param> <!-- the number of cells per row, if "?" try to detect the height automatically -->
+		<xsl:param name="checkered">light</xsl:param>
+		<xsl:param name="DefaultCellContent">yes</xsl:param> <!-- use the default img for cell content and only call make_cell_content if value was not recognized -->
+		<xsl:param name="CellFluentName">?</xsl:param> <!-- if "?" try to detect the cell fluent name automatically -->
+		<xsl:param name="xArgIdx">1</xsl:param>
+		<xsl:param name="yArgIdx">2</xsl:param>
+		<xsl:param name="contentArgIdx">3</xsl:param>
+		<xsl:param name="DefaultCell">yes</xsl:param>
+		<xsl:param name="CellWidth">48</xsl:param>
+		<xsl:param name="CellHeight" select="$CellWidth"/>
+	
+		<xsl:variable name="internalCellFluentName">
+			<xsl:choose>
+				<xsl:when test="$CellFluentName!='?'"><xsl:value-of select="$CellFluentName"/></xsl:when>
+				<xsl:when test="fact[prop-f='CELL' and count(./arg)=3]">CELL</xsl:when>
+				<xsl:when test="fact[prop-f='CELLHOLDS' and count(./arg)=3]">CELLHOLDS</xsl:when>
+				<xsl:when test="fact[prop-f='LOCATION' and count(./arg)=3]">LOCATION</xsl:when>
+				<xsl:when test="fact[count(./arg)=3]">
+					<xsl:value-of select="fact[count(arg)=3]/prop-f"/>
+				</xsl:when>
+				<xsl:otherwise></xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
+		<xsl:call-template name="chess_board">
+			<xsl:with-param name="CellFluentName" select="$internalCellFluentName"/>
+			<xsl:with-param name="Width" select="$Width"/>
+			<xsl:with-param name="Height" select="$Height"/>
+			<xsl:with-param name="checkered" select="$checkered"/>
+			<xsl:with-param name="DefaultCellContent" select="$DefaultCellContent"/>
+			<xsl:with-param name="xArgIdx" select="$xArgIdx"/>
+			<xsl:with-param name="yArgIdx" select="$yArgIdx"/>
+			<xsl:with-param name="contentArgIdx" select="$contentArgIdx"/>
+			<xsl:with-param name="DefaultCell" select="$DefaultCell"/>
+			<xsl:with-param name="CellWidth" select="$CellWidth"/>
+			<xsl:with-param name="CellHeight" select="$CellHeight"/>
+		</xsl:call-template>
+		
+		<!-- show remaining fluents -->
+		<xsl:call-template name="state">
+			<xsl:with-param name="excludeFluent" select="$internalCellFluentName"/>
+		</xsl:call-template>
+		
+	</xsl:template>
+	
 	<xsl:template name="chess_board">
 		<xsl:param name="Width">?</xsl:param> <!-- the number of cells per column, if "?" try to detect the width automatically -->
 		<xsl:param name="Height">?</xsl:param> <!-- the number of cells per row, if "?" try to detect the height automatically -->
@@ -30,11 +118,13 @@
 		<xsl:param name="DefaultCell">yes</xsl:param>
 		<xsl:param name="CellWidth">48</xsl:param>
 		<xsl:param name="CellHeight" select="$CellWidth"/>
+		<xsl:param name="BoardName"/>
 
 		<xsl:variable name="internalCellFluentName">
 			<xsl:choose>
 				<xsl:when test="$CellFluentName!='?'"><xsl:value-of select="$CellFluentName"/></xsl:when>
 				<xsl:when test="fact[prop-f='CELL' and count(./arg)=3]">CELL</xsl:when>
+				<xsl:when test="fact[prop-f='CELLHOLDS' and count(./arg)=3]">CELLHOLDS</xsl:when>
 				<xsl:when test="fact[prop-f='LOCATION' and count(./arg)=3]">LOCATION</xsl:when>
 				<xsl:when test="fact[count(./arg)=3]">
 					<xsl:value-of select="fact[count(arg)=3]/prop-f"/>
@@ -127,7 +217,7 @@
 				<xsl:variable name="yPosCell" select="$CellHeight * ($internalHeight - $y) + 2"/>
 				<xsl:variable name="CellColor">
 					<xsl:choose>
-						<xsl:when test="($checkered='dark' and ($x mod 2) + (($internalHeight + 1 - $y) mod 2) != 1) or ($checkered='light' and ($x mod 2) + (($internalHeight + 1 - $y) mod 2) = 1)">dark</xsl:when>
+						<xsl:when test="($checkered='dark' and ($x mod 2) + (($internalHeight + 1 - $y) mod 2) = 1) or ($checkered='light' and ($x mod 2) + (($internalHeight + 1 - $y) mod 2) != 1)">dark</xsl:when>
 						<xsl:when test="$checkered='alldark'">dark</xsl:when>
 						<xsl:otherwise>light</xsl:otherwise>
 					</xsl:choose>
@@ -200,13 +290,16 @@
 							<xsl:call-template name="make_chess_img">
 								<xsl:with-param name="piece" select="$piece"/>
 								<xsl:with-param name="background" select="$CellColor"/>
-								<xsl:with-param name="imgWidth" select="$CellWidth-4"/>
-								<xsl:with-param name="imgHeight" select="$CellHeight-4"/>
+								<xsl:with-param name="imgWidth" select="$CellWidth - 4"/>
+								<xsl:with-param name="imgHeight" select="$CellHeight - 4"/>
 							</xsl:call-template>
 						</xsl:otherwise>
 					</xsl:choose>
 				</div>
 			</xsl:for-each>
+			<xsl:if test="$BoardName!=''">
+				<p style="text-align: center">Board <xsl:value-of select="$BoardName"/></p>
+			</xsl:if>
 		</div>
 	</xsl:template>
 

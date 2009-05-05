@@ -97,9 +97,10 @@
 		
 		<!-- show remaining fluents -->
 		<xsl:call-template name="state">
-<!--			<xsl:with-param name="excludeFluent">LOCATION</xsl:with-param>-->
+			<xsl:with-param name="excludeFluent">LOCATION</xsl:with-param>
 			<xsl:with-param name="excludeFluent2">BLOCKEDNORTH</xsl:with-param>
 			<xsl:with-param name="excludeFluent3">BLOCKEDEAST</xsl:with-param>
+			<xsl:with-param name="excludeFluent4">WALL</xsl:with-param>
 		</xsl:call-template>
 		
 	</xsl:template>

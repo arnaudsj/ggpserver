@@ -11,19 +11,13 @@
 	<xsl:import href="../generic/state.xsl"/>
 	
 	<xsl:template name="print_state">
-		<!-- paint board -->
-		<xsl:call-template name="chess_board">
+		<xsl:call-template name="print_chess_state">
 			<xsl:with-param name="Width">7</xsl:with-param>
 			<xsl:with-param name="Height">7</xsl:with-param>
 			<xsl:with-param name="DefaultCellContent">no</xsl:with-param>
 			<xsl:with-param name="DefaultCell">no</xsl:with-param>
 			<xsl:with-param name="CellFluentName">CELL</xsl:with-param>
 			<xsl:with-param name="checkered">alldark</xsl:with-param>
-		</xsl:call-template>
-		
-		<!-- show remaining fluents -->
-		<xsl:call-template name="state">
-			<xsl:with-param name="excludeFluent">CELL</xsl:with-param>
 		</xsl:call-template>
 	</xsl:template>
 	
