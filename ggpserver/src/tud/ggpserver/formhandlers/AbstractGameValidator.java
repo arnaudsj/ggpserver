@@ -70,7 +70,7 @@ public abstract class AbstractGameValidator {
 		if (!gameName.matches("[a-zA-Z0-9._-]*")) {
 			getErrorsGameName().add("game name must only contain the following characters: a-z A-Z 0-9 . _ -");
 		}
-		boolean gameExists = (getDBConnector().getGame(gameName) == null);
+		boolean gameExists = (getDBConnector().getGame(gameName) != null);
 		if (gameExists && !isGameExpectedToExist()) {			// the game must not exist already
 			getErrorsGameName().add("there is already a game with name '" + gameName + "', please pick a different one");
 		} else if (!gameExists && isGameExpectedToExist()) {	// the game has to exist already
