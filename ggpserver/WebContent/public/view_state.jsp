@@ -17,7 +17,11 @@
     along with GGP Server.  If not, see <http://www.gnu.org/licenses/>.
 --%>
 
-<%@ page contentType="application/xhtml+xml" %>
+<%@ page contentType="text/html" %>
+<%-- Of course, "text/html" is the wrong content type. The correct type 
+     would be "application/xhtml+xml" or "application/xml". Unfortunately,
+     this isn't supported by Internet Explorer 6.0. --%>
+
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="viewState"
 	class="tud.ggpserver.formhandlers.ViewState" scope="page">
