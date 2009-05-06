@@ -72,7 +72,7 @@
 		<xsl:param name="height"/>
 		<xsl:param name="checkered"/>
 		<xsl:param name="DefaultCell"/>
-		<xsl:param name="row" select="$height"/>
+		<xsl:param name="row" select="'1'"/>
 
 		<xsl:call-template name="col-loop">
 			<xsl:with-param name="row" select="$row"/>
@@ -83,9 +83,9 @@
 		<br/>
 
 		<!-- loop -->
-		<xsl:if test="$row &gt; 1">
+		<xsl:if test="$row &lt; $height">
 			<xsl:call-template name="row-loop">
-				<xsl:with-param name="row" select="$row - 1"/>
+				<xsl:with-param name="row" select="$row + 1"/>
 				<xsl:with-param name="width" select="$width"/>
 				<xsl:with-param name="height" select="$height"/>
 				<xsl:with-param name="checkered" select="$checkered"/>

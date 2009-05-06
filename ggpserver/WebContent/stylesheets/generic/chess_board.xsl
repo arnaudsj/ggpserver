@@ -217,7 +217,7 @@
 				<xsl:variable name="yPosCell" select="$CellHeight * ($internalHeight - $y) + 2"/>
 				<xsl:variable name="CellColor">
 					<xsl:choose>
-						<xsl:when test="($checkered='dark' and ($x mod 2) + (($internalHeight + 1 - $y) mod 2) = 1) or ($checkered='light' and ($x mod 2) + (($internalHeight + 1 - $y) mod 2) != 1)">dark</xsl:when>
+						<xsl:when test="($checkered='dark' and ($x mod 2) + (($internalHeight + 1 - $y) mod 2) != 1) or ($checkered='light' and ($x mod 2) + (($internalHeight + 1 - $y) mod 2) = 1)">dark</xsl:when>
 						<xsl:when test="$checkered='alldark'">dark</xsl:when>
 						<xsl:otherwise>light</xsl:otherwise>
 					</xsl:choose>
@@ -238,11 +238,11 @@
 						<xsl:choose>
 							<xsl:when test="../fact[prop-f=$internalCellFluentName and arg[number($xArgIdx)]=$xArg and arg[number($yArgIdx)]=$yArg and arg[number($contentArgIdx)]!=$content]">MULTIPLE</xsl:when>
 							<xsl:when test="$content='B' or $content='BLANK'">BLANK</xsl:when>
-							<xsl:when test="$content='KNIGHT' or $content='WHITEKNIGHT' or $content='WN'">nl</xsl:when>
-							<xsl:when test="$content='PAWN' or $content='WHITEPAWN' or $content='WP'">pl</xsl:when>
-							<xsl:when test="$content='ROOK' or $content='WHITEROOK' or $content='WR'">rl</xsl:when>
-							<xsl:when test="$content='BISHOP' or $content='WHITEBISHOP' or $content='WB'">bl</xsl:when>
-							<xsl:when test="$content='QUEEN' or $content='WHITEQUEEN' or $content='WQ'">ql</xsl:when>
+							<xsl:when test="$content='K' or $content='KNIGHT' or $content='WHITEKNIGHT' or $content='WN'">nl</xsl:when>
+							<xsl:when test="$content='P' or $content='PAWN' or $content='WHITEPAWN' or $content='WP'">pl</xsl:when>
+							<xsl:when test="$content='R' or $content='ROOK' or $content='WHITEROOK' or $content='WR'">rl</xsl:when>
+							<xsl:when test="$content='B' or $content='BISHOP' or $content='WHITEBISHOP' or $content='WB'">bl</xsl:when>
+							<xsl:when test="$content='Q' or $content='QUEEN' or $content='WHITEQUEEN' or $content='WQ'">ql</xsl:when>
 							<xsl:when test="$content='KING' or $content='WHITEKING' or $content='WK'">kl</xsl:when>
 							<xsl:when test="$content='BLACKKNIGHT' or $content='BN'">nd</xsl:when>
 							<xsl:when test="$content='BLACKPAWN' or $content='BP'">pd</xsl:when>
@@ -255,7 +255,7 @@
 							<xsl:when test="$content='RED'">O2</xsl:when>
 							<xsl:when test="$content='GREEN'">O3</xsl:when>
 							<xsl:when test="$content='BLUE'">O4</xsl:when>
-							<xsl:when test="$content='CYAN'">O5</xsl:when>
+							<xsl:when test="$content='CYAN' or $content='TEAL'">O5</xsl:when>
 							<xsl:when test="$content='YELLOW'">O6</xsl:when>
 							<xsl:when test="$content='PINK'">O7</xsl:when>
 							<xsl:when test="$content='BROWN'">O8</xsl:when>
