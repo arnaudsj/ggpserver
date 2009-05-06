@@ -17,10 +17,14 @@
     along with GGP Server.  If not, see <http://www.gnu.org/licenses/>.
 --%>
 
-<%@ page contentType="text/html" %>
-<%-- Of course, "text/html" is the wrong content type. The correct type 
-     would be "application/xhtml+xml" or "application/xml". Unfortunately,
-     this isn't supported by Internet Explorer 6.0. --%>
+<%@ page contentType="application/xhtml+xml" %>
+<%-- TODO: we're in a little dilemma here as to which content type to choose.
+
+"application/xhtml+xml" or, equivalently, "application/xml":
+     Is the correct content type, works with Firefox, doesn't work with IE6.
+
+"text/html":
+     Is incorrect, works with Internet Explorer 6.0, doesn't work with Firefox. --%>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="viewState"
