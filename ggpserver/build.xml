@@ -49,12 +49,16 @@
         <pathelement location="../../../../../../usr/share/tomcat5.5/common/lib/naming-resources.jar"/>
         <pathelement location="../../../../../../usr/share/tomcat5.5/common/lib/jasper-compiler-jdt.jar"/>
         <pathelement location="../../../../../../usr/share/tomcat5.5/common/lib/naming-factory.jar"/>
+        <pathelement location="../../../../../../usr/share/tomcat5.5/common/lib/commons-lang.jar"/>
     </path>
     <path id="JUnit 4.libraryclasspath">
         <pathelement location="${ECLIPSE_HOME}/plugins/org.junit4_4.1.0.1/junit-4.1.jar"/>
     </path>
     <path id="Web App Libraries.libraryclasspath">
         <pathelement location="WebContent/WEB-INF/lib/catalina.jar"/>
+        <pathelement location="WebContent/WEB-INF/lib/commons-lang-2.4-javadoc.jar"/>
+        <pathelement location="WebContent/WEB-INF/lib/commons-lang-2.4-sources.jar"/>
+        <pathelement location="WebContent/WEB-INF/lib/commons-lang-2.4.jar"/>
     </path>
     <path id="ggpserver.classpath">
         <pathelement location="build/classes"/>
@@ -87,6 +91,20 @@
         </javac>
     </target>
     <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+    <target name="Test">
+        <java classname="tud.ggpserver.datamodel.Test" failonerror="true" fork="yes">
+            <classpath refid="ggpserver.classpath"/>
+        </java>
+    </target>
+    <target name="RoundRobinSchedulerTest">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <test name="tud.ggpserver.tests.RoundRobinSchedulerTest" todir="${junit.output.dir}"/>
+            <jvmarg line="-ea -Djava.util.logging.config.file=logging.properties"/>
+            <classpath refid="ggpserver.classpath"/>
+        </junit>
+    </target>
     <target name="GameControllerServerRunnerTest">
         <mkdir dir="${junit.output.dir}"/>
         <junit fork="yes" printsummary="withOutAndErr">

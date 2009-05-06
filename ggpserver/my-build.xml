@@ -84,6 +84,20 @@
         </javac>
     </target>
     <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+    <target name="Test">
+        <java classname="tud.ggpserver.datamodel.Test" failonerror="true" fork="yes">
+            <classpath refid="ggpserver.classpath"/>
+        </java>
+    </target>
+    <target name="RoundRobinSchedulerTest">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <test name="tud.ggpserver.tests.RoundRobinSchedulerTest" todir="${junit.output.dir}"/>
+            <jvmarg line="-ea -Djava.util.logging.config.file=logging.properties"/>
+            <classpath refid="ggpserver.classpath"/>
+        </junit>
+    </target>
     <target name="GameControllerServerRunnerTest">
         <mkdir dir="${junit.output.dir}"/>
         <junit fork="yes" printsummary="withOutAndErr">
