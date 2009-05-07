@@ -77,6 +77,7 @@
 		<xsl:call-template name="col-loop">
 			<xsl:with-param name="row" select="$row"/>
 			<xsl:with-param name="width" select="$width"/>
+			<xsl:with-param name="height" select="$height"/>
 			<xsl:with-param name="checkered" select="$checkered"/>
 			<xsl:with-param name="DefaultCell" select="$DefaultCell"/>
 		</xsl:call-template>
@@ -98,12 +99,13 @@
 		<xsl:param name="col">1</xsl:param>
 		<xsl:param name="row"/>
 		<xsl:param name="width"/>
+		<xsl:param name="height"/>
 		<xsl:param name="checkered"/>
 		<xsl:param name="DefaultCell"/>
 
 		<xsl:variable name="defaultClass">
 			<xsl:choose>
-				<xsl:when test="($checkered='dark' and (($col mod 2) + ($row mod 2) != 1)) or ($checkered='light' and (($col mod 2) + ($row mod 2) = 1))">cellDark</xsl:when>
+				<xsl:when test="($checkered='dark' and (($col mod 2) + (($height + 1 - $row) mod 2) != 1)) or ($checkered='light' and (($col mod 2) + (($height + 1 - $row) mod 2) = 1))">cellDark</xsl:when>
 				<xsl:when test="$checkered='alldark'">cellDark</xsl:when>
 				<xsl:otherwise>cellLight</xsl:otherwise>
 			</xsl:choose>
@@ -132,6 +134,7 @@
 				<xsl:with-param name="col" select="$col + 1"/>
 				<xsl:with-param name="row" select="$row"/>
 				<xsl:with-param name="width" select="$width"/>
+				<xsl:with-param name="height" select="$height"/>
 				<xsl:with-param name="checkered" select="$checkered"/>
 				<xsl:with-param name="DefaultCell" select="$DefaultCell"/>
 			</xsl:call-template>
