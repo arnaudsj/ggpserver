@@ -16,6 +16,17 @@
 		<xsl:variable name="currentStep" select="count(/match/history/step)+1"/>
 
 		<script language="JavaScript" type="text/javascript">
+			<xsl:text disable-output-escaping="yes">currentState="</xsl:text>
+				<xsl:call-template name="makeStepLinkURL">
+					<xsl:with-param name="step" select="$currentStep"/>
+				</xsl:call-template>
+			<xsl:text disable-output-escaping="yes">";</xsl:text>
+			<xsl:text disable-output-escaping="yes">nextState="</xsl:text>
+				<xsl:call-template name="makeStepLinkURL">
+					<xsl:with-param name="step" select="$currentStep+1"/>
+				</xsl:call-template>
+			<xsl:text disable-output-escaping="yes">";</xsl:text>
+			
 			<![CDATA[
 				<!--
 					var sec_;
@@ -34,13 +45,21 @@
 							sec_=seconds_left;
 							loop();
 						}else{
-							document.getElementById("timer").innerHTML="Inactive (Not the current step)";
+							if(seconds_left > -30) {
+								if (document.location.href.substr(document.location.href.length-currentState.length, currentState.length)!=currentState) {
+									document.getElementById("timer").innerHTML=""+seconds_left+" (Waiting for next state)";
+									setTimeout("shownextstep()", 5000);
+								} else {
+									document.getElementById("timer").innerHTML="Inactive (Not the current step)";
+								}
+							}else{
+								document.getElementById("timer").innerHTML="Inactive (Not the current step)";
+							}
 						}
 					}
 
 					function loop()
 					{
-						sec_--;
 						document.getElementById("timer").innerHTML=sec_;
 
 						if ( (sec_<=0) )
@@ -49,6 +68,7 @@
 						}
 						else
 						{
+							sec_--;
 							setTimeout("loop()", 1000);
 						}
 					}
@@ -58,12 +78,6 @@
 					}
 				// -->
 			]]>
-
-			<xsl:text disable-output-escaping="yes">nextState="</xsl:text>
-				<xsl:call-template name="makeStepLinkURL">
-					<xsl:with-param name="step" select="$currentStep+1"/>
-				</xsl:call-template>
-			<xsl:text disable-output-escaping="yes">";</xsl:text>
 
 			<xsl:choose>
 				<!-- Case: no history found ie. the game hasn't started) -->
