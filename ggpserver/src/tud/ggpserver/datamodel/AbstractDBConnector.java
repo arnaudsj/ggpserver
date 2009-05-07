@@ -447,31 +447,50 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 
 	}
 	
-	public int getRowCountPlayerMatches(String playerName) throws SQLException {
-		Connection con = getConnection();
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
-		try {
-			ps = con.prepareStatement("SELECT COUNT( `m`.`match_id` ) "
-					+ "FROM `matches` AS `m`, `match_players` AS `p` " 
-					+ "WHERE `m`.`match_id` = `p`.`match_id` AND `player` = ? ;");
-			ps.setString(1, playerName);
-			rs = ps.executeQuery();
-
-			if (rs.next()) {
-				return rs.getInt(1);				
-			} 
-			throw new SQLException("Something went wrong.");
-		} finally { 
-			if (con != null)
-				try {con.close();} catch (SQLException e) {}
-			if (ps != null)
-				try {ps.close();} catch (SQLException e) {}
-			if (rs != null)
-				try {rs.close();} catch (SQLException e) {}
-		} 
-
+	public int getRowCountPlayerGameMatches(String playerName, String gameName) throws SQLException {
+		if(playerName == null && gameName == null){
+			return getRowCount("matches");
+		}else{
+			Connection con = getConnection();
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+	
+			try {
+				if(playerName == null){
+					// if (gameName == null) {
+						// can't happen	
+					// } else {
+						ps = con.prepareStatement("SELECT COUNT( `match_id` ) FROM `matches` WHERE `game` = ?;");
+						ps.setString(1, gameName);
+					// }
+				} else {
+					if (gameName == null) {
+						ps = con.prepareStatement("SELECT COUNT( `m`.`match_id` ) "
+								+ "FROM `matches` AS `m`, `match_players` AS `p` " 
+								+ "WHERE `m`.`match_id` = `p`.`match_id` AND `player` = ? ;");
+						ps.setString(1, playerName);
+					} else {
+						ps = con.prepareStatement("SELECT COUNT( `m`.`match_id` ) "
+								+ "FROM `matches` AS `m`, `match_players` AS `p` " 
+								+ "WHERE `m`.`match_id` = `p`.`match_id` AND `m`.`game` = ? AND `player` = ? ;");
+						ps.setString(1, gameName);
+						ps.setString(2, playerName);
+					}
+				}
+				rs = ps.executeQuery();
+				if (rs.next()) {
+					return rs.getInt(1);				
+				} 
+				throw new SQLException("Something went wrong.");
+			} finally { 
+				if (con != null)
+					try {con.close();} catch (SQLException e) {}
+				if (ps != null)
+					try {ps.close();} catch (SQLException e) {}
+				if (rs != null)
+					try {rs.close();} catch (SQLException e) {}
+			}
+		}
 	}
 	
 	
@@ -642,7 +661,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return result;
 	}
 	
-	public List<Match<TermType, ReasonerStateInfoType>> getMatches(int startRow, int numDisplayedRows, String playerName) throws SQLException {
+	public List<Match<TermType, ReasonerStateInfoType>> getMatches(int startRow, int numDisplayedRows, String playerName, String gameName) throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -651,17 +670,35 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		
 		try {
 			if (playerName == null) {
-				ps = con.prepareStatement("SELECT `match_id` FROM `matches` ORDER BY `start_time` LIMIT ? , ?;");
-				ps.setInt(1, startRow);
-				ps.setInt(2, numDisplayedRows);				
+				if (gameName == null ) {
+					ps = con.prepareStatement("SELECT `match_id` FROM `matches` ORDER BY `start_time` LIMIT ? , ?;");
+					ps.setInt(1, startRow);
+					ps.setInt(2, numDisplayedRows);
+				} else {
+					ps = con.prepareStatement("SELECT `match_id` FROM `matches` WHERE `game` = ? ORDER BY `start_time` LIMIT ? , ?;");
+					ps.setString(1, gameName);
+					ps.setInt(2, startRow);
+					ps.setInt(3, numDisplayedRows);
+				}
 			} else {
-				ps = con.prepareStatement("SELECT `m`.`match_id` "
-					+ "FROM `matches` AS `m`, `match_players` AS `p` " 
-					+ "WHERE `m`.`match_id` = `p`.`match_id` AND `player` = ? " 
-					+ "ORDER BY `start_time` LIMIT ? , ?;");
-				ps.setString(1, playerName);
-				ps.setInt(2, startRow);
-				ps.setInt(3, numDisplayedRows);			
+				if (gameName == null) {
+					ps = con.prepareStatement("SELECT `m`.`match_id` "
+						+ "FROM `matches` AS `m`, `match_players` AS `p` " 
+						+ "WHERE `m`.`match_id` = `p`.`match_id` AND `player` = ? " 
+						+ "ORDER BY `start_time` LIMIT ? , ?;");
+					ps.setString(1, playerName);
+					ps.setInt(2, startRow);
+					ps.setInt(3, numDisplayedRows);
+				} else {
+					ps = con.prepareStatement("SELECT `m`.`match_id` "
+							+ "FROM `matches` AS `m`, `match_players` AS `p` " 
+							+ "WHERE `m`.`match_id` = `p`.`match_id` AND `m`.`game` = ? AND `player` = ? " 
+							+ "ORDER BY `start_time` LIMIT ? , ?;");
+						ps.setString(1, gameName);
+						ps.setString(2, playerName);
+						ps.setInt(3, startRow);
+						ps.setInt(4, numDisplayedRows);
+				}
 			}
 			rs = ps.executeQuery();
 			

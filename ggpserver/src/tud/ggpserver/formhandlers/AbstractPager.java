@@ -20,12 +20,16 @@
 package tud.ggpserver.formhandlers;
 
 import java.sql.SQLException;
+import java.util.AbstractList;
+import java.util.LinkedList;
+import java.util.List;
 
 import tud.ggpserver.datamodel.DBConnectorFactory;
 
 public abstract class AbstractPager {
 	protected int startRow = 0;
 	protected int numDisplayedRows = 30;
+	protected int maxNumDisplayedLinks = 21; // numbers with maxNumDisplayedLinks % 4 == 1 work best here
 	
 	public AbstractPager() {
 		super();
@@ -37,6 +41,10 @@ public abstract class AbstractPager {
 
 	public void setNumDisplayedRows(int numDisplayedRows) {
 		this.numDisplayedRows = numDisplayedRows;
+	}
+
+	public void setMaxNumDisplayedLinks(int maxNumDisplayedLinks) {
+		this.maxNumDisplayedLinks = maxNumDisplayedLinks;
 	}
 
 	public int getStartRow() {
@@ -61,7 +69,65 @@ public abstract class AbstractPager {
 
 	public int getNumberOfPages() throws SQLException {
 		return (getRowCount() - 1) / numDisplayedRows + 1;
-		
+	}
+
+	public List<Integer> getLinkedPages() throws SQLException {
+		final int numPages=getNumberOfPages();
+		if(numPages <= maxNumDisplayedLinks){
+			// show links to all pages
+			return new AbstractList<Integer>(){
+				@Override
+				public Integer get(int index) {
+					return index+1;
+				}
+				@Override
+				public int size() {
+					return numPages;
+				}
+			};
+		}else{
+			// Show links to pages
+			//		1 to n/4,
+			//		getPage()-n/4 to getPage()+n/4,
+			//		numPages-n/4 to numPages,
+			// where n is the maximum number of displayed links.
+			// That means we use 1/4th of the links for pages 1,2,...,
+			// half of the links for pages around the current one and
+			// 1/4th of the links for the last pages.
+			// If the regions overlap we move the middle part in the other direction so we always get exactly maxNumDisplayedLinks. 
+			LinkedList<Integer> result=new LinkedList<Integer>();
+			
+			int lastPageStart = (maxNumDisplayedLinks - 1) / 4;
+			int firstPageEnd = numPages + 1 - maxNumDisplayedLinks / 4;
+			int numMiddlePages = maxNumDisplayedLinks - lastPageStart - (numPages + 1 - firstPageEnd); 
+			int firstPageMiddle = getPage() - (numMiddlePages - 1) / 2;
+			int lastPageMiddle = firstPageMiddle + numMiddlePages - 1;
+			if(lastPageStart >= firstPageMiddle){
+				// move the middle part to the right
+				lastPageMiddle += lastPageStart - firstPageMiddle + 1;	
+				firstPageMiddle = lastPageStart + 1;
+			}
+			if(firstPageEnd <= lastPageMiddle){
+				// move the middle part to the left
+				firstPageMiddle -= lastPageMiddle - firstPageEnd + 1;
+				lastPageMiddle = firstPageEnd - 1;
+				if(firstPageMiddle <= lastPageStart) {
+					// actually this shouldn't happen because it means that numPages>maxNumDisplayedLinks
+					firstPageMiddle = lastPageStart + 1;
+				}
+			}
+			int i;
+			for(i=1; i<=lastPageStart; i++){
+				result.add(i);	
+			}
+			for(i=firstPageMiddle; i<=lastPageMiddle; i++){
+				result.add(i);	
+			}
+			for(i=firstPageEnd; i<=numPages; i++){
+				result.add(i);	
+			}
+			return result;
+		}
 	}
 
 	protected int getRowCount() throws SQLException {

@@ -248,6 +248,9 @@ div#content table tr.even {
     background-color:   #e7e7ef;	
 }
 
+div#content div.pager {
+	clear: both;
+}
 
 li.validationerror {
 	color:             red;

@@ -24,6 +24,7 @@
 	<c:catch> <% // this is for catching NumberFormatExceptions and the like %>
 		<jsp:setProperty name="pager" property="page"/>
 		<jsp:setProperty name="pager" property="playerName"/>
+		<jsp:setProperty name="pager" property="gameName"/>
 	</c:catch>
 </jsp:useBean>
 
@@ -39,10 +40,15 @@
 
 <!-- Content -->
 <div id="content">
-    <div id="ctitle">Show matches
-    <c:if test="${ pager.playerName != null }">
-     for ${pager.playerName}
-    </c:if>
+    <div id="ctitle">
+    	Show
+	    <c:if test="${ pager.gameName != null }">
+	     ${pager.gameName}
+	    </c:if>
+	    matches
+	    <c:if test="${ pager.playerName != null }">
+	     for ${pager.playerName}
+	    </c:if>
      </div>
 
 	<!-- pager -->

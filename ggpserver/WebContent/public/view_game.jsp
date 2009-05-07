@@ -79,6 +79,15 @@
 				</c:choose>
 			</td>
 		</tr>
+		<tr>
+			<td><b>matches</b></td>
+			<td>
+				<c:url value="show_matches.jsp" var="matchesURL">
+					<c:param name="gameName" value="${viewGame.name}" />
+				</c:url>
+				<a href='<c:out value="${matchesURL}" />'>show matches</a>
+			</td>
+		</tr>
 	</tbody>
 </table>
 

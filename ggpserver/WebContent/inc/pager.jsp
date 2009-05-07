@@ -1,5 +1,5 @@
 <%--
-    Copyright (C) 2009 Martin Günther (mintar@gmx.de)
+    Copyright (C) 2009 Martin Gï¿½nther (mintar@gmx.de)
 
     This file is part of GGP Server.
 
@@ -20,18 +20,24 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 	<c:if test="${pager.numberOfPages != 1}">
-	<br>
-		<c:forEach var="i" begin="1" end="${pager.numberOfPages}">
-			<c:choose>
-				<c:when test="${i == pager.page}" >
-					<b>${i}</b>
-				</c:when>
-				<c:otherwise>
-					<c:url value="${pager.targetJsp}" var="pageURL">
-						<c:param name="page" value="${i}" />
-					</c:url>
-					<a href='<c:out value="${pageURL}" />'>${i}</a>
-				</c:otherwise>
-			</c:choose>
-		</c:forEach>
+		<div class="pager">
+			<c:set var="previousI" value="-1"/> 
+			<c:forEach var="i" items="${pager.linkedPages}">
+				<c:if test="${(i != previousI + 1) && (previousI != -1)}">
+					...
+				</c:if>
+				<c:choose>
+					<c:when test="${i == pager.page}" >
+						<b>${i}</b>
+					</c:when>
+					<c:otherwise>
+						<c:url value="${pager.targetJsp}" var="pageURL">
+							<c:param name="page" value="${i}" />
+						</c:url>
+						<a href='<c:out value="${pageURL}" />'>${i}</a>
+					</c:otherwise>
+				</c:choose>
+				<c:set var="previousI" value="${i}"/> 
+			</c:forEach>
+		</div>
 	</c:if>

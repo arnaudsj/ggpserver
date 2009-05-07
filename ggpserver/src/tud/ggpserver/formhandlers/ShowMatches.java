@@ -28,6 +28,7 @@ import tud.ggpserver.datamodel.Match;
 
 public class ShowMatches extends AbstractPager {
 	private String playerName = null;
+	private String gameName = null;
 
 	@SuppressWarnings("unchecked")
 	private List<Match> matches = null;
@@ -38,17 +39,14 @@ public class ShowMatches extends AbstractPager {
 	@SuppressWarnings("unchecked")
 	public List<Match> getMatches() throws SQLException {
 		if (matches == null) {
-			matches = db.getMatches(startRow, numDisplayedRows, playerName);
+			matches = db.getMatches(startRow, numDisplayedRows, playerName, gameName);
 		}
 		return matches;
 	}
 	
 	@Override
 	protected int getRowCount() throws SQLException {
-		if (playerName == null) {
-			return super.getRowCount();
-		} 
-		return db.getRowCountPlayerMatches(playerName);
+		return db.getRowCountPlayerGameMatches(playerName, gameName);
 	}
 
 	public void setPlayerName(String playerName) {
@@ -57,6 +55,14 @@ public class ShowMatches extends AbstractPager {
 
 	public String getPlayerName() {
 		return playerName;
+	}
+
+	public String getGameName() {
+		return gameName;
+	}
+
+	public void setGameName(String gameName) {
+		this.gameName = gameName;
 	}
 
 	@Override
