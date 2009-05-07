@@ -115,7 +115,7 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 		}
 		msg+=")";
 		//notifyStartRunning(); // don't count time for the stop message
-		String reply=sendMsg(msg, match.getPlayclock(), notifier);
+		/*String reply=*/ sendMsg(msg, match.getPlayclock(), notifier);
 		//notifyStopRunning();
 		//logger.info("reply from "+this.getName()+": "+reply+ " after "+getLastMessageRuntime()+"ms");
 	}
@@ -134,7 +134,7 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 			pw.print("Receiver: "+host+"\r\n");
 			pw.print("Content-type: text/acl\r\n");	
 			pw.print("Content-length: "+msg.length()+"\r\n");	
-			pw.print("\r\n");	
+			pw.print("\r\n");
 	
 			pw.print(msg);
 			pw.flush();

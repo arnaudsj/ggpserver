@@ -207,29 +207,33 @@ public class XMLGameStateWriter
 		Element state=xmldoc.createElement("state");
 		Collection<? extends FluentInterface<? extends TermInterface>> fluents=currentState.getFluents();
 		for(FluentInterface<? extends TermInterface> f:fluents){
-			Element fact=xmldoc.createElement("fact");
-			Element e=xmldoc.createElement("prop-f");
-			e.setTextContent(f.getTerm().getName().toUpperCase());
-			fact.appendChild(e);
-			if(!f.getTerm().isVariable()){
-				for(TermInterface arg:f.getTerm().getArgs()){
-					e=xmldoc.createElement("arg");
-					if(arg.isConstant()){
-						e.setTextContent(arg.getName().toUpperCase());
-					}else{
-						e.setTextContent("?");
-						Logger.getLogger("tud.gamecontroller").warning("in XMLGameStateWriter.createStateElement: unsupported expression as argument of a fluent:"+arg);
-					}
-					fact.appendChild(e);
-				}
-			}else{
-				Logger.getLogger("tud.gamecontroller").warning("in XMLGameStateWriter.createStateElement: unsupported fluent expression in state:"+f);
-			}
-			state.appendChild(fact);
+			state.appendChild(createTermElement(xmldoc, "fact", f.getTerm()));
 		}
 		return state;
 	}
 
+	private static Node createTermElement(Document xmldoc, String elementName, TermInterface term) {
+		Element termElement=xmldoc.createElement(elementName);
+		Element e=xmldoc.createElement("prop-f");
+		e.setTextContent(term.getName().toUpperCase());
+		termElement.appendChild(e);
+		if(!term.isVariable()){
+			for(TermInterface arg:term.getArgs()){
+				if(arg.isConstant()){
+					e=xmldoc.createElement("arg");
+					e.setTextContent(arg.getName().toUpperCase());
+					termElement.appendChild(e);
+				}else{
+					termElement.appendChild(createTermElement(xmldoc, "arg", arg));
+				}
+			}
+		}else{
+			Logger.getLogger("tud.gamecontroller").warning("in XMLGameStateWriter.createStateElement: unsupported expression in state:"+term);
+		}
+		return termElement;
+	}
+
+	
 	private static Node createScoresElement(Document xmldoc, GameInterface<?, ?> game, Map<?, Integer> goalValues) {
 		Element scores=xmldoc.createElement("scores");
 		for(Object role:game.getOrderedRoles()){
