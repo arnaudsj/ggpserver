@@ -1,0 +1,28 @@
+=== public/view_state.jsp doesn't work with IE6 ===
+We're in a little dilemma here as to which content type to choose.
+
+"application/xhtml+xml" or, equivalently, "application/xml":
+     Is the correct content type, works with Firefox, doesn't work with IE6.
+
+"text/html":
+     Is incorrect, works with Internet Explorer 6.0, doesn't work with Firefox.
+
+Anyway, even if "text/html" is set as the content encoding, most of the site
+(including the XSLT-transformed XML states) looks awful in IE6. The question is:
+do we care? If we were professional web designers, we probably should (IE6 still
+has around 25% market share).
+
+
+=== Login doesn't work with cookies disabled ===
+In theory, it should work out-of-the box (via Tomcat's URL rewriting, i.e., if 
+the session ID can't be stored in a cookie, it is appended as a GET parameter
+to every URL):
+
+http://www.user.fh-stralsund.de/~twenge/Programmierung_2/javainsel4/javainsel_17_013.htm
+
+In practice, we get a "408 request timeout" when trying to login without cookies.
+This is Tomcat's way of saying that the session is invalid. Somehow the URL rewriting
+doesn't work, but I have no clue why.
+
+ATM, this is a very low-priority bug. I believe we can expect everybody to just 
+enable cookies.
