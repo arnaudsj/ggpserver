@@ -53,6 +53,8 @@
 		</table>
 	</form>
 
+	<p>Note: Cookies must be enabled after this point.</p>
+
 </div>  <!--end div "content"-->
 
 <jsp:directive.include file="/inc/footer.jsp" />
