@@ -124,7 +124,9 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 		String reply=null;
 		Socket s;
 		try {
+			logger.info("Begin creating Socket for " + host + ":" + port);
 			s = new Socket(host, port);
+			logger.info("Done creating Socket for " + host + ":" + port);
 			
 			OutputStream out=s.getOutputStream();
 			PrintWriter pw=new PrintWriter(out);
