@@ -26,6 +26,7 @@ import java.io.InputStreamReader;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
@@ -45,6 +46,7 @@ import tud.gamecontroller.term.TermInterface;
 public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer<TermType>  {
 
 	private String host;
+	private InetAddress hostAddress;
 	private int port;
 	private MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory;
 	private GameScramblerInterface gameScrambler;
@@ -57,6 +59,13 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 		this.movefactory=movefactory;
 		this.gameScrambler=gamescrambler;
 		this.logger=Logger.getLogger("tud.gamecontroller");
+		
+		// try to get the host address in order to cache the DNS result 
+		try {
+			getHostAddress();
+		} catch (UnknownHostException e) {
+			logger.warning("Could not get host address!" + e.getMessage());
+		}		
 	}
 
 	@Override
@@ -125,7 +134,7 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 		Socket s;
 		try {
 			logger.info("Begin creating Socket for " + host + ":" + port);
-			s = new Socket(host, port);
+			s = new Socket(getHostAddress(), port);
 			logger.info("Done creating Socket for " + host + ":" + port);
 			
 			OutputStream out=s.getOutputStream();
@@ -185,5 +194,12 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 	public String toString(){
 		return "remote("+getName()+", "+host+":"+port+")";
 //		return "remote("+host+":"+port+")";
+	}
+
+	private InetAddress getHostAddress() throws UnknownHostException {
+		if (hostAddress == null) {
+			hostAddress = InetAddress.getByName(host);
+		}
+		return hostAddress;
 	}
 }
