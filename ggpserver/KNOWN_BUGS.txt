@@ -14,15 +14,6 @@ has around 25% market share).
 
 
 === Login doesn't work with cookies disabled ===
-In theory, it should work out-of-the box (via Tomcat's URL rewriting, i.e., if 
-the session ID can't be stored in a cookie, it is appended as a GET parameter
-to every URL):
+This bug is fixed now. The only thing left to do is to use <c:url> or <% response.encodeURL() %> 
+CONSISTENTLY EVERYWHERE, or else it won't work.
 
-http://www.user.fh-stralsund.de/~twenge/Programmierung_2/javainsel4/javainsel_17_013.htm
-
-In practice, we get a "408 request timeout" when trying to login without cookies.
-This is Tomcat's way of saying that the session is invalid. Somehow the URL rewriting
-doesn't work, but I have no clue why.
-
-ATM, this is a very low-priority bug. I believe we can expect everybody to just 
-enable cookies.
