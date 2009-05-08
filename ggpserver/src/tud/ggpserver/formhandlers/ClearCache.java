@@ -19,28 +19,15 @@
 
 package tud.ggpserver.formhandlers;
 
-import tud.ggpserver.scheduler.RoundRobinScheduler;
+import tud.ggpserver.datamodel.AbstractDBConnector;
+import tud.ggpserver.datamodel.DBConnector;
+import tud.ggpserver.datamodel.DBConnectorFactory;
 
-public class AdminPage {
-	private boolean cacheCleared = false;
-	
-	public boolean isRunning() {
-		return RoundRobinScheduler.getInstance().isRunning();
-	}
-	
-	public void setAction(String action) {
-		if (action.equals("start")) {
-			RoundRobinScheduler.getInstance().start();
-		} else if (action.equals("stop")) {
-			RoundRobinScheduler.getInstance().stop();
+public class ClearCache {
+	public void clearCache() {
+		AbstractDBConnector db = DBConnectorFactory.getDBConnector();
+		if (db instanceof DBConnector) {
+			 DBConnector.clearCache();
 		}
-	}
-
-	public boolean isCacheCleared() {
-		return cacheCleared;
-	}
-
-	public void setCacheCleared(boolean cacheCleared) {
-		this.cacheCleared = cacheCleared;
 	}
 }

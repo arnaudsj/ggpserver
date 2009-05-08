@@ -1,5 +1,5 @@
-/*
-    Copyright (C) 2009 Martin GÃ¼nther <mintar@gmx.de> 
+<%--
+    Copyright (C) 2009 Martin Günther (mintar@gmx.de)
 
     This file is part of GGP Server.
 
@@ -15,32 +15,18 @@
 
     You should have received a copy of the GNU General Public License
     along with GGP Server.  If not, see <http://www.gnu.org/licenses/>.
-*/
+--%>
 
-package tud.ggpserver.formhandlers;
+<%@ page language="java" %>
 
-import tud.ggpserver.scheduler.RoundRobinScheduler;
+<jsp:useBean id="clearCache" class="tud.ggpserver.formhandlers.ClearCache" scope="request" />
 
-public class AdminPage {
-	private boolean cacheCleared = false;
+<%
+	response.setHeader("Cache-Control","private");
+	response.setHeader("Pragma","no-cache");
 	
-	public boolean isRunning() {
-		return RoundRobinScheduler.getInstance().isRunning();
-	}
+	clearCache.clearCache();
 	
-	public void setAction(String action) {
-		if (action.equals("start")) {
-			RoundRobinScheduler.getInstance().start();
-		} else if (action.equals("stop")) {
-			RoundRobinScheduler.getInstance().stop();
-		}
-	}
-
-	public boolean isCacheCleared() {
-		return cacheCleared;
-	}
-
-	public void setCacheCleared(boolean cacheCleared) {
-		this.cacheCleared = cacheCleared;
-	}
-}
+	String urlWithSessionID = response.encodeRedirectURL("index.jsp?cacheCleared=true");
+	response.sendRedirect(urlWithSessionID);
+%>

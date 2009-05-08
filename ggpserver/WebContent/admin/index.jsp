@@ -20,9 +20,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%> 
-<jsp:useBean id="scheduler" class="tud.ggpserver.formhandlers.AdminPage" scope="page">
+<jsp:useBean id="adminPage" class="tud.ggpserver.formhandlers.AdminPage" scope="page">
 	<c:catch> <% // this is for catching NumberFormatExceptions and the like %>
-		<jsp:setProperty name="scheduler" property="action"/>
+		<jsp:setProperty name="adminPage" property="action"/>
+		<jsp:setProperty name="adminPage" property="cacheCleared"/>
 	</c:catch>
 </jsp:useBean>
 
@@ -45,9 +46,10 @@
 <!-- Content -->
 <div id="content">
     <div id="ctitle">Admin page</div>
+    <h1 class="notopborder">Scheduler</h1>
     
     <c:choose>
-    	<c:when test="${scheduler.running}">
+    	<c:when test="${adminPage.running}">
 			<c:url value="index.jsp" var="url">
 				<c:param name="action" value="stop" />
 			</c:url>
@@ -60,6 +62,16 @@
 			The round-robin scheduler is <b>not running</b>. Click <a href='<c:out value="${url}" />'>here</a> to start it.
     	</c:otherwise>
     </c:choose>
+    
+    <h1>Cache</h1>
+	<c:url value="process_clear_cache.jsp" var="cacheURL" />
+    Click <a href='<c:out value="${cacheURL}" />'>here</a> to clear the cache (forces re-reading everything from the database).
+
+	<c:if test="${adminPage.cacheCleared}">
+		<script language="javascript" type="text/javascript">
+			alert ('Cache was successfully cleared.');
+		</script>
+	</c:if>
 
 </div>  <!--end div "content"-->
 
