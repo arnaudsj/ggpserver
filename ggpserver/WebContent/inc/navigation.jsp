@@ -26,5 +26,6 @@
 <a href="<%= request.getContextPath() + response.encodeURL("/public/show_games.jsp") %>">Show Games</a>
 <a href="<%= request.getContextPath() + response.encodeURL("/public/show_players.jsp") %>">Show Players</a>
 <a href="<%= request.getContextPath() + response.encodeURL("/public/show_users.jsp") %>">Show Users</a>
+<a href="<%= request.getContextPath() + response.encodeURL("/public/contact.jsp") %>">Contact</a>
 </div>
 
