@@ -208,7 +208,7 @@ div#footer {
 	float:              right;
     font-size:          x-small;
     font-variant:       small-caps;
-    width:              88px;
+    padding:			2px;
 }
 
 ul.no_deco{
