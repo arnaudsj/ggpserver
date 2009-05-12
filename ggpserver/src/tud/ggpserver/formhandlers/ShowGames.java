@@ -22,16 +22,13 @@ package tud.ggpserver.formhandlers;
 import java.sql.SQLException;
 import java.util.List;
 
-import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.Game;
 
 public class ShowGames extends AbstractPager {
-	protected AbstractDBConnector db = DBConnectorFactory.getDBConnector();
-
 	@SuppressWarnings("unchecked")
-	public List<Game> getGames() throws SQLException {
-		return db.getGames(startRow, numDisplayedRows);
+	public List<Game<?, ?>> getGames() throws SQLException {
+		return DBConnectorFactory.getDBConnector().getGames(startRow, numDisplayedRows);
 	}
 
 	@Override

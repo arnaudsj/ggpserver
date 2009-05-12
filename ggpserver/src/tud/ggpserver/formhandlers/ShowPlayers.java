@@ -24,17 +24,14 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import tud.gamecontroller.players.PlayerInfo;
-import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
 
 public class ShowPlayers extends AbstractPager {
 	private static final Logger logger = Logger.getLogger(ShowPlayers.class.getName());
 
-	protected final static AbstractDBConnector<?, ?> db = DBConnectorFactory.getDBConnector();
-
 	public List<PlayerInfo> getPlayers() throws SQLException {
-		List<PlayerInfo> result = db.getPlayerInfos(startRow, numDisplayedRows);
+		List<PlayerInfo> result = DBConnectorFactory.getDBConnector().getPlayerInfos(startRow, numDisplayedRows);
 		
 		if (!onlyRemotePlayerInfos(result)) {
 			logger.severe("DBConnector.getPlayerInfos() returned a PlayerInfo that was not a RemotePlayerInfo!"); //$NON-NLS-1$

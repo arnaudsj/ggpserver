@@ -25,19 +25,13 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import tud.gamecontroller.logging.GameControllerErrorMessage;
-import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.Match;
 
 
 public class ViewMatch {
-	/**
-	 * Logger for this class
-	 */
 	private static final Logger logger = Logger.getLogger(ViewMatch.class.getName());
 
-	private final static AbstractDBConnector db = DBConnectorFactory.getDBConnector();
-	
 	private Match<?, ?> match;
 	private int stepNumber = 1;
 
@@ -50,7 +44,7 @@ public class ViewMatch {
 	}
 
 	public void setMatchID(String matchID) throws SQLException {
-		match = db.getMatch(matchID);
+		match = DBConnectorFactory.getDBConnector().getMatch(matchID);
 	}
 
 	public Match getMatch() {

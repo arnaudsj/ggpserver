@@ -23,18 +23,15 @@ import java.sql.SQLException;
 
 import tud.gamecontroller.players.LocalPlayerInfo;
 import tud.gamecontroller.players.PlayerInfo;
-import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
 import tud.ggpserver.datamodel.User;
 
 public class ViewPlayer {
-	private final static AbstractDBConnector db = DBConnectorFactory.getDBConnector();
-
 	private PlayerInfo playerInfo = null;
 	
 	public void setName(String name) throws SQLException {
-		playerInfo = db.getPlayerInfo(name);
+		playerInfo = DBConnectorFactory.getDBConnector().getPlayerInfo(name);
 	}
 	
 	public PlayerInfo getPlayer() {
@@ -43,16 +40,16 @@ public class ViewPlayer {
 	
 	public User getOwner() throws SQLException {
 		if(playerInfo instanceof RemotePlayerInfo){
-			return ((RemotePlayerInfo)playerInfo).getOwner();
+			return ((RemotePlayerInfo) playerInfo).getOwner();
 		}else if(playerInfo instanceof LocalPlayerInfo){
-			return db.getUser("admin");
+			return DBConnectorFactory.getDBConnector().getUser("admin");
 		}
 		return null;
 	}
 	
 	public String getStatus() {
 		if(playerInfo instanceof RemotePlayerInfo){
-			return ((RemotePlayerInfo)playerInfo).getStatus();
+			return ((RemotePlayerInfo) playerInfo).getStatus();
 		}else if(playerInfo instanceof LocalPlayerInfo){
 			return "active";
 		}

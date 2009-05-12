@@ -19,15 +19,10 @@
 
 package tud.ggpserver.formhandlers;
 
-import tud.ggpserver.datamodel.AbstractDBConnector;
-import tud.ggpserver.datamodel.DBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 
 public class ClearCache {
 	public void clearCache() {
-		AbstractDBConnector db = DBConnectorFactory.getDBConnector();
-		if (db instanceof DBConnector) {
-			 DBConnector.clearCache();
-		}
+		DBConnectorFactory.getDBConnector().clearCache();
 	}
 }

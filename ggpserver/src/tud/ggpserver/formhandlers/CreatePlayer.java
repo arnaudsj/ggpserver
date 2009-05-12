@@ -23,7 +23,6 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
-import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.DuplicateInstanceException;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
@@ -35,8 +34,6 @@ public class CreatePlayer {
 	
 	private boolean correctlyCreated = false;
 	
-	private final static AbstractDBConnector db = DBConnectorFactory.getDBConnector();
-
 	public boolean isValid() throws SQLException {
 		errors.clear();
 		
@@ -55,7 +52,7 @@ public class CreatePlayer {
 		if (!playerName.matches( "[a-zA-Z][a-zA-Z0-9._-]*" )) {
 			errors.add("player name must begin with a letter and only contain the following characters: a-z A-Z 0-9 . _ -");
 			// do NOT allow "<" or ">" for the user name (otherwise cross-site scripting possible)
-		} else if (db.getPlayerInfo(playerName) != null) {
+		} else if (DBConnectorFactory.getDBConnector().getPlayerInfo(playerName) != null) {
 			// this is an "else if" such that only valid user names are checked to prevent SQL injection
 			errors.add("player name already exists, please pick a different one");
 		}
@@ -70,7 +67,7 @@ public class CreatePlayer {
 	
 	public void createPlayer() throws SQLException {
 		try {
-			db.createPlayerInfo(playerName, "", 0, db.getUser(userName), RemotePlayerInfo.STATUS_NEW);
+			DBConnectorFactory.getDBConnector().createPlayerInfo(playerName, "", 0, DBConnectorFactory.getDBConnector().getUser(userName), RemotePlayerInfo.STATUS_NEW);
 			correctlyCreated = true;
 		} catch (DuplicateInstanceException e) {
 			errors.add("player name already exists, please pick a different one");

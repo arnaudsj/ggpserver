@@ -23,13 +23,10 @@ import java.sql.SQLException;
 
 import org.apache.commons.lang.StringEscapeUtils;
 
-import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.Game;
 
 public class ViewGame {
-	private final static AbstractDBConnector db = DBConnectorFactory.getDBConnector();
-
 	private String name = "";
 	private Game game = null;
 
@@ -43,7 +40,7 @@ public class ViewGame {
 	
 	public Game getGame() throws SQLException {
 		if(game == null){
-			game = db.getGame(name);
+			game = DBConnectorFactory.getDBConnector().getGame(name);
 		}
 		return game;
 	}

@@ -86,6 +86,11 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 
 	protected abstract ReasonerInterface<TermType, ReasonerStateInfoType> getReasoner(String gameDescription, String name);
 
+	
+	public void clearCache() {
+		// this class doesn't cache anything, so there is nothing to do here.
+	}
+	
 	public User createUser(String userName, String password) throws DuplicateInstanceException, SQLException {
 		Connection con = getConnection(); 
 		PreparedStatement ps = null;
@@ -450,56 +455,56 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	public int getRowCountPlayerGameMatches(String playerName, String gameName) throws SQLException {
 		if(playerName == null && gameName == null){
 			return getRowCount("matches");
-		}else{
-			Connection con = getConnection();
-			PreparedStatement ps = null;
-			ResultSet rs = null;
-	
-			try {
-				if(playerName == null){
-					// if (gameName == null) {
-						// can't happen	
-					// } else {
-						ps = con.prepareStatement("SELECT COUNT( `match_id` ) FROM `matches` WHERE `game` = ?;");
-						ps.setString(1, gameName);
-					// }
-				} else {
-					if (gameName == null) {
-						ps = con.prepareStatement("SELECT COUNT( `m`.`match_id` ) "
-								+ "FROM `matches` AS `m`, `match_players` AS `p` " 
-								+ "WHERE `m`.`match_id` = `p`.`match_id` AND `player` = ? ;");
-						ps.setString(1, playerName);
-					} else {
-						ps = con.prepareStatement("SELECT COUNT( `m`.`match_id` ) "
-								+ "FROM `matches` AS `m`, `match_players` AS `p` " 
-								+ "WHERE `m`.`match_id` = `p`.`match_id` AND `m`.`game` = ? AND `player` = ? ;");
-						ps.setString(1, gameName);
-						ps.setString(2, playerName);
-					}
-				}
-				rs = ps.executeQuery();
-				if (rs.next()) {
-					return rs.getInt(1);				
-				} 
-				throw new SQLException("Something went wrong.");
-			} finally { 
-				if (con != null)
-					try {con.close();} catch (SQLException e) {}
-				if (ps != null)
-					try {ps.close();} catch (SQLException e) {}
-				if (rs != null)
-					try {rs.close();} catch (SQLException e) {}
-			}
 		}
-	}
-	
-	
-	public List<Game<TermType, ReasonerStateInfoType>> getGames(int startRow, int numDisplayedRows) throws SQLException {
+
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
-		List<Game<TermType,ReasonerStateInfoType>> result = new LinkedList<Game<TermType,ReasonerStateInfoType>>();
+		try {
+			if(playerName == null){
+				// if (gameName == null) {
+					// can't happen	
+				// } else {
+					ps = con.prepareStatement("SELECT COUNT( `match_id` ) FROM `matches` WHERE `game` = ?;");
+					ps.setString(1, gameName);
+				// }
+			} else {
+				if (gameName == null) {
+					ps = con.prepareStatement("SELECT COUNT( `m`.`match_id` ) "
+							+ "FROM `matches` AS `m`, `match_players` AS `p` " 
+							+ "WHERE `m`.`match_id` = `p`.`match_id` AND `player` = ? ;");
+					ps.setString(1, playerName);
+				} else {
+					ps = con.prepareStatement("SELECT COUNT( `m`.`match_id` ) "
+							+ "FROM `matches` AS `m`, `match_players` AS `p` " 
+							+ "WHERE `m`.`match_id` = `p`.`match_id` AND `m`.`game` = ? AND `player` = ? ;");
+					ps.setString(1, gameName);
+					ps.setString(2, playerName);
+				}
+			}
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				return rs.getInt(1);				
+			} 
+			throw new SQLException("Something went wrong.");
+		} finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+			if (rs != null)
+				try {rs.close();} catch (SQLException e) {}
+		}
+	}
+	
+	
+	public List<Game<?, ?>> getGames(int startRow, int numDisplayedRows) throws SQLException {
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		List<Game<?, ?>> result = new LinkedList<Game<?, ?>>();
 		
 		try {
 			ps = con.prepareStatement("SELECT `name` FROM `games` LIMIT ? , ?;");

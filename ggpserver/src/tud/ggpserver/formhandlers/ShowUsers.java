@@ -22,16 +22,14 @@ package tud.ggpserver.formhandlers;
 import java.sql.SQLException;
 import java.util.List;
 
-import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.User;
 
 
 public class ShowUsers extends AbstractPager {
-	protected AbstractDBConnector<?, ?> db = DBConnectorFactory.getDBConnector();
 
 	public List<User> getUsers() throws SQLException {
-		return db.getUsers(startRow, numDisplayedRows);
+		return DBConnectorFactory.getDBConnector().getUsers(startRow, numDisplayedRows);
 	}
 	
 	@Override

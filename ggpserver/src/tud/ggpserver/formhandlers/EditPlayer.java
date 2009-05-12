@@ -25,13 +25,11 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
-import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
 import tud.ggpserver.datamodel.User;
 
 public class EditPlayer {
-	private final static AbstractDBConnector db = DBConnectorFactory.getDBConnector();
 	private boolean correctlyUpdated = false;
 
 	private User user = null;
@@ -115,7 +113,7 @@ public class EditPlayer {
 		assert (isValidPlayer());
 		assert (isValid());
 		
-		db.updatePlayerInfo(getPlayerName(), getHost(), getPort(), user, getStatus());
+		DBConnectorFactory.getDBConnector().updatePlayerInfo(getPlayerName(), getHost(), getPort(), user, getStatus());
 		correctlyUpdated = true;
 	}
 	
@@ -162,7 +160,7 @@ public class EditPlayer {
 		}
 
 		// this cast is safe because of the check above
-		RemotePlayerInfo player = (RemotePlayerInfo) db.getPlayerInfo(playerName);
+		RemotePlayerInfo player = (RemotePlayerInfo) DBConnectorFactory.getDBConnector().getPlayerInfo(playerName);
 		
 		if (this.player == null) {
 			host = player.getHost();
@@ -196,7 +194,7 @@ public class EditPlayer {
 	}
 
 	public void setUserName(String userName) throws SQLException {
-		user = db.getUser(userName);
+		user = DBConnectorFactory.getDBConnector().getUser(userName);
 	}
 
 	public List<String> getErrorsHost() {

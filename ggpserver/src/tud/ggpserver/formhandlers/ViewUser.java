@@ -21,14 +21,11 @@ package tud.ggpserver.formhandlers;
 
 import java.sql.SQLException;
 
-import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.User;
 
 
 public class ViewUser {
-	private final static AbstractDBConnector db = DBConnectorFactory.getDBConnector();
-
 	private User user = null;
 
 	public User getUser() {
@@ -36,7 +33,7 @@ public class ViewUser {
 	}
 
 	public void setUserName(String userName) throws SQLException {
-		this.user = db.getUser(userName);
+		this.user = DBConnectorFactory.getDBConnector().getUser(userName);
 	}
 	
 }

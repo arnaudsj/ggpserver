@@ -23,12 +23,10 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
-import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.DuplicateInstanceException;
 
 public class Register {
-//	private Hashtable<String, String> errors = new Hashtable<String, String>();
 	private List<String> errorsPassword1 = new LinkedList<String>();
 	private List<String> errorsPassword2 = new LinkedList<String>();
 	private List<String> errorsUserName = new LinkedList<String>();
@@ -39,8 +37,6 @@ public class Register {
 	
 	private boolean correctlyCreated = false;
 	
-	private final static AbstractDBConnector db = DBConnectorFactory.getDBConnector();
-
 	public String getPassword1() {
 		return password1;
 	}
@@ -77,7 +73,7 @@ public class Register {
 		if (!userName.matches( "[a-zA-Z][a-zA-Z0-9._-]*" )) {
 			errorsUserName.add("user name must begin with a letter and only contain the following characters: a-z A-Z 0-9 . _ -");
 			// do NOT allow "<" or ">" for the user name (otherwise cross-site scripting possible)
-		} else if (db.getUser(userName) != null) {
+		} else if (DBConnectorFactory.getDBConnector().getUser(userName) != null) {
 			// this is an "else if" such that only valid user names are checked to prevent SQL injection
 			errorsUserName.add("user name already exists, please pick a different one");
 		}
@@ -134,7 +130,7 @@ public class Register {
 	 */
 	public void createUser() throws SQLException {
 		try {
-			db.createUser(userName, password1);
+			DBConnectorFactory.getDBConnector().createUser(userName, password1);
 			correctlyCreated = true;
 		} catch (DuplicateInstanceException e) {
 			errorsUserName.add("user name already exists, please pick a different one");

@@ -23,6 +23,7 @@ import static org.apache.commons.collections.map.AbstractReferenceMap.SOFT;
 
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.map.ReferenceMap;
@@ -41,10 +42,10 @@ import cs227b.teamIago.util.GameState;
 public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	private static DBConnector instance;
 	
-	private static Map<String, Game<Term, GameState>> games;
-	private static Map<String, Match<Term, GameState>> matches;
-	private static Map<String, PlayerInfo> playerInfos;
-	private static Map<String, User> users;
+	private Map<String, Game<Term, GameState>> games;
+	private Map<String, Match<Term, GameState>> matches;
+	private Map<String, PlayerInfo> playerInfos;
+	private Map<String, User> users;
 
 	private DBConnector() {
 		super();
@@ -58,8 +59,9 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 		return instance;
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
-	public static void clearCache() {
+	public  void clearCache() {
 		games = new ReferenceMap(SOFT, SOFT, false);
 		matches = new ReferenceMap(SOFT, SOFT, false);
 		playerInfos = new ReferenceMap(SOFT, SOFT, false);
@@ -100,10 +102,31 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	}
 
 	@Override
-	public void updateGameInfo(String name, String gameDescription, String stylesheet, boolean enabled) throws SQLException {
-		super.updateGameInfo(name, gameDescription, stylesheet, enabled);
+	public void updateGameInfo(String gameName, String gameDescription,
+			String stylesheet, boolean enabled) throws SQLException {
+		super.updateGameInfo(gameName, gameDescription, stylesheet, enabled);
+		clearCacheForGame(gameName);
+	}
+
+	private void clearCacheForGame(String gameName) throws SQLException {
 		// delete cached result, so it will read again on next request
-		games.remove(name);
+		games.remove(gameName);
+		
+		// also remove all cached matches of this game (to prevent the stale-stylesheet-bug).
+		// This is horribly inefficient if only a small percentage of all matches for that game 
+		// are in the cache, because getMatchesForGame(gameName) first creates all missing matches,
+		// only to delete them afterwards. Perhaps it would be more efficient to just clear the
+		// whole cache and be done with it.
+		// However, since updating a game doesn't happen very often anyway, this whole issue
+		// probably won't have much of a performance impact anyway.
+		for (Match<Term, GameState> match : getMatchesForGame(gameName)) {
+			matches.remove(match.getMatchID());
+		}
+	}
+
+	private List<Match<Term, GameState>> getMatchesForGame(String gameName) throws SQLException {
+		// The "0, Integer.MAX_VALUE" thing is a bit of a hack. 
+		return getMatches(0, Integer.MAX_VALUE, null, gameName);
 	}
 
 	/////////////////// MATCH ///////////////////
@@ -162,10 +185,23 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	@Override
 	public void updatePlayerInfo(String playerName, String host, int port,
 			User user, String status) throws SQLException {
+		super.updatePlayerInfo(playerName, host, port, user, status);
+		clearCacheForPlayer(playerName);		
+	}
+
+	private void clearCacheForPlayer(String playerName) throws SQLException {
 		// delete cached result, so it will read again on next request
 		playerInfos.remove(playerName);
 		
-		super.updatePlayerInfo(playerName, host, port, user, status);
+		// also remove all cached matches of this player. See comment for clearCacheForGame().
+		for (Match<Term, GameState> match : getMatchesForPlayer(playerName)) {
+			matches.remove(match.getMatchID());
+		}
+	}
+
+	private List<Match<Term,GameState>> getMatchesForPlayer(String playerName) throws SQLException {
+		// The "0, Integer.MAX_VALUE" thing is a bit of a hack. 
+		return getMatches(0, Integer.MAX_VALUE, playerName, null);
 	}
 
 	/////////////////// USER ///////////////////

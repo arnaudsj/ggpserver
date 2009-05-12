@@ -19,17 +19,15 @@
 
 package tud.ggpserver.formhandlers;
 
+import static tud.ggpserver.datamodel.DBConnectorFactory.getDBConnector;
+
 import java.sql.SQLException;
 import java.util.List;
 
-import tud.ggpserver.datamodel.AbstractDBConnector;
-import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
 import tud.ggpserver.datamodel.User;
 
 public class Profile {
-	private final static AbstractDBConnector<?, ?> db = DBConnectorFactory.getDBConnector();
-	
 	private User user = null;
 	private List<RemotePlayerInfo> players = null;
 
@@ -41,14 +39,14 @@ public class Profile {
 	}
 
 	public void setUserName(String userName) throws SQLException {
-		user = db.getUser(userName);
+		user = getDBConnector().getUser(userName);
 	}
 
 	public List<RemotePlayerInfo> getPlayers() throws SQLException {
 		assert (user != null);
 		
 		if (players == null) {
-			players = db.getPlayerInfosForUser(user.getUserName());
+			players = getDBConnector().getPlayerInfosForUser(user.getUserName());
 		}
 		
 		return players;

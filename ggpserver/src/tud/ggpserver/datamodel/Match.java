@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import tud.gamecontroller.GameControllerListener;
 import tud.gamecontroller.XMLGameStateWriter;
@@ -322,12 +323,36 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 			logger.severe("JointMoveInterface<? extends TermInterface> - exception: " + e); //$NON-NLS-1$
 		}
 	}
+
+	public String getXmlState(int stepNumber) {
+		if (stepNumber < 1 || stepNumber > getNumberOfStates()) {
+			throw new IndexOutOfBoundsException();
+		}
+
+		// DEPRECATED: The following detour isn't necessary any more, because
+		// the cache is now correctly cleared. However, this only works if you
+		// edit the stylesheets via the web interface. If you change the
+		// stylesheets directly, DBConnector doesn't know that the cache must be
+		// cleared, and you have to clear the cache manually (via the admin
+		// page).		
+//		// the detour via db is needed here because the stylesheet for a game might
+//		// have changed in the database, but the match still references an old Game object 
+//		String stylesheet = DBConnectorFactory.getDBConnector().getGame(game.getName()).getStylesheet();
+		String stylesheet = game.getStylesheet();
+		
+		// this is a hack to show old matches with the right stylesheets (e.g., if the stylesheet for a game was changed after the match)
+		// we just replace the stylesheet information with the current one  
+		Pattern styleSheetPattern=Pattern.compile("<\\?xml-stylesheet type=\"text/xsl\" href=\"[^\"]*\"\\?>");
+		String styleSheetReplacement="<?xml-stylesheet type=\"text/xsl\" href=\""+stylesheet+"\"?>";
+		
+		return styleSheetPattern.matcher(getXmlStates().get(stepNumber - 1)).replaceFirst(styleSheetReplacement);
+	}
 	
-	public List<String> getXmlStates() {
+	private List<String> getXmlStates() {
 		return xmlStates;
 	}
 
-	public void setXmlStates(List<String> xmlStates) {
+	protected void setXmlStates(List<String> xmlStates) {
 		this.xmlStates = xmlStates;
 	}
 	
@@ -424,8 +449,8 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 		buffer.append(getOrderedGoalValues());
 //		buffer.append(" xmlStates: ");
 //		buffer.append(xmlStates);
-		buffer.append(" number of xmlStates: ");
-		buffer.append(xmlStates.size());
+		buffer.append(" numberOfStates: ");
+		buffer.append(getNumberOfStates());
 		buffer.append(" jointMoves: ");
 		buffer.append(jointMoves);
 		buffer.append(" jointMovesStrings: ");
