@@ -23,7 +23,7 @@ import static org.apache.commons.collections.map.AbstractReferenceMap.SOFT;
 
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.List;
+import java.util.LinkedList;
 import java.util.Map;
 
 import org.apache.commons.collections.map.ReferenceMap;
@@ -39,20 +39,49 @@ import tud.gamecontroller.game.javaprover.TermFactory;
 import tud.gamecontroller.players.PlayerInfo;
 import cs227b.teamIago.util.GameState;
 
+/**
+ * To be threadsafe, all write access to the following things must be synchronized:
+ *    playerInfos 
+ *    matches
+ *    games 
+ *    users 
+ *    instance
+ * 
+ * It is not enough to use synchronized collections because of scenarios like the one 
+ * described in updatePlayerInfo(). 
+ * 
+ * Note: the necessity to synchronize everything means that ONLY A SINGLE THREAD per type
+ * of information (e.g., matches) can access the database. For the more complex objects
+ * like matches and games, this is paid off by the time (and memory!) it takes to create 
+ * one of these. Users and players might be better off without caching, although these
+ * don't account for the bulk of the database activity anyway. 
+ * 
+ * @author Martin Günther <mintar@gmx.de>
+ *
+ */
 public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	private static DBConnector instance;
 	
-	private Map<String, Game<Term, GameState>> games;
-	private Map<String, Match<Term, GameState>> matches;
-	private Map<String, PlayerInfo> playerInfos;
-	private Map<String, User> users;
+	@SuppressWarnings("unchecked")
+	private Map<String, Game<Term, GameState>> games = new ReferenceMap(SOFT, SOFT, false);
+	
+	@SuppressWarnings("unchecked")
+	private Map<String, Match<Term, GameState>> matches= new ReferenceMap(SOFT, SOFT, false);
+	
+	@SuppressWarnings("unchecked")
+	private Map<String, PlayerInfo> playerInfos = new ReferenceMap(SOFT, SOFT, false);
+
+	@SuppressWarnings("unchecked")
+	private Map<String, User> users = new ReferenceMap(SOFT, SOFT, false);
 
 	private DBConnector() {
 		super();
-		clearCache();   // to initialize the cache
 	}
 
-	public static DBConnector getInstance() {
+	/**
+	 * Will be synchronized on DBConnector.class .
+	 */
+	public static synchronized DBConnector getInstance() {
 		if (instance == null) {
 			instance = new DBConnector();
 		}
@@ -61,11 +90,19 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public  void clearCache() {
-		games = new ReferenceMap(SOFT, SOFT, false);
-		matches = new ReferenceMap(SOFT, SOFT, false);
-		playerInfos = new ReferenceMap(SOFT, SOFT, false);
-		users = new ReferenceMap(SOFT, SOFT, false);
+	public void clearCache() {
+		synchronized (games) {
+			games = new ReferenceMap(SOFT, SOFT, false);
+		}
+		synchronized (playerInfos) {
+			playerInfos = new ReferenceMap(SOFT, SOFT, false);
+		}
+		synchronized (matches) {
+			matches = new ReferenceMap(SOFT, SOFT, false);
+		}
+		synchronized (users) {
+			users = new ReferenceMap(SOFT, SOFT, false);
+		}
 	}
 	
 	@Override
@@ -83,19 +120,23 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	@Override
 	public Game<Term, GameState> createGame(String gameDescription, String name, String stylesheet, boolean enabled)
 			throws DuplicateInstanceException, SQLException {
-		Game<Term, GameState> result = super.createGame(gameDescription, name, stylesheet, enabled);
-		games.put(name, result);
-		return result;
+		synchronized (games) {
+			Game<Term, GameState> result = super.createGame(gameDescription, name, stylesheet, enabled);
+			games.put(name, result);
+			return result;
+		}
 	}
 
 	@Override
 	public Game<Term, GameState> getGame(String name) throws SQLException {
 		Game<Term, GameState> result = games.get(name);
 		if (result == null) {
-			result = super.getGame(name);
-
-			if (result != null) {
-				games.put(name, result);
+			synchronized (games) {
+				result = super.getGame(name);
+	
+				if (result != null) {
+					games.put(name, result);
+				}
 			}
 		}
 		return result;
@@ -104,30 +145,53 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	@Override
 	public void updateGameInfo(String gameName, String gameDescription,
 			String stylesheet, boolean enabled) throws SQLException {
-		super.updateGameInfo(gameName, gameDescription, stylesheet, enabled);
-		clearCacheForGame(gameName);
-	}
-
-	private void clearCacheForGame(String gameName) throws SQLException {
-		// delete cached result, so it will read again on next request
-		games.remove(gameName);
-		
-		// also remove all cached matches of this game (to prevent the stale-stylesheet-bug).
-		// This is horribly inefficient if only a small percentage of all matches for that game 
-		// are in the cache, because getMatchesForGame(gameName) first creates all missing matches,
-		// only to delete them afterwards. Perhaps it would be more efficient to just clear the
-		// whole cache and be done with it.
-		// However, since updating a game doesn't happen very often anyway, this whole issue
-		// probably won't have much of a performance impact anyway.
-		for (Match<Term, GameState> match : getMatchesForGame(gameName)) {
-			matches.remove(match.getMatchID());
+		synchronized (games) {
+			// this has to be synchronized to ensure that no stale result gets re-introduced into the 
+			// cache after clearing it
+			clearCacheForGame(gameName);
+			super.updateGameInfo(gameName, gameDescription, stylesheet, enabled);
 		}
 	}
 
-	private List<Match<Term, GameState>> getMatchesForGame(String gameName) throws SQLException {
-		// The "0, Integer.MAX_VALUE" thing is a bit of a hack. 
-		return getMatches(0, Integer.MAX_VALUE, null, gameName);
+	private void clearCacheForGame(String gameName) throws SQLException {
+		// this has to be done first, or otherwise this call to getGame() will be cached
+		Game game = getGame(gameName);
+		
+		synchronized (games) {
+			// delete cached result, so it will be read again on next request
+			games.remove(gameName);
+		}
+		
+		// also remove all cached matches of this game (to prevent the stale-stylesheet-bug).
+		synchronized (matches) {
+//			// This is horribly inefficient if only a small percentage of all matches for that game 
+//			// are in the cache, because getMatchesForGame(gameName) first creates all missing matches,
+//			// only to delete them afterwards. Perhaps it would be more efficient to just clear the
+//			// whole cache and be done with it.
+//			// However, since updating a game doesn't happen very often anyway, this whole issue
+//			// probably won't have much of a performance impact anyway.
+//			for (Match<Term, GameState> match : getMatchesForGame(gameName)) {
+//				matches.remove(match.getMatchID());
+//			}
+			for (Match<Term, GameState> match : matches.values()) {
+				if (match.getGame().equals(game)) {
+					matches.remove(match.getMatchID());
+				}
+			}
+		}
 	}
+
+//	/**
+//	 * When deleting a match is implemented, this will have to be synchronized,
+//	 * too (or at least a check for deleted matches must be done). The reason 
+//	 * is the way this method is implemented (one SQL query to get the game names, 
+//	 * multiple calls to getMatch() afterwards) -- this implementation is still
+//	 * good, because it enables caching of getMatch().
+//	 */
+//	private List<Match<Term, GameState>> getMatchesForGame(String gameName) throws SQLException {
+//		// The "0, Integer.MAX_VALUE" thing is a bit of a hack. 
+//		return getMatches(0, Integer.MAX_VALUE, null, gameName);
+//	}
 
 	/////////////////// MATCH ///////////////////
 	@Override
@@ -139,10 +203,11 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 			Map<? extends RoleInterface<Term>, ? extends PlayerInfo> rolesToPlayers,
 			Date startTime) throws DuplicateInstanceException,
 			SQLException {
-		
-		Match<Term, GameState> result = super.createMatch(matchID, game, startclock, playclock, rolesToPlayers, startTime);
-		matches.put(matchID, result);
-		return result;
+		synchronized (matches) {
+			Match<Term, GameState> result = super.createMatch(matchID, game, startclock, playclock, rolesToPlayers, startTime);
+			matches.put(matchID, result);
+			return result;
+		}
 	}
 
 	@Override
@@ -150,10 +215,12 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 			throws SQLException {
 		Match<Term, GameState> result = matches.get(matchID);
 		if (result == null) {
-			result = super.getMatch(matchID);
-			
-			if (result != null) {
-				matches.put(matchID, result);
+			synchronized (matches) {
+				result = super.getMatch(matchID);
+				
+				if (result != null) {
+					matches.put(matchID, result);
+				}
 			}
 		}
 		return result;
@@ -164,63 +231,95 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	public RemotePlayerInfo createPlayerInfo(String name, String host,
 			int port, User owner, String status)
 			throws DuplicateInstanceException, SQLException {
-		RemotePlayerInfo result = super.createPlayerInfo(name, host, port, owner, status);
-		playerInfos.put(name, result);
-		return result;
+		synchronized (playerInfos) {
+			RemotePlayerInfo result = super.createPlayerInfo(name, host, port, owner, status);
+			playerInfos.put(name, result);
+			return result;
+		}
 	}
 
 	@Override
 	public PlayerInfo getPlayerInfo(String name) throws SQLException {
 		PlayerInfo result = playerInfos.get(name);
 		if (result == null) {
-			result = super.getPlayerInfo(name);
-
-			if (result != null) {
-				playerInfos.put(name, result);
+			synchronized (playerInfos) {
+				result = super.getPlayerInfo(name);
+	
+				if (result != null) {
+					playerInfos.put(name, result);
+				}
 			}
 		}
 		return result;
 	}
 
+	/**
+	 * This method must be synchronized with getPlayerInfo(). Otherwise, the following could happen:
+	 * - Thread 1: updatePlayerInfo()  [changes player status to "active"]
+	 * - Thread 1: clears player from cache
+	 * - Thread 2: getPlayerInfo(), re-adds player to cache
+	 * - Thread 1: super.updatePlayerInfo() calls getPlayerInfo(), passes stale result 
+	 *   (status == "inactive") to notifyPlayerStatusChange(), which will think that 
+	 *   the state was changed to "inactive" instead of "active".   
+	 */
 	@Override
 	public void updatePlayerInfo(String playerName, String host, int port,
 			User user, String status) throws SQLException {
-		super.updatePlayerInfo(playerName, host, port, user, status);
-		clearCacheForPlayer(playerName);		
-	}
-
-	private void clearCacheForPlayer(String playerName) throws SQLException {
-		// delete cached result, so it will read again on next request
-		playerInfos.remove(playerName);
-		
-		// also remove all cached matches of this player. See comment for clearCacheForGame().
-		for (Match<Term, GameState> match : getMatchesForPlayer(playerName)) {
-			matches.remove(match.getMatchID());
+		synchronized (playerInfos) {
+			clearCacheForPlayer(playerName);		
+			super.updatePlayerInfo(playerName, host, port, user, status);
 		}
 	}
 
-	private List<Match<Term,GameState>> getMatchesForPlayer(String playerName) throws SQLException {
-		// The "0, Integer.MAX_VALUE" thing is a bit of a hack. 
-		return getMatches(0, Integer.MAX_VALUE, playerName, null);
+	private void clearCacheForPlayer(String playerName) throws SQLException {
+		// this has to be done first, or otherwise this call to getPlayerInfo() will be cached
+		PlayerInfo player = getPlayerInfo(playerName);
+		
+		// delete cached result, so it will be read again on next request
+		synchronized (playerInfos) {
+			playerInfos.remove(playerName);
+		}
+		
+		// remove all cached matches of this player. 
+		synchronized (matches) {
+			// See comment for clearCacheForGame().
+//			for (Match<Term, GameState> match : getMatchesForPlayer(playerName)) {
+//				matches.remove(match.getMatchID());
+//			}
+			for (Match<Term, GameState> match : new LinkedList<Match<Term, GameState>>(matches.values())) {
+				if (match.getPlayerInfos().contains(player)) {
+					matches.remove(match.getMatchID());
+				}
+			}
+		}
 	}
+
+//	private List<Match<Term,GameState>> getMatchesForPlayer(String playerName) throws SQLException {
+//		// The "0, Integer.MAX_VALUE" thing is a bit of a hack. 
+//		return getMatches(0, Integer.MAX_VALUE, playerName, null);
+//	}
 
 	/////////////////// USER ///////////////////
 	@Override
 	public User createUser(String userName, String password)
 			throws DuplicateInstanceException, SQLException {
-		User result = super.createUser(userName, password);
-		users.put(userName, result);
-		return result;
+		synchronized (users) {
+			User result = super.createUser(userName, password);
+			users.put(userName, result);
+			return result;
+		}
 	}
 
 	@Override
 	public User getUser(String userName) throws SQLException {
 		User result = users.get(userName);
 		if (result == null) {
-			result = super.getUser(userName);
-			
-			if (result != null) {
-				users.put(userName, result);
+			synchronized (users) {
+				result = super.getUser(userName);
+				
+				if (result != null) {
+					users.put(userName, result);
+				}
 			}
 		}
 		return result;

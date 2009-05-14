@@ -34,6 +34,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
@@ -67,21 +68,16 @@ import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
  * 
  */
 public abstract class AbstractDBConnector<TermType extends TermInterface, ReasonerStateInfoType> {
-	private static final Logger logger = Logger.getLogger(AbstractDBConnector.class.getName());
-
 	public static final int MATCHID_MAXLENGTH = 40;
 
-//	private final AbstractReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory;
-	private static final GameScramblerInterface gamescrambler;
+	private static final Logger logger = Logger.getLogger(AbstractDBConnector.class.getName());
+	private static final GameScramblerInterface gamescrambler = new IdentityGameScrambler();    // we don't do any scrambling (yet)
 
+	private static final String LAST_PLAYED_GAME = "last_played_game";
 	private static DataSource datasource;
 	
 	private Collection<PlayerStatusListener<TermType, ReasonerStateInfoType>> playerStatusListeners = new ArrayList<PlayerStatusListener<TermType, ReasonerStateInfoType>>();
 	
-	static {
-		gamescrambler = new IdentityGameScrambler();    // we don't do any scrambling (yet)
-	}
-
 	protected abstract MoveFactoryInterface<? extends MoveInterface<TermType>> getMoveFactory();
 
 	protected abstract ReasonerInterface<TermType, ReasonerStateInfoType> getReasoner(String gameDescription, String name);
@@ -620,7 +616,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			// AbstractRoundRobinScheduler.createPlayerInfos()
 		
 		try {
-			ps = con.prepareStatement("SELECT `name` FROM `players` where `status` = ?;");
+			ps = con.prepareStatement("SELECT `name` FROM `players` WHERE `status` = ?;");
 			ps.setString(1, status);
 			rs = ps.executeQuery();
 			
@@ -647,7 +643,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		List<RemotePlayerInfo> result = new LinkedList<RemotePlayerInfo>();
 		
 		try {
-			ps = con.prepareStatement("SELECT `name` FROM `players` where `owner` = ?;");
+			ps = con.prepareStatement("SELECT `name` FROM `players` WHERE `owner` = ?;");
 			ps.setString(1, userName);
 			rs = ps.executeQuery();
 			
@@ -865,7 +861,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		}
 		
 		try {
-			ps = con.prepareStatement("SELECT `step_number`, `type`, `message`, `player` FROM `errormessages` where `match_id` = ? ORDER BY `step_number`;");
+			ps = con.prepareStatement("SELECT `step_number`, `type`, `message`, `player` FROM `errormessages` WHERE `match_id` = ? ORDER BY `step_number`;");
 			ps.setString(1, match.getMatchID());
 			rs = ps.executeQuery();
 			
@@ -899,7 +895,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		List<List<String>> result = new LinkedList<List<String>>();
 		
 		try {
-			ps = con.prepareStatement("SELECT `step_number`, `roleindex`, `move` FROM `moves` where `match_id` = ? ORDER BY `step_number`, `roleindex`;");
+			ps = con.prepareStatement("SELECT `step_number`, `roleindex`, `move` FROM `moves` WHERE `match_id` = ? ORDER BY `step_number`, `roleindex`;");
 			ps.setString(1, matchID);
 			rs = ps.executeQuery();
 			
@@ -943,7 +939,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		List<String> result = new LinkedList<String>();
 
 		try {
-			ps = con.prepareStatement("SELECT `step_number`, `state` FROM `states` where `match_id` = ? ORDER BY `step_number`;");
+			ps = con.prepareStatement("SELECT `step_number`, `state` FROM `states` WHERE `match_id` = ? ORDER BY `step_number`;");
 			ps.setString(1, matchID);
 			rs = ps.executeQuery();
 			
@@ -1004,6 +1000,105 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			ps.setString(2, stylesheet);
 			ps.setBoolean(3, enabled);
 			ps.setString(4, gameName);
+			ps.executeUpdate(); 
+		} finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+		}
+	}
+
+	public Game<TermType, ReasonerStateInfoType> getLastPlayedGame() throws SQLException {
+		String lastGameName = getConfigEntry(LAST_PLAYED_GAME);
+		if (lastGameName == null) {
+			return null;
+		}
+		return getGame(lastGameName);
+	}
+	
+	public void setLastPlayedGame(Game currentGame) throws SQLException {
+		storeConfigEntry(LAST_PLAYED_GAME, currentGame.getName());
+	}
+
+
+	/**
+	 * Generic config to store key/value pairs (Strings up to length 255). Used
+	 * for things that do not occur often enough to justify having a table of
+	 * their own.
+	 */
+	private String getConfigEntry(String key) throws SQLException {
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		String result = null;
+		try {
+			ps = con.prepareStatement("SELECT `value` FROM `config` WHERE `key` = ? ;");
+			ps.setString(1, key);
+			rs = ps.executeQuery();
+			
+			if (rs.next()) {
+				result  = rs.getString("value");
+			}
+		} finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+			if (rs != null)
+				try {rs.close();} catch (SQLException e) {}
+		} 
+		return result;
+	}
+
+	private synchronized void storeConfigEntry(String key, String value) throws SQLException {
+		if (getConfigEntry(key) == null) {
+			// key doesn't exist --> create it
+			try {
+				createConfigEntry(key, value);
+			} catch (DuplicateInstanceException e) {
+				throw new InternalError("This should never happen!" + e);
+				// this should never happen, because we checked explicitly for non-existence before, so the key cannot exist!
+			}
+		} else {
+			// key exists --> update
+			updateConfigEntry(key, value);
+		}
+		
+	}
+
+	private void createConfigEntry(String key, String value) throws SQLException, DuplicateInstanceException {
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+		try { 
+
+			ps = con.prepareStatement("INSERT INTO `config` (`key` , `value`) VALUES (?, ?);");
+			ps.setString(1, key);
+			ps.setString(2, value);
+			
+			ps.executeUpdate();
+		} catch (MySQLIntegrityConstraintViolationException e) {
+			// MySQLIntegrityConstraintViolationException means here that the key could not be inserted
+			throw new DuplicateInstanceException(e);
+		} finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+		} 
+	}
+	
+	private void updateConfigEntry(String key, String value) throws SQLException {
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+
+		try {
+			ps = con.prepareStatement("UPDATE `ggpserver`.`config` "
+							+ "SET `value` = ? "
+							+ "WHERE `config`.`key` = ? LIMIT 1 ;");
+			ps.setString(1, value);
+			ps.setString(2, key);
 			ps.executeUpdate(); 
 		} finally { 
 			if (con != null)

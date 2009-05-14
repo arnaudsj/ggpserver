@@ -24,6 +24,7 @@ import java.util.List;
 
 import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
+import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.Game;
 
 public class GamePicker<TermType extends TermInterface, ReasonerStateInfoType> {
@@ -41,9 +42,23 @@ public class GamePicker<TermType extends TermInterface, ReasonerStateInfoType> {
 
 	@SuppressWarnings("unchecked")
 	private void initCurrentGame() throws SQLException {
-		List<Game<TermType, ReasonerStateInfoType>> allGames = getDBConnector().getAllEnabledGames();
-		// TODO: start first game with fewest matches (to evenly distribute matches among games), OR store the last played game in DB and resume
-		this.currentGame = allGames.get(0);
+		assert(currentGame == null);  // because this is only called in the constructor
+		try {
+			currentGame = ((AbstractDBConnector) DBConnectorFactory.getDBConnector()).getLastPlayedGame();
+			pickNextGame();
+		} catch (SQLException e) {
+			// ignore. currentGame will remain null.
+		}
+		if (currentGame == null) {
+			// key next_game didn't exist in Config, or game doesn't exist (any more?) in DB.
+			// fallback: pick first enabled game.
+			List<Game<TermType, ReasonerStateInfoType>> allGames = getDBConnector().getAllEnabledGames();
+			if (allGames.isEmpty()) {
+				throw new InternalError("No enabled games in Database!");   // shouldn't be an internal error
+			}
+			currentGame = allGames.get(0);
+		}
+		assert(currentGame != null);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -55,6 +70,7 @@ public class GamePicker<TermType extends TermInterface, ReasonerStateInfoType> {
 		int nextGameIndex = (allGames.indexOf(currentGame) + 1) % allGames.size();
 		currentGame = allGames.get(nextGameIndex);
 		
+		DBConnectorFactory.getDBConnector().setLastPlayedGame(currentGame);
 		return result;
 	}
 

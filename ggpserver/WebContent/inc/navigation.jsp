@@ -17,6 +17,8 @@
     along with GGP Server.  If not, see <http://www.gnu.org/licenses/>.
 --%>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%> 
+
 <!-- Navigation -->
 <div id="navigation">
 
@@ -26,6 +28,17 @@
 <a href="<%= request.getContextPath() + response.encodeURL("/public/show_games.jsp") %>">Show Games</a>
 <a href="<%= request.getContextPath() + response.encodeURL("/public/show_players.jsp") %>">Show Players</a>
 <a href="<%= request.getContextPath() + response.encodeURL("/public/show_users.jsp") %>">Show Users</a>
+<c:catch var="exception">
+	<c:set var="userName" value="<%= request.getUserPrincipal().getName()%>"></c:set>
+</c:catch>
+<% // TODO: use role "admin" instead of user "admin" %>
+	<c:if test="${exception == null}">
+		<c:if test='${userName == "admin"}'>
+			<a href="<%= request.getContextPath() + response.encodeURL("/admin/index.jsp") %>">Admin Page</a>
+		</c:if>
+		<a href="<%= request.getContextPath() + response.encodeURL("/members/profile.jsp") %>">My Players</a> 
+		<a href="<%= request.getContextPath() + response.encodeURL("/members/create_game.jsp") %>">Create Game</a> 
+	</c:if>
 <a href="<%= request.getContextPath() + response.encodeURL("/public/contact.jsp") %>">Contact</a>
 </div>
 

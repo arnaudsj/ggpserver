@@ -20,6 +20,24 @@ USE `ggpserver` ;
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `config`
+--
+
+DROP TABLE IF EXISTS `config`;
+CREATE TABLE IF NOT EXISTS `config` (
+  `key` varchar(255) NOT NULL,
+  `value` varchar(255) default NULL,
+  PRIMARY KEY  (`key`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `config`
+--
+
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `errormessages`
 --
 
