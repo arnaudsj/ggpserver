@@ -17,7 +17,7 @@
     along with GGP Server.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package tud.ggpserver.datamodel;
+package tud.ggpserver.scheduler;
 
 import java.sql.SQLException;
 import java.util.Collection;
@@ -33,6 +33,9 @@ import java.util.logging.Logger;
 import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.term.TermInterface;
+import tud.ggpserver.datamodel.AbstractDBConnector;
+import tud.ggpserver.datamodel.Match;
+import tud.ggpserver.datamodel.RemotePlayerInfo;
 
 /**
  * Keeps track of active / inactive players.
@@ -47,12 +50,11 @@ public class PlayerStatusTracker<TermType extends TermInterface, ReasonerStateIn
 	private final Map<RemotePlayerInfo, Integer> numOfflineMatches = Collections
 			.synchronizedMap(new HashMap<RemotePlayerInfo, Integer>());
 
-	private final AbstractDBConnector dbConnector;
+	private final AbstractDBConnector<TermType, ReasonerStateInfoType> dbConnector;
 	private Set<RemotePlayerInfo> activePlayers;
 
 	
-	@SuppressWarnings("unchecked")
-	public PlayerStatusTracker(final AbstractDBConnector dbConnector) {
+	public PlayerStatusTracker(final AbstractDBConnector<TermType, ReasonerStateInfoType> dbConnector) {
 		this.dbConnector = dbConnector;
 		dbConnector.addPlayerStatusListener(this);
 		
@@ -202,7 +204,7 @@ public class PlayerStatusTracker<TermType extends TermInterface, ReasonerStateIn
 		logger.warning(message);
 	}
 	
-	private AbstractDBConnector getDBConnector() {
+	private AbstractDBConnector<TermType, ReasonerStateInfoType> getDBConnector() {
 		return dbConnector;
 	}
 }

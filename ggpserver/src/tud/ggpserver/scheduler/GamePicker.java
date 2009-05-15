@@ -21,60 +21,72 @@ package tud.ggpserver.scheduler;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Logger;
 
 import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
-import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.Game;
 
 public class GamePicker<TermType extends TermInterface, ReasonerStateInfoType> {
-	private Game<TermType, ReasonerStateInfoType> currentGame;
-	private final AbstractDBConnector dbConnector;
+	/**
+	 * Logger for this class
+	 */
+	private static final Logger logger = Logger.getLogger(GamePicker.class.getName());
 
-	public GamePicker(final AbstractDBConnector dbConnector) {
+	private final AbstractDBConnector<TermType, ReasonerStateInfoType> dbConnector;
+
+	public GamePicker(final AbstractDBConnector<TermType, ReasonerStateInfoType> dbConnector) {
 		this.dbConnector = dbConnector;
-		try {
-			initCurrentGame();
-		} catch (SQLException e) {
-			throw new InternalError("Could not get games from database! " + e);
-		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private void initCurrentGame() throws SQLException {
-		assert(currentGame == null);  // because this is only called in the constructor
-		try {
-			currentGame = ((AbstractDBConnector) DBConnectorFactory.getDBConnector()).getLastPlayedGame();
-			pickNextGame();
-		} catch (SQLException e) {
-			// ignore. currentGame will remain null.
-		}
-		if (currentGame == null) {
+	/**
+	 * Does two things:
+	 * - increments the nextPlayedGame 
+	 * - returns the old nextPlayedGame
+	 * 
+	 * Returns null if there are no enabled games in database.
+	 */
+	public Game<TermType, ReasonerStateInfoType> pickNextGame() throws SQLException {
+		Game<TermType, ReasonerStateInfoType> oldNextPlayedGame = getNextPlayedGame();
+		
+		List<Game<TermType, ReasonerStateInfoType>> allGames = getDBConnector().getAllEnabledGames();
+
+		if (oldNextPlayedGame == null) {
+			assert (allGames.isEmpty());   // otherwise, getNextPlayedGame() wouldn't have returned null.
+			return null;
+		} 
+
+		int newNextPlayedGameIndex = (allGames.indexOf(oldNextPlayedGame) + 1) % allGames.size(); 
+		setNextPlayedGame(allGames.get(newNextPlayedGameIndex));
+		
+		return oldNextPlayedGame;
+	}
+
+	////////////////
+
+	public Game<TermType, ReasonerStateInfoType> getNextPlayedGame() throws SQLException {
+		Game<TermType, ReasonerStateInfoType> nextPlayedGame = getDBConnector().getNextPlayedGame();
+
+		if (nextPlayedGame == null) {
 			// key next_game didn't exist in Config, or game doesn't exist (any more?) in DB.
 			// fallback: pick first enabled game.
 			List<Game<TermType, ReasonerStateInfoType>> allGames = getDBConnector().getAllEnabledGames();
 			if (allGames.isEmpty()) {
-				throw new InternalError("No enabled games in Database!");   // shouldn't be an internal error
+				logger.warning("No enabled games in database!"); //$NON-NLS-1$
+				return null;
 			}
-			currentGame = allGames.get(0);
+			nextPlayedGame = allGames.get(0);
 		}
-		assert(currentGame != null);
-	}
-	
-	@SuppressWarnings("unchecked")
-	public Game<TermType, ReasonerStateInfoType> pickNextGame() throws SQLException {
-		Game<TermType, ReasonerStateInfoType> result = currentGame;
 		
-		List<Game<TermType, ReasonerStateInfoType>> allGames = getDBConnector().getAllEnabledGames();
-		
-		int nextGameIndex = (allGames.indexOf(currentGame) + 1) % allGames.size();
-		currentGame = allGames.get(nextGameIndex);
-		
-		DBConnectorFactory.getDBConnector().setLastPlayedGame(currentGame);
-		return result;
+		return nextPlayedGame;
 	}
 
-	private AbstractDBConnector getDBConnector() {
+	public void setNextPlayedGame(Game<TermType, ReasonerStateInfoType> nextPlayedGame) throws SQLException {
+		getDBConnector().setNextPlayedGame(nextPlayedGame);
+	}
+
+	
+	private AbstractDBConnector<TermType, ReasonerStateInfoType> getDBConnector() {
 		return dbConnector;
 	}
 }

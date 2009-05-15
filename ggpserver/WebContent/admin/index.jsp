@@ -63,6 +63,42 @@
     	</c:otherwise>
     </c:choose>
     
+	
+	<h1>Scheduler options</h1>
+	<c:url var="schedulerOptionsURL" value="process_scheduler_options.jsp" />
+	<form action="${schedulerOptionsURL}" method="post">
+	<table cellpadding="4" cellspacing="2" border="0">
+		<tr>
+			<td valign="top" align="right">
+				Next game to be played
+			</td>
+			<td>
+				<select name="nextPlayedGameName" size="1" >
+					<c:set var="theNextPlayedGameName" value="${adminPage.nextPlayedGameName}" />
+					
+					<c:forEach var="game" items="${adminPage.allGames}">
+						<c:choose>
+							<c:when test='${game.name == theNextPlayedGameName}'>
+								<option value="${game.name}" selected><c:out value="${game.name}" /></option>
+							</c:when>
+							<c:otherwise>
+								<option value="${game.name}"><c:out value="${game.name}" /></option>
+							</c:otherwise>
+						</c:choose>
+					</c:forEach>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2" align="center">
+				<input type="submit" value="Submit">
+				<input type="reset" value="Reset"> 
+			</td>
+		</tr>
+	</table>
+	</form>	
+	
+	
     <h1>Cache</h1>
 	<c:url value="process_clear_cache.jsp" var="cacheURL" />
     Click <a href='<c:out value="${cacheURL}" />'>here</a> to clear the cache (forces re-reading everything from the database).
@@ -72,6 +108,7 @@
 			alert ('Cache was successfully cleared.');
 		</script>
 	</c:if>
+
 
 </div>  <!--end div "content"-->
 

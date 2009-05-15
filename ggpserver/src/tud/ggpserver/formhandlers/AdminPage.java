@@ -19,6 +19,13 @@
 
 package tud.ggpserver.formhandlers;
 
+import static tud.ggpserver.datamodel.DBConnectorFactory.getDBConnector;
+
+import java.sql.SQLException;
+import java.util.List;
+
+import tud.ggpserver.datamodel.AbstractDBConnector;
+import tud.ggpserver.datamodel.Game;
 import tud.ggpserver.scheduler.RoundRobinScheduler;
 
 public class AdminPage {
@@ -42,5 +49,20 @@ public class AdminPage {
 
 	public void setCacheCleared(boolean cacheCleared) {
 		this.cacheCleared = cacheCleared;
+	}
+	
+	public String getNextPlayedGameName() throws SQLException {
+		return RoundRobinScheduler.getInstance().getNextPlayedGame().getName();
+	}
+
+	@SuppressWarnings("unchecked")
+	public void setNextPlayedGameName(String nextPlayedGame) throws SQLException {
+		Game<?, ?> game = getDBConnector().getGame(nextPlayedGame);
+		RoundRobinScheduler.getInstance().setNextPlayedGame(game);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Game<?, ?>> getAllGames() throws SQLException {
+		return ((AbstractDBConnector) getDBConnector()).getAllEnabledGames();
 	}
 }

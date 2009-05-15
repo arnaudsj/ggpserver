@@ -52,6 +52,7 @@ import tud.gamecontroller.players.RandomPlayerInfo;
 import tud.gamecontroller.scrambling.GameScramblerInterface;
 import tud.gamecontroller.scrambling.IdentityGameScrambler;
 import tud.gamecontroller.term.TermInterface;
+import tud.ggpserver.scheduler.PlayerStatusListener;
 import tud.ggpserver.util.Digester;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
@@ -74,7 +75,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	private static final Logger logger = Logger.getLogger(AbstractDBConnector.class.getName());
 	private static final GameScramblerInterface gamescrambler = new IdentityGameScrambler();    // we don't do any scrambling (yet)
 
-	private static final String LAST_PLAYED_GAME = "last_played_game";
+	private static final String NEXT_PLAYED_GAME = "next_played_game";
 	private static final Collection<String> defaultRoleNames = Collections.<String>singleton("member");
 	
 	private static DataSource datasource;
@@ -623,12 +624,12 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return result;
 	}
 	
-	public List<PlayerInfo> getPlayerInfos(String status) throws SQLException {
+	public List<RemotePlayerInfo> getPlayerInfos(String status) throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
-		List<PlayerInfo> result = new LinkedList<PlayerInfo>();
+		List<RemotePlayerInfo> result = new LinkedList<RemotePlayerInfo>();
 			// it is important that a new list is returned here,
 			// since the result of this method will be shuffled in
 			// AbstractRoundRobinScheduler.createPlayerInfos()
@@ -639,7 +640,10 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			rs = ps.executeQuery();
 			
 			while (rs.next()) {
-				result.add(getPlayerInfo(rs.getString("name")));
+				PlayerInfo playerInfo = getPlayerInfo(rs.getString("name"));
+				if (playerInfo instanceof RemotePlayerInfo) {
+					result.add((RemotePlayerInfo) playerInfo);
+				}
 			}
 		} finally { 
 			if (con != null)
@@ -1027,16 +1031,16 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		}
 	}
 
-	public Game<TermType, ReasonerStateInfoType> getLastPlayedGame() throws SQLException {
-		String lastGameName = getConfigEntry(LAST_PLAYED_GAME);
-		if (lastGameName == null) {
+	public Game<TermType, ReasonerStateInfoType> getNextPlayedGame() throws SQLException {
+		String nextGameName = getConfigEntry(NEXT_PLAYED_GAME);
+		if (nextGameName == null) {
 			return null;
 		}
-		return getGame(lastGameName);
+		return getGame(nextGameName);
 	}
 	
-	public void setLastPlayedGame(Game currentGame) throws SQLException {
-		storeConfigEntry(LAST_PLAYED_GAME, currentGame.getName());
+	public void setNextPlayedGame(Game nextPlayedGame) throws SQLException {
+		storeConfigEntry(NEXT_PLAYED_GAME, nextPlayedGame.getName());
 	}
 
 

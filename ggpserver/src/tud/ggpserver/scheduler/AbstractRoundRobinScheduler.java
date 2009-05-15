@@ -41,7 +41,6 @@ import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.Game;
 import tud.ggpserver.datamodel.Match;
-import tud.ggpserver.datamodel.PlayerStatusTracker;
 
 public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface, ReasonerStateInfoType> {
 	private static final Logger logger = Logger.getLogger(AbstractRoundRobinScheduler.class.getName());
@@ -58,7 +57,7 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 	private final PlayerStatusTracker<TermType, ReasonerStateInfoType> playerStatusTracker;
 
 	
-	public AbstractRoundRobinScheduler(AbstractDBConnector dbConnector) {
+	public AbstractRoundRobinScheduler(AbstractDBConnector<TermType, ReasonerStateInfoType> dbConnector) {
 		Logger.getLogger("tud.gamecontroller").addHandler(new LoggingHandler());
 		this.dbConnector = dbConnector;
 		this.gamePicker = new GamePicker<TermType, ReasonerStateInfoType>(dbConnector);
@@ -107,6 +106,15 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		}
 	}
 
+	
+	public Game<TermType, ReasonerStateInfoType> getNextPlayedGame() throws SQLException {
+		return gamePicker.getNextPlayedGame();
+	}
+
+	public void setNextPlayedGame(Game<TermType, ReasonerStateInfoType> nextPlayedGame) throws SQLException {
+		gamePicker.setNextPlayedGame(nextPlayedGame);
+	}
+	
 	public boolean isRunning() {
 		return running;
 	}
@@ -180,6 +188,11 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		
 		Game<TermType, ReasonerStateInfoType> nextGame = gamePicker.pickNextGame();
 		Collection<? extends PlayerInfo> activePlayers = playerStatusTracker.waitForActivePlayers();
+		// TODO: If there are no enabled games, gamePicker.pickNextGame() will return null.
+		// In order to handle this case correctly, one would have to replace gamePicker.pickNextGame()
+		// by some function waitForEnabledGames(), similar to playerStatusTracker.waitForActivePlayers().
+		// ATM, we will just run into a NullPointerException somewhere down the line, so let's hope that
+		// there is always at least one enabled game! :-)
 		
 		List<Map<RoleInterface<TermType>, PlayerInfo>> matchesToRolesToPlayers = createPlayerInfos(nextGame, activePlayers);
 		

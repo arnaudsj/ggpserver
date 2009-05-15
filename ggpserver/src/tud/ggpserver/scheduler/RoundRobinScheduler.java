@@ -27,6 +27,7 @@ import cs227b.teamIago.util.GameState;
 public class RoundRobinScheduler extends AbstractRoundRobinScheduler<Term, GameState> {
 	private static AbstractRoundRobinScheduler instance = null;
 	
+	@SuppressWarnings("unchecked")
 	private RoundRobinScheduler(AbstractDBConnector dbConnector) {
 		super(dbConnector);
 	}

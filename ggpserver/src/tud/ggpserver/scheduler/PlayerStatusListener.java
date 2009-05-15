@@ -17,9 +17,10 @@
     along with GGP Server.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package tud.ggpserver.datamodel;
+package tud.ggpserver.scheduler;
 
 import tud.gamecontroller.term.TermInterface;
+import tud.ggpserver.datamodel.RemotePlayerInfo;
 
 public interface PlayerStatusListener<TermType extends TermInterface, ReasonerStateInfoType> {
 
