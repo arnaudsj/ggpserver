@@ -25,20 +25,21 @@ import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.Match;
 
 public class ViewState {
-	private String matchID;
 	private int stepNumber = -1;
+	private Match<?, ?> match;
 
-	public void setMatchID(String matchID) {
-		this.matchID = matchID;
+	public void setMatchID(String matchID) throws SQLException {
+		match = DBConnectorFactory.getDBConnector().getMatch(matchID);
+		if (match == null) {
+			throw new NullPointerException();
+		}
 	}
 
 	public void setStepNumber(int stepNumber) {
 		this.stepNumber = stepNumber;
 	}
 
-	public String getXmlState() throws SQLException {
-		Match<?, ?> match = DBConnectorFactory.getDBConnector().getMatch(matchID);
-		
+	public String getXmlState() {
 		int stepNumber;
 		if (this.stepNumber < 1 || this.stepNumber > match.getNumberOfStates()) {
 			// return the last/final state

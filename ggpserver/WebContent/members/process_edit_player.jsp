@@ -40,7 +40,7 @@
 	<c:when test="${!editPlayer.validPlayer}" >
 	<% 
 		response.reset();
-		response.sendError(403);  // 403 forbidden
+		response.sendError(403, "You are neither an admin nor the owner of this player, so you cannot edit it.");  // 403 forbidden
 	%>
 	</c:when>
 	<c:when test="${editPlayer.valid}" > 

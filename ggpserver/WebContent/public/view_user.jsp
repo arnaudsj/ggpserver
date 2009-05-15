@@ -43,7 +43,7 @@
 
 <%
 if (viewUser.getUser() == null) {
-	response.sendError(404);
+	response.sendError(404, "That user doesn't exist.");
 	return;
 }
 %>

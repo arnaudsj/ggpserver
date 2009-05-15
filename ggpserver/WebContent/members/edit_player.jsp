@@ -52,7 +52,7 @@
 		// otherwise the compiler believes that the rest of the page 
 		// is unreachable code.
 		if (!editPlayer.isValidPlayer()) {
-			response.sendError(403);  // 403 forbidden
+			response.sendError(403, "You are neither an admin nor the owner of this player, so you cannot edit it.");  // 403 forbidden
 			return;
 		}
 	%>

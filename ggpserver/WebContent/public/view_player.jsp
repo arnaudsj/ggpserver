@@ -42,7 +42,7 @@
 <div id="ctitle">View player</div>
 <%
 if (viewPlayer.getPlayer() == null) {
-	response.sendError(404);
+	response.sendError(404, "That player doesn't exist.");
 	return;
 }
 %>

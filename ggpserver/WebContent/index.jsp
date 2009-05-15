@@ -50,7 +50,25 @@
 			<li>A player that does not submit a legal move for three matches in a row is set to inactive and has to be reactivated manually.</li>
 		</ul>
 
-
+	
+	<%
+		String ua = request.getHeader("User-Agent");
+	//	boolean isFirefox = (ua != null && ua.indexOf("Firefox/") != -1);
+		boolean isMSIE = (ua != null && ua.indexOf("MSIE") != -1);
+		response.setHeader("Vary", "User-Agent");
+	%>
+	<% if (isMSIE) { %>
+	<hr>
+	<table border="0" cellspacing="5" cellpadding="0" bgcolor="#EEEEEE">
+		<tr>
+			<td><a href="http://www.mozilla.com/?from=sfx&uid=0&t=306"><img
+				border="0" alt="Get Firefox!" title="Get Firefox!"
+				src="gfx/get-firefox-180-60.gif" width="180" height="60"></a></td>
+			<td valign="middle"><b>Unfortunately, some parts of this site don't look 
+			too good in Internet Explorer. We're sorry.</b></td>
+		</tr>
+	</table>
+	<% } %>
 </div>  <!--end div "content"-->
 
 <jsp:directive.include file="/inc/footer.jsp" />

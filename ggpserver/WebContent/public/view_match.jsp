@@ -20,8 +20,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<jsp:useBean id="viewMatch"
-	class="tud.ggpserver.formhandlers.ViewMatch" scope="page">
+<jsp:useBean id="viewMatch" class="tud.ggpserver.formhandlers.ViewMatch"
+	scope="page">
 	<c:catch>
 		<%
 		// this is for catching NumberFormatExceptions and the like
@@ -33,7 +33,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-	<jsp:directive.include file="/inc/headincludes.jsp" />
+<jsp:directive.include file="/inc/headincludes.jsp" />
 </head>
 <body>
 <div id="everything"><jsp:directive.include file="/inc/header.jsp" />
@@ -51,12 +51,9 @@
 		</tr>
 		<tr>
 			<td><b>game</b></td>
-			<td>					
-				<c:url value="view_game.jsp" var="gameURL">
-					<c:param name="name" value="${match.game.name}" />
-				</c:url>
-				<a href='<c:out value="${gameURL}" />'>${match.game.name}</a>	
-			</td>
+			<td><c:url value="view_game.jsp" var="gameURL">
+				<c:param name="name" value="${match.game.name}" />
+			</c:url> <a href='<c:out value="${gameURL}" />'>${match.game.name}</a></td>
 		<tr>
 			<td><b>status</b></td>
 			<td><c:out value="${match.status}"></c:out></td>
@@ -75,7 +72,8 @@
 		</tr>
 		<tr>
 			<td><b>players</b></td>
-			<td><c:forEach var="playerinfo" items="${match.orderedPlayerInfos}">
+			<td><c:forEach var="playerinfo"
+				items="${match.orderedPlayerInfos}">
 				<c:url value="view_player.jsp" var="playerURL">
 					<c:param name="name" value="${playerinfo.name}" />
 				</c:url>
@@ -139,7 +137,6 @@
 					<c:when test="<%= !viewMatch.getErrorMessages().isEmpty() %>">
 						<c:url value="view_errors.jsp" var="errorURL">
 							<c:param name="matchID" value="${match.matchID}" />
-							<% // <c:param name="stepNumber" value="${stepNumber}" /> %>
 						</c:url>
 						<div class="errors"><a href='<c:out value="${errorURL}" />'><span>errors</span></a></div>
 					</c:when>
