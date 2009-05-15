@@ -28,6 +28,7 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -74,9 +75,12 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	private static final GameScramblerInterface gamescrambler = new IdentityGameScrambler();    // we don't do any scrambling (yet)
 
 	private static final String LAST_PLAYED_GAME = "last_played_game";
+	private static final Collection<String> defaultRoleNames = Collections.<String>singleton("member");
+	
 	private static DataSource datasource;
 	
 	private Collection<PlayerStatusListener<TermType, ReasonerStateInfoType>> playerStatusListeners = new ArrayList<PlayerStatusListener<TermType, ReasonerStateInfoType>>();
+
 	
 	protected abstract MoveFactoryInterface<? extends MoveInterface<TermType>> getMoveFactory();
 
@@ -118,7 +122,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		} 
 
 		logger.info("String, String - Creating new user: " + userName); //$NON-NLS-1$
-		return new User(userName);
+		return new User(userName, defaultRoleNames);
 	}
 
 	public User getUser(String userName) throws SQLException {
@@ -128,14 +132,28 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		User result = null;
 
 		try { 
-			ps = con.prepareStatement("SELECT `user_name` FROM `users` WHERE `user_name` = ?;");
+//			ps = con.prepareStatement("SELECT `user_name` FROM `users` WHERE `user_name` = ?;");
+//			ps = con.prepareStatement("SELECT `role_name` FROM `user_roles` WHERE `user_name` = ? ;");   // (*)
+			ps = con.prepareStatement("SELECT `r`.`user_name`, `r`.`role_name` " + 
+					"FROM `users` AS `u`, `user_roles` as `r` " + 
+					"WHERE `u`.`user_name` = `r`.`user_name` AND `u`.`user_name` = ? ;");  // (**)
+			// strictly speaking, query (**) could by replaced by (*), but (**) also checks if the user exists in table "users". 
+			
 			ps.setString(1, userName);
 			rs = ps.executeQuery();
 			
-			if (rs.next()) {
-				logger.info("String - Returning new User: " + userName); //$NON-NLS-1$
-				result = new User(userName);
+			Collection<String> roleNames = new ArrayList<String>(2);
+			while (rs.next()) {
+				roleNames.add(rs.getString("role_name"));
 			}
+			if (roleNames.isEmpty()) {
+				// either the user doesn't exist in the "users" table, or he/she
+				// has no roles assigned in the "user_roles" table.
+				return null;
+			}
+			
+			logger.info("String - Returning new User: " + userName); //$NON-NLS-1$
+			result = new User(userName, roleNames);
 		} finally { 
 			if (con != null)
 				try {con.close();} catch (SQLException e) {}

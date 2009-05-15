@@ -1,0 +1,54 @@
+<html>
+<head>
+<title>Beginner AJAX Tutorial - Progress Bar</title>
+
+	<!-- Full version of YUI api -->
+<!--	<script language="javascript" type="text/javascript" src="yahoo.js"> </script>
+	<script language="javascript" type="text/javascript" src="event.js"> </script>
+	<script language="javascript" type="text/javascript" src="connection.js"> </script>-->
+
+	<!-- Stripped version (no comments or whitespace), all three files combined -->
+	<script language="javascript" type="text/javascript" src="yahoo_connection_event-min.js"> </script>
+
+
+	<script language="javascript" type="text/javascript">
+		function success_handler(o) {
+			replace_html('content', o.responseText);
+		}
+		
+		function failure_handler(o) {
+			replace_html('content', 'Server or your connection is death');
+		}
+		
+		function replace_html(id, content) {
+			document.getElementById(id).innerHTML = content;
+		}
+		
+		function show_progressbar(id) {
+			replace_html(id, '<img src="ajax-loader.gif" border="0" alt="Loading, please wait..." />');
+		}
+		
+		function send_request() {
+			show_progressbar('content');
+			var callback = { success:success_handler, failure:failure_handler, timeout: 10000 };
+			YAHOO.util.Connect.asyncRequest('GET', 'content.jsp', callback);
+		}
+		
+		function test_failure() {
+			show_progressbar('content');
+			var callback = { success:success_handler, failure:failure_handler, timeout: 10000 };
+			YAHOO.util.Connect.asyncRequest('GET', 'some-file-that-doesnt-exist.jsp', callback);
+		}
+		
+		var ajax_loader = new Image();
+		ajax_loader.src = 'ajax-loader.gif';
+	</script>
+</head>
+
+<body>
+<a href="javascript:send_request();">Send Request</a> | <a href="javascript:test_failure();">Fail a request</a>
+<div id="content">
+
+</div>
+</body>
+</html>

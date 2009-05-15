@@ -18,6 +18,12 @@
 --%>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%> 
+<jsp:useBean id="navigationUserBean"
+	class="tud.ggpserver.formhandlers.ViewUser" scope="page">
+	<c:catch>
+		<jsp:setProperty name="navigationUserBean" property="userName" value="<%= request.getUserPrincipal().getName()%>" />
+	</c:catch>
+</jsp:useBean>
 
 <!-- Navigation -->
 <div id="navigation">
@@ -28,17 +34,14 @@
 <a href="<%= request.getContextPath() + response.encodeURL("/public/show_games.jsp") %>">Show Games</a>
 <a href="<%= request.getContextPath() + response.encodeURL("/public/show_players.jsp") %>">Show Players</a>
 <a href="<%= request.getContextPath() + response.encodeURL("/public/show_users.jsp") %>">Show Users</a>
-<c:catch var="exception">
-	<c:set var="userName" value="<%= request.getUserPrincipal().getName()%>"></c:set>
-</c:catch>
-<% // TODO: use role "admin" instead of user "admin" %>
-	<c:if test="${exception == null}">
-		<c:if test='${userName == "admin"}'>
-			<a href="<%= request.getContextPath() + response.encodeURL("/admin/index.jsp") %>">Admin Page</a>
-		</c:if>
-		<a href="<%= request.getContextPath() + response.encodeURL("/members/profile.jsp") %>">My Players</a> 
-		<a href="<%= request.getContextPath() + response.encodeURL("/members/create_game.jsp") %>">Create Game</a> 
+
+<c:if test='${navigationUserBean.user != null}'>
+	<c:if test='<%= navigationUserBean.getUser().hasRole("admin") %>'>
+		<a href="<%= request.getContextPath() + response.encodeURL("/admin/index.jsp") %>">Admin Page</a>
 	</c:if>
+	<a href="<%= request.getContextPath() + response.encodeURL("/members/profile.jsp") %>">My Players</a> 
+	<a href="<%= request.getContextPath() + response.encodeURL("/members/create_game.jsp") %>">Create Game</a> 
+</c:if>
 <a href="<%= request.getContextPath() + response.encodeURL("/public/contact.jsp") %>">Contact</a>
 </div>
 

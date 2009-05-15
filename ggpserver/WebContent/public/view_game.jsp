@@ -29,6 +29,12 @@
 		<jsp:setProperty name="viewGame" property="name" />
 	</c:catch>
 </jsp:useBean>
+<jsp:useBean id="viewGameUserBean"
+	class="tud.ggpserver.formhandlers.ViewUser" scope="page">
+	<c:catch>
+		<jsp:setProperty name="viewGameUserBean" property="userName" value="<%= request.getUserPrincipal().getName()%>" />
+	</c:catch>
+</jsp:useBean>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -42,15 +48,14 @@
 <div id="ctitle">View game</div>
 
 <h1 class="notopborder">Information on game ${viewGame.name}
-	<c:catch var="exception">
-		<c:set var="userName" value="<%= request.getUserPrincipal().getName()%>"></c:set>		
-	</c:catch>
-	<c:if test='${userName == "admin"}'>
+<c:if test='${navigationUserBean.user != null}'>
+	<c:if test='<%= navigationUserBean.getUser().hasRole("admin") %>'>
 		<c:url value="../admin/edit_game.jsp" var="editURL">
 			<c:param name="gameName" value="${viewGame.name}" />
 		</c:url>
 		<div class="edit"><a href='<c:out value="${editURL}"/>'><span>edit</span></a></div>
 	</c:if>
+</c:if>
 </h1>
 <table>
 	<tbody>
