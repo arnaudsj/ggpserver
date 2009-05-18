@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+	 version="2.4">
+  <servlet>
+      <servlet-name>cgi</servlet-name>
+      <servlet-class>org.apache.catalina.servlets.CGIServlet</servlet-class>
+      <init-param>
+        <param-name>clientInputTimeout</param-name>
+        <param-value>100</param-value>
+      </init-param>
+      <init-param>
+        <param-name>debug</param-name>
+        <param-value>6</param-value>
+      </init-param>
+      <init-param>
+        <param-name>cgiPathPrefix</param-name>
+        <param-value>WEB-INF/cgi-bin</param-value>
+      </init-param>
+       <load-on-startup>5</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+      <servlet-name>cgi</servlet-name>
+      <url-pattern>/cgi-bin/*</url-pattern>
+  </servlet-mapping>
+  
+  <session-config>
+    <session-timeout>
+      30
+    </session-timeout>
+  </session-config>
+  <welcome-file-list>
+    <welcome-file>
+      index.jsp
+    </welcome-file>
+    <welcome-file>
+      index.html
+    </welcome-file>
+    <welcome-file>
+      index.htm
+    </welcome-file>
+  </welcome-file-list>
+
+	<!-- Define the roles we want to use in the application -->
+	<security-role> 
+	    <role-name>admin</role-name> 
+	</security-role>
+
+	<!-- Use BASIC security -->
+	<login-config>
+		<auth-method>BASIC</auth-method>
+	</login-config>
+
+	<security-constraint>
+	    <display-name>Security constraint for the /cgi-bin folder</display-name> 
+	
+	    <!-- Define the resource, /cgi-bin folder -->
+	    <web-resource-collection>
+	        <web-resource-name>cgibin</web-resource-name> 
+	        <url-pattern>/cgi-bin/*</url-pattern> 
+	    </web-resource-collection> 
+	
+	    <!-- Only administrators can access this resource --> 
+	    <auth-constraint> 
+	        <role-name>admin</role-name> 
+	    </auth-constraint> 
+	</security-constraint> 	
+	
+	<resource-ref>
+		<description>DB Connection</description>
+		<res-ref-name>jdbc/ggpserver</res-ref-name>
+		<res-type>javax.sql.DataSource</res-type>
+		<res-auth>Container</res-auth>
+		<res-sharing-scope>Shareable</res-sharing-scope>
+	</resource-ref>
+</web-app>
