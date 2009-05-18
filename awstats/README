@@ -1,0 +1,52 @@
+# HOW TO INSTALL AWSTATS 
+
+# --- 1. Install awstats ---
+
+sudo apt-get install awstats
+
+# TODO: build awstats.war
+# TODO: unzip awstats.war
+
+ln -s /usr/share/awstats/icon/ /var/lib/tomcat5.5/webapps/awstats/icon
+ln -s /usr/lib/cgi-bin/ /var/lib/tomcat5.5/webapps/awstats/WEB-INF/cgi-bin
+
+
+# --- 2. Change Tomcat access logs format ---
+
+# add the following element to the appropriate Server -> Service -> Engine -> Host element of /etc/tomcat5.5/server.xml
+
+        <Valve className="org.apache.catalina.valves.AccessLogValve" 
+                 directory="logs" prefix="ggpserver_access_log." suffix=".log" 
+                 pattern="combined" fileDateFormat="dd-MM-yy" resolveHosts="false"/> 
+
+
+# --- 3. Enable Perl scripts ---
+
+# By default, CGI execution is disabled in Tomcat, because CGIs don't conform
+# to the Tomcat security model. But we know what we are doing, right? :-)
+
+cd /usr/share/tomcat5.5/server/lib/
+mv servlets-cgi.renametojar servlets-cgi.jar   # (requires tomcat restart)
+
+
+# --- 4.  ---
+
+# In order for AllowToUpdateStatsFromBrowser to work, Tomcat needs write permission to /var/lib/awstats/, which is owned by www-data
+adduser tomcat55 www-data                      # (requires tomcat restart)
+chmod g+w /var/lib/awstats/
+
+
+# --- Configure ---
+# edit the following options in /etc/awstats/awstats.conf :
+LogFile="/usr/bin/perl /usr/share/doc/awstats/examples/logresolvemerge.pl /usr/share/tomcat5.5/logs/*.log |"
+LogFormat=1
+SiteDomain="euklid.inf.tu-dresden.de:8180"
+HostAliases="localhost:8180 127.0.0.1:8180 REGEX[inf\.tu-dresden\.de:8180$]"
+DirIcons="/awstats/icon"
+AllowToUpdateStatsFromBrowser=1
+
+# TODO: edit /etc/cron.d/awstats
+
+
+# all members with an "admin" role in the ggpserver DB can now log in using their 
+# user name and password: http://hostname:8180/awstats/
