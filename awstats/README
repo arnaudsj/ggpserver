@@ -2,13 +2,14 @@
 
 # --- 1. Install awstats ---
 
-sudo apt-get install awstats
+apt-get install awstats libgeo-ipfree-perl libnet-dns-perl libnet-ip-perl
 
-# TODO: build awstats.war
-# TODO: unzip awstats.war
-
-ln -s /usr/share/awstats/icon/ /var/lib/tomcat5.5/webapps/awstats/icon
-ln -s /usr/lib/cgi-bin/ /var/lib/tomcat5.5/webapps/awstats/WEB-INF/cgi-bin
+mkdir /var/lib/tomcat5.5/webapps/awstats/
+mkdir /var/lib/tomcat5.5/webapps/awstats/icon/
+cp $PATH_TO_THIS_DIR/WebContent/* /var/lib/tomcat5.5/webapps/awstats/
+cp -R /usr/share/awstats/icon/ /var/lib/tomcat5.5/webapps/awstats/icon          # has to be copied: tomcat won't follow symlinks out of the webapp dir
+ln -s /usr/lib/cgi-bin/ /var/lib/tomcat5.5/webapps/awstats/WEB-INF/cgi-bin      # can be softlinked: CGIs can do what they want
+chown -R tomcat55:nogroup /var/lib/tomcat5.5/webapps/awstats
 
 
 # --- 2. Change Tomcat access logs format ---
@@ -29,24 +30,35 @@ cd /usr/share/tomcat5.5/server/lib/
 mv servlets-cgi.renametojar servlets-cgi.jar   # (requires tomcat restart)
 
 
-# --- 4.  ---
+# --- 4. Configuration ---
+# change the following options in /etc/awstats/awstats.conf :
+LogFile="/usr/bin/perl /usr/share/doc/awstats/examples/logresolvemerge.pl /usr/share/tomcat5.5/logs/*.log |"
+LogFormat=1
+SiteDomain="euklid.inf.tu-dresden.de:8180"
+HostAliases="localhost:8180 127.0.0.1:8180"
+DirIcons="/awstats/icon"
+AllowToUpdateStatsFromBrowser=1
 
-# In order for AllowToUpdateStatsFromBrowser to work, Tomcat needs write permission to /var/lib/awstats/, which is owned by www-data
+
+# --- 5. Make output directory writable ---
+# Tomcat needs write permission to /var/lib/awstats/ to write the results. this directory is owned by www-data:wwwdata
 adduser tomcat55 www-data                      # (requires tomcat restart)
 chmod g+w /var/lib/awstats/
 
 
-# --- Configure ---
-# edit the following options in /etc/awstats/awstats.conf :
-LogFile="/usr/bin/perl /usr/share/doc/awstats/examples/logresolvemerge.pl /usr/share/tomcat5.5/logs/*.log |"
-LogFormat=1
-SiteDomain="euklid.inf.tu-dresden.de:8180"
-HostAliases="localhost:8180 127.0.0.1:8180 REGEX[inf\.tu-dresden\.de:8180$]"
-DirIcons="/awstats/icon"
-AllowToUpdateStatsFromBrowser=1
+# --- 6. cron job ---
+# edit /etc/cron.d/awstats to 
+# 1. remove the string "-a -r /var/log/apache/access.log", and
+# 2. change user www-data to tomcat55 (because www doesn't have permission to read /var/log/tomcat55)
+#
+# In other words,
+#      0,10,20,30,40,50 * * * * www-data [ -x /usr/lib/cgi-bin/awstats.pl -a -f /etc/awstats/awstats.conf -a -r /var/log/apache/access.log ] && /usr/lib/cgi-bin/awstats.pl -config=awstats -update >/dev/null
+# becomes
+#      0,10,20,30,40,50 * * * * tomcat55 [ -x /usr/lib/cgi-bin/awstats.pl -a -f /etc/awstats/awstats.conf ] && /usr/lib/cgi-bin/awstats.pl -config=awstats -update >/dev/null
+#
+# Remember that a crontab file MUST END WITH A BLANK LINE! :-|
 
-# TODO: edit /etc/cron.d/awstats
 
-
-# all members with an "admin" role in the ggpserver DB can now log in using their 
+# --- finished! ---
+# all members with an "admin" role in the ggpserver DB can now log in here, using their 
 # user name and password: http://hostname:8180/awstats/
