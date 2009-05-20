@@ -17,9 +17,16 @@
 	<xsl:import href="board.xsl"/>
 	<xsl:import href="state.xsl"/>
 
+	<!--
+		print_all_chess_boards prints a chessboard for all detected board fluents.
+		At the moment ternary fluents with a name CELL* are considered as boards.
+	-->
+	
 	<xsl:template name="print_all_chess_boards">
-		<xsl:param name="Width">?</xsl:param> <!-- the number of cells per column, if "?" try to detect the width automatically -->
-		<xsl:param name="Height">?</xsl:param> <!-- the number of cells per row, if "?" try to detect the height automatically -->
+		<xsl:param name="Width">?</xsl:param> <!-- the number of cells per row, if "?" try to detect the width automatically -->
+		<xsl:param name="Height">?</xsl:param> <!-- the number of cells per column, if "?" try to detect the height automatically -->
+		<xsl:param name="MinX">1</xsl:param> <!-- the lowest x coordinate (as number) -->
+		<xsl:param name="MinY">1</xsl:param> <!-- the lowest y coordinate (as number) -->
 		<xsl:param name="checkered">light</xsl:param>
 		<xsl:param name="DefaultCellContent">yes</xsl:param> <!-- use the default img for cell content and only call make_cell_content if value was not recognized -->
 		<xsl:param name="xArgIdx">1</xsl:param>
@@ -40,6 +47,8 @@
 							<xsl:with-param name="CellFluentName" select="$CellFluentName"/>
 							<xsl:with-param name="Width" select="$Width"/>
 							<xsl:with-param name="Height" select="$Height"/>
+							<xsl:with-param name="MinX" select="$MinX"/>
+							<xsl:with-param name="MinY" select="$MinY"/>
 							<xsl:with-param name="checkered" select="$checkered"/>
 							<xsl:with-param name="DefaultCellContent" select="$DefaultCellContent"/>
 							<xsl:with-param name="xArgIdx" select="$xArgIdx"/>
@@ -56,12 +65,16 @@
 				</xsl:if>
 			</xsl:if>
 		</xsl:for-each>
-
 	</xsl:template>
 	
+	<!--
+		print_chess_state prints a chess board and a list with the remaining fluents.
+	-->
 	<xsl:template name="print_chess_state">
-		<xsl:param name="Width">?</xsl:param> <!-- the number of cells per column, if "?" try to detect the width automatically -->
-		<xsl:param name="Height">?</xsl:param> <!-- the number of cells per row, if "?" try to detect the height automatically -->
+		<xsl:param name="Width">?</xsl:param> <!-- the number of cells per row, if "?" try to detect the width automatically -->
+		<xsl:param name="Height">?</xsl:param> <!-- the number of cells per column, if "?" try to detect the height automatically -->
+		<xsl:param name="MinX">1</xsl:param> <!-- the lowest x coordinate (as number) -->
+		<xsl:param name="MinY">1</xsl:param> <!-- the lowest y coordinate (as number) -->
 		<xsl:param name="checkered">light</xsl:param>
 		<xsl:param name="DefaultCellContent">yes</xsl:param> <!-- use the default img for cell content and only call make_cell_content if value was not recognized -->
 		<xsl:param name="CellFluentName">?</xsl:param> <!-- if "?" try to detect the cell fluent name automatically -->
@@ -89,6 +102,8 @@
 			<xsl:with-param name="CellFluentName" select="$internalCellFluentName"/>
 			<xsl:with-param name="Width" select="$Width"/>
 			<xsl:with-param name="Height" select="$Height"/>
+			<xsl:with-param name="MinX" select="$MinX"/>
+			<xsl:with-param name="MinY" select="$MinY"/>
 			<xsl:with-param name="checkered" select="$checkered"/>
 			<xsl:with-param name="DefaultCellContent" select="$DefaultCellContent"/>
 			<xsl:with-param name="xArgIdx" select="$xArgIdx"/>
@@ -103,13 +118,17 @@
 		<xsl:call-template name="state">
 			<xsl:with-param name="excludeFluent" select="$internalCellFluentName"/>
 		</xsl:call-template>
-		
 	</xsl:template>
 	
+	<!--
+		chess_board prints a chess board from a selected or automatically detected board fluent.
+	-->
 	<xsl:template name="chess_board">
-		<xsl:param name="Width">?</xsl:param> <!-- the number of cells per column, if "?" try to detect the width automatically -->
-		<xsl:param name="Height">?</xsl:param> <!-- the number of cells per row, if "?" try to detect the height automatically -->
-		<xsl:param name="checkered">light</xsl:param>
+		<xsl:param name="Width">?</xsl:param> <!-- the number of cells per row, if "?" try to detect the width automatically -->
+		<xsl:param name="Height">?</xsl:param> <!-- the number of cells per column, if "?" try to detect the height automatically -->
+		<xsl:param name="MinX">1</xsl:param> <!-- the lowest x coordinate (as number) -->
+		<xsl:param name="MinY">1</xsl:param> <!-- the lowest y coordinate (as number) -->
+		<xsl:param name="checkered">light</xsl:param> <!-- "invisible" is not supported for cells that do have a content, light background will be used instead -->
 		<xsl:param name="DefaultCellContent">yes</xsl:param> <!-- use the default img for cell content and only call make_cell_content if value was not recognized -->
 		<xsl:param name="CellFluentName">?</xsl:param> <!-- if "?" try to detect the cell fluent name automatically -->
 		<xsl:param name="xArgIdx">1</xsl:param>
@@ -120,6 +139,7 @@
 		<xsl:param name="CellHeight" select="$CellWidth"/>
 		<xsl:param name="BoardName"/>
 
+		<!-- try detect board fluent if it wasn't given as parameter -->
 		<xsl:variable name="internalCellFluentName">
 			<xsl:choose>
 				<xsl:when test="$CellFluentName!='?'"><xsl:value-of select="$CellFluentName"/></xsl:when>
@@ -133,14 +153,43 @@
 			</xsl:choose>
 		</xsl:variable>
 		
+		<!-- detect board size and lowest coordinate if $Width='?' (or $Height='?') -->
+		<xsl:variable name="internalMinX">
+			<xsl:choose>
+				<xsl:when test="$Width!='?'"><xsl:value-of select="$MinX"/></xsl:when>
+				<xsl:otherwise>
+					<xsl:call-template name="getMinCoord">
+						<xsl:with-param name="cellFluentName" select="$internalCellFluentName"/>
+						<xsl:with-param name="coordArgIdx" select="$xArgIdx"/>
+						<xsl:with-param name="otherArgIdx" select="$yArgIdx"/>
+					</xsl:call-template>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
 		<xsl:variable name="internalWidth">
 			<xsl:choose>
 				<xsl:when test="$Width!='?'"><xsl:value-of select="$Width"/></xsl:when>
 				<xsl:otherwise>
-					<xsl:variable name="ARow">
-						<xsl:value-of select="fact[prop-f=$internalCellFluentName]/arg[number($yArgIdx)]"/>
-					</xsl:variable>
-					<xsl:value-of select="count(fact[prop-f=$internalCellFluentName and arg[number($yArgIdx)]=$ARow])"/>
+					<xsl:call-template name="getDimension">
+						<xsl:with-param name="cellFluentName" select="$internalCellFluentName"/>
+						<xsl:with-param name="coordArgIdx" select="$xArgIdx"/>
+						<xsl:with-param name="otherArgIdx" select="$yArgIdx"/>
+						<xsl:with-param name="MinCoord" select="$internalMinX"/>
+					</xsl:call-template>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
+		<xsl:variable name="internalMinY">
+			<xsl:choose>
+				<xsl:when test="$Height!='?'"><xsl:value-of select="$MinY"/></xsl:when>
+				<xsl:otherwise>
+					<xsl:call-template name="getMinCoord">
+						<xsl:with-param name="cellFluentName" select="$internalCellFluentName"/>
+						<xsl:with-param name="coordArgIdx" select="$yArgIdx"/>
+						<xsl:with-param name="otherArgIdx" select="$xArgIdx"/>
+					</xsl:call-template>
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
@@ -149,10 +198,12 @@
 			<xsl:choose>
 				<xsl:when test="$Height!='?'"><xsl:value-of select="$Height"/></xsl:when>
 				<xsl:otherwise>
-					<xsl:variable name="ACol">
-						<xsl:value-of select="fact[prop-f=$internalCellFluentName]/arg[number($xArgIdx)]"/>
-					</xsl:variable>
-					<xsl:value-of select="count(fact[prop-f=$internalCellFluentName and arg[number($xArgIdx)]=$ACol])"/>
+					<xsl:call-template name="getDimension">
+						<xsl:with-param name="cellFluentName" select="$internalCellFluentName"/>
+						<xsl:with-param name="coordArgIdx" select="$yArgIdx"/>
+						<xsl:with-param name="otherArgIdx" select="$xArgIdx"/>
+						<xsl:with-param name="MinCoord" select="$internalMinY"/>
+					</xsl:call-template>
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
@@ -171,7 +222,7 @@
 		</style>
 
 		<div class="chess_board">
-
+			<!-- print the raw board -->
 			<xsl:call-template name="board">
 				<xsl:with-param name="Width" select="$internalWidth"/>
 				<xsl:with-param name="Height" select="$internalHeight"/>
@@ -183,38 +234,30 @@
 				<xsl:with-param name="DefaultCell" select="$DefaultCell"/>
 			</xsl:call-template>
 
+			<!-- for each cell print the content -->
 			<xsl:for-each select="fact[prop-f=$internalCellFluentName]">
 				<xsl:variable name="xArg" select="./arg[number($xArgIdx)]"/>
 				<xsl:variable name="yArg" select="./arg[number($yArgIdx)]"/>
 				<xsl:variable name="content" select="./arg[number($contentArgIdx)]"/>
 
-				<xsl:variable name="COORDINATES" select="'12345678ABCDEFGH'"/>
-				<xsl:variable name="NUMBERS" select="'1234567812345678'"/>
-
-				<xsl:variable name="x">
-					<xsl:choose>
-						<xsl:when test="string-length($xArg)>1">
-							<xsl:value-of select="number(translate($xArg, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', ''))"/>
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:value-of select="number(translate($xArg,$COORDINATES,$NUMBERS))"/>
-						</xsl:otherwise>
-					</xsl:choose>
+				<!-- compute numeric x,y coordinates from the fluent's arguments -->
+				<xsl:variable name="xArgNumber">
+					<xsl:call-template name="coord2number">
+						<xsl:with-param name="coord" select="$xArg"/>
+					</xsl:call-template>
 				</xsl:variable>
+				<xsl:variable name="x" select="$xArgNumber - $internalMinX + 1"/>
 
-				<xsl:variable name="y">
-					<xsl:choose>
-						<xsl:when test="string-length($yArg)>1">
-							<xsl:value-of select="number(translate($yArg, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', ''))"/>
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:value-of select="number(translate($yArg,$COORDINATES,$NUMBERS))"/>
-						</xsl:otherwise>
-					</xsl:choose>
+				<xsl:variable name="yArgNumber">
+					<xsl:call-template name="coord2number">
+						<xsl:with-param name="coord" select="$yArg"/>
+					</xsl:call-template>
 				</xsl:variable>
+				<xsl:variable name="y" select="$yArgNumber - $internalMinY + 1"/>
 
 				<xsl:variable name="xPosCell" select="$CellWidth * ($x - 1) + 2"/>
 				<xsl:variable name="yPosCell" select="$CellHeight * ($internalHeight - $y) + 2"/>
+				<!-- select the right background color for the cell based on the coordinates -->
 				<xsl:variable name="CellColor">
 					<xsl:choose>
 						<xsl:when test="($checkered='dark' and ($x mod 2) + (($internalHeight + 1 - $y) mod 2) != 1) or ($checkered='light' and ($x mod 2) + (($internalHeight + 1 - $y) mod 2) = 1)">dark</xsl:when>
@@ -234,6 +277,7 @@
 						y: <xsl:value-of select="$yArg"/> -&gt; <xsl:value-of select="$y"/>
 					</xsl:comment>
 
+					<!-- select the default image for the cell content -->
 					<xsl:variable name="piece">
 						<xsl:choose>
 							<xsl:when test="../fact[prop-f=$internalCellFluentName and arg[number($xArgIdx)]=$xArg and arg[number($yArgIdx)]=$yArg and arg[number($contentArgIdx)]!=$content]">MULTIPLE</xsl:when>
@@ -274,6 +318,7 @@
 						</xsl:choose>
 					</xsl:variable>
 
+					<!-- print the image or call a user defined template to print the cell -->
 					<xsl:choose>
 						<xsl:when test="$DefaultCellContent!='yes' or $piece=''">
 							<xsl:call-template name="make_cell_content">
@@ -297,14 +342,97 @@
 					</xsl:choose>
 				</div>
 			</xsl:for-each>
+			<!-- print a caption with the name of the board, if defined -->
 			<xsl:if test="$BoardName!=''">
 				<p style="text-align: center">Board <xsl:value-of select="$BoardName"/></p>
 			</xsl:if>
 		</div>
 	</xsl:template>
 
+	<!-- computes a numeric coordinate from the string representation -->
+	<xsl:template name="coord2number">
+		<xsl:param name="coord"/>
+		
+		<xsl:variable name="COORDINATES" select="'12345678ABCDEFGH'"/>
+		<xsl:variable name="NUMBERS" select="'1234567812345678'"/>
+		
+		<xsl:choose>
+			<xsl:when test="string-length($coord)>1">
+				<xsl:value-of select="number(translate($coord, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', ''))"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="number(translate($coord,$COORDINATES,$NUMBERS))"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
 
+	<!-- tries to detect the dimension of a board -->
+	<xsl:template name="getDimension">
+		<xsl:param name="cellFluentName"/>
+		<xsl:param name="coordArgIdx"/>
+		<xsl:param name="otherArgIdx"/>
+		<xsl:param name="MinCoord"/>
+		
+		<xsl:variable name="MaxCoordVar">
+			<xsl:call-template name="getMaxCoord">
+				<xsl:with-param name="cellFluentName" select="$cellFluentName"/>
+				<xsl:with-param name="coordArgIdx" select="$coordArgIdx"/>
+				<xsl:with-param name="otherArgIdx" select="$otherArgIdx"/>
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:variable name="MinCoordVar">
+			<xsl:choose>
+				<xsl:when test="$MinCoord!='?'"><xsl:value-of select="$MinCoord"/></xsl:when>
+				<xsl:otherwise>
+					<xsl:call-template name="getMinCoord">
+						<xsl:with-param name="cellFluentName" select="$cellFluentName"/>
+						<xsl:with-param name="coordArgIdx" select="$coordArgIdx"/>
+						<xsl:with-param name="otherArgIdx" select="$otherArgIdx"/>
+					</xsl:call-template>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:value-of select="$MaxCoordVar - $MinCoordVar + 1"/>
+	</xsl:template>
+	
+	<xsl:template name="getMinCoord">
+		<xsl:param name="cellFluentName"/>
+		<xsl:param name="coordArgIdx"/>
+		<xsl:param name="otherArgIdx"/>
+		
+		<xsl:variable name="SomeOtherCoord">
+			<xsl:value-of select="fact[prop-f=$cellFluentName]/arg[number($otherArgIdx)]"/>
+		</xsl:variable>
+		<xsl:for-each select="fact[prop-f=$cellFluentName and arg[number($otherArgIdx)]=$SomeOtherCoord]/arg[number($coordArgIdx)]">
+			<xsl:sort order="ascending"/>
+			<xsl:if test="position() = 1">
+				<xsl:call-template name="coord2number">
+					<xsl:with-param name="coord" select="."/>
+				</xsl:call-template>
+			</xsl:if>
+		</xsl:for-each>
+	</xsl:template>
+	
+	<xsl:template name="getMaxCoord">
+		<xsl:param name="cellFluentName"/>
+		<xsl:param name="coordArgIdx"/>
+		<xsl:param name="otherArgIdx"/>
+		
+		<xsl:variable name="SomeOtherCoord">
+			<xsl:value-of select="fact[prop-f=$cellFluentName]/arg[number($otherArgIdx)]"/>
+		</xsl:variable>
+		<xsl:for-each select="fact[prop-f=$cellFluentName and arg[number($otherArgIdx)]=$SomeOtherCoord]/arg[number($coordArgIdx)]">
+			<xsl:sort order="descending"/>
+			<xsl:if test="position() = 1">
+				<xsl:call-template name="coord2number">
+					<xsl:with-param name="coord" select="."/>
+				</xsl:call-template>
+			</xsl:if>
+		</xsl:for-each>
+	</xsl:template>
+	
 	<!--
+		make_chess_img prints the picture of a chess piece.
 		valid pieces are:
 			[abcdefghkmnpqrsz][dl] - (piecename+color)
 			O[0..9]                - circles in different colors
@@ -319,10 +447,14 @@
 		<xsl:param name="background">light</xsl:param>
 		<xsl:param name="imgWidth">44</xsl:param>
 		<xsl:param name="imgHeight">44</xsl:param>
+		<xsl:param name="style"/>
 		
 		<img>
 			<xsl:attribute name="width"><xsl:value-of select="$imgWidth"/></xsl:attribute>
 			<xsl:attribute name="height"><xsl:value-of select="$imgHeight"/></xsl:attribute>
+			<xsl:if test="$style!=''">
+				<xsl:attribute name="style"><xsl:value-of select="$style"/></xsl:attribute>
+			</xsl:if>
 			<xsl:attribute name="src">
 				<xsl:value-of select="$stylesheetURL"/>
 				<xsl:text>/generic/chess_images/Chess_</xsl:text>

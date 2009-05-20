@@ -17,7 +17,8 @@
 			<!-- no - all cells have light background
 			      light - the first cell has light background
 			      dark - the first cell has dark background
-			      alldark - all cells have dark background -->
+			      alldark - all cells have dark background
+			      invisible - all cells are invisible -->
 		<xsl:param name="LightCellColor">#CCCCCC</xsl:param>
 		<xsl:param name="DarkCellColor">#AAAAAA</xsl:param>
 		<xsl:param name="DefaultCell">yes</xsl:param>
@@ -107,6 +108,7 @@
 			<xsl:choose>
 				<xsl:when test="($checkered='dark' and (($col mod 2) + (($height + 1 - $row) mod 2) != 1)) or ($checkered='light' and (($col mod 2) + (($height + 1 - $row) mod 2) = 1))">cellDark</xsl:when>
 				<xsl:when test="$checkered='alldark'">cellDark</xsl:when>
+				<xsl:when test="$checkered='invisible'">cellInvisible</xsl:when>
 				<xsl:otherwise>cellLight</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
