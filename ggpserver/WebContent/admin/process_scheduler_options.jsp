@@ -18,6 +18,7 @@
 --%>
 
 <%@ page language="java" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%> 
 
 <jsp:useBean id="adminPage" class="tud.ggpserver.formhandlers.AdminPage" scope="request">
 	<c:catch>
