@@ -48,8 +48,8 @@
 <div id="ctitle">View game</div>
 
 <h1 class="notopborder">Information on game ${viewGame.name}
-<c:if test='${navigationUserBean.user != null}'>
-	<c:if test='<%= navigationUserBean.getUser().hasRole("admin") %>'>
+<c:if test='${viewGameUserBean.user != null}'>
+	<c:if test='<%= viewGameUserBean.getUser().hasRole("admin") %>'>
 		<c:url value="../admin/edit_game.jsp" var="editURL">
 			<c:param name="gameName" value="${viewGame.name}" />
 		</c:url>
