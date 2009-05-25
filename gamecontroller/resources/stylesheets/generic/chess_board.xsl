@@ -32,8 +32,10 @@
 		<xsl:param name="xArgIdx">1</xsl:param>
 		<xsl:param name="yArgIdx">2</xsl:param>
 		<xsl:param name="contentArgIdx">3</xsl:param>
+		<xsl:param name="mirrorY">no</xsl:param>
 		<xsl:param name="DefaultCell">yes</xsl:param>
-		<xsl:param name="CellWidth">48</xsl:param>
+		<xsl:param name="BorderWidth">2</xsl:param> <!-- the width of the boarder around each cell in px -->
+		<xsl:param name="CellWidth" select="44 + 2 * $BorderWidth"/>
 		<xsl:param name="CellHeight" select="$CellWidth"/>
 		
 		<xsl:for-each select="fact">
@@ -54,9 +56,11 @@
 							<xsl:with-param name="xArgIdx" select="$xArgIdx"/>
 							<xsl:with-param name="yArgIdx" select="$yArgIdx"/>
 							<xsl:with-param name="contentArgIdx" select="$contentArgIdx"/>
+							<xsl:with-param name="mirrorY" select="$mirrorY"/>
 							<xsl:with-param name="DefaultCell" select="$DefaultCell"/>
 							<xsl:with-param name="CellWidth" select="$CellWidth"/>
 							<xsl:with-param name="CellHeight" select="$CellHeight"/>
+							<xsl:with-param name="BorderWidth" select="$BorderWidth"/>
 							<xsl:with-param name="BoardName">
 								<xsl:if test="$CellFluentName!='CELL'"><xsl:value-of select="substring-after($CellFluentName, 'CELL')"/></xsl:if>
 							</xsl:with-param>
@@ -81,8 +85,10 @@
 		<xsl:param name="xArgIdx">1</xsl:param>
 		<xsl:param name="yArgIdx">2</xsl:param>
 		<xsl:param name="contentArgIdx">3</xsl:param>
+		<xsl:param name="mirrorY">no</xsl:param>
 		<xsl:param name="DefaultCell">yes</xsl:param>
-		<xsl:param name="CellWidth">48</xsl:param>
+		<xsl:param name="BorderWidth">2</xsl:param> <!-- the width of the boarder around each cell in px -->
+		<xsl:param name="CellWidth" select="44 + 2 * $BorderWidth"/>
 		<xsl:param name="CellHeight" select="$CellWidth"/>
 	
 		<xsl:variable name="internalCellFluentName">
@@ -109,9 +115,11 @@
 			<xsl:with-param name="xArgIdx" select="$xArgIdx"/>
 			<xsl:with-param name="yArgIdx" select="$yArgIdx"/>
 			<xsl:with-param name="contentArgIdx" select="$contentArgIdx"/>
+			<xsl:with-param name="mirrorY" select="$mirrorY"/>
 			<xsl:with-param name="DefaultCell" select="$DefaultCell"/>
 			<xsl:with-param name="CellWidth" select="$CellWidth"/>
 			<xsl:with-param name="CellHeight" select="$CellHeight"/>
+			<xsl:with-param name="BorderWidth" select="$BorderWidth"/>
 		</xsl:call-template>
 		
 		<!-- show remaining fluents -->
@@ -134,8 +142,10 @@
 		<xsl:param name="xArgIdx">1</xsl:param>
 		<xsl:param name="yArgIdx">2</xsl:param>
 		<xsl:param name="contentArgIdx">3</xsl:param>
+		<xsl:param name="mirrorY">no</xsl:param>
 		<xsl:param name="DefaultCell">yes</xsl:param>
-		<xsl:param name="CellWidth">48</xsl:param>
+		<xsl:param name="BorderWidth">2</xsl:param> <!-- the width of the boarder around each cell in px -->
+		<xsl:param name="CellWidth" select="44 + 2 * $BorderWidth"/>
 		<xsl:param name="CellHeight" select="$CellWidth"/>
 		<xsl:param name="BoardName"/>
 
@@ -212,8 +222,8 @@
 			div.chesscellcontent
 			{
 				position: absolute;
-				width:    <xsl:value-of select="$CellWidth - 4"/>px;
-				height:   <xsl:value-of select="$CellHeight - 4"/>px;
+				width:    <xsl:value-of select="$CellWidth - 2 * $BorderWidth"/>px;
+				height:   <xsl:value-of select="$CellHeight - 2 * $BorderWidth"/>px;
 			}
 			div.chess_board
 			{
@@ -228,6 +238,7 @@
 				<xsl:with-param name="Height" select="$internalHeight"/>
 				<xsl:with-param name="CellWidth" select="$CellWidth"/>
 				<xsl:with-param name="CellHeight" select="$CellHeight"/>
+				<xsl:with-param name="BorderWidth" select="$BorderWidth"/>
 				<xsl:with-param name="checkered" select="$checkered"/>
 				<xsl:with-param name="LightCellColor">#ffce9e</xsl:with-param>
 				<xsl:with-param name="DarkCellColor">#d18b47</xsl:with-param>
@@ -255,8 +266,14 @@
 				</xsl:variable>
 				<xsl:variable name="y" select="$yArgNumber - $internalMinY + 1"/>
 
-				<xsl:variable name="xPosCell" select="$CellWidth * ($x - 1) + 2"/>
-				<xsl:variable name="yPosCell" select="$CellHeight * ($internalHeight - $y) + 2"/>
+				<xsl:variable name="xPosCell" select="$CellWidth * ($x - 1) + $BorderWidth"/>
+				<xsl:variable name="yPosCell">
+					<xsl:choose>
+						<xsl:when test="$mirrorY='yes'"><xsl:value-of select="$CellHeight * ($y - 1) + $BorderWidth"/></xsl:when>
+						<xsl:otherwise><xsl:value-of select="$CellHeight * ($internalHeight - $y) + $BorderWidth"/></xsl:otherwise>
+					</xsl:choose>
+				 
+				</xsl:variable>
 				<!-- select the right background color for the cell based on the coordinates -->
 				<xsl:variable name="CellColor">
 					<xsl:choose>
@@ -335,8 +352,8 @@
 							<xsl:call-template name="make_chess_img">
 								<xsl:with-param name="piece" select="$piece"/>
 								<xsl:with-param name="background" select="$CellColor"/>
-								<xsl:with-param name="imgWidth" select="$CellWidth - 4"/>
-								<xsl:with-param name="imgHeight" select="$CellHeight - 4"/>
+								<xsl:with-param name="imgWidth" select="$CellWidth - 2 * $BorderWidth"/>
+								<xsl:with-param name="imgHeight" select="$CellHeight - 2 * $BorderWidth"/>
 							</xsl:call-template>
 						</xsl:otherwise>
 					</xsl:choose>

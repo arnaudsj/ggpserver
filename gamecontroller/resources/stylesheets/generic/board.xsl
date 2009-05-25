@@ -12,6 +12,7 @@
 		<xsl:param name="Height"/> <!-- the number of cells per row -->
 		<xsl:param name="CellWidth">40</xsl:param> <!-- the width of each cell in px -->
 		<xsl:param name="CellHeight" select="$CellWidth"/> <!-- the height of each cell in px -->
+		<xsl:param name="BorderWidth">2</xsl:param> <!-- the width of the boarder around each cell in px -->
 		<xsl:param name="CellFluentName">CELL</xsl:param>
 		<xsl:param name="checkered">no</xsl:param>
 			<!-- no - all cells have light background
@@ -34,18 +35,22 @@
 			}
 			div.cellLight
 			{
-				width:  <xsl:value-of select="$CellWidth - 4"/>px;
-				height: <xsl:value-of select="$CellHeight - 4"/>px;
+				width:  <xsl:value-of select="$CellWidth - 2 * $BorderWidth"/>px;
+				height: <xsl:value-of select="$CellHeight - 2 * $BorderWidth"/>px;
 				float:	left;
-				border: 2px solid #FFC;
+				<xsl:if test="$BorderWidth>0">
+					border: <xsl:value-of select="$BorderWidth"/>px solid #FFC;
+				</xsl:if>
 				background-color: <xsl:value-of select="$LightCellColor"/>;
 			}
 			div.cellDark
 			{
-				width:  <xsl:value-of select="$CellWidth - 4"/>px;
-				height: <xsl:value-of select="$CellHeight - 4"/>px;
+				width:  <xsl:value-of select="$CellWidth - 2 * $BorderWidth"/>px;
+				height: <xsl:value-of select="$CellHeight - 2 * $BorderWidth"/>px;
 				float:	left;
-				border: 2px solid #FFC;
+				<xsl:if test="$BorderWidth>0">
+					border: <xsl:value-of select="$BorderWidth"/>px solid #FFC;
+				</xsl:if>
 				background-color: <xsl:value-of select="$DarkCellColor"/>;
 			}
 			div.cellInvisible
