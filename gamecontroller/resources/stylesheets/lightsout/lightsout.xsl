@@ -24,6 +24,7 @@
 		<xsl:call-template name="make_chess_img">
 			<xsl:with-param name="piece" select="''"/>
 			<xsl:with-param name="background" select="$background2"/>
+			<xsl:with-param name="alt" select="$content"/>
 		</xsl:call-template>
 	</xsl:template>
 	

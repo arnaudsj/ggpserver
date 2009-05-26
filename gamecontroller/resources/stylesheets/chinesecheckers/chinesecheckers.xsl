@@ -119,6 +119,8 @@
 								<xsl:attribute name="src">
 									<xsl:value-of select="$stylesheetURL"/>chinesecheckers/boardpitb.gif
 								</xsl:attribute>
+								<xsl:attribute name="title"><xsl:value-of select="arg[1]"/></xsl:attribute>
+								<xsl:attribute name="alt"><xsl:value-of select="arg[1]"/> blank</xsl:attribute>
 							</img>
 						</xsl:when>
 						<xsl:otherwise> <!-- arg[2] is a color -->
@@ -129,6 +131,8 @@
 								<xsl:attribute name="src">
 									<xsl:value-of select="$stylesheetURL"/>chinesecheckers/boardpit.gif
 								</xsl:attribute>
+								<xsl:attribute name="title"><xsl:value-of select="arg[1]"/></xsl:attribute>
+								<xsl:attribute name="alt"><xsl:value-of select="arg[1]"/> <xsl:value-of select="arg[2]"/></xsl:attribute>
 							</img>
 						</xsl:otherwise>
 					</xsl:choose>

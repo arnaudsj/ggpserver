@@ -354,6 +354,7 @@
 								<xsl:with-param name="background" select="$CellColor"/>
 								<xsl:with-param name="imgWidth" select="$CellWidth - 2 * $BorderWidth"/>
 								<xsl:with-param name="imgHeight" select="$CellHeight - 2 * $BorderWidth"/>
+								<xsl:with-param name="alt" select="$content"/>
 							</xsl:call-template>
 						</xsl:otherwise>
 					</xsl:choose>
@@ -464,11 +465,14 @@
 		<xsl:param name="background">light</xsl:param>
 		<xsl:param name="imgWidth">44</xsl:param>
 		<xsl:param name="imgHeight">44</xsl:param>
+		<xsl:param name="alt"/>
 		<xsl:param name="style"/>
 		
 		<img>
 			<xsl:attribute name="width"><xsl:value-of select="$imgWidth"/></xsl:attribute>
 			<xsl:attribute name="height"><xsl:value-of select="$imgHeight"/></xsl:attribute>
+			<xsl:attribute name="alt"><xsl:value-of select="$alt"/></xsl:attribute>
+			<xsl:attribute name="title"><xsl:value-of select="$alt"/></xsl:attribute>
 			<xsl:if test="$style!=''">
 				<xsl:attribute name="style"><xsl:value-of select="$style"/></xsl:attribute>
 			</xsl:if>

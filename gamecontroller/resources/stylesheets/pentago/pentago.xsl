@@ -89,6 +89,7 @@
 
 					<xsl:call-template name="make_chess_img">
 						<xsl:with-param name="piece" select="$piece"/>
+						<xsl:with-param name="alt" select="./arg[4]"/>
 					</xsl:call-template>
 				</div>
 			</xsl:for-each>
