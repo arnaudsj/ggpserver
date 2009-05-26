@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-<!--
-	similar to chess_like but uses knights as pieces
-	works for knightthrough*, ...
--->
-
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 	<xsl:import href="../generic/template.xsl"/>
@@ -25,8 +20,8 @@
 
 		<xsl:variable name="piece2">
 			<xsl:choose>
-				<xsl:when test="$content='WHITE'">nl</xsl:when>
-				<xsl:when test="$content='BLACK'">nd</xsl:when>
+				<xsl:when test="$content='S'">j1</xsl:when>
+				<xsl:when test="$content='W'">j0</xsl:when>
 				<xsl:otherwise><xsl:value-of select="$piece"/></xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
@@ -37,5 +32,5 @@
 			<xsl:with-param name="alt" select="$content"/>
 		</xsl:call-template>
 	</xsl:template>
-	
+
 </xsl:stylesheet>

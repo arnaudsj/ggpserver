@@ -26,7 +26,7 @@
 										<xsl:variable name="lo" select="'abcdefghijklmnopqrstuvwxyz'"/>
 										<xsl:choose>
 											<!-- hard coded control toggle matching -->
-											<xsl:when test="translate(/match/state/fact[prop-f='CONTROL']/arg[1],$up,$lo)=translate(.,$up,$lo)">
+											<xsl:when test="translate(/match/state/fact[contains(prop-f,'CONTROL') and count(arg)=1]/arg[1],$up,$lo)=translate(.,$up,$lo)">
 												<xsl:value-of select="."/>*
 											</xsl:when>
 											<xsl:otherwise>

@@ -12,12 +12,14 @@
 		<xsl:param name="Height"/> <!-- the number of cells per row -->
 		<xsl:param name="CellWidth">40</xsl:param> <!-- the width of each cell in px -->
 		<xsl:param name="CellHeight" select="$CellWidth"/> <!-- the height of each cell in px -->
+		<xsl:param name="BorderWidth">2</xsl:param> <!-- the width of the boarder around each cell in px -->
 		<xsl:param name="CellFluentName">CELL</xsl:param>
 		<xsl:param name="checkered">no</xsl:param>
 			<!-- no - all cells have light background
 			      light - the first cell has light background
 			      dark - the first cell has dark background
-			      alldark - all cells have dark background -->
+			      alldark - all cells have dark background
+			      invisible - all cells are invisible -->
 		<xsl:param name="LightCellColor">#CCCCCC</xsl:param>
 		<xsl:param name="DarkCellColor">#AAAAAA</xsl:param>
 		<xsl:param name="DefaultCell">yes</xsl:param>
@@ -33,18 +35,22 @@
 			}
 			div.cellLight
 			{
-				width:  <xsl:value-of select="$CellWidth - 4"/>px;
-				height: <xsl:value-of select="$CellHeight - 4"/>px;
+				width:  <xsl:value-of select="$CellWidth - 2 * $BorderWidth"/>px;
+				height: <xsl:value-of select="$CellHeight - 2 * $BorderWidth"/>px;
 				float:	left;
-				border: 2px solid #FFC;
+				<xsl:if test="$BorderWidth>0">
+					border: <xsl:value-of select="$BorderWidth"/>px solid #FFC;
+				</xsl:if>
 				background-color: <xsl:value-of select="$LightCellColor"/>;
 			}
 			div.cellDark
 			{
-				width:  <xsl:value-of select="$CellWidth - 4"/>px;
-				height: <xsl:value-of select="$CellHeight - 4"/>px;
+				width:  <xsl:value-of select="$CellWidth - 2 * $BorderWidth"/>px;
+				height: <xsl:value-of select="$CellHeight - 2 * $BorderWidth"/>px;
 				float:	left;
-				border: 2px solid #FFC;
+				<xsl:if test="$BorderWidth>0">
+					border: <xsl:value-of select="$BorderWidth"/>px solid #FFC;
+				</xsl:if>
 				background-color: <xsl:value-of select="$DarkCellColor"/>;
 			}
 			div.cellInvisible
@@ -107,6 +113,7 @@
 			<xsl:choose>
 				<xsl:when test="($checkered='dark' and (($col mod 2) + (($height + 1 - $row) mod 2) != 1)) or ($checkered='light' and (($col mod 2) + (($height + 1 - $row) mod 2) = 1))">cellDark</xsl:when>
 				<xsl:when test="$checkered='alldark'">cellDark</xsl:when>
+				<xsl:when test="$checkered='invisible'">cellInvisible</xsl:when>
 				<xsl:otherwise>cellLight</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
