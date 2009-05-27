@@ -341,20 +341,6 @@ CREATE TABLE IF NOT EXISTS `players` (
   PRIMARY KEY  (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
---
--- Dumping data for table `players`
---
-
-INSERT INTO `players` (`name`, `host`, `port`, `owner`, `status`) VALUES
-('Fluxplayer_martin', 'h1464732.stratoserver.net', 8000, 'martin', 'inactive'),
-('Luckylemming', 'h1464732.stratoserver.net', 4001, 'martin', 'inactive'),
-('Fluxplayer', 'diogenes.inf.tu-dresden.de', 8000, 'stephan', 'inactive'),
-('LuckyLemming_23', 'platon.inf.tu-dresden.de', 4001, 'stephan', 'inactive'),
-('centurio', '141.89.59.107', 5000, 'manju', 'inactive'),
-('monomaniac', 'joelv.dyndns.org', 8080, 'joelv', 'inactive'),
-('Etheric', 'theEbox2.stanford.edu', 9147, 'ethan', 'inactive'),
-('CadiaPlayer_lite', 'stormur.ru.is', 4001, 'hilmar', 'inactive');
-
 -- --------------------------------------------------------
 
 --
@@ -392,16 +378,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 --
 
 INSERT INTO `users` (`user_name`, `user_pass`) VALUES
-('martin', '5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8'),
 ('admin', '64acb644acc172824a5c0aa3bf1c6686d09ada13'),
-('stephan', '280553d693d6735db61230561b2ff66e834778a4'),
-('eschkufz', '5ee07d6ed577f60e851e92175d367e8257edb4d8'),
-('hilmar', '101f993a22f13f1cc54e6b03a0bbf104a3738fb8'),
-('manju', 'f4ca746cde2442845f40be391db7622d58a564ba'),
-('joningi', '356a4ec860a8c5461185a2e8923cce21428f1405'),
-('joelv', 'ef0406b93c372f7a484411b9d842c024239a6d5a'),
-('yngvi', '42572770d7567fe5176904791e0a47dcbf8e5fdf'),
-('ethan', '86ca08f681555f247c14186ba7dd89171cafc861');
 
 -- --------------------------------------------------------
 
@@ -422,13 +399,3 @@ CREATE TABLE IF NOT EXISTS `user_roles` (
 
 INSERT INTO `user_roles` (`user_name`, `role_name`) VALUES
 ('admin', 'admin'),
-('eschkufz', 'member'),
-('ethan', 'member'),
-('hilmar', 'member'),
-('joelv', 'member'),
-('joningi', 'member'),
-('manju', 'member'),
-('martin', 'member'),
-('new_admin', 'member'),
-('stephan', 'member'),
-('yngvi', 'member');
