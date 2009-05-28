@@ -26,11 +26,12 @@ import java.util.List;
 
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.Game;
+import tud.ggpserver.datamodel.Tournament;
 import tud.ggpserver.scheduler.RoundRobinScheduler;
 
 public class AdminPage {
 	private boolean cacheCleared = false;
-	
+
 	public boolean isRunning() {
 		return RoundRobinScheduler.getInstance().isRunning();
 	}
@@ -64,5 +65,10 @@ public class AdminPage {
 	@SuppressWarnings("unchecked")
 	public List<Game<?, ?>> getAllGames() throws SQLException {
 		return ((AbstractDBConnector) getDBConnector()).getAllEnabledGames();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Tournament<?, ?>> getTournaments() throws SQLException {
+		return ((AbstractDBConnector) getDBConnector()).getTournaments();
 	}
 }

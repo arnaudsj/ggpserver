@@ -29,7 +29,6 @@ import tud.ggpserver.datamodel.User;
 
 public class Profile {
 	private User user = null;
-	private List<RemotePlayerInfo> players = null;
 
 	public String getUserName() {
 		if (user == null) {
@@ -45,10 +44,6 @@ public class Profile {
 	public List<RemotePlayerInfo> getPlayers() throws SQLException {
 		assert (user != null);
 		
-		if (players == null) {
-			players = getDBConnector().getPlayerInfosForUser(user.getUserName());
-		}
-		
-		return players;
+		return getDBConnector().getPlayerInfosForUser(user.getUserName());
 	}
 }

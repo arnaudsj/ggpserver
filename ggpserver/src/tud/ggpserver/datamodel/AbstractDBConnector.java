@@ -40,6 +40,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
+import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MoveFactoryInterface;
 import tud.gamecontroller.game.MoveInterface;
@@ -87,7 +88,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 
 	protected abstract ReasonerInterface<TermType, ReasonerStateInfoType> getReasoner(String gameDescription, String name);
 
-	
+
 	public void clearCache() {
 		// this class doesn't cache anything, so there is nothing to do here.
 	}
@@ -358,16 +359,10 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			Date startTime) throws SQLException {
 		
 		long number = System.currentTimeMillis();
-		
 		Match<TermType, ReasonerStateInfoType> match = null;
 		
 		while (match == null) {
-			String firstPart = /*"Match." +*/ game.getName();
-			String secondPart = "." + Long.toString(number);
-			if (firstPart.length() + secondPart.length() > MATCHID_MAXLENGTH) {
-				firstPart = firstPart.substring(0, MATCHID_MAXLENGTH - secondPart.length() - 2) + "..";
-			}
-			String matchID = firstPart + secondPart;
+			String matchID = generateMatchID(game, Long.toString(number));
 			try {
 				match = createMatch(matchID, game, startclock, playclock, rolesToPlayers, startTime);
 			} catch (DuplicateInstanceException e) {
@@ -376,8 +371,13 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		}
 		
 		return match;
-	}	
+	}
 
+	public Match<TermType, ReasonerStateInfoType> createMatch(Game<TermType, ReasonerStateInfoType> game,
+			int startclock, int playclock, Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayers) throws SQLException {
+		return createMatch(game, startclock, playclock, rolesToPlayers, new Date());
+	}
+	
 	public Match<TermType, ReasonerStateInfoType> getMatch(String matchID)
 			throws SQLException {
 		Connection con = getConnection();
@@ -1145,4 +1145,105 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		}
 		return datasource.getConnection();
 	}
+	
+	protected static String generateMatchID(GameInterface game, String appendix) {
+		String firstPart;
+		if (game == null) {
+			firstPart = "null";
+		} else {
+			firstPart = game.getName();
+		}
+		
+		String secondPart;
+		if (appendix == null) {
+			secondPart = ".?????????????";
+		} else {
+			secondPart = "." + appendix;
+		}
+		
+		if (firstPart.length() + secondPart.length() > MATCHID_MAXLENGTH) {
+			firstPart = firstPart.substring(0, MATCHID_MAXLENGTH - secondPart.length() - 2) + "..";
+		}
+		return firstPart + secondPart;
+	}
+
+	public List<Tournament<TermType , ReasonerStateInfoType>> getTournaments() throws SQLException {
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		List<Tournament<TermType , ReasonerStateInfoType>> result = new LinkedList<Tournament<TermType , ReasonerStateInfoType>>();
+		
+		try {
+			ps = con.prepareStatement("SELECT `tournament_id` FROM `tournaments`");
+			rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				result.add(getTournament(rs.getString("tournament_id")));
+			}
+		} finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+			if (rs != null)
+				try {rs.close();} catch (SQLException e) {}
+		} 
+
+		return result;
+	}
+
+	public Tournament<TermType , ReasonerStateInfoType> getTournament(String tournamentID) throws SQLException {
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		Tournament<TermType , ReasonerStateInfoType> result = null;
+		
+		try { 
+			ps = con.prepareStatement("SELECT `tournament_id`, `owner` FROM `tournaments` WHERE `tournament_id` = ?;");
+			ps.setString(1, tournamentID);
+			rs = ps.executeQuery();
+			
+			if (rs.next()) {
+				result = new Tournament<TermType, ReasonerStateInfoType>(rs.getString("tournament_id"), getUser(rs.getString("owner")));
+			}
+		} finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+			if (rs != null)
+				try {rs.close();} catch (SQLException e) {}
+		} 
+
+		return result;
+	}
+
+	public Tournament<TermType , ReasonerStateInfoType> createTournament(String tournamentID, User owner) throws DuplicateInstanceException,
+			SQLException {
+		
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+		try {
+
+			ps = con.prepareStatement("INSERT INTO `tournaments` (`tournament_id`, `owner`) VALUES (?, ?) ;");
+			ps.setString(1, tournamentID);
+			ps.setString(2, owner.getUserName());
+			
+			ps.executeUpdate();
+			ps.close();
+		} catch (MySQLIntegrityConstraintViolationException e) {
+			// MySQLIntegrityConstraintViolationException means here that the key could not be inserted
+			throw new DuplicateInstanceException(e);
+		} finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+		} 
+
+		logger.info("Creating new tournament: " + tournamentID); //$NON-NLS-1$
+		return new Tournament<TermType, ReasonerStateInfoType>(tournamentID, owner);
+	}	
 }

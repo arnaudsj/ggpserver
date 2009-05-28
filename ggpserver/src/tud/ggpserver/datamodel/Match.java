@@ -138,7 +138,7 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 	public List<? extends PlayerInfo> getOrderedPlayerInfos() {
 		if (orderedPlayerInfos  == null) {
 			orderedPlayerInfos = new LinkedList<PlayerInfo>();
-			for (RoleInterface<TermType> role : game.getOrderedRoles()) {
+			for (RoleInterface<TermType> role : getGame().getOrderedRoles()) {
 				orderedPlayerInfos.add(playerInfos.get(role));
 			}
 		}
@@ -164,7 +164,7 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 	private void initPlayers() {
 		Map<RoleInterface<TermType>, Player<TermType>> myPlayers = new HashMap<RoleInterface<TermType>, Player<TermType>>();
 		
-		for (RoleInterface<TermType> role : game.getOrderedRoles()) {
+		for (RoleInterface<TermType> role : getGame().getOrderedRoles()) {
 			PlayerInfo playerInfo = playerInfos.get(role);
 			
 			Player<TermType> player = PlayerFactory.<TermType> createPlayer(playerInfo, moveFactory, gameScrambler);
@@ -422,7 +422,7 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 		buffer.append(" matchID: ");
 		buffer.append(getMatchID());
 		buffer.append(" game: ");
-		buffer.append(game);
+		buffer.append(getGame());
 		buffer.append(" startclock: ");
 		buffer.append(getStartclock());
 		buffer.append(" playclock: ");
