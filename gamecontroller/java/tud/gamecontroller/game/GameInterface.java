@@ -21,7 +21,7 @@ package tud.gamecontroller.game;
 
 import java.util.List;
 
-import tud.aux.NamedObject;
+import tud.auxiliary.NamedObject;
 
 public interface GameInterface<
 	TermType,

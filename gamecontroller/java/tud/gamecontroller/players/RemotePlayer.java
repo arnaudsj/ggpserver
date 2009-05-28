@@ -33,7 +33,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import tud.gamecontroller.MessageSentNotifier;
-import tud.gamecontroller.aux.InvalidKIFException;
+import tud.gamecontroller.auxiliary.InvalidKIFException;
 import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.MoveFactoryInterface;

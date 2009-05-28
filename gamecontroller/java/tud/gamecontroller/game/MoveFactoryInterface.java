@@ -19,7 +19,7 @@
 
 package tud.gamecontroller.game;
 
-import tud.gamecontroller.aux.InvalidKIFException;
+import tud.gamecontroller.auxiliary.InvalidKIFException;
 
 public interface MoveFactoryInterface<MoveType> {
 

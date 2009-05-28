@@ -21,7 +21,7 @@ package tud.gamecontroller.game.jocular;
 
 import stanfordlogic.gdl.GdlExpression;
 import stanfordlogic.gdl.Parser;
-import tud.gamecontroller.aux.InvalidKIFException;
+import tud.gamecontroller.auxiliary.InvalidKIFException;
 
 public class TermFactory implements tud.gamecontroller.term.TermFactoryInterface<Term> {
 	Parser parser;

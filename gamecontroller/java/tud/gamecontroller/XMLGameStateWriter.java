@@ -47,7 +47,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import tud.aux.NamedObject;
+import tud.auxiliary.NamedObject;
 import tud.gamecontroller.game.FluentInterface;
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.JointMoveInterface;

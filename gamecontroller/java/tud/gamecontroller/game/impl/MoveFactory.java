@@ -19,7 +19,7 @@
 
 package tud.gamecontroller.game.impl;
 
-import tud.gamecontroller.aux.InvalidKIFException;
+import tud.gamecontroller.auxiliary.InvalidKIFException;
 import tud.gamecontroller.game.MoveFactoryInterface;
 import tud.gamecontroller.term.TermFactoryInterface;
 import tud.gamecontroller.term.TermInterface;

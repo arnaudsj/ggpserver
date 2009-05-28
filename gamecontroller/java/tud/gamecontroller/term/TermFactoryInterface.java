@@ -19,7 +19,7 @@
 
 package tud.gamecontroller.term;
 
-import tud.gamecontroller.aux.InvalidKIFException;
+import tud.gamecontroller.auxiliary.InvalidKIFException;
 
 public interface TermFactoryInterface<TermType> {
 

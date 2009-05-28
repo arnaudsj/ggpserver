@@ -19,7 +19,7 @@
 
 package tud.gamecontroller.players;
 
-import tud.aux.NamedObject;
+import tud.auxiliary.NamedObject;
 import tud.gamecontroller.MessageSentNotifier;
 import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MatchInterface;

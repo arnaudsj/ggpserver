@@ -17,13 +17,13 @@
         <file path="/gamecontroller/.classpath"/>
         <javaElement handleIdentifier="=gamecontroller/&lt;cs227b.teamIago.parser"/>
         <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.game"/>
-        <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.aux"/>
+        <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.auxiliary"/>
         <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.logging"/>
         <javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.gameProver"/>
         <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.scrambling"/>
         <javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.resolver"/>
         <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.game.javaprover"/>
-        <javaElement handleIdentifier="=gamecontroller/&lt;tud.aux"/>
+        <javaElement handleIdentifier="=gamecontroller/&lt;tud.auxiliary"/>
         <file path="/gamecontroller/LICENSE"/>
         <javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.util"/>
         <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.cli"/>

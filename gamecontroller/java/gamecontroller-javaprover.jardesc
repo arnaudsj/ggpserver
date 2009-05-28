@@ -12,7 +12,7 @@
 </manifest>
 <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
 <file path="/gamecontroller/.classpath"/>
-<javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.aux{InvalidKIFException.java"/>
+<javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.auxiliary{InvalidKIFException.java"/>
 <javaElement handleIdentifier="=JavaProver/&lt;cs227b.teamIago.parser{Tokenizer.java"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.term{TermInterface.java"/>
 <file path="/gamecontroller/LICENSE"/>
@@ -51,7 +51,7 @@
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.term{AbstractTerm.java"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.game.impl"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.term{TermFactoryInterface.java"/>
-<javaElement handleIdentifier="=gamecontroller/&lt;tud.aux{NamedObject.java"/>
+<javaElement handleIdentifier="=gamecontroller/&lt;tud.auxiliary{NamedObject.java"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.players{PlayerInfo.java"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.game{StateInterface.java"/>
 <javaElement handleIdentifier="=gamecontroller/&lt;tud.gamecontroller.game.javaprover{Term.java"/>

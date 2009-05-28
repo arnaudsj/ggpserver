@@ -17,7 +17,7 @@
     along with GameController.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package tud.aux;
+package tud.auxiliary;
 
 public interface NamedObject {
 	public String getName();

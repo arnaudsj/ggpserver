@@ -17,7 +17,7 @@
     along with GameController.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package tud.gamecontroller.aux;
+package tud.gamecontroller.auxiliary;
 
 public class InvalidKIFException extends Exception {
 
