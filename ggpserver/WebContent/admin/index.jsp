@@ -109,6 +109,62 @@
 		</script>
 	</c:if>
 
+    <h1>Tournaments</h1>
+	<table>
+		<thead>
+			<tr>
+				<th>tournament</th>
+				<th>owner</th>
+				<th colspan="2">actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			<c:forEach var="tournament" items="${adminPage.tournaments}" varStatus="lineInfo">
+				<c:choose>
+					<c:when test="${lineInfo.count % 2 == 0}">
+						<c:set var="rowClass" value="even" />
+					</c:when>
+					<c:otherwise>
+						<c:set var="rowClass" value="odd" />
+					</c:otherwise>
+				</c:choose>
+				<tr class="${rowClass}">
+					<td>
+						<c:out value="${tournament.tournamentID}" />
+					</td>
+					<td>
+						<c:out value="${tournament.owner.userName}" />
+					</td>
+					<td>
+						<c:url value="../public/show_matches.jsp" var="viewURL">
+							<c:param name="tournament" value="${tournament.tournamentID}" />
+						</c:url>
+						<div class="view"><a href='<c:out value="${viewURL}" />'><span>view</span></a></div>
+					</td>
+					<td>
+						<c:url value="edit_tournament.jsp" var="editURL">
+							<c:param name="tournament" value="${tournament.tournamentID}" />
+						</c:url>
+						<div class="edit"><a href='<c:out value="${editURL}" />'><span>edit</span></a></div>
+					</td>
+				</tr>
+			</c:forEach>
+	
+			<c:choose>
+				<c:when test='${rowClass == "odd"}'>
+					<c:set var="rowClass" value="even" />
+				</c:when>
+				<c:otherwise>
+					<c:set var="rowClass" value="odd" />
+				</c:otherwise>
+			</c:choose>
+			<tr class="${rowClass}">
+				<td colspan="4">
+					<div><a href='<%= response.encodeURL("create_tournament.jsp") %>'><span>Add new tournament</span></a></div>
+				</td>
+			</tr>
+		</tbody>
+	</table>
 
 </div>  <!--end div "content"-->
 

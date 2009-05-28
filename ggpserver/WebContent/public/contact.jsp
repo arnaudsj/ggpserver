@@ -32,7 +32,11 @@
 
 GGP Server was created by the <a
 	href="http://www.inf.tu-dresden.de/?node_id=1361">Computational
-Logic group</a> at <a href="http://tu-dresden.de/">TU Dresden</a>.<br>
+Logic group</a> at <a href="http://tu-dresden.de/">TU Dresden</a>.
+GGP Server is Open Source Software and licensed under the GPLv3. 
+To obtain a copy of the source code, please visit its 
+<a href="https://sourceforge.net/projects/ggpserver/">SourceForge 
+project page</a>.<br>
 
 If you have any comments, questions, ideas or bug reports, the
 developers would love to hear from you. You can contact us at

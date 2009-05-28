@@ -19,6 +19,9 @@
 	<security-role> 
 	    <role-name>member</role-name> 
 	</security-role>
+	<security-role> 
+	    <role-name>nobody</role-name> 
+	</security-role>
 
 	<!-- Use FORM-based security -->
 	<login-config>
@@ -57,6 +60,21 @@
 	    <!-- Only administrators can access this resource --> 
 	    <auth-constraint> 
 	        <role-name>admin</role-name> 
+	    </auth-constraint> 
+	</security-constraint> 	
+	
+	<security-constraint>
+	    <display-name>Security constraint for all internal folders</display-name> 
+	
+	    <web-resource-collection> 
+	        <web-resource-name>Internal stuff</web-resource-name> 
+	        <url-pattern>/inc/*</url-pattern> 
+	        <url-pattern>/ajax-test/*</url-pattern> 
+	    </web-resource-collection> 
+	
+	    <!-- Nobody can access this resource directly --> 
+	    <auth-constraint> 
+	        <role-name>nobody</role-name> 
 	    </auth-constraint> 
 	</security-constraint> 	
 	
