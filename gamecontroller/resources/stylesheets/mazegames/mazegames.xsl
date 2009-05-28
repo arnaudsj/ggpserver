@@ -149,16 +149,15 @@
 			<xsl:otherwise>
 				<xsl:variable name="imgName">
 					<xsl:choose>
-						<xsl:when test="$content='GHOST'">blinky.gif</xsl:when>
-						<xsl:when test="$content='FLAG'">exit.gif</xsl:when>
-						<xsl:when test="substring($content,1,7)='SOLDIER'">explorer.gif</xsl:when>
-						<xsl:when test="substring($content,1,9)='TERRORIST'">bomberman.gif</xsl:when>
-						<xsl:when test="substring($content,1,3)='GUN' or substring($content,1,7)='GRENADE' or substring($content,1,6)='MEDKIT'">box.gif</xsl:when>
-						<xsl:otherwise><xsl:value-of select="translate($content, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>.gif</xsl:otherwise>
+						<xsl:when test="$content='GHOST'">blinky</xsl:when>
+						<xsl:when test="substring($content,1,7)='SOLDIER'">explorer</xsl:when>
+						<xsl:when test="substring($content,1,9)='TERRORIST'">bomberman</xsl:when>
+						<xsl:when test="substring($content,1,3)='GUN' or substring($content,1,7)='GRENADE' or substring($content,1,6)='MEDKIT'">box</xsl:when>
+						<xsl:otherwise><xsl:value-of select="translate($content, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/></xsl:otherwise>
 					</xsl:choose>
 				</xsl:variable>
 				<img>
-					<xsl:attribute name="src"><xsl:value-of select="concat($stylesheetURL, '/mazegames/', $imgName)"/></xsl:attribute>
+					<xsl:attribute name="src"><xsl:value-of select="concat($stylesheetURL, '/mazegames/', $imgName, '.png')"/></xsl:attribute>
 					<xsl:attribute name="alt"><xsl:value-of select="$content"/></xsl:attribute>
 					<xsl:attribute name="title"><xsl:value-of select="$content"/></xsl:attribute>
 				</img>
