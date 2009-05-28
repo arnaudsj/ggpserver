@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project basedir="." default="jar" name="gamecontroller">
+<project basedir="." default="jars" name="gamecontroller">
     <property environment="env"/>
     <property name="ggpserver.location" value="../ggpserver"/>
     <property name="debuglevel" value="source,lines,vars"/>
@@ -33,10 +33,31 @@
         <delete dir="bin"/>
         <delete file="gamecontroller.jar"/>
     </target>
+    <target depends="cli-jar, gui-jar, jar" name="jars"/>
     <target depends="build" name="jar">
-	    <jar destfile="gamecontroller.jar" basedir="bin" manifest="java/gamecontroller-javaprover-cli-Manifest"/>
+	    <jar destfile="gamecontroller.jar" basedir="bin"/>
     </target>
-    <target depends="clean" name="cleanall"/>
+    <target depends="build" name="cli-jar">
+	    <jar destfile="gamecontroller-cli.jar"
+			 manifest="java/gamecontroller-javaprover-cli-Manifest">
+			<fileset dir="bin">
+				<exclude name="stanfordlogic/"/>
+				<exclude name="de/"/>
+				<exclude name="tud/gamecontroller/gui/"/>
+			</fileset>
+		 </jar>
+    </target>
+    <target depends="build" name="gui-jar">
+	    <jar destfile="gamecontroller-gui.jar"
+			 manifest="java/gamecontroller-Javaprover-Manifest">
+			<fileset dir="bin">
+				<exclude name="stanfordlogic/"/>
+				<exclude name="de/"/>
+				<exclude name="tud/gamecontroller/cli/"/>
+			</fileset>
+		 </jar>
+    </target>
+	<target depends="clean" name="cleanall"/>
     <target depends="build-subprojects,build-project" name="build"/>
     <target name="build-subprojects"/>
     <target depends="init" name="build-project">
