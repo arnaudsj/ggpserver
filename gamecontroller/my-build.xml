@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project basedir="." default="build" name="gamecontroller">
+<project basedir="." default="jar" name="gamecontroller">
     <property environment="env"/>
     <property name="ggpserver.location" value="../ggpserver"/>
     <property name="debuglevel" value="source,lines,vars"/>
@@ -34,7 +34,7 @@
         <delete file="gamecontroller.jar"/>
     </target>
     <target depends="build" name="jar">
-		<jar destfile="gamecontroller.jar" basedir="bin"/>
+	    <jar destfile="gamecontroller.jar" basedir="bin" manifest="java/gamecontroller-javaprover-cli-Manifest"/>
     </target>
     <target depends="clean" name="cleanall"/>
     <target depends="build-subprojects,build-project" name="build"/>
