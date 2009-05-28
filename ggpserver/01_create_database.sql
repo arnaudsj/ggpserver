@@ -399,3 +399,30 @@ CREATE TABLE IF NOT EXISTS `user_roles` (
 
 INSERT INTO `user_roles` (`user_name`, `role_name`) VALUES
 ('admin', 'admin'),
+
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tournaments`
+--
+
+DROP TABLE IF EXISTS `tournaments`;
+CREATE TABLE IF NOT EXISTS `tournaments` (
+  `tournament_id` varchar(40) NOT NULL,
+  `owner` varchar(20) NOT NULL,
+  PRIMARY KEY  (`tournament_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tournament_matches`
+--
+
+DROP TABLE IF EXISTS `tournament_matches`;
+CREATE TABLE IF NOT EXISTS `tournament_matches` (
+  `tournament_id` varchar(40) NOT NULL,
+  `match_id` varchar(40) NOT NULL,
+  PRIMARY KEY  (`tournament_id`,`match_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
