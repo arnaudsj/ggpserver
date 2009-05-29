@@ -86,7 +86,7 @@ public abstract class AbstractGameControllerCLIRunner<
 			while(index<argv.length){
 				if(argv[index].equals("-printxml")){
 					doPrintXML=true; ++index;
-					if(index+2<argv.length){
+					if(index+1<argv.length){
 						xmlOutputDir=argv[index]; ++index;
 						styleSheet=argv[index]; ++index;
 					}else{
