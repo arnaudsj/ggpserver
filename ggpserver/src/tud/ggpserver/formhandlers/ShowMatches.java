@@ -40,9 +40,13 @@ public class ShowMatches extends AbstractPager {
 	@SuppressWarnings("unchecked")
 	public List<Match> getMatches() throws SQLException {
 		if (matches == null) {
-			matches = db.getMatches(startRow, numDisplayedRows, playerName, gameName, tournamentID, true);
+			matches = db.getMatches(startRow, numDisplayedRows, playerName, gameName, tournamentID, excludeNewMatches());
 		}
 		return matches;
+	}
+
+	protected boolean excludeNewMatches() {
+		return true;
 	}
 	
 	@Override
@@ -71,7 +75,8 @@ public class ShowMatches extends AbstractPager {
 		return tournamentID;
 	}
 
-	public void setTournamentID(String tournamentID) {
+	@SuppressWarnings("unused")
+	public void setTournamentID(String tournamentID) throws SQLException {
 		this.tournamentID = tournamentID;
 	}
 
