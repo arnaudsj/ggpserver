@@ -451,7 +451,6 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			statement.execute("SELECT COUNT( * ) FROM `" + tableName + "`;");
 			rs = statement.getResultSet();
 			
-			
 			if (rs.next()) {
 				return rs.getInt(1);				
 			} 
@@ -466,53 +465,6 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		} 
 
 	}
-	
-	public int getRowCountPlayerGameMatches(String playerName, String gameName) throws SQLException {
-		if(playerName == null && gameName == null){
-			return getRowCount("matches");
-		}
-
-		Connection con = getConnection();
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
-		try {
-			if(playerName == null){
-				// if (gameName == null) {
-					// can't happen	
-				// } else {
-					ps = con.prepareStatement("SELECT COUNT( `match_id` ) FROM `matches` WHERE `game` = ?;");
-					ps.setString(1, gameName);
-				// }
-			} else {
-				if (gameName == null) {
-					ps = con.prepareStatement("SELECT COUNT( `m`.`match_id` ) "
-							+ "FROM `matches` AS `m`, `match_players` AS `p` " 
-							+ "WHERE `m`.`match_id` = `p`.`match_id` AND `player` = ? ;");
-					ps.setString(1, playerName);
-				} else {
-					ps = con.prepareStatement("SELECT COUNT( `m`.`match_id` ) "
-							+ "FROM `matches` AS `m`, `match_players` AS `p` " 
-							+ "WHERE `m`.`match_id` = `p`.`match_id` AND `m`.`game` = ? AND `player` = ? ;");
-					ps.setString(1, gameName);
-					ps.setString(2, playerName);
-				}
-			}
-			rs = ps.executeQuery();
-			if (rs.next()) {
-				return rs.getInt(1);				
-			} 
-			throw new SQLException("Something went wrong.");
-		} finally { 
-			if (con != null)
-				try {con.close();} catch (SQLException e) {}
-			if (ps != null)
-				try {ps.close();} catch (SQLException e) {}
-			if (rs != null)
-				try {rs.close();} catch (SQLException e) {}
-		}
-	}
-	
 	
 	public List<Game<?, ?>> getGames(int startRow, int numDisplayedRows) throws SQLException {
 		Connection con = getConnection();
@@ -684,7 +636,27 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return result;
 	}
 	
-	public List<Match<TermType, ReasonerStateInfoType>> getMatches(int startRow, int numDisplayedRows, String playerName, String gameName, String tournamentID) throws SQLException {
+	/**
+	 * @param startRow
+	 *            The first database row to be returned
+	 * @param numDisplayedRows
+	 *            The number of rows (= matches) to be returned
+	 * @param playerName
+	 *            If not <code>null</code>, return only matches from this player
+	 * @param gameName
+	 *            If not <code>null</code>, return only matches of this game
+	 * @param tournamentID
+	 *            If not <code>null</code>, return only matches from this tournament
+	 * @param excludeNew
+	 *            If <code>true</code>, do not return matches with status "new"
+	 * @return All matches that match the given filter criteria. Filters can be
+	 *         combined.
+	 * @throws SQLException
+	 */
+	public List<Match<TermType, ReasonerStateInfoType>> getMatches(
+			int startRow, int numDisplayedRows, String playerName,
+			String gameName, String tournamentID, boolean excludeNew)
+			throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -692,47 +664,8 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		List<Match<TermType, ReasonerStateInfoType>> result = new LinkedList<Match<TermType, ReasonerStateInfoType>>();
 		
 		try {
-			// initialize statement and parameters
-			final String select =  "SELECT `m`.`match_id`";
-			String from =          "FROM `matches` AS `m`";
-			String where =         "WHERE TRUE";
-			final String orderBy = "ORDER BY `m`.`start_time`";
-			final String limit =   "LIMIT ? , ?";
-
-			List<Object> parameters = new LinkedList<Object>();
-
-			// add specific filters
-			if (gameName != null) {
-				where += " AND `m`.`game` = ?";
-				parameters.add(gameName);
-			}
-			if (playerName != null) {
-				from += ", `match_players` AS `p`";
-				where += " AND `m`.`match_id` = `p`.`match_id` AND `p`.`player` = ?";
-				parameters.add(playerName);
-			}
-			if (tournamentID != null) {
-				from += ", `tournament_matches` AS `t`";
-				where += " AND `m`.`match_id` = `t`.`match_id` AND `t`.`tournament_id` = ?";
-				parameters.add(tournamentID);
-			}
-			parameters.add(startRow);
-			parameters.add(numDisplayedRows);
+			ps = prepareMatchesStatement(con, false, startRow, numDisplayedRows, playerName, gameName, tournamentID, excludeNew);
 			
-			// prepare statement, fill in parameters
-			ps = con.prepareStatement(select + " " + from + " " + where + " " + orderBy + " " + limit + ";");
-			for (int i = 0; i < parameters.size(); i++) {
-				Object parameter = parameters.get(i);
-				if (parameter instanceof Integer) {
-					ps.setInt(i + 1, (Integer) parameter);
-				} else if (parameter instanceof String) {
-					ps.setString(i + 1, (String) parameter);
-				} else {
-					throw new InternalError("this should never happen");
-				}
-			}
-			
-			// execute and get result
 			rs = ps.executeQuery();
 			
 			while (rs.next()) {
@@ -749,6 +682,89 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 
 		return result;
 	}
+
+	public int getRowCountMatches(String playerName, String gameName, String tournamentID, boolean excludeNew) throws SQLException {
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			ps = prepareMatchesStatement(con, true, 0, Integer.MAX_VALUE, playerName, gameName, tournamentID, excludeNew);
+			
+			rs = ps.executeQuery();
+			
+			if (rs.next()) {
+				return rs.getInt(1);				
+			} 
+			throw new SQLException("Something went wrong.");
+		} finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+			if (rs != null)
+				try {rs.close();} catch (SQLException e) {}
+		} 
+	}
+
+	/**
+	 * @param onlyRowCount
+	 *            If <code>true</code>, prepare a statement to count the
+	 *            number of rows
+	 */
+	private PreparedStatement prepareMatchesStatement(Connection con, boolean onlyRowCount, int startRow, int numDisplayedRows, String playerName, String gameName, String tournamentID, boolean excludeNew) throws SQLException, InternalError {
+		PreparedStatement ps = null;
+
+		// initialize statement and parameters
+		String select;
+		if (onlyRowCount) {
+			select =  "SELECT COUNT(*)";
+		} else {
+			select =  "SELECT `m`.`match_id`";
+		}
+		String from =          "FROM `matches` AS `m`";
+		String where =         "WHERE TRUE";
+		final String orderBy = "ORDER BY `m`.`start_time`";
+		final String limit =   "LIMIT ? , ?";
+
+		List<Object> parameters = new LinkedList<Object>();
+
+		// add specific filters
+		if (gameName != null) {
+			where += " AND `m`.`game` = ?";
+			parameters.add(gameName);
+		}
+		if (playerName != null) {
+			from += ", `match_players` AS `p`";
+			where += " AND `m`.`match_id` = `p`.`match_id` AND `p`.`player` = ?";
+			parameters.add(playerName);
+		}
+		if (tournamentID != null) {
+			from += ", `tournament_matches` AS `t`";
+			where += " AND `m`.`match_id` = `t`.`match_id` AND `t`.`tournament_id` = ?";
+			parameters.add(tournamentID);
+		}
+		if (excludeNew) {
+			where += " AND `m`.`status` != 'new'";
+		}
+		parameters.add(startRow);
+		parameters.add(numDisplayedRows);
+		
+		// prepare statement, fill in parameters
+		ps = con.prepareStatement(select + " " + from + " " + where + " " + orderBy + " " + limit + ";");
+		for (int i = 0; i < parameters.size(); i++) {
+			Object parameter = parameters.get(i);
+			if (parameter instanceof Integer) {
+				ps.setInt(i + 1, (Integer) parameter);
+			} else if (parameter instanceof String) {
+				ps.setString(i + 1, (String) parameter);
+			} else {
+				throw new InternalError("this should never happen");
+			}
+		}
+		return ps;
+	}
+	
 	
 	protected void setMatchStatus(Match<? extends TermType, ReasonerStateInfoType> match, String status) throws SQLException {
 		Connection con = getConnection();
@@ -1255,5 +1271,5 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 
 		logger.info("Creating new tournament: " + tournamentID); //$NON-NLS-1$
 		return new Tournament<TermType, ReasonerStateInfoType>(tournamentID, owner);
-	}	
+	}
 }

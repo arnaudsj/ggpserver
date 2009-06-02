@@ -151,5 +151,13 @@ public abstract class AbstractPager {
 
 	public abstract String getTargetJsp();
 
+	/**
+	 * This String is used for two things:<br>
+	 * 1. The name to be used in the pager title (see inc/pager_title.jsp)<br>
+	 * 2. The database table to be used for calculating the row count. If a
+	 *    subclass doesn't simply display all entries from one table, a more
+	 *    complex query must be used for calculating the row count. This can be
+	 *    achieved by overriding getRowCount().
+	 */
 	public abstract String getTableName();
 }

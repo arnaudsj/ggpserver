@@ -40,14 +40,14 @@ public class ShowMatches extends AbstractPager {
 	@SuppressWarnings("unchecked")
 	public List<Match> getMatches() throws SQLException {
 		if (matches == null) {
-			matches = db.getMatches(startRow, numDisplayedRows, playerName, gameName, tournamentID);
+			matches = db.getMatches(startRow, numDisplayedRows, playerName, gameName, tournamentID, true);
 		}
 		return matches;
 	}
 	
 	@Override
 	protected int getRowCount() throws SQLException {
-		return db.getRowCountPlayerGameMatches(playerName, gameName);
+		return db.getRowCountMatches(playerName, gameName, tournamentID, true);
 	}
 
 	public String getPlayerName() {
