@@ -30,7 +30,6 @@ public class EditGame extends AbstractGameValidator {
 	
 	public void updateGame() throws SQLException {
 		assert(isValid());
-		// TODO: fill in (???)
 		getDBConnector().updateGameInfo(getGameName(), getGameDescription(), getStylesheet(), getEnabled());
 		correctlyUpdated = true;
 	}
