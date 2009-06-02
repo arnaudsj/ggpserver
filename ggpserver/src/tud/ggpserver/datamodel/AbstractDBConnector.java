@@ -684,7 +684,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return result;
 	}
 	
-	public List<Match<TermType, ReasonerStateInfoType>> getMatches(int startRow, int numDisplayedRows, String playerName, String gameName) throws SQLException {
+	public List<Match<TermType, ReasonerStateInfoType>> getMatches(int startRow, int numDisplayedRows, String playerName, String gameName, String tournamentID) throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -710,6 +710,11 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				from += ", `match_players` AS `p`";
 				where += " AND `m`.`match_id` = `p`.`match_id` AND `p`.`player` = ?";
 				parameters.add(playerName);
+			}
+			if (tournamentID != null) {
+				from += ", `tournament_matches` AS `t`";
+				where += " AND `m`.`match_id` = `t`.`match_id` AND `t`.`tournament_id` = ?";
+				parameters.add(tournamentID);
 			}
 			parameters.add(startRow);
 			parameters.add(numDisplayedRows);
