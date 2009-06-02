@@ -149,6 +149,9 @@ public abstract class AbstractPager {
 		startRow = (page - 1) * numDisplayedRows;
 	}
 
+	/**
+	 * This is the URL of the page that the result pages will link to (without the "page" parameter).
+	 */
 	public abstract String getTargetJsp();
 
 	/**
