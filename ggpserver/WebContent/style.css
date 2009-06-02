@@ -32,6 +32,10 @@ a {
     text-decoration:    none;
 }
 
+a img {
+	border-style:		none;
+}
+
 hr {
     margin-top:         25px;
     margin-bottom:      25px;
@@ -222,8 +226,9 @@ div#footer {
 	float:              right;
     font-size:          x-small;
     font-variant:       small-caps;
-    padding:			2px;
+    margin-right:		-3px;
 }
+
 
 ul.no_deco{
     list-style-type:    none;
@@ -254,6 +259,12 @@ div#content table td
 	padding-right:      5px;
 }	
 
+div#content table td.nopadding
+{
+	padding-left:       0px;
+	padding-right:      0px;
+}
+
 div#content table tr.odd {
     background-color:   #ffffff;	
 }
@@ -276,6 +287,7 @@ span.highlight {
 }
 
 /**************** ICONS ****************/
+/* action: view a player / match / game / ... */
 .view {
   background: url(icons/sweetie/png-8/24-zoom.png) no-repeat;
   display:             inline-block;
@@ -286,6 +298,7 @@ span.highlight {
   visibility:          hidden;
 }
 
+/* action: edit a player / match / game / ... */
 .edit {
   background: url(icons/other/22-edit.png) no-repeat;
   display:             inline-block;
@@ -296,6 +309,60 @@ span.highlight {
   visibility:          hidden;
 }
 
+/* action: start a match */
+.start {
+  background: url(icons/sweetie/png-8/24-arrow-next.png) no-repeat;
+  display:             inline-block;
+  height:              24px;
+  width:               24px;
+}
+.start a span {
+  visibility:          hidden;
+}
+
+.start-bw {
+  background: url(icons/sweetie/png-8/24-arrow-next-bw.png) no-repeat;
+  display:             inline-block;
+  height:              24px;
+  width:               24px;
+}
+.start-bw a span {
+  visibility:          hidden;
+}
+
+/* action: delete a match */
+.delete {
+  background: url(icons/sweetie/png-8/24-em-cross.png) no-repeat;
+  display:             inline-block;
+  height:              24px;
+  width:               24px;
+}
+.delete a span {
+  visibility:          hidden;
+}
+
+.delete-bw {
+  background: url(icons/sweetie/png-8/24-em-cross-bw.png) no-repeat;
+  display:             inline-block;
+  height:              24px;
+  width:               24px;
+}
+.delete-bw a span {
+  visibility:          hidden;
+}
+
+/* action: clone a match */
+.clone {
+  background: url(icons/other/24-edit-copy.png) no-repeat;
+  display:             inline-block;
+  height:              24px;
+  width:               24px;
+}
+.clone a span {
+  visibility:          hidden;
+}
+
+/* errors in match */
 .errors {
   background: url(icons/other/16-warning_icon.png) no-repeat;
   display:             inline-block;
@@ -312,6 +379,7 @@ span.highlight {
   visibility:          hidden;
 }
 
+/* errors in match, but not for current player */
 .errors_bw {
   background: url(icons/other/16-warning_icon_bw.png) no-repeat;
   display:             inline-block;
