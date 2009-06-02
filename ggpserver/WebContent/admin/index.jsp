@@ -137,13 +137,13 @@
 					</td>
 					<td>
 						<c:url value="../public/show_matches.jsp" var="viewURL">
-							<c:param name="tournament" value="${tournament.tournamentID}" />
+							<c:param name="tournamentID" value="${tournament.tournamentID}" />
 						</c:url>
 						<div class="view"><a href='<c:out value="${viewURL}" />'><span>view</span></a></div>
 					</td>
 					<td>
 						<c:url value="edit_tournament.jsp" var="editURL">
-							<c:param name="tournament" value="${tournament.tournamentID}" />
+							<c:param name="tournamentID" value="${tournament.tournamentID}" />
 						</c:url>
 						<div class="edit"><a href='<c:out value="${editURL}" />'><span>edit</span></a></div>
 					</td>
