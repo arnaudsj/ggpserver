@@ -692,37 +692,42 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		List<Match<TermType, ReasonerStateInfoType>> result = new LinkedList<Match<TermType, ReasonerStateInfoType>>();
 		
 		try {
-			if (playerName == null) {
-				if (gameName == null ) {
-					ps = con.prepareStatement("SELECT `match_id` FROM `matches` ORDER BY `start_time` LIMIT ? , ?;");
-					ps.setInt(1, startRow);
-					ps.setInt(2, numDisplayedRows);
+			// initialize statement and parameters
+			final String select =  "SELECT `m`.`match_id`";
+			String from =          "FROM `matches` AS `m`";
+			String where =         "WHERE TRUE";
+			final String orderBy = "ORDER BY `m`.`start_time`";
+			final String limit =   "LIMIT ? , ?";
+
+			List<Object> parameters = new LinkedList<Object>();
+
+			// add specific filters
+			if (gameName != null) {
+				where += " AND `m`.`game` = ?";
+				parameters.add(gameName);
+			}
+			if (playerName != null) {
+				from += ", `match_players` AS `p`";
+				where += " AND `m`.`match_id` = `p`.`match_id` AND `p`.`player` = ?";
+				parameters.add(playerName);
+			}
+			parameters.add(startRow);
+			parameters.add(numDisplayedRows);
+			
+			// prepare statement, fill in parameters
+			ps = con.prepareStatement(select + " " + from + " " + where + " " + orderBy + " " + limit + ";");
+			for (int i = 0; i < parameters.size(); i++) {
+				Object parameter = parameters.get(i);
+				if (parameter instanceof Integer) {
+					ps.setInt(i + 1, (Integer) parameter);
+				} else if (parameter instanceof String) {
+					ps.setString(i + 1, (String) parameter);
 				} else {
-					ps = con.prepareStatement("SELECT `match_id` FROM `matches` WHERE `game` = ? ORDER BY `start_time` LIMIT ? , ?;");
-					ps.setString(1, gameName);
-					ps.setInt(2, startRow);
-					ps.setInt(3, numDisplayedRows);
-				}
-			} else {
-				if (gameName == null) {
-					ps = con.prepareStatement("SELECT `m`.`match_id` "
-						+ "FROM `matches` AS `m`, `match_players` AS `p` " 
-						+ "WHERE `m`.`match_id` = `p`.`match_id` AND `player` = ? " 
-						+ "ORDER BY `start_time` LIMIT ? , ?;");
-					ps.setString(1, playerName);
-					ps.setInt(2, startRow);
-					ps.setInt(3, numDisplayedRows);
-				} else {
-					ps = con.prepareStatement("SELECT `m`.`match_id` "
-							+ "FROM `matches` AS `m`, `match_players` AS `p` " 
-							+ "WHERE `m`.`match_id` = `p`.`match_id` AND `m`.`game` = ? AND `player` = ? " 
-							+ "ORDER BY `start_time` LIMIT ? , ?;");
-						ps.setString(1, gameName);
-						ps.setString(2, playerName);
-						ps.setInt(3, startRow);
-						ps.setInt(4, numDisplayedRows);
+					throw new InternalError("this should never happen");
 				}
 			}
+			
+			// execute and get result
 			rs = ps.executeQuery();
 			
 			while (rs.next()) {
