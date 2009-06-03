@@ -1,18 +1,3 @@
-=== public/view_state.jsp doesn't work with IE6 ===
-We're in a little dilemma here as to which content type to choose.
-
-"application/xhtml+xml" or, equivalently, "application/xml":
-     Is the correct content type, works with Firefox, doesn't work with IE6.
-
-"text/html":
-     Is incorrect, works with Internet Explorer 6.0, doesn't work with Firefox.
-
-Anyway, even if "text/html" is set as the content encoding, most of the site
-(including the XSLT-transformed XML states) looks awful in IE6. The question is:
-do we care? If we were professional web designers, we probably should (IE6 still
-has around 25% market share).
-
-
 === Login doesn't work with cookies disabled ===
 This bug is fixed now. The only thing left to do is to use <c:url> or <% response.encodeURL() %> 
 CONSISTENTLY EVERYWHERE, or else it won't work.
