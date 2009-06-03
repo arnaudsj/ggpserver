@@ -62,7 +62,6 @@ div#everything {
 }
 
 div#header {
-	float:              left;
     clear:              both;
     margin-top:         5px;
     margin-bottom:      10px;
@@ -73,7 +72,6 @@ div#header {
 }
 
 div#user {
-	float:              left;
     clear:              both;
     margin-bottom:      10px;
     width:              900px;
@@ -86,7 +84,6 @@ div#user a {
 	color:              #000000;
 	line-height:        200%;
 	padding:            5px 10px;
-	margin:				2px;
 }
 
 div#user a:hover {
@@ -165,15 +162,14 @@ div#navigation a:hover {
 }*/
 
 div#content {
-	float:              left;
+	float:              right;
     text-align:         left;
-    margin-left:        5%;
     margin-bottom:      10px;
     background-color:   #fff;
     border:             1px solid #344e9d;
     padding:            10px;
     padding-top:        0px;
-    width:              76%;
+    width:              79%;
 }
 
 div#ctitle {
@@ -199,7 +195,6 @@ div#content h1 {
     font-variant:       small-caps;
     font-weight:        bold;
     border-top:         1px dotted #777595;
-/*    margin-top:         -11px;*/    /* MG: this created problems for all following h1's */
     padding-top:        15px;
 }
 
@@ -222,11 +217,11 @@ div#content h3 {
 
 
 div#footer {
-/*    clear:              both;*/
-	float:              right;
+    clear:              both;
+	text-align:         right;
     font-size:          x-small;
     font-variant:       small-caps;
-    margin-right:		-3px;
+    margin-right:		-5px;
 }
 
 
