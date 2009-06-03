@@ -26,10 +26,11 @@
 	class="tud.ggpserver.formhandlers.EditTournament" scope="page">
 	<c:catch>
 		<% // this is for catching NumberFormatExceptions and the like %>
-		<jsp:setProperty name="pager" property="page" />
 		<jsp:setProperty name="pager" property="tournamentID" />
+		<jsp:setProperty name="pager" property="page" />
 	</c:catch>
 </jsp:useBean>
+<%@page import="tud.ggpserver.formhandlers.EditTournament"%>
 <html>
 <head>
 	<jsp:directive.include file="/inc/headincludes.jsp" />
@@ -46,8 +47,9 @@
 </head>
 <body>
 <div id="everything"><jsp:directive.include file="/inc/header.jsp" />
-<jsp:directive.include file="/inc/navigation.jsp" /> <!-- Content -->
-<div id="content">
+<%--<jsp:directive.include file="/inc/navigation.jsp" />   // omit navigation menu   --%>
+<!-- Content -->
+<div id="content" style="width:auto">  <%-- width:auto is used in conjunction with removing the navigation menu --%>
 <div id="ctitle">Edit Tournament</div>
 
 <!-- pager --> <jsp:directive.include file="/inc/pager_title.jsp" /> <jsp:directive.include
@@ -128,7 +130,9 @@
 				<%-- action "start" [only NEW] --%>
 				<td class="nopadding"><c:choose>
 					<c:when test="${ match.status == 'new' }">
-						<c:url value="process_start_match.jsp" var="startURL">
+						<c:url value="process_edit_tournament.jsp" var="startURL">
+							<c:param name="tournamentID" value="${pager.tournamentID}"/>
+							<c:param name="action" value="<%= EditTournament.START_MATCH %>"/>
 							<c:param name="matchID" value="${match.matchID}" />
 						</c:url>
 						<div class="start"><a href='<c:out value="${startURL}" />'><span>start</span></a></div>
@@ -140,7 +144,9 @@
 
 				<%-- action "delete" [all, but warn on finished/running] --%>
 				<td class="nopadding">
-					<c:url value="process_delete_match.jsp" var="deleteURL">
+					<c:url value="process_edit_tournament.jsp" var="deleteURL">
+						<c:param name="tournamentID" value="${pager.tournamentID}"/>
+						<c:param name="action" value="<%= EditTournament.DELETE_MATCH %>"/>
 						<c:param name="matchID" value="${match.matchID}" />
 					</c:url>
 
@@ -157,13 +163,14 @@
 				</td>
 
 				<%-- action "clone" [all] --%>
-				<td class="nopadding"><c:url value="process_clone_match.jsp" var="cloneURL">
-					<c:param name="matchID" value="${match.matchID}" />
+				<td class="nopadding">
+				<c:url value="process_edit_tournament.jsp" var="cloneURL">
 					<c:param name="tournamentID" value="${pager.tournamentID}"/>
+					<c:param name="action" value="<%= EditTournament.CLONE_MATCH %>"/>
+					<c:param name="matchID" value="${match.matchID}" />
 				</c:url>
 				<div class="clone"><a href='<c:out value="${cloneURL}" />'><span>clone</span></a></div>
 				</td>
-
 			</tr>
 		</c:forEach>
 		
@@ -178,8 +185,9 @@
 		</c:choose>
 		<tr class="${rowClass}">
 			<td colspan="12">
-				<c:url value="process_add_match.jsp" var="addMatchURL">
+				<c:url value="process_edit_tournament.jsp" var="addMatchURL">
 					<c:param name="tournamentID" value="${pager.tournamentID}"/>
+					<c:param name="action" value="<%= EditTournament.ADD_MATCH %>"/>
 				</c:url>
 				<a href='<c:out value="${addMatchURL}" />'>Add new match</a>
 			</td>		
@@ -201,16 +209,22 @@
 	<div class="errors_bw"></div> &ndash; some other players produced errors
 	</c:if>
 
-<h1>Tips</h1>
+<h1>Notes</h1>
 <ul>
 	<li>Before viewing, starting, deleting, cloning or adding 
 	a match, you have to save your changes.</li>
 	<li>When clicking "save changes", all changes will be stored
-	persistently, including any new matches.</li>
+	persistently, including any new matches. They can still be 
+	edited.</li>
+	<li>New matches won't show up on the public/show_matches.jsp
+	page; only running, aborted and finished matches do.</li>
+	<li>When you select a new game with a different number of 
+	roles than the previously selected one, you have to save 
+	the changes so the number of player boxes is updated.</li>
+	<li>In other words: save, save, save! ;-)</li>
 </ul>
-</div>
-<!--end div "content"--> <jsp:directive.include file="/inc/footer.jsp" />
-</div>
-<!-- end div "everything" -->
+</div><!--end div "content"-->
+<jsp:directive.include file="/inc/footer.jsp" />
+</div><!-- end div "everything" -->
 </body>
 </html>

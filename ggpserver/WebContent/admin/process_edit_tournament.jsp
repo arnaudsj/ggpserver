@@ -20,10 +20,12 @@
 <%@ page language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%> 
 
-<jsp:useBean id="createTournament" class="tud.ggpserver.formhandlers.CreateTournament" scope="request">
+<jsp:useBean id="pager"
+	class="tud.ggpserver.formhandlers.EditTournament" scope="page">
 	<c:catch>
-		<jsp:setProperty name="createTournament" property="tournamentID"/>
-		<jsp:setProperty name="createTournament" property="userName" value="<%= request.getUserPrincipal().getName() %>"/>
+		<jsp:setProperty name="pager" property="tournamentID" />
+		<jsp:setProperty name="pager" property="action" />
+		<jsp:setProperty name="pager" property="matchID" />
 	</c:catch>
 </jsp:useBean>
 
@@ -32,26 +34,28 @@
 	response.setHeader("Pragma","no-cache");
 %>
 
+
 <c:choose> 
-	<c:when test="${createTournament.valid}" > 
+	<c:when test="${pager.valid}" > 
 		<%
-			// add tournament to database
-			createTournament.createTournament();
+			pager.performAction();
 		%>
 		<c:choose> 
-			<c:when test="${createTournament.correctlyCreated}" >
+			<c:when test="${pager.correctlyPerformed}" >
 				<%
-					String urlWithSessionID = response.encodeRedirectURL("index.jsp");
+					String urlWithSessionID = response.encodeRedirectURL("edit_tournament.jsp" 
+							+ "?tournamentID=" + request.getParameter("tournamentID")
+							+ "&page=" + request.getParameter("page")) ;
 					response.sendRedirect(urlWithSessionID);
 				%>
 			</c:when> 
 			<c:otherwise>
-				<jsp:forward page="create_tournament.jsp"/>
+				<jsp:forward page="edit_tournament.jsp"/>
 			</c:otherwise> 
 		</c:choose>
 	</c:when> 
 	<c:otherwise>
-		<jsp:forward page="create_tournament.jsp"/>
+		<jsp:forward page="edit_tournament.jsp"/>
 	</c:otherwise> 
 </c:choose>
 
