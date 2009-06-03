@@ -35,13 +35,13 @@ public class Match<
 		ReasonerStateInfoType
 		> implements MatchInterface<TermType, State<TermType, ReasonerStateInfoType>> {
 	private String matchID;
-	protected Game<TermType, ReasonerStateInfoType> game;
+	private GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game;
 	private int startclock;
 	private int playclock;
-	protected Map<? extends RoleInterface<TermType>, ? extends Player<TermType>> players;
+	private Map<? extends RoleInterface<TermType>, ? extends Player<TermType>> players;
 	private List<Player<TermType>> orderedPlayers=null;
 	
-	public Match(String matchID, Game<TermType, ReasonerStateInfoType> game, int startclock, int playclock, Map<? extends RoleInterface<TermType>, ? extends Player<TermType>> players){
+	public Match(String matchID, GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game, int startclock, int playclock, Map<? extends RoleInterface<TermType>, ? extends Player<TermType>> players){
 		this.matchID=matchID;
 		this.game=game;
 		this.startclock=startclock;
@@ -82,6 +82,14 @@ public class Match<
 	 */
 	public Collection<? extends Player<TermType>> getPlayers() {
 		return players.values();
+	}
+	
+	protected boolean hasPlayers() {
+		return (players != null);
+	}
+	
+	protected void setPlayers(Map<? extends RoleInterface<TermType>, ? extends Player<TermType>> players) {
+		this.players = players;
 	}
 
 	/* (non-Javadoc)

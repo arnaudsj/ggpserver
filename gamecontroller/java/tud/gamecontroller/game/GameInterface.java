@@ -45,4 +45,6 @@ public interface GameInterface<
 	 * @return the GDL game description in infix KIF format without comments and linebreaks
 	 */
 	public abstract String getKIFGameDescription();
+
+	public abstract String getStylesheet();
 }
