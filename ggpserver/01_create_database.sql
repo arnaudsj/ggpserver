@@ -277,6 +277,7 @@ CREATE TABLE IF NOT EXISTS `matches` (
   `play_clock` int(11) NOT NULL,
   `start_time` timestamp NOT NULL default CURRENT_TIMESTAMP,
   `status` varchar(20) NOT NULL default 'new',
+  `tournament_id` VARCHAR(40) NOT NULL,
   PRIMARY KEY  (`match_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
@@ -414,15 +415,9 @@ CREATE TABLE IF NOT EXISTS `tournaments` (
   PRIMARY KEY  (`tournament_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
--- --------------------------------------------------------
-
 --
--- Table structure for table `tournament_matches`
+-- Dumping data for table `tournaments`
 --
 
-DROP TABLE IF EXISTS `tournament_matches`;
-CREATE TABLE IF NOT EXISTS `tournament_matches` (
-  `tournament_id` varchar(40) NOT NULL,
-  `match_id` varchar(40) NOT NULL,
-  PRIMARY KEY  (`tournament_id`,`match_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+INSERT INTO `tournaments` (`tournament_id`, `owner`) VALUES
+('round_robin_tournament', 'admin');
