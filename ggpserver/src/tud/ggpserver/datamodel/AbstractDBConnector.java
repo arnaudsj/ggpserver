@@ -46,6 +46,7 @@ import tud.gamecontroller.game.MoveFactoryInterface;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.ReasonerInterface;
 import tud.gamecontroller.game.RoleInterface;
+import tud.gamecontroller.game.impl.State;
 import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.LegalPlayerInfo;
 import tud.gamecontroller.players.PlayerInfo;
@@ -303,21 +304,26 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return result;
 	}
 	
-	public Match<TermType, ReasonerStateInfoType> createMatch(String matchID, Game<TermType, ReasonerStateInfoType> game,
-			int startclock, int playclock, Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayers,
-			Date startTime) throws DuplicateInstanceException,
-			SQLException {
-		
+	public Match<TermType, ReasonerStateInfoType> createMatch(
+			String matchID,
+			GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game,
+			int startclock,
+			int playclock,
+			Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayers,
+			Tournament<TermType, ReasonerStateInfoType> tournament,
+			Date startTime) throws DuplicateInstanceException, SQLException {
+
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		try {
 
-			ps = con.prepareStatement("INSERT INTO `matches` (`match_id` , `game` , `start_clock` , `play_clock` , `start_time`) VALUES (?, ?, ?, ?, ?);");
+			ps = con.prepareStatement("INSERT INTO `matches` (`match_id` , `game` , `start_clock` , `play_clock` , `start_time`, `tournament_id`) VALUES (?, ?, ?, ?, ?, ?);");
 			ps.setString(1, matchID);
 			ps.setString(2, game.getName());
 			ps.setInt(3, startclock);
 			ps.setInt(4, playclock);
 			ps.setTimestamp(5, new Timestamp(startTime.getTime()));
+			ps.setString(6, tournament.getTournamentID());
 			
 			ps.executeUpdate();
 			ps.close();
@@ -348,15 +354,15 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 
 		logger.info("String, Game<TermType,ReasonerStateInfoType>, int, int, Map<? extends RoleInterface<TermType>,? extends PlayerInfo>, Date - Creating new match: " + matchID); //$NON-NLS-1$
 		return new Match<TermType, ReasonerStateInfoType>(matchID, game, startclock, playclock,
-				rolesToPlayers, startTime, getMoveFactory(), gamescrambler, this);
+				rolesToPlayers, startTime, getMoveFactory(), gamescrambler, tournament, this);
 	}
 	
 	/**
 	 * Creates a match with a generated match ID.
 	 */
-	public Match<TermType, ReasonerStateInfoType> createMatch(Game<TermType, ReasonerStateInfoType> game,
+	public Match<TermType, ReasonerStateInfoType> createMatch(GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game,
 			int startclock, int playclock, Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayers,
-			Date startTime) throws SQLException {
+			Tournament<TermType, ReasonerStateInfoType> tournament, Date startTime) throws SQLException {
 		
 		long number = System.currentTimeMillis();
 		Match<TermType, ReasonerStateInfoType> match = null;
@@ -364,7 +370,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		while (match == null) {
 			String matchID = generateMatchID(game, Long.toString(number));
 			try {
-				match = createMatch(matchID, game, startclock, playclock, rolesToPlayers, startTime);
+				match = createMatch(matchID, game, startclock, playclock, rolesToPlayers, tournament, startTime);
 			} catch (DuplicateInstanceException e) {
 				number++;
 			}
@@ -373,9 +379,10 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return match;
 	}
 
-	public Match<TermType, ReasonerStateInfoType> createMatch(Game<TermType, ReasonerStateInfoType> game,
-			int startclock, int playclock, Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayers) throws SQLException {
-		return createMatch(game, startclock, playclock, rolesToPlayers, new Date());
+	public Match<TermType, ReasonerStateInfoType> createMatch(GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game,
+			int startclock, int playclock, Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayers, 
+			Tournament<TermType, ReasonerStateInfoType> tournament) throws SQLException {
+		return createMatch(game, startclock, playclock, rolesToPlayers, tournament, new Date());
 	}
 	
 	public Match<TermType, ReasonerStateInfoType> getMatch(String matchID)
@@ -388,7 +395,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		Match<TermType, ReasonerStateInfoType> result = null;
 
 		try {
-			ps = con.prepareStatement("SELECT `game` , `start_clock` , `play_clock` , `start_time` , `status` FROM `matches` WHERE `match_id` = ?;");
+			ps = con.prepareStatement("SELECT `game` , `start_clock` , `play_clock` , `start_time` , `status`, `tournament_id` FROM `matches` WHERE `match_id` = ?;");
 			ps.setString(1, matchID);
 			rs = ps.executeQuery();
 			
@@ -417,7 +424,8 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				logger.info("String - Returning new match: " + matchID); //$NON-NLS-1$
 
 				result = new Match<TermType, ReasonerStateInfoType>(matchID, game, rs.getInt("start_clock"), 
-						rs.getInt("play_clock"), playerinfos, rs.getTimestamp("start_time"), getMoveFactory(), gamescrambler, this);
+						rs.getInt("play_clock"), playerinfos, rs.getTimestamp("start_time"), getMoveFactory(), 
+						gamescrambler, getTournament(rs.getString("tournament_id")), this);
 				result.setStatus(status);
 				if (status.equals(Match.STATUS_FINISHED)) {
 					result.setGoalValues(goalValues);
@@ -740,8 +748,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			parameters.add(playerName);
 		}
 		if (tournamentID != null) {
-			from += ", `tournament_matches` AS `t`";
-			where += " AND `m`.`match_id` = `t`.`match_id` AND `t`.`tournament_id` = ?";
+			where += " AND `m`.`tournament_id` = ?";
 			parameters.add(tournamentID);
 		}
 		if (excludeNew) {
@@ -1232,7 +1239,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			rs = ps.executeQuery();
 			
 			if (rs.next()) {
-				result = new Tournament<TermType, ReasonerStateInfoType>(rs.getString("tournament_id"), getUser(rs.getString("owner")));
+				result = new Tournament<TermType, ReasonerStateInfoType>(rs.getString("tournament_id"), getUser(rs.getString("owner")), this);
 			}
 		} finally { 
 			if (con != null)
@@ -1270,6 +1277,6 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		} 
 
 		logger.info("Creating new tournament: " + tournamentID); //$NON-NLS-1$
-		return new Tournament<TermType, ReasonerStateInfoType>(tournamentID, owner);
+		return new Tournament<TermType, ReasonerStateInfoType>(tournamentID, owner, this);
 	}
 }

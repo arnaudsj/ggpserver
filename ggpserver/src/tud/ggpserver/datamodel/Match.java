@@ -31,12 +31,14 @@ import java.util.regex.Pattern;
 
 import tud.gamecontroller.GameControllerListener;
 import tud.gamecontroller.XMLGameStateWriter;
+import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.MoveFactoryInterface;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.StateInterface;
+import tud.gamecontroller.game.impl.State;
 import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.Player;
 import tud.gamecontroller.players.PlayerFactory;
@@ -57,7 +59,7 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 	public static final String STATUS_ABORTED = "aborted";
 	
 	private final Date startTime;
-	private final Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> playerInfos;
+	private final Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayers;
 	private List<PlayerInfo> orderedPlayerInfos = null;
 	private final MoveFactoryInterface<? extends MoveInterface<TermType>> moveFactory;
 	private final GameScramblerInterface gameScrambler;
@@ -89,31 +91,35 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 	private List<List<GameControllerErrorMessage>> errorMessages = new LinkedList<List<GameControllerErrorMessage>>();
 	
 	private final AbstractDBConnector<TermType, ReasonerStateInfoType> db;
+
+	private Tournament<TermType, ReasonerStateInfoType> tournament;
 	
 	/**
 	 * Use DBConnectorFactory.getDBConnector().getMatch() instead 
 	 */
 	protected Match(
 			String matchID,
-			Game<TermType, ReasonerStateInfoType> game,
+			GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game,
 			int startclock,
 			int playclock,
-			Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> playerinfos,
+			Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayers,
 			Date startTime,
 			MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory,
 			GameScramblerInterface gamescrambler,
+			Tournament<TermType, ReasonerStateInfoType> tournament,
 			AbstractDBConnector<TermType, ReasonerStateInfoType> db) {
 		super(matchID, game, startclock, playclock, null);
-		this.playerInfos = playerinfos;
+		this.rolesToPlayers = rolesToPlayers;
 		this.startTime = startTime;
 		this.moveFactory = movefactory;
 		this.gameScrambler = gamescrambler;
+		this.tournament = tournament;
 		this.db = db;
 	}
 
 	@Override
 	public List<? extends Player<TermType>> getOrderedPlayers() {
-		if (players == null) {
+		if (!super.hasPlayers()) {
 			initPlayers();
 		}
 		return super.getOrderedPlayers();
@@ -121,7 +127,7 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 
 	@Override
 	public Player<TermType> getPlayer(RoleInterface<TermType> role) {
-		if (players == null) {
+		if (!super.hasPlayers()) {
 			initPlayers();
 		}
 		return super.getPlayer(role);
@@ -129,7 +135,7 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 
 	@Override
 	public Collection<? extends Player<TermType>> getPlayers() {
-		if (players == null) {
+		if (!super.hasPlayers()) {
 			initPlayers();
 		}
 		return super.getPlayers();
@@ -139,17 +145,17 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 		if (orderedPlayerInfos  == null) {
 			orderedPlayerInfos = new LinkedList<PlayerInfo>();
 			for (RoleInterface<TermType> role : getGame().getOrderedRoles()) {
-				orderedPlayerInfos.add(playerInfos.get(role));
+				orderedPlayerInfos.add(rolesToPlayers.get(role));
 			}
 		}
 		return orderedPlayerInfos;	}
 
 	public PlayerInfo getPlayerInfo(RoleInterface<TermType> role) {
-		return playerInfos.get(role);
+		return rolesToPlayers.get(role);
 	}
 
 	public Collection<? extends PlayerInfo> getPlayerInfos() {
-		return playerInfos.values();
+		return rolesToPlayers.values();
 	}
 
 	public Date getStartTime() {
@@ -165,12 +171,12 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 		Map<RoleInterface<TermType>, Player<TermType>> myPlayers = new HashMap<RoleInterface<TermType>, Player<TermType>>();
 		
 		for (RoleInterface<TermType> role : getGame().getOrderedRoles()) {
-			PlayerInfo playerInfo = playerInfos.get(role);
+			PlayerInfo playerInfo = rolesToPlayers.get(role);
 			
 			Player<TermType> player = PlayerFactory.<TermType> createPlayer(playerInfo, moveFactory, gameScrambler);
 			myPlayers.put(role, player);
 		}
-		players = myPlayers;
+		super.setPlayers(myPlayers);
 	}
 
 	/**
@@ -291,6 +297,7 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 	}
 	
 	public void updateErrorMessage(GameControllerErrorMessage errorMessage) {
+		System.out.println("ERROR MESSAGE RECEIVED");
 		int stepNumber = errorMessages.size();
 		errorMessages.get(stepNumber - 1).add(errorMessage);
 		
@@ -338,7 +345,7 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 //		// the detour via db is needed here because the stylesheet for a game might
 //		// have changed in the database, but the match still references an old Game object 
 //		String stylesheet = DBConnectorFactory.getDBConnector().getGame(game.getName()).getStylesheet();
-		String stylesheet = game.getStylesheet();
+		String stylesheet = getGame().getStylesheet();
 		
 		// this is a hack to show old matches with the right stylesheets (e.g., if the stylesheet for a game was changed after the match)
 		// we just replace the stylesheet information with the current one  
@@ -357,7 +364,7 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 	}
 	
 	protected void updateXmlState(StateInterface<? extends TermInterface, ?> currentState, Map<? extends RoleInterface<?>, Integer> goalValues) {
-		String xmlState = XMLGameStateWriter.createXMLOutputStream(this, currentState, jointMoves, goalValues, game.getStylesheet()).toString();
+		String xmlState = XMLGameStateWriter.createXMLOutputStream(this, currentState, jointMoves, goalValues, getGame().getStylesheet()).toString();
 		xmlStates.add(xmlState);
 		
 		int stepNumber = xmlStates.size();
@@ -393,7 +400,6 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 	}
 	
 	public boolean getHasErrorsSinglePlayer(PlayerInfo player) {
-		// TODO: caching (be careful, see below)
 		for (List<GameControllerErrorMessage> errorMessagesSingleState : getErrorMessagesForPlayer(player)) {
 			if (!errorMessagesSingleState.isEmpty()) {
 				return true;
@@ -433,8 +439,8 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 		buffer.append(getOrderedPlayers());
 		buffer.append(" startTime: ");
 		buffer.append(startTime);
-		buffer.append(" playerInfos: ");
-		buffer.append(playerInfos);
+		buffer.append(" rolesToPlayers: ");
+		buffer.append(rolesToPlayers);
 		buffer.append(" orderedPlayerInfos: ");
 		buffer.append(getOrderedPlayerInfos());
 		buffer.append(" moveFactory: ");
@@ -473,8 +479,6 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 	}
 	
 	public List<List<GameControllerErrorMessage>> getErrorMessagesForPlayer(PlayerInfo player) {
-		// TODO: caching; but be careful with running matches!
-		
 		if (!getPlayerInfos().contains(player)) {
 			throw new IllegalArgumentException("Player info " + player + " not found in match " + this);
 		}
@@ -492,5 +496,13 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 			result.add(playerErrorsSingleState);
 		}
 		return result;
+	}
+
+	public Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> getRolesToPlayers() {
+		return new HashMap<RoleInterface<TermType>, PlayerInfo>(rolesToPlayers);
+	}
+
+	public Tournament<TermType, ReasonerStateInfoType> getTournament() {
+		return tournament;
 	}
 }

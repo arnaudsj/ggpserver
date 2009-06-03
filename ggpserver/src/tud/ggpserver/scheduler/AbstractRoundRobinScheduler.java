@@ -23,7 +23,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,6 +42,7 @@ import tud.ggpserver.datamodel.Game;
 import tud.ggpserver.datamodel.Match;
 
 public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface, ReasonerStateInfoType> {
+	public static final String ROUND_ROBIN_TOURNAMENT_ID = "round_robin_tournament";
 	private static final Logger logger = Logger.getLogger(AbstractRoundRobinScheduler.class.getName());
 	private static final Random random = new Random();
 	private static final long DELAY_BETWEEN_GAMES = 2000;   // wait two seconds
@@ -197,7 +197,7 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		List<Map<RoleInterface<TermType>, PlayerInfo>> matchesToRolesToPlayers = createPlayerInfos(nextGame, activePlayers);
 		
 		for (Map<RoleInterface<TermType>, PlayerInfo> rolesToPlayers : matchesToRolesToPlayers) {
-			result.add(getDBConnector().createMatch(nextGame, startclock, playclock, rolesToPlayers, new Date()));
+			result.add(getDBConnector().createMatch(nextGame, startclock, playclock, rolesToPlayers, dbConnector.getTournament(ROUND_ROBIN_TOURNAMENT_ID)));
 		}
 		return result;
 	}

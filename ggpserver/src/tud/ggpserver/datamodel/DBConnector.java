@@ -28,11 +28,13 @@ import java.util.Map;
 
 import org.apache.commons.collections.map.ReferenceMap;
 
+import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.MoveFactoryInterface;
 import tud.gamecontroller.game.ReasonerInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.impl.Move;
 import tud.gamecontroller.game.impl.MoveFactory;
+import tud.gamecontroller.game.impl.State;
 import tud.gamecontroller.game.javaprover.Reasoner;
 import tud.gamecontroller.game.javaprover.Term;
 import tud.gamecontroller.game.javaprover.TermFactory;
@@ -197,14 +199,15 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	@Override
 	public Match<Term, GameState> createMatch(
 			String matchID,
-			Game<Term, GameState> game,
+			GameInterface<Term, State<Term, GameState>> game,
 			int startclock,
 			int playclock,
 			Map<? extends RoleInterface<Term>, ? extends PlayerInfo> rolesToPlayers,
+			Tournament<Term, GameState> tournament,
 			Date startTime) throws DuplicateInstanceException,
 			SQLException {
 		synchronized (matches) {
-			Match<Term, GameState> result = super.createMatch(matchID, game, startclock, playclock, rolesToPlayers, startTime);
+			Match<Term, GameState> result = super.createMatch(matchID, game, startclock, playclock, rolesToPlayers, tournament, startTime);
 			matches.put(matchID, result);
 			return result;
 		}

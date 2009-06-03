@@ -19,7 +19,7 @@
 
 package tud.ggpserver.datamodel;
 
-import java.util.LinkedList;
+import java.sql.SQLException;
 import java.util.List;
 
 import tud.gamecontroller.term.TermInterface;
@@ -28,21 +28,16 @@ public class Tournament<TermType extends TermInterface, ReasonerStateInfoType> {
 	private final String tournamentID;
 	private final User owner;
 	
-	private List<Match<TermInterface, ReasonerStateInfoType>> matches = new LinkedList<Match<TermInterface,ReasonerStateInfoType>>();
+	private final AbstractDBConnector<TermType, ReasonerStateInfoType> db;
 
-	public Tournament(final String tournamentID, final User owner) {
+	public Tournament(final String tournamentID, final User owner, AbstractDBConnector<TermType, ReasonerStateInfoType> db) {
 		this.tournamentID = tournamentID;
 		this.owner = owner;
+		this.db = db;
 	}
 
-	public List<Match<TermInterface, ReasonerStateInfoType>> getMatches() {
-		// TODO
-		return matches;
-	}
-
-	public void addMatch(Match<TermInterface, ReasonerStateInfoType> match) {
-		// TODO
-		this.matches.add(match);
+	public List<Match<TermType,ReasonerStateInfoType>> getMatches() throws SQLException {
+		return db.getMatches(0, Integer.MAX_VALUE, null, null, tournamentID, false);
 	}
 
 	public String getTournamentID() {
@@ -51,5 +46,30 @@ public class Tournament<TermType extends TermInterface, ReasonerStateInfoType> {
 
 	public User getOwner() {
 		return owner;
+	}
+
+	@Override
+	public int hashCode() {
+		final int PRIME = 31;
+		int result = 1;
+		result = PRIME * result + ((tournamentID == null) ? 0 : tournamentID.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final Tournament other = (Tournament) obj;
+		if (tournamentID == null) {
+			if (other.tournamentID != null)
+				return false;
+		} else if (!tournamentID.equals(other.tournamentID))
+			return false;
+		return true;
 	}
 }
