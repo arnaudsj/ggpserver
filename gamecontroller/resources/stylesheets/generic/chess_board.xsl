@@ -332,13 +332,38 @@
 							<xsl:when test="$content='9'">x9</xsl:when>
 							<xsl:when test="$content='X'">xx</xsl:when>
 							<xsl:when test="$content='O'">xo</xsl:when>
-							<xsl:otherwise>UNKNOWN</xsl:otherwise>
+							<xsl:otherwise>
+								<xsl:choose>
+									<xsl:when test="contains($content, 'KNIGHT')">n</xsl:when>
+									<xsl:when test="contains($content, 'PAWN')">p</xsl:when>
+									<xsl:when test="contains($content, 'ROOK')">r</xsl:when>
+									<xsl:when test="contains($content, 'BISHOP')">b</xsl:when>
+									<xsl:when test="contains($content, 'QUEEN')">q</xsl:when>
+									<xsl:when test="contains($content, 'KING')">k</xsl:when>
+									<xsl:when test="contains($content, 'CHECKER')">j</xsl:when>
+									<xsl:when test="contains($content, 'DISC')">O</xsl:when>
+									<xsl:otherwise>UNKNOWN</xsl:otherwise>
+								</xsl:choose>
+								<xsl:choose>
+									<xsl:when test="contains($content, 'BLACK')">0</xsl:when>
+									<xsl:when test="contains($content, 'WHITE')">1</xsl:when>
+									<xsl:when test="contains($content, 'RED')">2</xsl:when>
+									<xsl:when test="contains($content, 'GREEN')">3</xsl:when>
+									<xsl:when test="contains($content, 'BLUE')">4</xsl:when>
+									<xsl:when test="contains($content, 'CYAN') or contains($content, 'TEAL')">5</xsl:when>
+									<xsl:when test="contains($content, 'YELLOW')">6</xsl:when>
+									<xsl:when test="contains($content, 'PINK')">7</xsl:when>
+									<xsl:when test="contains($content, 'BROWN') or contains($content, 'ORANGE')">8</xsl:when>
+									<xsl:when test="contains($content, 'MAGENTA')">9</xsl:when>
+									<xsl:otherwise/>
+								</xsl:choose>
+							</xsl:otherwise>
 						</xsl:choose>
 					</xsl:variable>
 
 					<!-- print the image or call a user defined template to print the cell -->
 					<xsl:choose>
-						<xsl:when test="$DefaultCellContent!='yes' or $piece='UNKNOWN'">
+						<xsl:when test="$DefaultCellContent!='yes' or contains($piece, 'UNKNOWN')">
 							<xsl:call-template name="make_cell_content">
 								<xsl:with-param name="xArg" select="$xArg"/>
 								<xsl:with-param name="yArg" select="$yArg"/>
