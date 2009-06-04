@@ -50,6 +50,8 @@
 			<li>A player that does not submit a legal move for three matches in a row is set to inactive and has to be reactivated manually.</li>
 		</ul>
 
+	<h1 class="notopborder">Sourceforge project</h1>
+		The server is open source. Join the <a href="http://ggpserver.sourceforge.net/">GGP Server SourceForge project</a> if you want to help with the development.
 	
 	<%
 		String ua = request.getHeader("User-Agent");
