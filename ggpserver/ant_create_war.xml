@@ -7,6 +7,10 @@
 		<classes dir="build/classes"/>
 		<lib file="${gamecontroller.location}/gamecontroller.jar"/>
 		<fileset dir="WebContent"/>
+		<fileset dir="${gamecontroller.location}/resources/">
+				<include name="stylesheets/**"/>
+				<exclude name="stylesheets/generic/sitespecific.xsl"/>
+		</fileset>
 		</war>
 	</target>
 </project>
