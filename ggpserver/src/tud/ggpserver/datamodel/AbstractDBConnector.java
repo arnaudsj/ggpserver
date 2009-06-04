@@ -430,9 +430,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				if (status.equals(Match.STATUS_FINISHED)) {
 					result.setGoalValues(goalValues);
 				}
-				List<String> states = getStates(matchID);
-				result.setXmlStates(states);
-				result.setErrorMessages(getErrorMessages(result, states.size()));
+				result.setErrorMessages(getErrorMessages(result, result.getNumberOfStates()));
 				result.setJointMovesStrings(getJointMovesStrings(matchID));				
 			}
 		} finally { 
@@ -986,7 +984,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return result;
 	}
 
-	private List<String> getStates(String matchID) throws SQLException {
+	protected List<String> getXmlStates(String matchID) throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -1011,7 +1009,9 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				try {ps.close();} catch (SQLException e) {}
 			if (rs != null)
 				try {rs.close();} catch (SQLException e) {}
-		} 
+		}
+		
+		// TODO: This should return a more "clever" list instead (don't really fill the list, instead read lazily from database)
 
 		return result;
 	}
@@ -1278,5 +1278,26 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 
 		logger.info("Creating new tournament: " + tournamentID); //$NON-NLS-1$
 		return new Tournament<TermType, ReasonerStateInfoType>(tournamentID, owner, this);
+	}
+	
+	/**
+	 * Cleans up all matches marked as "running" in the database (sets their status to "aborted").
+	 * @throws SQLException 
+	 */
+	public void cleanup() throws SQLException {
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+
+		try {
+			ps = con.prepareStatement("UPDATE `matches` SET `status` = ? WHERE `status` = ? ;");
+			ps.setString(1, Match.STATUS_ABORTED);
+			ps.setString(2, Match.STATUS_RUNNING);
+			ps.executeUpdate(); 
+		} finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+		}
 	}
 }

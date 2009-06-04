@@ -46,6 +46,14 @@ import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.scrambling.GameScramblerInterface;
 import tud.gamecontroller.term.TermInterface;
 
+/**
+ * TODO: This class should be refactored. Actually, there are two types of matches:
+ *    A RunnableMatch that needs to know about Players (not PlayerInfos) etc., and
+ *    whose states, errormessages and jointmoves lists can grow, and a FinishedMatch
+ *    whose lists are fixed.   
+ * 
+ * @author Martin Günther <mintar@gmx.de>
+ */
 public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 		extends tud.gamecontroller.game.impl.Match<TermType, ReasonerStateInfoType> implements GameControllerListener {
 	/**
@@ -70,12 +78,19 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 	
 	/**
 	 * State 0 = initial state, State 1 = state after first joint move, ..., State n = final state
+	 * 
+	 * This list will only be non-empty for running matches.
 	 */
 	private List<String> xmlStates = new LinkedList<String>();
 	
 	/**
 	 * JointMove 0 = joint move leading from initial state to State 1.
 	 * This list always has one less element than the states list.
+	 * 
+	 * jointMoves will only be non-empty if they were calculated by 
+	 * running this match. If this match comes from the database 
+	 * instead, jointMoves will be empty and jointMovesStrings will
+	 * be filled.  
 	 */
 	private List<JointMoveInterface<? extends TermInterface>> jointMoves = new LinkedList<JointMoveInterface<? extends TermInterface>>();   // all joint moves executed so far
 	private List<List<String>> jointMovesStrings = new LinkedList<List<String>>();   // this is an ugly hack because it's so hard to generate the correct sort of "real" joint moves from inside the AbstractDBConnector
@@ -238,6 +253,10 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 		updateGoalValues(goalValues);
 		updateXmlState(currentState, goalValues);
 		updateStatus(STATUS_FINISHED);
+		
+		// Clear the jointMoves and xmlStates lists, they are only needed for running matches.
+		xmlStates = new LinkedList<String>();
+		jointMoves = new LinkedList<JointMoveInterface<? extends TermInterface>>();
 	}
 	
 	public String getStatus() {
@@ -336,38 +355,37 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 			throw new IndexOutOfBoundsException();
 		}
 
-		// DEPRECATED: The following detour isn't necessary any more, because
-		// the cache is now correctly cleared. However, this only works if you
-		// edit the stylesheets via the web interface. If you change the
-		// stylesheets directly, DBConnector doesn't know that the cache must be
-		// cleared, and you have to clear the cache manually (via the admin
-		// page).		
-//		// the detour via db is needed here because the stylesheet for a game might
-//		// have changed in the database, but the match still references an old Game object 
-//		String stylesheet = DBConnectorFactory.getDBConnector().getGame(game.getName()).getStylesheet();
 		String stylesheet = getGame().getStylesheet();
 		
 		// this is a hack to show old matches with the right stylesheets (e.g., if the stylesheet for a game was changed after the match)
 		// we just replace the stylesheet information with the current one  
-		Pattern styleSheetPattern=Pattern.compile("<\\?xml-stylesheet type=\"text/xsl\" href=\"[^\"]*\"\\?>");
-		String styleSheetReplacement="<?xml-stylesheet type=\"text/xsl\" href=\""+stylesheet+"\"?>";
+		Pattern styleSheetPattern = Pattern.compile("<\\?xml-stylesheet type=\"text/xsl\" href=\"[^\"]*\"\\?>");
+		String styleSheetReplacement = "<?xml-stylesheet type=\"text/xsl\" href=\""+stylesheet+"\"?>";
+		
+		// TODO: This hack should be moved to AbstractDBConnector.getXmlStates() 
 		
 		return styleSheetPattern.matcher(getXmlStates().get(stepNumber - 1)).replaceFirst(styleSheetReplacement);
 	}
 	
 	private List<String> getXmlStates() {
-		return xmlStates;
-	}
-
-	protected void setXmlStates(List<String> xmlStates) {
-		this.xmlStates = xmlStates;
+		// This is a bit of a hack: Use the xmlStates field only if the match is
+		// running. Otherwise, use the result from the database.
+		if (status.equals(STATUS_RUNNING)) {
+			return xmlStates;
+		}
+		try {
+			return db.getXmlStates(getMatchID());
+		} catch (SQLException e) {
+			logger.warning("exception: " + e); //$NON-NLS-1$
+			return new LinkedList<String>();
+		}
 	}
 	
 	protected void updateXmlState(StateInterface<? extends TermInterface, ?> currentState, Map<? extends RoleInterface<?>, Integer> goalValues) {
 		String xmlState = XMLGameStateWriter.createXMLOutputStream(this, currentState, jointMoves, goalValues, getGame().getStylesheet()).toString();
 		xmlStates.add(xmlState);
 		
-		int stepNumber = xmlStates.size();
+		int stepNumber = getNumberOfStates();
 		
 		try {
 			db.addState(getMatchID(), stepNumber, xmlState);

@@ -85,4 +85,10 @@
 		<res-auth>Container</res-auth>
 		<res-sharing-scope>Shareable</res-sharing-scope>
 	</resource-ref>
+	
+	<listener>
+		<description>On application startup, this class starts the database cleanup function.</description>
+		<display-name>DatabaseCleaner</display-name>
+		<listener-class>tud.ggpserver.webapp.DatabaseCleaner</listener-class>
+	</listener>
 </web-app>

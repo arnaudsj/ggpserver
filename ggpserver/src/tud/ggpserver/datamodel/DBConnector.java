@@ -94,17 +94,22 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	@SuppressWarnings("unchecked")
 	public void clearCache() {
 		synchronized (games) {
-			games = new ReferenceMap(SOFT, SOFT, false);
+			games.clear();
 		}
 		synchronized (playerInfos) {
-			playerInfos = new ReferenceMap(SOFT, SOFT, false);
+			playerInfos.clear();
 		}
 		synchronized (matches) {
-			matches = new ReferenceMap(SOFT, SOFT, false);
+			matches.clear();
 		}
 		synchronized (users) {
-			users = new ReferenceMap(SOFT, SOFT, false);
+			users.clear();
 		}
+		
+		// Run the garbage collection. The reason for doing this is that we 
+		// can generate a heap dump afterwards that doesn't contain many stale
+		// objects.
+		System.gc();
 	}
 	
 	@Override

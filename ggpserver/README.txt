@@ -67,7 +67,8 @@ permission java.io.FilePermission "${catalina.base}${file.separator}logs${file.s
 
 JAVA_OPTS="-Djava.awt.headless=true -Xmx256M"
 
-# The more, the better. Most memory is needed for the games. 128MB should be okay for now, but you never know...
+# If you want to trigger a heap dump if an OutOfMemoryError occurs, also add the following options:
+-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/var/lib/tomcat5.5/logs
 
 # ========================================================================================
 
