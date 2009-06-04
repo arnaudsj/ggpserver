@@ -298,7 +298,7 @@
 					<xsl:variable name="piece">
 						<xsl:choose>
 							<xsl:when test="../fact[prop-f=$internalCellFluentName and arg[number($xArgIdx)]=$xArg and arg[number($yArgIdx)]=$yArg and arg[number($contentArgIdx)]!=$content]">MULTIPLE</xsl:when>
-							<xsl:when test="$content='B' or $content='BLANK'">BLANK</xsl:when>
+							<xsl:when test="$content='B' or $content='BLANK'"/>
 							<xsl:when test="$content='K' or $content='KNIGHT' or $content='WHITEKNIGHT' or $content='WN'">nl</xsl:when>
 							<xsl:when test="$content='P' or $content='PAWN' or $content='WHITEPAWN' or $content='WP'">pl</xsl:when>
 							<xsl:when test="$content='R' or $content='ROOK' or $content='WHITEROOK' or $content='WR'">rl</xsl:when>
@@ -332,12 +332,13 @@
 							<xsl:when test="$content='9'">x9</xsl:when>
 							<xsl:when test="$content='X'">xx</xsl:when>
 							<xsl:when test="$content='O'">xo</xsl:when>
+							<xsl:otherwise>UNKNOWN</xsl:otherwise>
 						</xsl:choose>
 					</xsl:variable>
 
 					<!-- print the image or call a user defined template to print the cell -->
 					<xsl:choose>
-						<xsl:when test="$DefaultCellContent!='yes' or $piece=''">
+						<xsl:when test="$DefaultCellContent!='yes' or $piece='UNKNOWN'">
 							<xsl:call-template name="make_cell_content">
 								<xsl:with-param name="xArg" select="$xArg"/>
 								<xsl:with-param name="yArg" select="$yArg"/>
@@ -346,7 +347,7 @@
 								<xsl:with-param name="background" select="$CellColor"/>
 							</xsl:call-template>
 						</xsl:when>
-						<xsl:when test="$piece='BLANK'"/> <!-- empty cell -->
+						<xsl:when test="$piece=''"/> <!-- empty cell -->
 						<xsl:when test="$piece='MULTIPLE'"><b>?</b></xsl:when> <!-- multiple elements in cell -->
 						<xsl:otherwise>
 							<xsl:call-template name="make_chess_img">
@@ -452,12 +453,12 @@
 	<!--
 		make_chess_img prints the picture of a chess piece.
 		valid pieces are:
-			[abcdefghkmnpqrsz][dl] - (piecename+color)
-			O[0..9]                - circles in different colors
-			x[1..9]                - numbers 1 to 9
-			x[owx]                 - small black and white circles and x
-			''                     - empty square
-			[jD][01]			   - single and double checkers pieces in black and white
+			[abcdefghkmnpqrsz][dl23456789] - (piecename+color)
+			O[0..9]                        - circles in different colors
+			x[1..9]                        - numbers 1 to 9
+			x[owx]                         - small black and white circles and x
+			''                             - empty square
+			[jD][01]                       - single and double checkers pieces in black and white
 		background is either 'light' or 'dark'
 	-->
 	<xsl:template name="make_chess_img">
