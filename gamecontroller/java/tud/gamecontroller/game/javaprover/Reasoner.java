@@ -62,7 +62,7 @@ public class Reasoner implements ReasonerInterface<Term, GameState> {
 		}
 	}
 
-	public List<? extends RoleInterface<Term>> GetRoles() {
+	public List<? extends RoleInterface<Term>> getRoles() {
 		ExpList expList;
 		synchronized (gameSim) {
 			expList=gameSim.GetRoles();

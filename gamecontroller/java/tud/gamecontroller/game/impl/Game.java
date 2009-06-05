@@ -56,7 +56,7 @@ public class Game<
 	}
 
 	public RoleInterface<TermType> getRole(int roleindex) {
-		return reasoner.GetRoles().get(roleindex);
+		return reasoner.getRoles().get(roleindex);
 	}
 
 	public List<? extends RoleInterface<TermType>> getOrderedRoles(){
@@ -70,7 +70,7 @@ public class Game<
 	}
 
 	public int getNumberOfRoles() {
-		return reasoner.GetRoles().size();
+		return reasoner.getRoles().size();
 	}
 
 	public String getName() {

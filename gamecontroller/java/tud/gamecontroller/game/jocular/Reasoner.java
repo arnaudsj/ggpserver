@@ -84,7 +84,7 @@ public class Reasoner implements ReasonerInterface<Term, ProofContext> {
 	/* (non-Javadoc)
 	 * @see tud.gamecontroller.game.jocular.ReasonerInterface#GetRoles()
 	 */
-	public synchronized List<? extends RoleInterface<Term>> GetRoles() {
+	public synchronized List<? extends RoleInterface<Term>> getRoles() {
 		List<RoleInterface<Term>> roles=new ArrayList<RoleInterface<Term>>();
 		Iterable<GroundFact> roleFacts = stanfordlogicReasoner.getAllAnswers(makeQuery("role", "?r"));
 		for(GroundFact roleFact:roleFacts){

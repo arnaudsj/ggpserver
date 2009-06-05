@@ -26,7 +26,7 @@ public interface ReasonerInterface<
 	TermType,
 	ReasonerStateInfoType> {
 
-	List<? extends RoleInterface<TermType>> GetRoles();
+	List<? extends RoleInterface<TermType>> getRoles();
 
 	ReasonerStateInfoType getInitialState();
 
