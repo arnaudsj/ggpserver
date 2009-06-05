@@ -36,9 +36,9 @@ public interface ReasonerInterface<
 
 	boolean isLegal(ReasonerStateInfoType state, RoleInterface<TermType> role, MoveInterface<TermType> move);
 
-	int GetGoalValue(ReasonerStateInfoType state, RoleInterface<TermType> role);
+	int getGoalValue(ReasonerStateInfoType state, RoleInterface<TermType> role);
 
-	Collection<? extends MoveInterface<TermType>> GetLegalMoves(ReasonerStateInfoType state, RoleInterface<TermType> role);
+	Collection<? extends MoveInterface<TermType>> getLegalMoves(ReasonerStateInfoType state, RoleInterface<TermType> role);
 
 	Collection<? extends FluentInterface<TermType>> getFluents(ReasonerStateInfoType state);
 

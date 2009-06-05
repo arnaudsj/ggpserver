@@ -58,7 +58,7 @@ public class State<
 	}
 
 	public int getGoalValue(RoleInterface<TermType> role) {
-		return reasoner.GetGoalValue(stateInformation, role);
+		return reasoner.getGoalValue(stateInformation, role);
 	}
 
 	public MoveInterface<TermType> getLegalMove(RoleInterface<TermType> role) {
@@ -66,7 +66,7 @@ public class State<
 	}
 
 	public Collection<? extends MoveInterface<TermType>> getLegalMoves(RoleInterface<TermType> role) {
-		return reasoner.GetLegalMoves(stateInformation, role);
+		return reasoner.getLegalMoves(stateInformation, role);
 	}
 	
 	public Collection<? extends FluentInterface<TermType>> getFluents() {

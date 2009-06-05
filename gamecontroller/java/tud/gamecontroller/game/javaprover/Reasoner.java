@@ -106,14 +106,14 @@ public class Reasoner implements ReasonerInterface<Term, GameState> {
 		}
 	}
 
-	public int GetGoalValue(GameState state, RoleInterface<Term> role) {
+	public int getGoalValue(GameState state, RoleInterface<Term> role) {
 		synchronized (gameSim) {
 			gameSim.SetGameState(state);
 			return gameSim.GetGoalValue(role.getTerm().getExpr());
 		}
 	}
 
-	public Collection<? extends MoveInterface<Term>> GetLegalMoves(GameState state, RoleInterface<Term> role) {
+	public Collection<? extends MoveInterface<Term>> getLegalMoves(GameState state, RoleInterface<Term> role) {
 		ExpList exprlist;
 		synchronized (gameSim) {
 			gameSim.SetGameState(state);

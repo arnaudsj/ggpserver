@@ -138,7 +138,7 @@ public class Reasoner implements ReasonerInterface<Term, ProofContext> {
 	/* (non-Javadoc)
 	 * @see tud.gamecontroller.game.jocular.ReasonerInterface#GetGoalValue(tud.gamecontroller.game.jocular.State, tud.gamecontroller.game.Role)
 	 */
-	public synchronized int GetGoalValue(ProofContext state, RoleInterface<Term> role) {
+	public synchronized int getGoalValue(ProofContext state, RoleInterface<Term> role) {
 		GroundFact f=stanfordlogicReasoner.getAnAnswer(new VariableFact(parser.TOK_GOAL, role.getTerm().getExpr(), TermVariable.makeTermVariable()), state);
 		return Integer.parseInt(f.getTerm(1).toString(parser.getSymbolTable()));
 	}
@@ -146,7 +146,7 @@ public class Reasoner implements ReasonerInterface<Term, ProofContext> {
 	/* (non-Javadoc)
 	 * @see tud.gamecontroller.game.jocular.ReasonerInterface#GetLegalMoves(tud.gamecontroller.game.jocular.State, tud.gamecontroller.game.Role)
 	 */
-	public synchronized Collection<? extends MoveInterface<Term>> GetLegalMoves(ProofContext state, RoleInterface<Term> role) {
+	public synchronized Collection<? extends MoveInterface<Term>> getLegalMoves(ProofContext state, RoleInterface<Term> role) {
 		Iterable<GroundFact> legalFacts=stanfordlogicReasoner.getAllAnswersIterable(new VariableFact(parser.TOK_LEGAL, role.getTerm().getExpr(), TermVariable.makeTermVariable()), state);
 		Collection<MoveInterface<Term>> moveslist=new LinkedList<MoveInterface<Term>>();
         for (GroundFact fact : legalFacts) {
