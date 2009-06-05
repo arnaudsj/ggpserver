@@ -81,7 +81,7 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 	 * 
 	 * This list will only be non-empty for running matches.
 	 */
-	private List<String> xmlStates = new LinkedList<String>();
+	private final List<String> xmlStates;
 	
 	/**
 	 * JointMove 0 = joint move leading from initial state to State 1.
@@ -129,6 +129,7 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 		this.moveFactory = movefactory;
 		this.gameScrambler = gamescrambler;
 		this.tournament = tournament;
+		this.xmlStates = new XMLStatesList(matchID, db);
 		this.db = db;
 	}
 
@@ -254,8 +255,7 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 		updateXmlState(currentState, goalValues);
 		updateStatus(STATUS_FINISHED);
 		
-		// Clear the jointMoves and xmlStates lists, they are only needed for running matches.
-		xmlStates = new LinkedList<String>();
+		// Clear the jointMoves list, they are only needed for running matches.
 		jointMoves = new LinkedList<JointMoveInterface<? extends TermInterface>>();
 	}
 	
@@ -316,7 +316,6 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 	}
 	
 	public void updateErrorMessage(GameControllerErrorMessage errorMessage) {
-		System.out.println("ERROR MESSAGE RECEIVED");
 		int stepNumber = errorMessages.size();
 		errorMessages.get(stepNumber - 1).add(errorMessage);
 		
@@ -368,24 +367,16 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 	}
 	
 	private List<String> getXmlStates() {
-		// This is a bit of a hack: Use the xmlStates field only if the match is
-		// running. Otherwise, use the result from the database.
-		if (status.equals(STATUS_RUNNING)) {
-			return xmlStates;
-		}
-		try {
-			return db.getXmlStates(getMatchID());
-		} catch (SQLException e) {
-			logger.warning("exception: " + e); //$NON-NLS-1$
-			return new LinkedList<String>();
-		}
+		return xmlStates;
 	}
 	
 	protected void updateXmlState(StateInterface<? extends TermInterface, ?> currentState, Map<? extends RoleInterface<?>, Integer> goalValues) {
 		String xmlState = XMLGameStateWriter.createXMLOutputStream(this, currentState, jointMoves, goalValues, getGame().getStylesheet()).toString();
-		xmlStates.add(xmlState);
 		
-		int stepNumber = getNumberOfStates();
+//		xmlStates.add(xmlState);
+//		int stepNumber = getNumberOfStates();
+
+		int stepNumber = getNumberOfStates() + 1;
 		
 		try {
 			db.addState(getMatchID(), stepNumber, xmlState);

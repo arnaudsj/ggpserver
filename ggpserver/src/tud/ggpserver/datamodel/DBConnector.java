@@ -28,6 +28,7 @@ import java.util.Map;
 
 import org.apache.commons.collections.map.ReferenceMap;
 
+import tud.gamecontroller.ReasonerFactory;
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.MoveFactoryInterface;
 import tud.gamecontroller.game.ReasonerInterface;
@@ -76,16 +77,23 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	@SuppressWarnings("unchecked")
 	private Map<String, User> users = new ReferenceMap(SOFT, SOFT, false);
 
-	private DBConnector() {
-		super();
+	private DBConnector(ReasonerFactory<Term, GameState> reasonerFactory) {
+		super(reasonerFactory);
 	}
+
 
 	/**
 	 * Will be synchronized on DBConnector.class .
 	 */
 	public static synchronized DBConnector getInstance() {
+		ReasonerFactory<Term, GameState> reasonerFactory = new ReasonerFactory<Term, GameState>() {
+			public ReasonerInterface<Term, GameState> getReasoner(String gameDescription, String gameName) {
+				return new Reasoner(gameDescription);
+			}
+		};
+		
 		if (instance == null) {
-			instance = new DBConnector();
+			instance = new DBConnector(reasonerFactory);
 		}
 		return instance;
 	}
@@ -115,12 +123,6 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	@Override
 	protected MoveFactoryInterface<Move<Term>> getMoveFactory() {
 		return new MoveFactory<Term>(new TermFactory());
-	}
-
-	@Override
-	protected ReasonerInterface<Term, GameState> getReasoner(
-			String gameDescription, String name) {
-		return new Reasoner(gameDescription);
 	}
 
 	/////////////////// GAME ///////////////////

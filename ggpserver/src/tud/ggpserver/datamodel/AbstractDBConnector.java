@@ -40,11 +40,11 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
+import tud.gamecontroller.ReasonerFactory;
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MoveFactoryInterface;
 import tud.gamecontroller.game.MoveInterface;
-import tud.gamecontroller.game.ReasonerInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.impl.State;
 import tud.gamecontroller.logging.GameControllerErrorMessage;
@@ -84,10 +84,14 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	
 	private Collection<PlayerStatusListener<TermType, ReasonerStateInfoType>> playerStatusListeners = new ArrayList<PlayerStatusListener<TermType, ReasonerStateInfoType>>();
 
-	
-	protected abstract MoveFactoryInterface<? extends MoveInterface<TermType>> getMoveFactory();
+	private final ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory;
 
-	protected abstract ReasonerInterface<TermType, ReasonerStateInfoType> getReasoner(String gameDescription, String name);
+	
+	public AbstractDBConnector(final ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory) {
+		this.reasonerFactory = reasonerFactory;
+	}
+
+	protected abstract MoveFactoryInterface<? extends MoveInterface<TermType>> getMoveFactory();
 
 
 	public void clearCache() {
@@ -268,7 +272,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		} 
 
 		logger.info("String, String - Creating new game: " + name); //$NON-NLS-1$
-		return new Game<TermType, ReasonerStateInfoType>(gameDescription, name, getReasoner(gameDescription, name), stylesheet, enabled);
+		return new Game<TermType, ReasonerStateInfoType>(gameDescription, name, reasonerFactory, stylesheet, enabled);
 	}
 
 	public Game<TermType, ReasonerStateInfoType> getGame(String name) throws SQLException {
@@ -289,7 +293,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				boolean enabled = rs.getBoolean("enabled");
 				
 				logger.info("String - Returning new game: " + name); //$NON-NLS-1$
-				result = new Game<TermType, ReasonerStateInfoType>(gameDescription, name, getReasoner(gameDescription, name), stylesheet, enabled);
+				result = new Game<TermType, ReasonerStateInfoType>(gameDescription, name, reasonerFactory, stylesheet, enabled);
 				
 			}
 		} finally { 
@@ -984,7 +988,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return result;
 	}
 
-	protected List<String> getXmlStates(String matchID) throws SQLException {
+	protected List<String> getXMLStates(String matchID) throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -1010,10 +1014,59 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			if (rs != null)
 				try {rs.close();} catch (SQLException e) {}
 		}
-		
-		// TODO: This should return a more "clever" list instead (don't really fill the list, instead read lazily from database)
 
 		return result;
+	}
+
+	protected String getXMLState(String matchID, int stepNumber) throws SQLException {
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			ps = con.prepareStatement("SELECT `state` FROM `states` WHERE `match_id` = ? AND `step_number` = ?;");
+			ps.setString(1, matchID);
+			ps.setInt(2, stepNumber);
+			rs = ps.executeQuery();
+			
+			if (rs.next()) {
+				return rs.getString("state");
+			} else {
+				throw new SQLException("XML state not found!");
+			}
+		} finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+			if (rs != null)
+				try {rs.close();} catch (SQLException e) {}
+		}
+	}
+
+	protected int getNumberOfXMLStates(String matchID) throws SQLException {
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			ps = con.prepareStatement("SELECT COUNT(*) FROM `states` WHERE `match_id` = ? ;");
+			ps.setString(1, matchID);
+			rs = ps.executeQuery();
+			
+			if (rs.next()) {
+				return rs.getInt(1);
+			} else {
+				throw new SQLException("XML state not found!");
+			}
+		} finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+			if (rs != null)
+				try {rs.close();} catch (SQLException e) {}
+		}
 	}
 
 	public void updatePlayerInfo(String playerName, String host, int port, User user, String status) throws SQLException {

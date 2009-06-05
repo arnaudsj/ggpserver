@@ -19,7 +19,7 @@
 
 package tud.ggpserver.datamodel;
 
-import tud.gamecontroller.game.ReasonerInterface;
+import tud.gamecontroller.ReasonerFactory;
 import tud.gamecontroller.term.TermInterface;
 
 public class Game<
@@ -29,8 +29,8 @@ public class Game<
 	private boolean enabled;
 	
 	public Game(String gameDescription, String name,
-			ReasonerInterface<TermType, ReasonerStateInfoType> reasoner, String stylesheet, boolean enabled) {
-		super(gameDescription, name, reasoner, stylesheet);
+			ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory, String stylesheet, boolean enabled) {
+		super(gameDescription, name, reasonerFactory, stylesheet);
 		this.enabled=enabled;
 	}
 
