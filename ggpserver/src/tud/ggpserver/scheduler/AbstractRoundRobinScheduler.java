@@ -64,6 +64,7 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		this.playerStatusTracker = new PlayerStatusTracker<TermType, ReasonerStateInfoType>(dbConnector);
 	}
 
+	// TODO: synchronization
 	public void start() {
 		if (!running) {
 			setRunning(true);

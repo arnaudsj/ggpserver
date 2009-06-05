@@ -114,12 +114,12 @@ public abstract class AbstractGameValidator {
 			if (initialState == null) {
 				errorsDescription.add("there was a syntax error in your game description (could not get initial state)");
 			}
-			List<? extends RoleInterface<Term>> roles = reasoner.GetRoles();
+			List<? extends RoleInterface<Term>> roles = reasoner.getRoles();
 			if (roles == null || roles.isEmpty()) {
 				errorsDescription.add("there was a syntax error in your game description (could not determine number of roles)");
 			} else {
 				for (RoleInterface<Term> role : roles) {
-					Collection<? extends MoveInterface<Term>> legalMoves = reasoner.GetLegalMoves(initialState, role);
+					Collection<? extends MoveInterface<Term>> legalMoves = reasoner.getLegalMoves(initialState, role);
 					if (legalMoves == null || legalMoves.isEmpty()) {
 						errorsDescription.add("there was a syntax error in your game description (could not get legal moves)");
 					}

@@ -1,8 +1,11 @@
 package tud.ggpserver.formhandlers;
 
 import java.sql.SQLException;
+import java.util.List;
 
+import tud.ggpserver.datamodel.Game;
 import tud.ggpserver.datamodel.Match;
+import tud.ggpserver.datamodel.RemotePlayerInfo;
 import tud.ggpserver.datamodel.Tournament;
 
 public class EditTournament extends ShowMatches {
@@ -15,6 +18,11 @@ public class EditTournament extends ShowMatches {
 	private String action;
 	private Match<?, ?> match;
 	private boolean correctlyPerformed = false;
+
+	@SuppressWarnings("unchecked")
+	public List<Game<?, ?>> getGames() throws SQLException {
+		return db.getAllEnabledGames();
+	}
 
 	public void setMatchID(String matchID) throws SQLException {
 		this.match = db.getMatch(matchID);
@@ -106,5 +114,10 @@ public class EditTournament extends ShowMatches {
 
 	public boolean isCorrectlyPerformed() {
 		return correctlyPerformed;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<RemotePlayerInfo> getEnabledPlayerInfos() throws SQLException {
+		return db.getPlayerInfos(RemotePlayerInfo.STATUS_ACTIVE);
 	}
 }

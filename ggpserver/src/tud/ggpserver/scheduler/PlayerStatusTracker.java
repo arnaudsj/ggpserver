@@ -164,9 +164,10 @@ public class PlayerStatusTracker<TermType extends TermInterface, ReasonerStateIn
 	private boolean returnedOnlyErrors(Match<TermType, ReasonerStateInfoType> match, PlayerInfo playerInfo) {
 		List<List<GameControllerErrorMessage>> errorMessages = match.getErrorMessagesForPlayer(playerInfo);
 		
-		assert (errorMessages.size() == match.getNumberOfStates());
+		int numberOfStates = match.getNumberOfStates();
+		assert (errorMessages.size() == numberOfStates);
 		
-		for (int i = 0; i < match.getNumberOfStates(); i++) {
+		for (int i = 0; i < numberOfStates; i++) {
 			if (errorMessages.get(i).size() == 0) {
 				// no error messages for this state
 				return false;

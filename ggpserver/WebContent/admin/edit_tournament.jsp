@@ -55,6 +55,11 @@
 <!-- pager --> <jsp:directive.include file="/inc/pager_title.jsp" /> <jsp:directive.include
 	file="/inc/pager.jsp" />
 
+<c:url value="process_save_tournament.jsp" var="saveURL">
+<!--	<c:param name="tournamentID" value="${pager.tournamentID}"/>-->
+</c:url>
+<form name="theForm" action="${saveURL}" method="post">
+
 <table>
 	<thead>
 		<tr>
@@ -81,19 +86,70 @@
 			</c:choose>
 			<tr class="${rowClass}">
 				<td><c:out value="${match.matchID}" /></td>
-				<td><c:out value="${match.game.name}" /></td>
+				<td>
+					<c:choose>
+						<c:when test="${match.status == 'new'}">
+							<select name="gameName+${match.matchID}" size="1" onChange="theForm.submit();" style="max-width:120px;">
+								<c:forEach var="game" items="${pager.games}">
+									<c:choose>
+										<c:when test='${game.name == match.game.name}'>
+											<option value="${game.name}" selected="selected" ><c:out value="${game.name}" /></option>
+										</c:when>
+										<c:otherwise>
+											<option value="${game.name}"><c:out value="${game.name}" /></option>
+										</c:otherwise>
+									</c:choose>
+								</c:forEach>
+							</select>							
+						</c:when>
+						<c:otherwise><c:out value="${match.game.name}" /></c:otherwise>
+					</c:choose>
+				</td>
 				<td><c:out value="${match.status}" /></td>
-				<td><c:out value="${match.startclock}" /></td>
-				<td><c:out value="${match.playclock}" /></td>
-				<td><c:forEach var="playerinfo"
-					items="${match.orderedPlayerInfos}">
-					<c:url value="../public/view_player.jsp" var="playerURL">
-						<c:param name="name" value="${playerinfo.name}" />
-					</c:url>
-					<a href='<c:out value="${playerURL}" />'> <c:out
-						value="${playerinfo.name}" /> </a>
-					<br>
-				</c:forEach></td>
+				<td>
+					<c:choose>
+						<c:when test="${match.status == 'new'}">
+							<input type="text" name="startclock+${match.matchID}" size="3" value="${match.startclock}" maxlength="4" style="text-align: right;" onchange="document.theForm.submitButton.style.color = '#ff0000';">
+						</c:when>
+						<c:otherwise><c:out value="${match.startclock}" /></c:otherwise>
+					</c:choose>
+				</td>
+				<td>
+					<c:choose>
+						<c:when test="${match.status == 'new'}">
+							<input type="text" name="playclock+${match.matchID}" size="3" value="${match.playclock}" maxlength="4" style="text-align: right;" onchange="document.theForm.submitButton.style.color = '#ff0000';">
+						</c:when>
+						<c:otherwise><c:out value="${match.playclock}" /></c:otherwise>
+					</c:choose>
+				</td>
+				<td>
+					<c:forEach var="selectedplayerinfo" items="${match.orderedPlayerInfos}">
+						<c:choose>
+							<c:when test="${match.status == 'new'}">
+								<select name="playerInfos+${match.matchID}" size="1" onchange="document.theForm.submitButton.style.color = '#ff0000';" style="max-width:120px;">
+									<c:forEach var="playerinfo" items="${pager.enabledPlayerInfos}">
+										<c:choose>
+											<c:when test='${playerinfo.name == selectedplayerinfo.name}'>
+												<option value="${playerinfo.name}" selected="selected" ><c:out value="${playerinfo.name}" /></option>
+											</c:when>
+											<c:otherwise>
+												<option value="${playerinfo.name}"><c:out value="${playerinfo.name}" /></option>
+											</c:otherwise>
+										</c:choose>
+									</c:forEach>
+								</select>
+							</c:when>
+							<c:otherwise>
+								<c:url value="../public/view_player.jsp" var="playerURL">
+									<c:param name="name" value="${selectedplayerinfo.name}" />
+								</c:url>
+								<a href='<c:out value="${playerURL}" />'> 
+								<c:out value="${selectedplayerinfo.name}" /> </a>
+								<br>
+							</c:otherwise>
+						</c:choose>
+					</c:forEach>
+				</td>
 				<td><c:choose>
 					<c:when test="${match.goalValues == null}">
 							---
@@ -128,6 +184,7 @@
 				</td>
 
 				<%-- action "start" [only NEW] --%>
+				<% // TODO: if running: action stop %>
 				<td class="nopadding"><c:choose>
 					<c:when test="${ match.status == 'new' }">
 						<c:url value="process_edit_tournament.jsp" var="startURL">
@@ -199,8 +256,9 @@
 <c:url value="process_save_changes.jsp" var="saveChangesURL">
 	<c:param name="tournamentID" value="${pager.tournamentID}"/>
 </c:url>
-<p><center><input type="button" value="Save" style="color:#ff0000; font-size:14pt; font-weight:bold;" onclick="window.location='${saveChangesURL}'"></center></p>
-<% // TODO: steal save button code from backuppc %>
+<center><input type="submit" name="submitButton" value="Save" style="color:#c0c0c0; font-size:14pt; font-weight:bold;" onclick="window.location='${saveChangesURL}'"></center>
+
+</form>
 
 <!-- pager --> <jsp:directive.include file="/inc/pager.jsp" /> <c:if
 	test="${pager.playerName != null}">
@@ -216,12 +274,9 @@
 	<li>When clicking "save changes", all changes will be stored
 	persistently, including any new matches. They can still be 
 	edited.</li>
-	<li>New matches won't show up on the public/show_matches.jsp
-	page; only running, aborted and finished matches do.</li>
-	<li>When you select a new game with a different number of 
-	roles than the previously selected one, you have to save 
-	the changes so the number of player boxes is updated.</li>
-	<li>In other words: save, save, save! ;-)</li>
+	<li>New matches won't show up on the publicly visible 
+	public/show_matches.jsp page; only running, aborted and 
+	finished matches do.</li>
 </ul>
 </div><!--end div "content"-->
 <jsp:directive.include file="/inc/footer.jsp" />

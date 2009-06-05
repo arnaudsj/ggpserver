@@ -59,12 +59,14 @@ public class ViewMatch {
 	}
 	
 	public List<GameControllerErrorMessage> getErrorMessages() {
-		if ((stepNumber < 1) || (stepNumber > match.getNumberOfStates())) {
+		int numberOfStates = match.getNumberOfStates();
+		if ((stepNumber < 1) || (stepNumber > numberOfStates)) {
 			return new LinkedList<GameControllerErrorMessage>();
 		}
-		if (match.getNumberOfStates() > match.getErrorMessages().size()) {
-			logger.severe("getErrorMessages().size() smaller than getNumberOfStates()! Causing match: " + match.toString());        //$NON-NLS-1$s
-			throw new InternalError("getErrorMessages().size() smaller than getNumberOfStates()! Causing match: " + match.toString());
+		if (numberOfStates > match.getErrorMessages().size()) {
+			String message = "getErrorMessages().size() smaller than getNumberOfStates()! Causing match: " + match.toString();
+			logger.severe(message);
+			throw new InternalError(message);
 		}
 		return match.getErrorMessages().get(stepNumber - 1);
 	}

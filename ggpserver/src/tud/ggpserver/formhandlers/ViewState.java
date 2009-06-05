@@ -41,9 +41,10 @@ public class ViewState {
 
 	public String getXmlState() {
 		int stepNumber;
-		if (this.stepNumber < 1 || this.stepNumber > match.getNumberOfStates()) {
+		int numberOfStates = match.getNumberOfStates();
+		if (this.stepNumber < 1 || this.stepNumber > numberOfStates) {
 			// return the last/final state
-			stepNumber = match.getNumberOfStates();
+			stepNumber = numberOfStates;
 		} else {
 			stepNumber = this.stepNumber;
 		}
