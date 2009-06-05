@@ -51,7 +51,7 @@ public class Reasoner implements ReasonerInterface<Term, GameState> {
 	
 	public Reasoner(String gameDescription) {
 		this.gameDescription=gameDescription;
-		gameSim=new GameSimulator(false, false);
+		gameSim=new GameSimulator(false, true);
 		gameSim.ParseDescIntoTheory(gameDescription);
 	}
 
