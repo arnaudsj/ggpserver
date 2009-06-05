@@ -30,7 +30,6 @@ import java.util.logging.Logger;
 
 import tud.gamecontroller.game.MoveFactoryInterface;
 import tud.gamecontroller.game.MoveInterface;
-import tud.gamecontroller.game.ReasonerInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.impl.Game;
 import tud.gamecontroller.game.impl.Match;
@@ -46,12 +45,19 @@ import tud.gamecontroller.term.TermInterface;
 public abstract class AbstractGameControllerRunner<
 		TermType extends TermInterface,
 		ReasonerStateInfoType> {
+	
+	private final ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory;
 
 	private GameController<
 		TermType,
 		ReasonerStateInfoType
 		> gameController=null;
 	
+	public AbstractGameControllerRunner(final ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory) {
+		super();
+		this.reasonerFactory = reasonerFactory;
+	}
+
 	public Logger getLogger(){
 		return Logger.getLogger("tud.gamecontroller");
 	}
@@ -136,10 +142,8 @@ public abstract class AbstractGameControllerRunner<
 	}
 
 	protected Game<TermType, ReasonerStateInfoType> createGame(String gameDescription, String name){
-		return new Game<TermType, ReasonerStateInfoType>(gameDescription, name, getReasoner(gameDescription, name));
+		return new Game<TermType, ReasonerStateInfoType>(gameDescription, name, reasonerFactory);
 	}
-
-	protected abstract ReasonerInterface<TermType, ReasonerStateInfoType> getReasoner(String gameDescription, String gameName);
 
 	public GameController<
 		TermType,

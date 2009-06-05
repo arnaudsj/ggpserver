@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import tud.gamecontroller.AbstractGameControllerRunner;
+import tud.gamecontroller.ReasonerFactory;
 import tud.gamecontroller.game.impl.Game;
 import tud.gamecontroller.logging.PlainTextLogFormatter;
 import tud.gamecontroller.logging.UnbufferedStreamHandler;
@@ -50,7 +51,8 @@ public abstract class AbstractGameControllerCLIRunner<
 	private File scrambleWordList=null;
 	private Collection<PlayerInfo> playerInfos=null;
 	
-	public AbstractGameControllerCLIRunner(){
+	public AbstractGameControllerCLIRunner(ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory){
+		super(reasonerFactory);
 		Logger logger=getLogger();
 		logger.setUseParentHandlers(false);
 		logger.addHandler(new UnbufferedStreamHandler(System.out, new PlainTextLogFormatter()));
@@ -205,38 +207,47 @@ public abstract class AbstractGameControllerCLIRunner<
 
 //	protected abstract Match<TermType,StateType,Player<TermType, StateType>> createMatch(String matchID, GameType game, int startClock, int playClock, Map<Role<TermType>, Player<TermType, StateType>> players);
 
+	@Override
 	protected boolean doPrintXML() {
 		return doPrintXML;
 	}
 
+	@Override
 	protected Game<TermType, ReasonerStateInfoType> getGame() {
 		return createGame(gameFile);
 	}
 
+	@Override
 	protected String getMatchID() {
 		return matchID;
 	}
 
+	@Override
 	protected int getStartClock() {
 		return startClock;
 	}
 
+	@Override
 	protected int getPlayClock() {
 		return playClock;
 	}
 
+	@Override
 	protected Collection<PlayerInfo> getPlayerInfos() {
 		return playerInfos;
 	}
 
+	@Override
 	protected File getScrambleWordListFile() {
 		return scrambleWordList;
 	}
 
+	@Override
 	protected String getStyleSheet() {
 		return styleSheet;
 	}
 
+	@Override
 	protected String getXmlOutputDir() {
 		return xmlOutputDir;
 	}

@@ -23,7 +23,7 @@ import java.io.File;
 
 import stanfordlogic.gdl.Parser;
 import stanfordlogic.prover.ProofContext;
-import tud.gamecontroller.game.ReasonerInterface;
+import tud.gamecontroller.ReasonerFactory;
 import tud.gamecontroller.term.TermFactoryInterface;
 
 public class GameControllerGuiRunner extends
@@ -31,14 +31,9 @@ public class GameControllerGuiRunner extends
 
 	private Parser parser; 
 	
-	public GameControllerGuiRunner(File gameFile) {
-		super(gameFile);
+	public GameControllerGuiRunner(File gameFile, ReasonerFactory<Term, ProofContext> reasonerFactory) {
+		super(gameFile, reasonerFactory);
 		this.parser=new Parser();
-	}
-
-	@Override
-	protected ReasonerInterface<Term, ProofContext> getReasoner(String gameDescription, String gameName) {
-		return new Reasoner(gameDescription, parser);
 	}
 
 	@Override

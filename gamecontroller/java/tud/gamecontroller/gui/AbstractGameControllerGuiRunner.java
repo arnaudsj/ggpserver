@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.Collection;
 
 import tud.gamecontroller.AbstractGameControllerRunner;
+import tud.gamecontroller.ReasonerFactory;
 import tud.gamecontroller.game.MoveFactoryInterface;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.impl.Game;
@@ -45,8 +46,8 @@ public abstract class AbstractGameControllerGuiRunner<
 	private Collection<PlayerInfo> playerInfos=null;
 	private GameControllerFrame<TermType,ReasonerStateInfoType> frame=null;
 	
-	public AbstractGameControllerGuiRunner(File gameFile) {
-		super();
+	public AbstractGameControllerGuiRunner(File gameFile, ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory) {
+		super(reasonerFactory);
 		this.gameFile=gameFile;
 	}
 

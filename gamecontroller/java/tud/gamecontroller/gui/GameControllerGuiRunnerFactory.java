@@ -21,11 +21,21 @@ package tud.gamecontroller.gui;
 
 import java.io.File;
 
+import tud.gamecontroller.ReasonerFactory;
+import tud.gamecontroller.game.ReasonerInterface;
+import tud.gamecontroller.game.javaprover.Reasoner;
+import tud.gamecontroller.game.javaprover.Term;
+import cs227b.teamIago.util.GameState;
+
 public class GameControllerGuiRunnerFactory {
 
 	public static AbstractGameControllerGuiRunner<?, ?> createGameControllerGuiRunner(File gameFile){
-		return new tud.gamecontroller.game.javaprover.GameControllerGuiRunner(gameFile);
-//		return new tud.gamecontroller.game.jocular.GameControllerGuiRunner(gameFile);
+		ReasonerFactory<Term, GameState> reasonerFactory = new ReasonerFactory<Term, GameState>() {
+			public ReasonerInterface<Term, GameState> getReasoner(String gameDescription, String gameName) {
+				return new Reasoner(gameDescription);
+			}
+		};
+		
+		return new tud.gamecontroller.game.javaprover.GameControllerGuiRunner(gameFile, reasonerFactory);
 	}
-	
 }

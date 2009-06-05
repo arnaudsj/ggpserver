@@ -19,6 +19,7 @@
 
 package tud.gamecontroller.game.javaprover;
 
+import tud.gamecontroller.ReasonerFactory;
 import tud.gamecontroller.cli.AbstractGameControllerCLIRunner;
 import tud.gamecontroller.game.MoveFactoryInterface;
 import tud.gamecontroller.game.ReasonerInterface;
@@ -30,20 +31,25 @@ public class GameControllerCLIRunner
 		extends AbstractGameControllerCLIRunner<
 			Term,
 			GameState
-		>{
+		> {
+
+	public GameControllerCLIRunner(ReasonerFactory<Term, GameState> reasonerFactory) {
+		super(reasonerFactory);
+	}
 
 	public static void main(String[] args) {
-		GameControllerCLIRunner gcRunner=new GameControllerCLIRunner();
+		ReasonerFactory<Term, GameState> reasonerFactory = new ReasonerFactory<Term, GameState>() {
+			public ReasonerInterface<Term, GameState> getReasoner(String gameDescription, String gameName) {
+				return new Reasoner(gameDescription);
+			}
+		};
+		
+		GameControllerCLIRunner gcRunner=new GameControllerCLIRunner(reasonerFactory);
 		gcRunner.runFromCommandLine(args);
 	}
 
 	@Override
 	protected MoveFactoryInterface<Move<Term>> getMoveFactory() {
 		return new MoveFactory<Term>(new TermFactory());
-	}
-
-	@Override
-	protected ReasonerInterface<Term, GameState> getReasoner(String gameDescription, String gameName) {
-		return new Reasoner(gameDescription);
 	}
 }

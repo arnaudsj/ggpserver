@@ -21,20 +21,15 @@ package tud.gamecontroller.game.javaprover;
 
 import java.io.File;
 
-import tud.gamecontroller.game.ReasonerInterface;
+import tud.gamecontroller.ReasonerFactory;
 import tud.gamecontroller.term.TermFactoryInterface;
 import cs227b.teamIago.util.GameState;
 
 public class GameControllerGuiRunner extends
 		tud.gamecontroller.gui.AbstractGameControllerGuiRunner<Term, GameState> {
 
-	public GameControllerGuiRunner(File gameFile) {
-		super(gameFile);
-	}
-
-	@Override
-	protected ReasonerInterface<Term, GameState> getReasoner(String gameDescription, String gameName) {
-		return new Reasoner(gameDescription);
+	public GameControllerGuiRunner(File gameFile, ReasonerFactory<Term, GameState> reasonerFactory) {
+		super(gameFile, reasonerFactory);
 	}
 
 	@Override

@@ -38,7 +38,7 @@ public class Atom extends Term {
 			this.trans = trans;
 		}
 	}
-	protected static HashMap volatileTable = new HashMap(); 
+//	protected static HashMap volatileTable = new HashMap(); // FIXME: Oh my god, a static HashMap that gets only stored into and never emptied. Memory Leak!!!
 	protected VolObj volObj;
 
 	protected String literal;
@@ -48,11 +48,11 @@ public class Atom extends Term {
 	 */
 	public Atom(String literal) {
 		this.literal = literal.toUpperCase();
-		volObj = (VolObj) volatileTable.get(this.literal);
-		if (volObj == null) {
+//		volObj = (VolObj) volatileTable.get(this.literal);
+//		if (volObj == null) {
 			volObj = new VolObj(false);
-			volatileTable.put(this.literal,volObj);
-		}		
+//			volatileTable.put(this.literal,volObj);
+//		}		
 	}
 	/**
 	 * @return Returns the literal.
