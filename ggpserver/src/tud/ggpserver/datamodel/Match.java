@@ -55,7 +55,9 @@ import tud.gamecontroller.term.TermInterface;
  * @author Martin Günther <mintar@gmx.de>
  */
 public class Match<TermType extends TermInterface, ReasonerStateInfoType>
-		extends tud.gamecontroller.game.impl.Match<TermType, ReasonerStateInfoType> implements GameControllerListener {
+		implements
+		MatchInterface<TermType, State<TermType, ReasonerStateInfoType>>,
+		GameControllerListener {
 	/**
 	 * Logger for this class
 	 */
@@ -108,6 +110,15 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 	private final AbstractDBConnector<TermType, ReasonerStateInfoType> db;
 
 	private Tournament<TermType, ReasonerStateInfoType> tournament;
+
+	private final String matchID;
+	private final GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game;
+	private final int startclock;
+	private final int playclock;
+	
+	private Map<RoleInterface<TermType>, Player<TermType>> players;
+	private List<Player<TermType>> orderedPlayers = null;
+	
 	
 	/**
 	 * Use DBConnectorFactory.getDBConnector().getMatch() instead 
@@ -123,7 +134,10 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 			GameScramblerInterface gamescrambler,
 			Tournament<TermType, ReasonerStateInfoType> tournament,
 			AbstractDBConnector<TermType, ReasonerStateInfoType> db) {
-		super(matchID, game, startclock, playclock, null);
+		this.matchID = matchID;
+		this.game = game;
+		this.startclock = startclock;
+		this.playclock = playclock;
 		this.rolesToPlayers = rolesToPlayers;
 		this.startTime = startTime;
 		this.moveFactory = movefactory;
@@ -135,26 +149,32 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 
 	@Override
 	public List<? extends Player<TermType>> getOrderedPlayers() {
-		if (!super.hasPlayers()) {
+		if (players == null) {
 			initPlayers();
 		}
-		return super.getOrderedPlayers();
+		if (orderedPlayers == null) {
+			orderedPlayers = new LinkedList<Player<TermType>>();
+			for (RoleInterface<TermType> role : game.getOrderedRoles()) {
+				orderedPlayers.add(players.get(role));
+			}
+		}
+		return orderedPlayers;
 	}
 
 	@Override
 	public Player<TermType> getPlayer(RoleInterface<TermType> role) {
-		if (!super.hasPlayers()) {
+		if (players == null) {
 			initPlayers();
 		}
-		return super.getPlayer(role);
+		return players.get(role);
 	}
 
 	@Override
 	public Collection<? extends Player<TermType>> getPlayers() {
-		if (!super.hasPlayers()) {
+		if (players == null) {
 			initPlayers();
 		}
-		return super.getPlayers();
+		return players.values();
 	}
 	
 	public List<? extends PlayerInfo> getOrderedPlayerInfos() {
@@ -178,21 +198,15 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 		return new Date(startTime.getTime());
 	}
 
-	/**
-	 * Note: after I had written this, I noticed that it does pretty much the
-	 * same as AbstractGameControllerRunner.createPlayers(), minus the
-	 * filling-up with random players.
-	 */
 	private void initPlayers() {
-		Map<RoleInterface<TermType>, Player<TermType>> myPlayers = new HashMap<RoleInterface<TermType>, Player<TermType>>();
+		players = new HashMap<RoleInterface<TermType>, Player<TermType>>();
 		
-		for (RoleInterface<TermType> role : getGame().getOrderedRoles()) {
+		for (RoleInterface<TermType> role : game.getOrderedRoles()) {
 			PlayerInfo playerInfo = rolesToPlayers.get(role);
 			
 			Player<TermType> player = PlayerFactory.<TermType> createPlayer(playerInfo, moveFactory, gameScrambler);
-			myPlayers.put(role, player);
+			players.put(role, player);
 		}
-		super.setPlayers(myPlayers);
 	}
 
 	/**
@@ -514,4 +528,49 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 	public Tournament<TermType, ReasonerStateInfoType> getTournament() {
 		return tournament;
 	}
+
+	public GameInterface<TermType, State<TermType, ReasonerStateInfoType>> getGame() {
+		return game;
+	}
+
+	public String getMatchID() {
+		return matchID;
+	}
+
+	public int getPlayclock() {
+		return playclock;
+	}
+
+	public int getStartclock() {
+		return startclock;
+	}
+	
+
+	@Override
+	public int hashCode() {
+		final int PRIME = 31;
+		int result = 1;
+		result = PRIME * result + ((matchID == null) ? 0 : matchID.hashCode());
+		return result;
+	}
+
+	/**
+	 * Two matches are considered equal iff their matchID is equal (i.e., matchID is a unique identifier).
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final Match other = (Match) obj;
+		if (matchID == null) {
+			if (other.matchID != null)
+				return false;
+		} else if (!matchID.equals(other.matchID))
+			return false;
+		return true;
+	}	
 }
