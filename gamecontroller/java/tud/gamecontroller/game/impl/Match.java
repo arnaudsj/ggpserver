@@ -83,14 +83,6 @@ public class Match<
 	public Collection<? extends Player<TermType>> getPlayers() {
 		return players.values();
 	}
-	
-	protected boolean hasPlayers() {
-		return (players != null);
-	}
-	
-	protected void setPlayers(Map<? extends RoleInterface<TermType>, ? extends Player<TermType>> players) {
-		this.players = players;
-	}
 
 	/* (non-Javadoc)
 	 * @see tud.gamecontroller.game.MatchInterface#getOrderedPlayers()
