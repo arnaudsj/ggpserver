@@ -51,7 +51,7 @@ import tud.auxiliary.NamedObject;
 import tud.gamecontroller.game.FluentInterface;
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.JointMoveInterface;
-import tud.gamecontroller.game.MatchInterface;
+import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.term.GameObjectInterface;
@@ -63,7 +63,7 @@ public class XMLGameStateWriter
 	private String outputDir, matchDir;
 	private List<JointMoveInterface<? extends TermInterface>> moves;
 	private int step;
-	private MatchInterface<? extends TermInterface, ?> match;
+	private RunnableMatchInterface<? extends TermInterface, ?> match;
 	private String stylesheet;
 		
 	public XMLGameStateWriter(String outputDir, String stylesheet) {
@@ -73,7 +73,7 @@ public class XMLGameStateWriter
 		this.match=null;
 	}
 
-	public void gameStarted(MatchInterface<? extends TermInterface, ?> match, StateInterface<? extends TermInterface, ?> currentState) {
+	public void gameStarted(RunnableMatchInterface<? extends TermInterface, ?> match, StateInterface<? extends TermInterface, ?> currentState) {
 		this.match=match;
 		this.step=1;
 		matchDir=outputDir+File.separator+match.getMatchID();
@@ -108,7 +108,7 @@ public class XMLGameStateWriter
 	}
 
 	public static ByteArrayOutputStream createXMLOutputStream(
-			MatchInterface<? extends TermInterface, ?> match,
+			RunnableMatchInterface<? extends TermInterface, ?> match,
 			StateInterface<? extends TermInterface, ?> currentState,
 			List<JointMoveInterface<? extends TermInterface>> moves,
 			Map<?, Integer> goalValues,
@@ -152,7 +152,7 @@ public class XMLGameStateWriter
 	 * @return
 	 * @throws ParserConfigurationException
 	 */
-	static public Document createXML(MatchInterface<? extends TermInterface, ?> match, StateInterface<? extends TermInterface,?> currentState, List<JointMoveInterface<? extends TermInterface>> moves, Map<?, Integer> goalValues, String stylesheet) 
+	static public Document createXML(RunnableMatchInterface<? extends TermInterface, ?> match, StateInterface<? extends TermInterface,?> currentState, List<JointMoveInterface<? extends TermInterface>> moves, Map<?, Integer> goalValues, String stylesheet) 
 	throws ParserConfigurationException {
 		
 		 Document xmldoc = null;

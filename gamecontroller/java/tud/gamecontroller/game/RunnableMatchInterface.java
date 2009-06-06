@@ -24,15 +24,13 @@ import java.util.List;
 
 import tud.gamecontroller.players.Player;
 
-public interface MatchInterface<TermType, StateType extends StateInterface<TermType, ? extends StateType>> {
-
-	String getMatchID();
-
-	GameInterface<TermType,StateType> getGame();
-
-	int getStartclock();
-
-	int getPlayclock();
+/**
+ * This interface represents a runnable match. In contrast to MatchInterface,
+ * this interface provides methods to get executable Players instead of just
+ * PlayerInfos. This is only needed if the match is actually to be run.
+ */
+public interface RunnableMatchInterface<TermType, StateType extends StateInterface<TermType, ? extends StateType>>
+		extends MatchInterface<TermType, StateType> {
 
 	Collection<? extends Player<TermType>> getPlayers();
 

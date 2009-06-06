@@ -20,13 +20,13 @@
 package tud.gamecontroller.game.javaprover;
 
 import tud.gamecontroller.GameController;
-import tud.gamecontroller.game.MatchInterface;
+import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.impl.State;
 import cs227b.teamIago.util.GameState;
 
 public class JavaProverGameController extends GameController<Term, GameState> {
 
-	public JavaProverGameController(MatchInterface<Term, State<Term, GameState>> match) {
+	public JavaProverGameController(RunnableMatchInterface<Term, State<Term, GameState>> match) {
 		super(match);
 	}
 

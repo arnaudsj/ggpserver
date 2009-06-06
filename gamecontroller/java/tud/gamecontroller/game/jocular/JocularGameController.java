@@ -21,12 +21,12 @@ package tud.gamecontroller.game.jocular;
 
 import stanfordlogic.prover.ProofContext;
 import tud.gamecontroller.GameController;
-import tud.gamecontroller.game.MatchInterface;
+import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.impl.State;
 
 public class JocularGameController extends GameController<Term, ProofContext> {
 
-	public JocularGameController(MatchInterface<Term, State<Term, ProofContext>> match) {
+	public JocularGameController(RunnableMatchInterface<Term, State<Term, ProofContext>> match) {
 		super(match);
 	}
 

@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import tud.gamecontroller.game.GameInterface;
-import tud.gamecontroller.game.MatchInterface;
+import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.players.Player;
 import tud.gamecontroller.term.TermInterface;
@@ -33,7 +33,7 @@ import tud.gamecontroller.term.TermInterface;
 public class Match<
 		TermType extends TermInterface,
 		ReasonerStateInfoType
-		> implements MatchInterface<TermType, State<TermType, ReasonerStateInfoType>> {
+		> implements RunnableMatchInterface<TermType, State<TermType, ReasonerStateInfoType>> {
 	private String matchID;
 	private GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game;
 	private int startclock;
@@ -50,42 +50,42 @@ public class Match<
 	}
 
 	/* (non-Javadoc)
-	 * @see tud.gamecontroller.game.MatchInterface#getMatchID()
+	 * @see tud.gamecontroller.game.RunnableMatchInterface#getMatchID()
 	 */
 	public String getMatchID() {
 		return matchID;
 	}
 
 	/* (non-Javadoc)
-	 * @see tud.gamecontroller.game.MatchInterface#getGame()
+	 * @see tud.gamecontroller.game.RunnableMatchInterface#getGame()
 	 */
 	public GameInterface<TermType, State<TermType, ReasonerStateInfoType>> getGame() {
 		return game;
 	}
 
 	/* (non-Javadoc)
-	 * @see tud.gamecontroller.game.MatchInterface#getStartclock()
+	 * @see tud.gamecontroller.game.RunnableMatchInterface#getStartclock()
 	 */
 	public int getStartclock() {
 		return startclock;
 	}
 
 	/* (non-Javadoc)
-	 * @see tud.gamecontroller.game.MatchInterface#getPlayclock()
+	 * @see tud.gamecontroller.game.RunnableMatchInterface#getPlayclock()
 	 */
 	public int getPlayclock() {
 		return playclock;
 	}
 
 	/* (non-Javadoc)
-	 * @see tud.gamecontroller.game.MatchInterface#getPlayers()
+	 * @see tud.gamecontroller.game.RunnableMatchInterface#getPlayers()
 	 */
 	public Collection<? extends Player<TermType>> getPlayers() {
 		return players.values();
 	}
 
 	/* (non-Javadoc)
-	 * @see tud.gamecontroller.game.MatchInterface#getOrderedPlayers()
+	 * @see tud.gamecontroller.game.RunnableMatchInterface#getOrderedPlayers()
 	 */
 	public List<? extends Player<TermType>> getOrderedPlayers() {
 		if(orderedPlayers==null){
@@ -98,7 +98,7 @@ public class Match<
 	}
 
 	/* (non-Javadoc)
-	 * @see tud.gamecontroller.game.MatchInterface#getPlayer(RoleType)
+	 * @see tud.gamecontroller.game.RunnableMatchInterface#getPlayer(RoleType)
 	 */
 	public Player<TermType> getPlayer(RoleInterface<TermType> role) {
 		return players.get(role);
