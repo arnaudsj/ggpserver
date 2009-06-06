@@ -33,7 +33,7 @@ import tud.gamecontroller.GameControllerListener;
 import tud.gamecontroller.XMLGameStateWriter;
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.JointMoveInterface;
-import tud.gamecontroller.game.MatchInterface;
+import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.MoveFactoryInterface;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
@@ -46,21 +46,13 @@ import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.scrambling.GameScramblerInterface;
 import tud.gamecontroller.term.TermInterface;
 
-/**
- * TODO: This class should be refactored. Actually, there are two types of matches:
- *    A RunnableMatch that needs to know about Players (not PlayerInfos) etc., and
- *    whose states, errormessages and jointmoves lists can grow, and a FinishedMatch
- *    whose lists are fixed.   
- * 
- * @author Martin Günther <mintar@gmx.de>
- */
+
+// XXX: Separate everything possible into a new class RunnableMatch.
 public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 		implements
-		MatchInterface<TermType, State<TermType, ReasonerStateInfoType>>,
+		RunnableMatchInterface<TermType, State<TermType, ReasonerStateInfoType>>,
 		GameControllerListener {
-	/**
-	 * Logger for this class
-	 */
+
 	private static final Logger logger = Logger.getLogger(Match.class.getName());
 
 	public static final String STATUS_NEW = "new";
@@ -237,7 +229,7 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 	 * 
 	 * Like above, errorMessages and xmlStates will have size n+1 [== 1], while jointMoves and jointMovesStrings will have size (n) [== 0].
 	 */
-	public void gameStarted(MatchInterface<? extends TermInterface, ?> match, StateInterface<? extends TermInterface, ?> currentState) {
+	public void gameStarted(RunnableMatchInterface<? extends TermInterface, ?> match, StateInterface<? extends TermInterface, ?> currentState) {
 		updateStatus(STATUS_RUNNING);
 		
 		// prepare the error messages list for new entries  
@@ -572,5 +564,10 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType>
 		} else if (!matchID.equals(other.matchID))
 			return false;
 		return true;
-	}	
+	}
+	
+	public RunnableMatchInterface<TermType, StateInterface<TermType,? extends State<TermType, ReasonerStateInfoType>>> makeRunnable() {
+		// XXX
+		return null;
+	}
 }
