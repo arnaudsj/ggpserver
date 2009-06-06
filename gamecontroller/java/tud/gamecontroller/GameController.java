@@ -28,10 +28,10 @@ import java.util.logging.Logger;
 
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.JointMoveInterface;
+import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.impl.JointMove;
-import tud.gamecontroller.game.impl.Match;
 import tud.gamecontroller.game.impl.State;
 import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.Player;
@@ -56,7 +56,7 @@ public class GameController<
 	 */
 	private static final int EXTRA_DEADLINE_TIME=1000; 
 	
-	private Match<TermType, ReasonerStateInfoType> match;
+	private MatchInterface<TermType, State<TermType, ReasonerStateInfoType>> match;
 	private GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game;
 	private State<TermType, ReasonerStateInfoType> currentState;
 	private int startclock;
@@ -65,7 +65,7 @@ public class GameController<
 	private Logger logger;
 	private Collection<GameControllerListener> listeners;
 
-	public GameController(Match<TermType, ReasonerStateInfoType> match) {
+	public GameController(MatchInterface<TermType, State<TermType, ReasonerStateInfoType>> match) {
 		this.match=match;
 		this.game=match.getGame();
 		this.startclock=match.getStartclock();
