@@ -19,6 +19,8 @@
 
 package tud.gamecontroller.playerthreads;
 
+import java.util.logging.Logger;
+
 import tud.gamecontroller.MessageSentNotifier;
 import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.RoleInterface;
@@ -28,6 +30,7 @@ import tud.gamecontroller.term.TermInterface;
 public abstract class AbstractPlayerThread<
 		TermType extends TermInterface
 		> extends Thread implements MessageSentNotifier {
+	private static final Logger logger = Logger.getLogger(AbstractPlayerThread.class.getName());
 	
 	protected Player<TermType> player;
 	protected RoleInterface<TermType> role;
@@ -43,6 +46,7 @@ public abstract class AbstractPlayerThread<
 		this.match=match;
 		this.timeout=timeout;
 		deadline=0;
+		logger.info("Player thread initialized: " + this); // this.toString() will miss properties that are initialized in subclasses
 	}
 	public Player<TermType> getPlayer() {
 		return player;
@@ -134,4 +138,12 @@ public abstract class AbstractPlayerThread<
 		}
 	}
 	
+	@Override
+	protected void finalize() throws Throwable {
+		try {
+			logger.info("Player thread finalized: " + this); //$NON-NLS-1$
+		} finally {
+			super.finalize();
+		}
+	}
 }

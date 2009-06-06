@@ -34,4 +34,20 @@ public class PlayerThreadStart<
 	public void run(){
 		player.gameStart(match, getRole(), this);
 	}
+
+	@Override
+	public String toString() {
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("[PlayerThreadStart:");
+		buffer.append(" name: ");
+		buffer.append(getName());
+		buffer.append(" match ID: ");
+		buffer.append(match.getMatchID());
+		buffer.append(" role: ");
+		buffer.append(role);
+		buffer.append(" player: ");
+		buffer.append(player);
+		buffer.append("]");
+		return buffer.toString();
+	}
 }

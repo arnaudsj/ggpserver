@@ -38,4 +38,22 @@ public class PlayerThreadStop<
 	public void run(){
 		player.gameStop(priormoves, this);
 	}
+	
+	@Override
+	public String toString() {
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("[PlayerThreadStop:");
+		buffer.append(" name: ");
+		buffer.append(getName());
+		buffer.append(" match ID: ");
+		buffer.append(match.getMatchID());
+		buffer.append(" player: ");
+		buffer.append(player);
+		buffer.append(" role: ");
+		buffer.append(role);
+		buffer.append(" priormoves: ");
+		buffer.append(priormoves);
+		buffer.append("]");
+		return buffer.toString();
+	}
 }
