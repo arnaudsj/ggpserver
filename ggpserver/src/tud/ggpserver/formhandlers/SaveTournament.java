@@ -56,7 +56,7 @@ public class SaveTournament {
 
 	private void parseGameName(String matchID, String[] params) throws SQLException {
 		if (params.length == 1) {
-			// TODO: db.getMatch(matchID).setGame(db.getGame(params[0]));
+			// XXX: db.getMatch(matchID).setGame(db.getGame(params[0]));
 			System.out.println("match(" + matchID + ").setGame(" + params[0] + ")");
 		}
 	}
@@ -65,7 +65,7 @@ public class SaveTournament {
 		if (params.length == 1) {
 			try {
 				Integer startClock = Integer.parseInt(params[0]);
-				// TODO: db.getMatch(matchID).setStartClock(startClock);
+				// XXX: db.getMatch(matchID).setStartClock(startClock);
 				System.out.println("match(" + matchID + ").setStartClock(" + startClock + ")");
 			} catch (NumberFormatException e) {
 				// ignore
@@ -78,7 +78,7 @@ public class SaveTournament {
 			try {
 				Integer playClock = Integer.parseInt(params[0]);
 				if (playClock != null) {
-					// TODO: db.getMatch(matchID).setPlayClock(playClock);
+					// XXX: db.getMatch(matchID).setPlayClock(playClock);
 					System.out.println("match(" + matchID + ").setPlayClock(" + playClock + ")");
 				}
 			} catch (NumberFormatException e) {
@@ -90,7 +90,7 @@ public class SaveTournament {
 	private void parsePlayerInfos(String matchID, String[] params) throws SQLException {
 		int roleNumber = 0;
 		for (String playerName : params) {
-			// TODO: db.getMatch(matchID).setPlayerInfo(roleNumber, db.getPlayerInfo(playerName));
+			// XXX: db.getMatch(matchID).setPlayerInfo(roleNumber, db.getPlayerInfo(playerName));
 			System.out.println("match(" + matchID + ").setPlayerInfo(" + roleNumber + ", " + playerName + ")"); 
 			
 			roleNumber++;

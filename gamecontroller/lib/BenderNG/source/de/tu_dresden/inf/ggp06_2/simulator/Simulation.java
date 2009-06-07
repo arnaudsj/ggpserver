@@ -36,7 +36,7 @@ public class Simulation extends Thread {
                               )
                     );        
         
-            logger.info( "Player " + role + "created Match" );
+            logger.info( "Player " + role + "created RunnableMatch" );
         }   
 
         logger.info( "Initial State " + game.getInitialNode() );

@@ -21,43 +21,56 @@ package tud.ggpserver.datamodel;
 
 import java.sql.SQLException;
 import java.util.AbstractList;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.List;
 
-public class XMLStatesList extends AbstractList<String> {
+public class JointMovesList extends AbstractList<List<String>> {
 	private final AbstractDBConnector<?, ?> db;
 	private final String matchID;
+	private List<List<String>> cache = new ArrayList<List<String>>();
 	
-	private static final Pattern styleSheetPattern = Pattern.compile("<\\?xml-stylesheet type=\"text/xsl\" href=\"[^\"]*\"\\?>");
-	private final String stylesheet;
-
-	public XMLStatesList(final String matchID, final AbstractDBConnector<?, ?> db, String stylesheet) {
+	public JointMovesList(final String matchID, final AbstractDBConnector<?, ?> db) {
 		this.db = db;
 		this.matchID = matchID;
-		this.stylesheet = stylesheet;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.util.AbstractList#get(int)
+	 */
 	@Override
-	public String get(int stepNumber) {
+	public List<String> get(int stepNumber) {
+		if (stepNumber < 0 || stepNumber >= size()) {
+			throw new IndexOutOfBoundsException();
+		}
 		try {
-			String xmlState = db.getXMLState(matchID, stepNumber);
-
-			// this is a hack to show old matches with the right stylesheets
-			// (e.g., if the stylesheet for a game was changed after the match)
-			// we just replace the stylesheet information with the current one
-			String styleSheetReplacement = "<?xml-stylesheet type=\"text/xsl\" href=\"" + stylesheet + "\"?>";
+			growCache(stepNumber + 1);
 			
-			return styleSheetPattern.matcher(xmlState).replaceFirst(styleSheetReplacement);
-		} catch (SQLException e) {
-			IndexOutOfBoundsException e2 = new IndexOutOfBoundsException(e.getMessage());
-			e2.initCause(e);
+			List<String> result = cache.get(stepNumber);
+			if (result == null) {
+				result = db.getJointMove(matchID, stepNumber);
+				cache.set(stepNumber, result);
+			}
+			return result;
+		} catch (SQLException e1) {
+			IndexOutOfBoundsException e2 = new IndexOutOfBoundsException(e1.getMessage());
+			e2.initCause(e1);
 			throw e2;
+		}
+	}
+
+	/**
+	 * Grows the cache so it can hold at least <code>size</code> elements.
+	 */
+	private void growCache(int size) {
+		while (cache.size() < size) {
+			cache.add(null);
 		}
 	}
 
 	@Override
 	public int size() {
 		try {
-			return db.getNumberOfXMLStates(matchID);
+			return db.getNumberOfXMLStates(matchID) - 1;
 		} catch (SQLException e) {
 			InternalError internalError = new InternalError(e.getMessage());
 			internalError.initCause(e);

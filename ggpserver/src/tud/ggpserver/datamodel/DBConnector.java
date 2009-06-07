@@ -40,6 +40,8 @@ import tud.gamecontroller.game.javaprover.Reasoner;
 import tud.gamecontroller.game.javaprover.Term;
 import tud.gamecontroller.game.javaprover.TermFactory;
 import tud.gamecontroller.players.PlayerInfo;
+import tud.ggpserver.datamodel.matches.NewMatch;
+import tud.ggpserver.datamodel.matches.ServerMatch;
 import cs227b.teamIago.util.GameState;
 
 /**
@@ -69,7 +71,7 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	private Map<String, Game<Term, GameState>> games = new ReferenceMap(SOFT, SOFT, false);
 	
 	@SuppressWarnings("unchecked")
-	private Map<String, Match<Term, GameState>> matches= new ReferenceMap(SOFT, SOFT, false);
+	private Map<String, ServerMatch<Term, GameState>> matches= new ReferenceMap(SOFT, SOFT, false);
 	
 	@SuppressWarnings("unchecked")
 	private Map<String, PlayerInfo> playerInfos = new ReferenceMap(SOFT, SOFT, false);
@@ -87,7 +89,7 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	 */
 	public static synchronized DBConnector getInstance() {
 		ReasonerFactory<Term, GameState> reasonerFactory = new ReasonerFactory<Term, GameState>() {
-			public ReasonerInterface<Term, GameState> getReasoner(String gameDescription, String gameName) {
+			public ReasonerInterface<Term, GameState> createReasoner(String gameDescription, String gameName) {
 				return new Reasoner(gameDescription);
 			}
 		};
@@ -173,16 +175,7 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 		
 		// also remove all cached matches of this game (to prevent the stale-stylesheet-bug).
 		synchronized (matches) {
-//			// This is horribly inefficient if only a small percentage of all matches for that game 
-//			// are in the cache, because getMatchesForGame(gameName) first creates all missing matches,
-//			// only to delete them afterwards. Perhaps it would be more efficient to just clear the
-//			// whole cache and be done with it.
-//			// However, since updating a game doesn't happen very often anyway, this whole issue
-//			// probably won't have much of a performance impact anyway.
-//			for (Match<Term, GameState> match : getMatchesForGame(gameName)) {
-//				matches.remove(match.getMatchID());
-//			}
-			for (Match<Term, GameState> match : matches.values()) {
+			for (ServerMatch match : matches.values()) {
 				if (match.getGame().equals(game)) {
 					matches.remove(match.getMatchID());
 				}
@@ -190,40 +183,29 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 		}
 	}
 
-//	/**
-//	 * When deleting a match is implemented, this will have to be synchronized,
-//	 * too (or at least a check for deleted matches must be done). The reason 
-//	 * is the way this method is implemented (one SQL query to get the game names, 
-//	 * multiple calls to getMatch() afterwards) -- this implementation is still
-//	 * good, because it enables caching of getMatch().
-//	 */
-//	private List<Match<Term, GameState>> getMatchesForGame(String gameName) throws SQLException {
-//		// The "0, Integer.MAX_VALUE" thing is a bit of a hack. 
-//		return getMatches(0, Integer.MAX_VALUE, null, gameName);
-//	}
 
 	/////////////////// MATCH ///////////////////
 	@Override
-	public Match<Term, GameState> createMatch(
+	public NewMatch<Term, GameState> createMatch(
 			String matchID,
 			GameInterface<Term, State<Term, GameState>> game,
 			int startclock,
 			int playclock,
-			Map<? extends RoleInterface<Term>, ? extends PlayerInfo> rolesToPlayers,
+			Map<? extends RoleInterface<Term>, ? extends PlayerInfo> rolesToPlayerInfos,
 			Tournament<Term, GameState> tournament,
 			Date startTime) throws DuplicateInstanceException,
 			SQLException {
 		synchronized (matches) {
-			Match<Term, GameState> result = super.createMatch(matchID, game, startclock, playclock, rolesToPlayers, tournament, startTime);
+			NewMatch<Term, GameState> result = super.createMatch(matchID, game, startclock, playclock, rolesToPlayerInfos, tournament, startTime);
 			matches.put(matchID, result);
 			return result;
 		}
 	}
 
 	@Override
-	public Match<Term, GameState> getMatch(String matchID)
+	public ServerMatch<Term, GameState> getMatch(String matchID)
 			throws SQLException {
-		Match<Term, GameState> result = matches.get(matchID);
+		ServerMatch<Term, GameState> result = matches.get(matchID);
 		if (result == null) {
 			synchronized (matches) {
 				result = super.getMatch(matchID);
@@ -235,6 +217,29 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 		}
 		return result;
 	}
+	
+	@Override
+	public void deleteMatch(String matchID) throws SQLException {
+		synchronized (matches) {
+			clearCacheForMatch(matchID);
+			super.deleteMatch(matchID);
+		}
+	}
+	
+	private void clearCacheForMatch(String matchID) {
+		synchronized (matches) {
+			matches.remove(matchID);
+		}
+	}
+
+	@Override
+	public void setMatchStatus(ServerMatch<Term, GameState> match, String status) throws SQLException {
+		synchronized (matches) {
+			clearCacheForMatch(match.getMatchID());
+			super.setMatchStatus(match, status);
+		}
+	}
+
 
 	/////////////////// PLAYERINFO ///////////////////
 	@Override
@@ -292,22 +297,14 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 		
 		// remove all cached matches of this player. 
 		synchronized (matches) {
-			// See comment for clearCacheForGame().
-//			for (Match<Term, GameState> match : getMatchesForPlayer(playerName)) {
-//				matches.remove(match.getMatchID());
-//			}
-			for (Match<Term, GameState> match : new LinkedList<Match<Term, GameState>>(matches.values())) {
+			for (ServerMatch match : new LinkedList<ServerMatch<Term, GameState>>(matches.values())) {
+					// new LinkedList(...) necessary to avoid concurrent iteration and modification
 				if (match.getPlayerInfos().contains(player)) {
 					matches.remove(match.getMatchID());
 				}
 			}
 		}
 	}
-
-//	private List<Match<Term,GameState>> getMatchesForPlayer(String playerName) throws SQLException {
-//		// The "0, Integer.MAX_VALUE" thing is a bit of a hack. 
-//		return getMatches(0, Integer.MAX_VALUE, playerName, null);
-//	}
 
 	/////////////////// USER ///////////////////
 	@Override

@@ -5,7 +5,7 @@ import tud.gamecontroller.term.TermInterface;
 
 public interface ReasonerFactory<TermType extends TermInterface, ReasonerStateInfoType> {
 
-	public abstract ReasonerInterface<TermType, ReasonerStateInfoType> getReasoner(
+	public abstract ReasonerInterface<TermType, ReasonerStateInfoType> createReasoner(
 			String gameDescription, String gameName);
 
 }

@@ -54,7 +54,7 @@
 	<tbody>
 		<c:set var="rowClass" value="even" />
 		
-		<c:forEach var="stepNumber" begin="1" end="${match.numberOfStates}">
+		<c:forEach var="stepNumber" begin="1" end="<%= viewErrors.getMatch().getXmlStates().size() %>">
 			<jsp:setProperty name="viewErrors" property="stepNumber"
 				value="${stepNumber}" />
 			

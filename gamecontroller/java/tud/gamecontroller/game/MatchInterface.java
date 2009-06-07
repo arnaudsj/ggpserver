@@ -19,6 +19,7 @@
 
 package tud.gamecontroller.game;
 
+
 /**
  * The point of this interfaces is not to refer to the actual Player
  * implementation, only to PlayerInfos. This makes Matches that are not intended
@@ -38,7 +39,7 @@ public interface MatchInterface<TermType, StateType extends StateInterface<TermT
 	public abstract int getStartclock();
 
 	public abstract int getPlayclock();
-
+	
 	// TODO: This could be extended to include the following methods:
 	//	public abstract Collection<? extends PlayerInfo<TermType>> getPlayerInfos();
 	//	public abstract List<? extends PlayerInfo> getOrderedPlayerInfos();

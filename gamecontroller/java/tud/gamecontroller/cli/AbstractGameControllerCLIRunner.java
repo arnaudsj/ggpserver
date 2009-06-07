@@ -205,7 +205,7 @@ public abstract class AbstractGameControllerCLIRunner<
 		System.exit(-1);
 	}
 
-//	protected abstract Match<TermType,StateType,Player<TermType, StateType>> createMatch(String matchID, GameType game, int startClock, int playClock, Map<Role<TermType>, Player<TermType, StateType>> players);
+//	protected abstract RunnableMatch<TermType,StateType,Player<TermType, StateType>> createMatch(String matchID, GameType game, int startClock, int playClock, Map<Role<TermType>, Player<TermType, StateType>> players);
 
 	@Override
 	protected boolean doPrintXML() {

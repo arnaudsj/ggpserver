@@ -49,7 +49,7 @@ public class Game<
 		this.reasonerFactory=reasonerFactory;
 		this.gameDescription=gameDescription;
 		ReasonerInterface<TermType, ReasonerStateInfoType> reasoner = reasonerFactory
-				.getReasoner(gameDescription, name);
+				.createReasoner(gameDescription, name);
 		roles = reasoner.getRoles();
 		kifGameDescription = reasoner.getKIFGameDescription();
 	}
@@ -60,7 +60,7 @@ public class Game<
 	}
 	
 	public State<TermType, ReasonerStateInfoType> getInitialState() {
-		ReasonerInterface<TermType, ReasonerStateInfoType> reasoner = reasonerFactory.getReasoner(gameDescription, name);
+		ReasonerInterface<TermType, ReasonerStateInfoType> reasoner = reasonerFactory.createReasoner(gameDescription, name);
 		return new State<TermType,ReasonerStateInfoType>(reasoner , reasoner.getInitialState());
 	}
 

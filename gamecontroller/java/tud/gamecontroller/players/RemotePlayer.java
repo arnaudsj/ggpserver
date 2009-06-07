@@ -39,6 +39,7 @@ import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.MoveFactoryInterface;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
+import tud.gamecontroller.logging.ErrorMessageListener;
 import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.scrambling.GameScramblerInterface;
 import tud.gamecontroller.term.TermInterface;
@@ -103,7 +104,7 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 				move=movefactory.getMoveFromKIF(descrambledReply);
 			} catch (InvalidKIFException ex) {
 				String message = "Error parsing reply \""+reply+"\" from "+this+": "+ex.getMessage();
-				logger.log(Level.SEVERE, message, new GameControllerErrorMessage(GameControllerErrorMessage.PARSING_ERROR, message, match, this.getName()));
+				logErrorMessage(GameControllerErrorMessage.PARSING_ERROR, message);
 			}
 //			if(moveterm!=null && !moveterm.isGround()){
 //				logger.severe("Reply \""+reply+"\" from "+this+" is not a ground term. (descrambled:\""+descrambledReply+"\")");
@@ -175,14 +176,15 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 			Thread.currentThread().interrupt();
 		} catch (UnknownHostException e) {
 			String message = "error: unknown host \""+ host+ "\"";
-			logger.log(Level.SEVERE, message, new GameControllerErrorMessage(GameControllerErrorMessage.UNKNOWN_HOST, message, match, this.getName()));
+			logErrorMessage(GameControllerErrorMessage.UNKNOWN_HOST, message);
+
 			// call the notifier in case of an exception, otherwise 
 			// the GameController will wait forever if the exception occurred
 			// before the sending of the message
 			notifier.messageWasSent();
 		} catch (IOException e) {
 			String message = "error: io error for "+ this+" : "+e.getMessage();
-			logger.log(Level.SEVERE, message, new GameControllerErrorMessage(GameControllerErrorMessage.IO_ERROR, message, match, this.getName()));
+			logErrorMessage(GameControllerErrorMessage.IO_ERROR, message);
 			// call the notifier in case of an exception, otherwise 
 			// the GameController will wait forever if the exception occurred
 			// before the sending of the message
@@ -191,6 +193,16 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 		return reply;
 	}
 
+
+	private void logErrorMessage(String message, String type) {
+		GameControllerErrorMessage errorMessage = new GameControllerErrorMessage(type, message, this.getName());
+		if (match instanceof ErrorMessageListener) {
+			((ErrorMessageListener) match).notifyErrorMessage(errorMessage);
+		}
+		logger.log(Level.SEVERE, message, errorMessage);
+	}
+
+	@Override
 	public String toString(){
 		return "remote("+getName()+", "+host+":"+port+")";
 //		return "remote("+host+":"+port+")";

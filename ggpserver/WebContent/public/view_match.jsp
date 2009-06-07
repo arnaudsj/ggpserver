@@ -111,7 +111,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		<c:forEach var="stepNumber" begin="1" end="${match.numberOfStates}"
+		<c:forEach var="stepNumber" begin="1" end="<%= viewMatch.getMatch().getXmlStates().size() %>"
 			varStatus="lineInfo">
 			<jsp:setProperty name="viewMatch" property="stepNumber"
 				value="${stepNumber}" />

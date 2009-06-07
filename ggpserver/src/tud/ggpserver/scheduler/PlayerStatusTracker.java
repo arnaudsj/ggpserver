@@ -30,12 +30,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import tud.gamecontroller.logging.ErrorMessageListener;
 import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
-import tud.ggpserver.datamodel.Match;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
+import tud.ggpserver.datamodel.matches.RunningMatch;
+import tud.ggpserver.datamodel.matches.ServerMatch;
 
 /**
  * Keeps track of active / inactive players.
@@ -119,7 +121,7 @@ public class PlayerStatusTracker<TermType extends TermInterface, ReasonerStateIn
 	 * When a player has played MAX_ERROR_MATCHES in a row, its status is set to
 	 * "inactive".
 	 */
-	public void updateDeadPlayers(Match<TermType, ReasonerStateInfoType> match) {
+	public void updateDeadPlayers(RunningMatch<TermType, ReasonerStateInfoType> match) {
 		for (RemotePlayerInfo playerInfo : onlyRemotePlayerInfos(match)) {
 			if (returnedOnlyErrors(match, playerInfo)) {
 				int newNumOfflineMatches = getNumOfflineMatches(playerInfo) + 1;
@@ -138,7 +140,7 @@ public class PlayerStatusTracker<TermType extends TermInterface, ReasonerStateIn
 		}
 	}
 
-	private Collection<RemotePlayerInfo> onlyRemotePlayerInfos(Match<TermType, ReasonerStateInfoType> match) {
+	private Collection<RemotePlayerInfo> onlyRemotePlayerInfos(ServerMatch<TermType, ReasonerStateInfoType> match) {
 		Collection<RemotePlayerInfo> remotePlayerInfos = new LinkedList<RemotePlayerInfo>();
 		
 		for (PlayerInfo info : match.getPlayerInfos()) {
@@ -161,10 +163,10 @@ public class PlayerStatusTracker<TermType extends TermInterface, ReasonerStateIn
 	 * @return <code>true</code> iff the given player caused an error message
 	 *         in every single state of the given match.
 	 */
-	private boolean returnedOnlyErrors(Match<TermType, ReasonerStateInfoType> match, PlayerInfo playerInfo) {
+	private boolean returnedOnlyErrors(ServerMatch<TermType, ReasonerStateInfoType> match, PlayerInfo playerInfo) {
 		List<List<GameControllerErrorMessage>> errorMessages = match.getErrorMessagesForPlayer(playerInfo);
 		
-		int numberOfStates = match.getNumberOfStates();
+		int numberOfStates = match.getXmlStates().size();
 		assert (errorMessages.size() == numberOfStates);
 		
 		for (int i = 0; i < numberOfStates; i++) {
@@ -193,15 +195,16 @@ public class PlayerStatusTracker<TermType extends TermInterface, ReasonerStateIn
 	/**
 	 * add an informative error message to the match
 	 */
-	private void addDisableMessage(Match<TermType, ReasonerStateInfoType> match, RemotePlayerInfo playerInfo) {
+	private void addDisableMessage(ErrorMessageListener<TermType, ReasonerStateInfoType> match, RemotePlayerInfo playerInfo) {
 		String message = "The status of player "
 				+ playerInfo.getName()
 				+ " was set to INACTIVE because it produced"
 				+ " an error in each state of more than "
 				+ MAX_ERROR_MATCHES + " matches in a row.";
-		match.updateErrorMessage(new GameControllerErrorMessage(
-				GameControllerErrorMessage.PLAYER_DISABLED,
-				message, match, playerInfo.getName()));					
+		GameControllerErrorMessage errorMessage = new GameControllerErrorMessage(
+						GameControllerErrorMessage.PLAYER_DISABLED,
+						message, playerInfo.getName());
+		match.notifyErrorMessage(errorMessage);					
 		logger.warning(message);
 	}
 	

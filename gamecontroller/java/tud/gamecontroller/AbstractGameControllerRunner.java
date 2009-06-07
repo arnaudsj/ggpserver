@@ -31,8 +31,10 @@ import java.util.logging.Logger;
 import tud.gamecontroller.game.MoveFactoryInterface;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
+import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.impl.Game;
-import tud.gamecontroller.game.impl.Match;
+import tud.gamecontroller.game.impl.RunnableMatch;
+import tud.gamecontroller.game.impl.State;
 import tud.gamecontroller.players.Player;
 import tud.gamecontroller.players.PlayerFactory;
 import tud.gamecontroller.players.PlayerInfo;
@@ -73,8 +75,8 @@ public abstract class AbstractGameControllerRunner<
 		Game<TermType, ReasonerStateInfoType> game=getGame();
 		Map<RoleInterface<TermType>,Player<TermType>> players=
 				createPlayers(game, gameScrambler);
-		Match<TermType, ReasonerStateInfoType> match=
-				new Match<TermType, ReasonerStateInfoType>(
+		RunnableMatchInterface<TermType, State<TermType, ReasonerStateInfoType>> match=
+				new RunnableMatch<TermType, ReasonerStateInfoType>(
 						getMatchID(), game, getStartClock(), getPlayClock(), players);
 		gameController=new GameController<
 			TermType,

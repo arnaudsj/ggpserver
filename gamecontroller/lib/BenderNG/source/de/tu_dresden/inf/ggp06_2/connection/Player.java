@@ -29,13 +29,13 @@ public class Player {
         public MatchTimerTask( Match matchToTime ) {
             match = matchToTime;
             match.getTimerFlag().reset();
-            logger.info( "Create a new Match Timer." );
+            logger.info( "Create a new RunnableMatch Timer." );
         }
 
         @Override
         public void run() {
             match.getTimerFlag().interrupt();
-            logger.info( "Match gets interrupted." );
+            logger.info( "RunnableMatch gets interrupted." );
         }
     }
 

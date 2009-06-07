@@ -23,8 +23,12 @@ import java.sql.SQLException;
 import java.util.List;
 
 import tud.gamecontroller.term.TermInterface;
+import tud.ggpserver.datamodel.matches.ServerMatch;
 
 public class Tournament<TermType extends TermInterface, ReasonerStateInfoType> {
+	public static final int DEFAULT_STARTCLOCK = 600;
+	public static final int DEFAULT_PLAYCLOCK = 30;
+	
 	private final String tournamentID;
 	private final User owner;
 	
@@ -36,7 +40,7 @@ public class Tournament<TermType extends TermInterface, ReasonerStateInfoType> {
 		this.db = db;
 	}
 
-	public List<Match<TermType,ReasonerStateInfoType>> getMatches() throws SQLException {
+	public List<ServerMatch<TermType,ReasonerStateInfoType>> getMatches() throws SQLException {
 		return db.getMatches(0, Integer.MAX_VALUE, null, null, tournamentID, false);
 	}
 

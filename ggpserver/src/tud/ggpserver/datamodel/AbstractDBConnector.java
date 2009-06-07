@@ -54,6 +54,11 @@ import tud.gamecontroller.players.RandomPlayerInfo;
 import tud.gamecontroller.scrambling.GameScramblerInterface;
 import tud.gamecontroller.scrambling.IdentityGameScrambler;
 import tud.gamecontroller.term.TermInterface;
+import tud.ggpserver.datamodel.matches.AbortedMatch;
+import tud.ggpserver.datamodel.matches.FinishedMatch;
+import tud.ggpserver.datamodel.matches.NewMatch;
+import tud.ggpserver.datamodel.matches.RunningMatch;
+import tud.ggpserver.datamodel.matches.ServerMatch;
 import tud.ggpserver.scheduler.PlayerStatusListener;
 import tud.ggpserver.util.Digester;
 
@@ -308,12 +313,12 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return result;
 	}
 	
-	public Match<TermType, ReasonerStateInfoType> createMatch(
+	public NewMatch<TermType, ReasonerStateInfoType> createMatch(
 			String matchID,
 			GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game,
 			int startclock,
 			int playclock,
-			Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayers,
+			Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayerInfos,
 			Tournament<TermType, ReasonerStateInfoType> tournament,
 			Date startTime) throws DuplicateInstanceException, SQLException {
 
@@ -339,7 +344,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			
 			Integer roleindex = 0;
 			for (RoleInterface<TermType> role : game.getOrderedRoles()) {
-				ps.setString(2, rolesToPlayers.get(role).getName());
+				ps.setString(2, rolesToPlayerInfos.get(role).getName());
 				ps.setString(3, roleindex.toString());
 		
 				ps.executeUpdate();
@@ -354,27 +359,27 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				try {con.close();} catch (SQLException e) {}
 			if (ps != null)
 				try {ps.close();} catch (SQLException e) {}
-		} 
+		}
 
 		logger.info("String, Game<TermType,ReasonerStateInfoType>, int, int, Map<? extends RoleInterface<TermType>,? extends PlayerInfo>, Date - Creating new match: " + matchID); //$NON-NLS-1$
-		return new Match<TermType, ReasonerStateInfoType>(matchID, game, startclock, playclock,
-				rolesToPlayers, startTime, getMoveFactory(), gamescrambler, tournament, this);
+		return new NewMatch<TermType, ReasonerStateInfoType>(matchID, game, startclock, playclock,
+				rolesToPlayerInfos, startTime, this);
 	}
 	
 	/**
 	 * Creates a match with a generated match ID.
 	 */
-	public Match<TermType, ReasonerStateInfoType> createMatch(GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game,
-			int startclock, int playclock, Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayers,
+	public NewMatch<TermType, ReasonerStateInfoType> createMatch(GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game,
+			int startclock, int playclock, Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayerInfos,
 			Tournament<TermType, ReasonerStateInfoType> tournament, Date startTime) throws SQLException {
 		
 		long number = System.currentTimeMillis();
-		Match<TermType, ReasonerStateInfoType> match = null;
+		NewMatch<TermType, ReasonerStateInfoType> match = null;
 		
 		while (match == null) {
 			String matchID = generateMatchID(game, Long.toString(number));
 			try {
-				match = createMatch(matchID, game, startclock, playclock, rolesToPlayers, tournament, startTime);
+				match = createMatch(matchID, game, startclock, playclock, rolesToPlayerInfos, tournament, startTime);
 			} catch (DuplicateInstanceException e) {
 				number++;
 			}
@@ -383,28 +388,31 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return match;
 	}
 
-	public Match<TermType, ReasonerStateInfoType> createMatch(GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game,
-			int startclock, int playclock, Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayers, 
+	public NewMatch<TermType, ReasonerStateInfoType> createMatch(GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game,
+			int startclock, int playclock, Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayerInfos, 
 			Tournament<TermType, ReasonerStateInfoType> tournament) throws SQLException {
-		return createMatch(game, startclock, playclock, rolesToPlayers, tournament, new Date());
+		return createMatch(game, startclock, playclock, rolesToPlayerInfos, tournament, new Date());
 	}
 	
-	public Match<TermType, ReasonerStateInfoType> getMatch(String matchID)
+	public ServerMatch<TermType, ReasonerStateInfoType> getMatch(String matchID)
 			throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		PreparedStatement ps_roles = null;
 		ResultSet rs = null;
 
-		Match<TermType, ReasonerStateInfoType> result = null;
+		ServerMatch<TermType, ReasonerStateInfoType> result = null;
 
 		try {
-			ps = con.prepareStatement("SELECT `game` , `start_clock` , `play_clock` , `start_time` , `status`, `tournament_id` FROM `matches` WHERE `match_id` = ?;");
+			ps = con.prepareStatement("SELECT `game` , `start_clock` , `play_clock` , `start_time` , `status` FROM `matches` WHERE `match_id` = ?;");
 			ps.setString(1, matchID);
 			rs = ps.executeQuery();
 			
 			if (rs.next()) {
 				Game<TermType, ReasonerStateInfoType> game = getGame(rs.getString("game"));
+				int startclock = rs.getInt("start_clock");
+				int playclock = rs.getInt("play_clock");
+				Timestamp startTime = rs.getTimestamp("start_time");
 				String status = rs.getString("status");
 				
 				ps_roles = con.prepareStatement("SELECT `player` , `roleindex` , `goal_value` FROM `match_players` WHERE `match_id` = ?;");
@@ -412,7 +420,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 
 				ResultSet rs_roles = ps_roles.executeQuery();
 
-				Map<RoleInterface<TermType>, PlayerInfo> playerinfos = new HashMap<RoleInterface<TermType>, PlayerInfo>();				
+				Map<RoleInterface<TermType>, PlayerInfo> rolesToPlayerInfos = new HashMap<RoleInterface<TermType>, PlayerInfo>();				
 				Map<RoleInterface<TermType>, Integer> goalValues = new HashMap<RoleInterface<TermType>, Integer>();
 				
 				while (rs_roles.next()) {
@@ -421,21 +429,35 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 					PlayerInfo playerInfo = getPlayerInfo(rs_roles.getString("player"));
 					playerInfo.setRoleindex(roleindex);
 						
-					playerinfos.put(role, playerInfo);
+					rolesToPlayerInfos.put(role, playerInfo);
 					goalValues.put(role, rs_roles.getInt("goal_value"));
 				}				
 
-				logger.info("String - Returning new match: " + matchID); //$NON-NLS-1$
-
-				result = new Match<TermType, ReasonerStateInfoType>(matchID, game, rs.getInt("start_clock"), 
-						rs.getInt("play_clock"), playerinfos, rs.getTimestamp("start_time"), getMoveFactory(), 
-						gamescrambler, getTournament(rs.getString("tournament_id")), this);
-				result.setStatus(status);
-				if (status.equals(Match.STATUS_FINISHED)) {
-					result.setGoalValues(goalValues);
+//				List<List<GameControllerErrorMessage>> errorMessages = getErrorMessages(matchID, getNumberOfXMLStates(matchID));
+//				List<List<String>> jointMovesStrings = getJointMovesStrings(matchID);
+				
+				if (status.equals(ServerMatch.STATUS_NEW)) {
+					result = new NewMatch<TermType, ReasonerStateInfoType>(
+							matchID, game, startclock, playclock,
+							rolesToPlayerInfos, startTime, this);
+				} else if (status.equals(ServerMatch.STATUS_RUNNING)) {
+					result = new RunningMatch<TermType, ReasonerStateInfoType>(
+							matchID, game, startclock, playclock,
+							rolesToPlayerInfos, startTime, this,
+							getMoveFactory(), gamescrambler);
+				} else if (status.equals(ServerMatch.STATUS_ABORTED)) {
+					result = new AbortedMatch<TermType, ReasonerStateInfoType>(
+							matchID, game, startclock, playclock,
+							rolesToPlayerInfos, startTime, this);
+				} else if (status.equals(ServerMatch.STATUS_FINISHED)) {
+					result = new FinishedMatch<TermType, ReasonerStateInfoType>(
+							matchID, game, startclock, playclock,
+							rolesToPlayerInfos, startTime, this, goalValues);
 				}
-				result.setErrorMessages(getErrorMessages(result, result.getNumberOfStates()));
-				result.setJointMovesStrings(getJointMovesStrings(matchID));				
+				
+				if (result == null) {
+					throw new SQLException("Field \"status\" in database entry for match " + matchID + " has an illegal value!");
+				}
 			}
 		} finally { 
 			if (con != null)
@@ -448,8 +470,94 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				try {rs.close();} catch (SQLException e) {}
 		} 
 
+		logger.info("String - Returning new match: " + matchID); //$NON-NLS-1$
 		return result;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public NewMatch<TermType, ReasonerStateInfoType> getNewMatch(String matchID) throws SQLException {
+		ServerMatch<TermType, ReasonerStateInfoType> match = getMatch(matchID);
+		if (match instanceof NewMatch) {
+			return (NewMatch) match;
+		}
+		throw new IllegalArgumentException("Not a new match: " + matchID);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public RunningMatch<TermType, ReasonerStateInfoType> getRunningMatch(String matchID) throws SQLException {
+		ServerMatch<TermType, ReasonerStateInfoType> match = getMatch(matchID);
+		if (match instanceof RunningMatch) {
+			return (RunningMatch) match;
+		}
+		throw new IllegalArgumentException("Not a running match: " + matchID);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public FinishedMatch<TermType, ReasonerStateInfoType> getFinishedMatch(String matchID) throws SQLException {
+		ServerMatch<TermType, ReasonerStateInfoType> match = getMatch(matchID);
+		if (match instanceof FinishedMatch) {
+			return (FinishedMatch) match;
+		}
+		throw new IllegalArgumentException("Not a finished match: " + matchID);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public AbortedMatch<TermType, ReasonerStateInfoType> getAbortedMatch(String matchID) throws SQLException {
+		ServerMatch<TermType, ReasonerStateInfoType> match = getMatch(matchID);
+		if (match instanceof AbortedMatch) {
+			return (AbortedMatch) match;
+		}
+		throw new IllegalArgumentException("Not an aborted match: " + matchID);
+	}
+	
+	public void deleteMatch(String matchID) throws SQLException {
+		Connection con = getConnection();
+		
+		PreparedStatement ps = null;
+		try {
+			con.setAutoCommit(false);
+			
+			// LOW_PRIORITY means that the actual deletion will only 
+			// be performed after there are no more reading clients. 
+			ps = con.prepareStatement("DELETE LOW_PRIORITY FROM `matches` WHERE `match_id` = ? LIMIT 1");
+			ps.setString(1, matchID);
+			ps.executeUpdate();
+			ps.close();
+			
+			ps = con.prepareStatement("DELETE LOW_PRIORITY FROM `errormessages` WHERE `match_id` = ?");
+			ps.setString(1, matchID);
+			ps.executeUpdate();
+			ps.close();
+			
+			ps = con.prepareStatement("DELETE LOW_PRIORITY FROM `match_players` WHERE `match_id` = ?");
+			ps.setString(1, matchID);
+			ps.executeUpdate();
+			ps.close();
+			
+			ps = con.prepareStatement("DELETE LOW_PRIORITY FROM `states` WHERE `match_id` = ?");
+			ps.setString(1, matchID);
+			ps.executeUpdate();
+			ps.close();
+			
+			ps = con.prepareStatement("DELETE LOW_PRIORITY FROM `moves` WHERE `match_id` = ?");
+			ps.setString(1, matchID);
+			ps.executeUpdate();
+			ps.close();
+			
+			con.commit();
+		} catch (SQLException e) {
+			if (con != null) {
+				con.rollback();
+			}
+			throw e;
+		} finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+		} 
+	}
+	
 	
 	public int getRowCount(String tableName) throws SQLException {
 		Connection con = getConnection();
@@ -663,7 +771,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	 *         combined.
 	 * @throws SQLException
 	 */
-	public List<Match<TermType, ReasonerStateInfoType>> getMatches(
+	public List<ServerMatch<TermType, ReasonerStateInfoType>> getMatches(
 			int startRow, int numDisplayedRows, String playerName,
 			String gameName, String tournamentID, boolean excludeNew)
 			throws SQLException {
@@ -671,7 +779,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
-		List<Match<TermType, ReasonerStateInfoType>> result = new LinkedList<Match<TermType, ReasonerStateInfoType>>();
+		List<ServerMatch<TermType, ReasonerStateInfoType>> result = new LinkedList<ServerMatch<TermType, ReasonerStateInfoType>>();
 		
 		try {
 			ps = prepareMatchesStatement(con, false, startRow, numDisplayedRows, playerName, gameName, tournamentID, excludeNew);
@@ -775,7 +883,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	}
 	
 	
-	protected void setMatchStatus(Match<? extends TermType, ReasonerStateInfoType> match, String status) throws SQLException {
+	public void setMatchStatus(ServerMatch<TermType, ReasonerStateInfoType> match, String status) throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 
@@ -792,7 +900,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		} 
 	}
 	
-	protected void setMatchGoalValues(Match<? extends TermType, ReasonerStateInfoType> match, Map<? extends RoleInterface<?>, Integer> goalValues) throws SQLException {
+	public void setMatchGoalValues(ServerMatch<TermType, ReasonerStateInfoType> match, Map<? extends RoleInterface<?>, Integer> goalValues) throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 
@@ -819,7 +927,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	/**
 	 * @param stepNumber counting starts from 1
 	 */
-	protected void addErrorMessage(String matchID, int stepNumber, GameControllerErrorMessage errorMessage) throws SQLException {
+	public void addErrorMessage(String matchID, int stepNumber, GameControllerErrorMessage errorMessage) throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 
@@ -847,7 +955,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	/**
 	 * @param stepNumber counting starts from 1
 	 */
-	protected void addJointMove(String matchID, int stepNumber, JointMoveInterface<? extends TermInterface> jointMove) throws SQLException, DuplicateInstanceException {
+	public void addJointMove(String matchID, int stepNumber, JointMoveInterface<? extends TermInterface> jointMove) throws SQLException, DuplicateInstanceException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 
@@ -878,7 +986,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	/**
 	 * @param stepNumber counting starts from 1
 	 */
-	protected void addState(String matchID, int stepNumber, String xmlState) throws SQLException, DuplicateInstanceException {
+	public void addState(String matchID, int stepNumber, String xmlState) throws SQLException, DuplicateInstanceException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		
@@ -900,81 +1008,65 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		} 
 	}
 	
-	/**
-	 * Returns a list of lists of error messages for each step number. The first
-	 * element of result is the list of error messages for step number 1, and so
-	 * on. Unfortunately, step number counting starts with 1, so to get the
-	 * error messages for step number i, use result.get(i - 1).
-	 */
-	private List<List<GameControllerErrorMessage>> getErrorMessages(Match<TermType, ReasonerStateInfoType> match, int numberOfStates) throws SQLException {
+//	/**
+//	 * Returns a list of lists of error messages for each step number. The first
+//	 * element of result is the list of error messages for step number 1, and so
+//	 * on. Unfortunately, step number counting starts with 1, so to get the
+//	 * error messages for step number i, use result.get(i - 1).
+//	 */
+//	private List<List<GameControllerErrorMessage>> getErrorMessages(String matchID, int numberOfStates) throws SQLException {
+//		Connection con = getConnection();
+//		PreparedStatement ps = null;
+//		ResultSet rs = null;
+//
+//		List<List<GameControllerErrorMessage>> result = new ArrayList<List<GameControllerErrorMessage>>(numberOfStates);
+//		
+//		for (int i = 0; i < numberOfStates; i++) {
+//			result.add(new LinkedList<GameControllerErrorMessage>());
+//		}
+//		
+//		try {
+//			ps = con.prepareStatement("SELECT `step_number`, `type`, `message`, `player` FROM `errormessages` WHERE `match_id` = ? ORDER BY `step_number`;");
+//			ps.setString(1, matchID);
+//			rs = ps.executeQuery();
+//			
+//			while (rs.next()) {
+//				int errorMsgStepNumber = rs.getInt("step_number");   // step number counting starts with 1 
+//				if (errorMsgStepNumber > numberOfStates) {
+//					String message = "errorMsgStepNumber bigger than numberOfStates! Causing match id: " + matchID;
+//					logger.severe(message);        //$NON-NLS-1$s
+//					throw new InternalError(message);					
+//				}
+//				GameControllerErrorMessage errorMessage = new GameControllerErrorMessage(rs.getString("type"), rs.getString("message"), rs.getString("player"));
+//				result.get(errorMsgStepNumber - 1).add(errorMessage);
+//			}
+//		} finally { 
+//			if (con != null)
+//				try {con.close();} catch (SQLException e) {}
+//			if (ps != null)
+//				try {ps.close();} catch (SQLException e) {}
+//			if (rs != null)
+//				try {rs.close();} catch (SQLException e) {}
+//		} 
+//
+//		return result;
+//	}
+	protected List<GameControllerErrorMessage> getErrorMessages(String matchID, int stepNumber) throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
-		List<List<GameControllerErrorMessage>> result = new ArrayList<List<GameControllerErrorMessage>>(numberOfStates);
-		
-		for (int i = 0; i < numberOfStates; i++) {
-			result.add(new LinkedList<GameControllerErrorMessage>());
-		}
+		List<GameControllerErrorMessage> result = new ArrayList<GameControllerErrorMessage>();
 		
 		try {
-			ps = con.prepareStatement("SELECT `step_number`, `type`, `message`, `player` FROM `errormessages` WHERE `match_id` = ? ORDER BY `step_number`;");
-			ps.setString(1, match.getMatchID());
-			rs = ps.executeQuery();
-			
-			while (rs.next()) {
-				int errorMsgStepNumber = rs.getInt("step_number");   // step number counting starts with 1 
-				if (errorMsgStepNumber > numberOfStates) {
-					String message = "errorMsgStepNumber bigger than numberOfStates! Causing match id: " + match.getMatchID();
-					logger.severe(message);        //$NON-NLS-1$s
-					throw new InternalError(message);					
-				}
-				GameControllerErrorMessage errorMessage = new GameControllerErrorMessage(rs.getString("type"), rs.getString("message"), match, rs.getString("player"));
-				result.get(errorMsgStepNumber - 1).add(errorMessage);
-			}
-		} finally { 
-			if (con != null)
-				try {con.close();} catch (SQLException e) {}
-			if (ps != null)
-				try {ps.close();} catch (SQLException e) {}
-			if (rs != null)
-				try {rs.close();} catch (SQLException e) {}
-		} 
-
-		return result;
-	}
-
-	private List<List<String>> getJointMovesStrings(String matchID) throws SQLException {
-		Connection con = getConnection();
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
-		List<List<String>> result = new LinkedList<List<String>>();
-		
-		try {
-			ps = con.prepareStatement("SELECT `step_number`, `roleindex`, `move` FROM `moves` WHERE `match_id` = ? ORDER BY `step_number`, `roleindex`;");
+			ps = con.prepareStatement("SELECT `type`, `message`, `player` FROM `errormessages` WHERE `match_id` = ? AND `step_number` = ? ;");
 			ps.setString(1, matchID);
+			ps.setInt(2, stepNumber + 1);   // stepNumber starts from 0, in DB from 1
 			rs = ps.executeQuery();
 			
-			List<String> jointMove = null;
-			int stepNumber = 0;
 			while (rs.next()) {
-				int roleIndex = rs.getInt("roleindex");
-				if (roleIndex == 0) {
-					stepNumber++;
-					if (jointMove != null) {
-						result.add(jointMove);
-					}
-					jointMove = new LinkedList<String>();
-				}
-				assert(jointMove != null);
-				jointMove.add(rs.getString("move"));
-
-				assert(rs.getInt("step_number") == stepNumber);
-				assert(roleIndex == jointMove.size() - 1);
-			}
-			if (jointMove != null) {
-				result.add(jointMove);
+				GameControllerErrorMessage errorMessage = new GameControllerErrorMessage(rs.getString("type"), rs.getString("message"), rs.getString("player"));
+				result.add(errorMessage);
 			}
 		} finally { 
 			if (con != null)
@@ -988,23 +1080,70 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return result;
 	}
 
-	protected List<String> getXMLStates(String matchID) throws SQLException {
+
+//	private List<List<String>> getJointMovesStrings(String matchID) throws SQLException {
+//		Connection con = getConnection();
+//		PreparedStatement ps = null;
+//		ResultSet rs = null;
+//
+//		List<List<String>> result = new LinkedList<List<String>>();
+//		
+//		try {
+//			ps = con.prepareStatement("SELECT `step_number`, `roleindex`, `move` FROM `moves` WHERE `match_id` = ? ORDER BY `step_number`, `roleindex`;");
+//			ps.setString(1, matchID);
+//			rs = ps.executeQuery();
+//			
+//			List<String> jointMove = null;
+//			int stepNumber = 0;
+//			while (rs.next()) {
+//				int roleIndex = rs.getInt("roleindex");
+//				if (roleIndex == 0) {
+//					stepNumber++;
+//					if (jointMove != null) {
+//						result.add(jointMove);
+//					}
+//					jointMove = new LinkedList<String>();
+//				}
+//				assert(jointMove != null);
+//				jointMove.add(rs.getString("move"));
+//
+//				assert(rs.getInt("step_number") == stepNumber);
+//				assert(roleIndex == jointMove.size() - 1);
+//			}
+//			if (jointMove != null) {
+//				result.add(jointMove);
+//			}
+//		} finally { 
+//			if (con != null)
+//				try {con.close();} catch (SQLException e) {}
+//			if (ps != null)
+//				try {ps.close();} catch (SQLException e) {}
+//			if (rs != null)
+//				try {rs.close();} catch (SQLException e) {}
+//		} 
+//
+//		return result;
+//	}
+	
+	public List<String> getJointMove(String matchID, int stepNumber) throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
 		List<String> result = new LinkedList<String>();
-
+		
 		try {
-			ps = con.prepareStatement("SELECT `step_number`, `state` FROM `states` WHERE `match_id` = ? ORDER BY `step_number`;");
+			ps = con.prepareStatement("SELECT `roleindex`, `move` FROM `moves` WHERE `match_id` = ? AND `step_number` = ? ORDER BY `roleindex`;");
 			ps.setString(1, matchID);
+			ps.setInt(2, stepNumber + 1);   // stepNumber starts from 0, in DB from 1
 			rs = ps.executeQuery();
 			
-			int stepNumber = 1;
 			while (rs.next()) {
-				assert(rs.getInt("step_number") == stepNumber);
-				result.add(rs.getString("state"));
-				stepNumber++;
+				int roleIndex = rs.getInt("roleindex");  // roleindex starts from 0 in DB
+
+				result.add(rs.getString("move"));
+
+				assert(roleIndex == result.size() - 1);
 			}
 		} finally { 
 			if (con != null)
@@ -1013,10 +1152,40 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				try {ps.close();} catch (SQLException e) {}
 			if (rs != null)
 				try {rs.close();} catch (SQLException e) {}
-		}
+		} 
 
 		return result;
 	}
+
+//	private List<String> getXMLStates(String matchID) throws SQLException {
+//		Connection con = getConnection();
+//		PreparedStatement ps = null;
+//		ResultSet rs = null;
+//
+//		List<String> result = new LinkedList<String>();
+//
+//		try {
+//			ps = con.prepareStatement("SELECT `step_number`, `state` FROM `states` WHERE `match_id` = ? ORDER BY `step_number`;");
+//			ps.setString(1, matchID);
+//			rs = ps.executeQuery();
+//			
+//			int stepNumber = 1;
+//			while (rs.next()) {
+//				assert(rs.getInt("step_number") == stepNumber);
+//				result.add(rs.getString("state"));
+//				stepNumber++;
+//			}
+//		} finally { 
+//			if (con != null)
+//				try {con.close();} catch (SQLException e) {}
+//			if (ps != null)
+//				try {ps.close();} catch (SQLException e) {}
+//			if (rs != null)
+//				try {rs.close();} catch (SQLException e) {}
+//		}
+//
+//		return result;
+//	}
 
 	protected String getXMLState(String matchID, int stepNumber) throws SQLException {
 		Connection con = getConnection();
@@ -1026,7 +1195,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		try {
 			ps = con.prepareStatement("SELECT `state` FROM `states` WHERE `match_id` = ? AND `step_number` = ?;");
 			ps.setString(1, matchID);
-			ps.setInt(2, stepNumber);
+			ps.setInt(2, stepNumber + 1);   // stepNumber starts from 0, in DB from 1
 			rs = ps.executeQuery();
 			
 			if (rs.next()) {
@@ -1232,7 +1401,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return datasource.getConnection();
 	}
 	
-	protected static String generateMatchID(GameInterface game, String appendix) {
+	public static String generateMatchID(GameInterface game, String appendix) {
 		String firstPart;
 		if (game == null) {
 			firstPart = "null";
@@ -1343,8 +1512,8 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 
 		try {
 			ps = con.prepareStatement("UPDATE `matches` SET `status` = ? WHERE `status` = ? ;");
-			ps.setString(1, Match.STATUS_ABORTED);
-			ps.setString(2, Match.STATUS_RUNNING);
+			ps.setString(1, ServerMatch.STATUS_ABORTED);
+			ps.setString(2, ServerMatch.STATUS_RUNNING);
 			ps.executeUpdate(); 
 		} finally { 
 			if (con != null)

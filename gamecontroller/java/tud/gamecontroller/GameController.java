@@ -33,6 +33,7 @@ import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.impl.JointMove;
 import tud.gamecontroller.game.impl.State;
+import tud.gamecontroller.logging.ErrorMessageListener;
 import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.Player;
 import tud.gamecontroller.playerthreads.AbstractPlayerThread;
@@ -148,7 +149,11 @@ public class GameController<
 		for(AbstractPlayerThread<?> t:threads){
 			if(!t.waitUntilDeadline()){
 				String message = "player "+t.getPlayer()+" timed out!";
-				logger.log(loglevel, message, new GameControllerErrorMessage(GameControllerErrorMessage.TIMEOUT, message, match, t.getPlayer().getName()));
+				GameControllerErrorMessage errorMessage = new GameControllerErrorMessage(GameControllerErrorMessage.TIMEOUT, message, t.getPlayer().getName());
+				if (match instanceof ErrorMessageListener) {
+					((ErrorMessageListener) match).notifyErrorMessage(errorMessage);
+				}
+				logger.log(loglevel, message, errorMessage);
 			}
 		}
 	}
@@ -177,7 +182,11 @@ public class GameController<
 			if(move==null || !currentState.isLegal(role, move)){
 				Player<TermType> player = match.getPlayer(role);
 				String message = "Illegal move \""+move+"\" from "+player+ " in step "+step;
-				logger.log(Level.SEVERE, message, new GameControllerErrorMessage(GameControllerErrorMessage.ILLEGAL_MOVE, message, match, player.getName()));
+				GameControllerErrorMessage errorMessage = new GameControllerErrorMessage(GameControllerErrorMessage.ILLEGAL_MOVE, message, player.getName());
+				if (match instanceof ErrorMessageListener) {
+					((ErrorMessageListener) match).notifyErrorMessage(errorMessage);
+				}
+				logger.log(Level.SEVERE, message, errorMessage);
 				jointMove.put(role,currentState.getLegalMove(role));
 			}else{
 				jointMove.put(role,move);

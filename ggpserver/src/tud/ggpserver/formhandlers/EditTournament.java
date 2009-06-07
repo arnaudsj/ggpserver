@@ -1,12 +1,19 @@
 package tud.ggpserver.formhandlers;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
+import tud.gamecontroller.game.RoleInterface;
+import tud.gamecontroller.players.LegalPlayerInfo;
+import tud.gamecontroller.players.PlayerInfo;
+import tud.gamecontroller.players.RandomPlayerInfo;
 import tud.ggpserver.datamodel.Game;
-import tud.ggpserver.datamodel.Match;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
 import tud.ggpserver.datamodel.Tournament;
+import tud.ggpserver.datamodel.matches.ServerMatch;
 
 public class EditTournament extends ShowMatches {
 	public static final String ADD_MATCH = "add_match";
@@ -16,7 +23,7 @@ public class EditTournament extends ShowMatches {
 	
 	private Tournament<?, ?> tournament;
 	private String action;
-	private Match<?, ?> match;
+	private ServerMatch<?, ?> match;
 	private boolean correctlyPerformed = false;
 
 	@SuppressWarnings("unchecked")
@@ -77,8 +84,6 @@ public class EditTournament extends ShowMatches {
 			throw new InternalError("performAction() called without checking isValid() first!");
 		}
 
-		System.out.println("performing action: " + action + " " + match.getMatchID());
-
 		if (action.equals(ADD_MATCH)) {
 			addMatch();
 		} else if (action.equals(START_MATCH)) {
@@ -91,24 +96,37 @@ public class EditTournament extends ShowMatches {
 		}
 	}
 	
-	private void addMatch() {
-		// TODO Auto-generated method stub
+	@SuppressWarnings("unchecked")
+	private void addMatch() throws SQLException {
+		List<Game<?, ?>> allEnabledGames = db.getAllEnabledGames();
+		Game<?, ?> game = allEnabledGames.get(0);
+		Map<RoleInterface, PlayerInfo> rolesToPlayerInfos = new HashMap<RoleInterface, PlayerInfo>();
+		
+		int roleIndex = 0;
+		for (RoleInterface<?> role : game.getOrderedRoles()) {
+			rolesToPlayerInfos.put(role, new RandomPlayerInfo(roleIndex));
+			roleIndex++;
+		}
+		
+		db.createMatch(game, Tournament.DEFAULT_STARTCLOCK,
+				Tournament.DEFAULT_PLAYCLOCK, rolesToPlayerInfos, tournament);
+
 		correctlyPerformed = true;
 	}
 
-	private void startMatch(Match<?, ?> match) {
-		// TODO Auto-generated method stub
+	private void startMatch(ServerMatch match) {
+		// XXX: Auto-generated method stub
 		correctlyPerformed = true;
 	}
 
-	private void deleteMatch(Match<?, ?> match) {
-		// TODO Auto-generated method stub
+	private void deleteMatch(ServerMatch match) throws SQLException {
+		db.deleteMatch(match.getMatchID());
 		correctlyPerformed = true;
 	}
 
 	@SuppressWarnings("unchecked")
-	private void cloneMatch(Match<?, ?> match) throws SQLException {
-		db.createMatch(match.getGame(), match.getStartclock(), match.getPlayclock(), match.getRolesToPlayers(), tournament);
+	private void cloneMatch(ServerMatch match) throws SQLException {
+		db.createMatch(match.getGame(), match.getStartclock(), match.getPlayclock(), match.getRolesToPlayerInfos(), tournament);
 		correctlyPerformed = true;
 	}
 
@@ -117,7 +135,12 @@ public class EditTournament extends ShowMatches {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<RemotePlayerInfo> getEnabledPlayerInfos() throws SQLException {
-		return db.getPlayerInfos(RemotePlayerInfo.STATUS_ACTIVE);
+	public List<PlayerInfo> getEnabledPlayerInfos() throws SQLException {
+		List<PlayerInfo> result = new LinkedList<PlayerInfo>();
+		result.add(new RandomPlayerInfo(-1));
+		result.add(new LegalPlayerInfo(-1));
+		result.addAll(db.getPlayerInfos(RemotePlayerInfo.STATUS_ACTIVE));
+
+		return result;
 	}
 }

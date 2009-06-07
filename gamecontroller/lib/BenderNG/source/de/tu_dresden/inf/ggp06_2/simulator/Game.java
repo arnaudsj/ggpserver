@@ -41,7 +41,7 @@ import de.tu_dresden.inf.ggp06_2.simulator.flags.TimerFlag;
  * Caching is done for roles, goals and the inital state. That means all of this
  * will be generated only once on the first call of the correspondig getter.
  *
- * @see Match
+ * @see RunnableMatch
  *
  * @author Ingo Keller - General Game Playing course student at TUD
  * @author Arsen Kostenko - General Game Playing course student at TUD

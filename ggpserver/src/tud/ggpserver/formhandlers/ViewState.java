@@ -22,11 +22,11 @@ package tud.ggpserver.formhandlers;
 import java.sql.SQLException;
 
 import tud.ggpserver.datamodel.DBConnectorFactory;
-import tud.ggpserver.datamodel.Match;
+import tud.ggpserver.datamodel.matches.ServerMatch;
 
 public class ViewState {
 	private int stepNumber = -1;
-	private Match<?, ?> match;
+	private ServerMatch<?, ?> match;
 
 	public void setMatchID(String matchID) throws SQLException {
 		match = DBConnectorFactory.getDBConnector().getMatch(matchID);
@@ -41,7 +41,7 @@ public class ViewState {
 
 	public String getXmlState() {
 		int stepNumber;
-		int numberOfStates = match.getNumberOfStates();
+		int numberOfStates = match.getXmlStates().size();
 		if (this.stepNumber < 1 || this.stepNumber > numberOfStates) {
 			// return the last/final state
 			stepNumber = numberOfStates;
@@ -49,6 +49,6 @@ public class ViewState {
 			stepNumber = this.stepNumber;
 		}
 		
-		return match.getXmlState(stepNumber);
+		return match.getXmlStates().get(stepNumber - 1);
 	}
 }

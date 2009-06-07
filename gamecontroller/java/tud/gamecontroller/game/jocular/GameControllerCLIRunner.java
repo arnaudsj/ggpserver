@@ -39,7 +39,7 @@ public class GameControllerCLIRunner
 	
 	public static void main(String[] args) {
 		ReasonerFactory<Term, ProofContext> reasonerFactory = new ReasonerFactory<Term, ProofContext>() {
-			public ReasonerInterface<Term, ProofContext> getReasoner(String gameDescription, String gameName) {
+			public ReasonerInterface<Term, ProofContext> createReasoner(String gameDescription, String gameName) {
 				return new Reasoner(gameDescription, new Parser());
 			}
 		};

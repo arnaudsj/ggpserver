@@ -43,7 +43,7 @@ public abstract class Gamer extends ReasoningEntity implements Stoppable
     /** Play clock: how much time I have to make a move */
     protected int                                         playClock_;
     
-    /** Match ID */
+    /** RunnableMatch ID */
     protected String                                      gameId_;
     
     /** Ordered list of roles. */

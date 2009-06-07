@@ -26,13 +26,13 @@ import java.util.logging.Logger;
 
 import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.ggpserver.datamodel.DBConnectorFactory;
-import tud.ggpserver.datamodel.Match;
+import tud.ggpserver.datamodel.matches.ServerMatch;
 
 
 public class ViewMatch {
 	private static final Logger logger = Logger.getLogger(ViewMatch.class.getName());
 
-	private Match<?, ?> match;
+	private ServerMatch<?, ?> match;
 	private int stepNumber = 1;
 
 	public int getStepNumber() {
@@ -47,19 +47,19 @@ public class ViewMatch {
 		match = DBConnectorFactory.getDBConnector().getMatch(matchID);
 	}
 
-	public Match getMatch() {
+	public ServerMatch getMatch() {
 		return match;
 	}
 	
 	public List<String> getMoves() {
-		if ((stepNumber < 1) || stepNumber > (match.getNumberOfStates() - 1)) {  // -1, because there is one less jointmove than states
+		if ((stepNumber < 1) || stepNumber > (match.getXmlStates().size() - 1)) {  // -1, because there is one less jointmove than states
 			return new LinkedList<String>();
 		}
 		return match.getJointMovesStrings().get(stepNumber - 1);
 	}
 	
 	public List<GameControllerErrorMessage> getErrorMessages() {
-		int numberOfStates = match.getNumberOfStates();
+		int numberOfStates = match.getXmlStates().size();
 		if ((stepNumber < 1) || (stepNumber > numberOfStates)) {
 			return new LinkedList<GameControllerErrorMessage>();
 		}
