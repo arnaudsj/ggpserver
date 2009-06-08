@@ -34,9 +34,10 @@ import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
-import tud.ggpserver.datamodel.ErrorMessageList;
-import tud.ggpserver.datamodel.JointMovesList;
-import tud.ggpserver.datamodel.XMLStatesList;
+import tud.ggpserver.datamodel.dblists.DynamicDBBackedList;
+import tud.ggpserver.datamodel.dblists.ErrorMessageAccessor;
+import tud.ggpserver.datamodel.dblists.JointMovesAccessor;
+import tud.ggpserver.datamodel.dblists.XMLStateAccessor;
 
 public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateInfoType>
 		extends Match<TermType, ReasonerStateInfoType> {
@@ -55,9 +56,9 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 	/**
 	 * State 0 = initial state, State 1 = state after first joint move, ..., State n = final state
 	 */
-	private List<String> xmlStates;
+	protected List<String> xmlStates;
 	
-	private List<List<String>> jointMovesStrings;
+	protected List<List<String>> jointMovesStrings;
 	
 	/**
 	 * - errors from the start message and first play message go to index 0
@@ -67,7 +68,7 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 	 * - errors from the stop message go to index n
 	 * The match has n+1 states, n play messages and the stop message, therefore there is an entry in errorMessages for each state.
 	 */
-	private List<List<GameControllerErrorMessage>> errorMessages;
+	protected List<List<GameControllerErrorMessage>> errorMessages;
 	
 	private final AbstractDBConnector<TermType, ReasonerStateInfoType> db;
 	
@@ -158,7 +159,7 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 
 	public List<List<String>> getJointMovesStrings() {
 		if (jointMovesStrings == null) {
-			jointMovesStrings = new JointMovesList(getMatchID(), getDB()); 
+			jointMovesStrings = new DynamicDBBackedList<List<String>>(new JointMovesAccessor(getMatchID(), getDB()), true); 
 		}
 		return jointMovesStrings;
 	}
@@ -167,7 +168,7 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 	
 	public List<String> getXmlStates() {
 		if (xmlStates == null) {
-			xmlStates = new XMLStatesList(getMatchID(), getDB(), getGame().getStylesheet());
+			xmlStates = new DynamicDBBackedList<String>(new XMLStateAccessor(getMatchID(), getDB(), getGame().getStylesheet()), false);
 		}
 		return xmlStates;
 	}
@@ -176,7 +177,7 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 	
 	public List<List<GameControllerErrorMessage>> getErrorMessages() {
 		if (errorMessages == null) {
-			errorMessages = new ErrorMessageList(getMatchID(), getDB());
+			errorMessages = new DynamicDBBackedList<List<GameControllerErrorMessage>>(new ErrorMessageAccessor(getMatchID(), getDB()), true);
 		}
 		return errorMessages;
 	}

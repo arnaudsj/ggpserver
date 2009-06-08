@@ -1008,50 +1008,53 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		} 
 	}
 	
-//	/**
-//	 * Returns a list of lists of error messages for each step number. The first
-//	 * element of result is the list of error messages for step number 1, and so
-//	 * on. Unfortunately, step number counting starts with 1, so to get the
-//	 * error messages for step number i, use result.get(i - 1).
-//	 */
-//	private List<List<GameControllerErrorMessage>> getErrorMessages(String matchID, int numberOfStates) throws SQLException {
-//		Connection con = getConnection();
-//		PreparedStatement ps = null;
-//		ResultSet rs = null;
-//
-//		List<List<GameControllerErrorMessage>> result = new ArrayList<List<GameControllerErrorMessage>>(numberOfStates);
-//		
-//		for (int i = 0; i < numberOfStates; i++) {
-//			result.add(new LinkedList<GameControllerErrorMessage>());
-//		}
-//		
-//		try {
-//			ps = con.prepareStatement("SELECT `step_number`, `type`, `message`, `player` FROM `errormessages` WHERE `match_id` = ? ORDER BY `step_number`;");
-//			ps.setString(1, matchID);
-//			rs = ps.executeQuery();
-//			
-//			while (rs.next()) {
-//				int errorMsgStepNumber = rs.getInt("step_number");   // step number counting starts with 1 
-//				if (errorMsgStepNumber > numberOfStates) {
-//					String message = "errorMsgStepNumber bigger than numberOfStates! Causing match id: " + matchID;
-//					logger.severe(message);        //$NON-NLS-1$s
-//					throw new InternalError(message);					
-//				}
-//				GameControllerErrorMessage errorMessage = new GameControllerErrorMessage(rs.getString("type"), rs.getString("message"), rs.getString("player"));
-//				result.get(errorMsgStepNumber - 1).add(errorMessage);
-//			}
-//		} finally { 
-//			if (con != null)
-//				try {con.close();} catch (SQLException e) {}
-//			if (ps != null)
-//				try {ps.close();} catch (SQLException e) {}
-//			if (rs != null)
-//				try {rs.close();} catch (SQLException e) {}
-//		} 
-//
-//		return result;
-//	}
-	protected List<GameControllerErrorMessage> getErrorMessages(String matchID, int stepNumber) throws SQLException {
+	/**
+	 * Returns a list of lists of error messages for each step number. The first
+	 * element of result is the list of error messages for step number 1, and so
+	 * on. Unfortunately, step number counting starts with 1, so to get the
+	 * error messages for step number i, use result.get(i - 1).
+	 */
+	public List<List<GameControllerErrorMessage>> getAllErrorMessages(String matchID, int numberOfStates) throws SQLException {
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		List<List<GameControllerErrorMessage>> result = new ArrayList<List<GameControllerErrorMessage>>(numberOfStates);
+		
+		for (int i = 0; i < numberOfStates; i++) {
+			result.add(new LinkedList<GameControllerErrorMessage>());
+		}
+		
+		try {
+			ps = con.prepareStatement("SELECT `step_number`, `type`, `message`, `player` FROM `errormessages` WHERE `match_id` = ? ORDER BY `step_number`;");
+			ps.setString(1, matchID);
+			rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				int errorMsgStepNumber = rs.getInt("step_number");   // step number counting starts with 1 
+				if (errorMsgStepNumber > numberOfStates) {
+					String message = "errorMsgStepNumber bigger than numberOfStates! Causing match id: " + matchID;
+					logger.severe(message);        //$NON-NLS-1$s
+					throw new InternalError(message);					
+				}
+				GameControllerErrorMessage errorMessage = new GameControllerErrorMessage(rs.getString("type"), rs.getString("message"), rs.getString("player"));
+				result.get(errorMsgStepNumber - 1).add(errorMessage);
+			}
+		} finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+			if (rs != null)
+				try {rs.close();} catch (SQLException e) {}
+		} 
+
+		return result;
+	}
+	
+	
+	
+	public List<GameControllerErrorMessage> getErrorMessages(String matchID, int stepNumber) throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -1081,49 +1084,49 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	}
 
 
-//	private List<List<String>> getJointMovesStrings(String matchID) throws SQLException {
-//		Connection con = getConnection();
-//		PreparedStatement ps = null;
-//		ResultSet rs = null;
-//
-//		List<List<String>> result = new LinkedList<List<String>>();
-//		
-//		try {
-//			ps = con.prepareStatement("SELECT `step_number`, `roleindex`, `move` FROM `moves` WHERE `match_id` = ? ORDER BY `step_number`, `roleindex`;");
-//			ps.setString(1, matchID);
-//			rs = ps.executeQuery();
-//			
-//			List<String> jointMove = null;
-//			int stepNumber = 0;
-//			while (rs.next()) {
-//				int roleIndex = rs.getInt("roleindex");
-//				if (roleIndex == 0) {
-//					stepNumber++;
-//					if (jointMove != null) {
-//						result.add(jointMove);
-//					}
-//					jointMove = new LinkedList<String>();
-//				}
-//				assert(jointMove != null);
-//				jointMove.add(rs.getString("move"));
-//
-//				assert(rs.getInt("step_number") == stepNumber);
-//				assert(roleIndex == jointMove.size() - 1);
-//			}
-//			if (jointMove != null) {
-//				result.add(jointMove);
-//			}
-//		} finally { 
-//			if (con != null)
-//				try {con.close();} catch (SQLException e) {}
-//			if (ps != null)
-//				try {ps.close();} catch (SQLException e) {}
-//			if (rs != null)
-//				try {rs.close();} catch (SQLException e) {}
-//		} 
-//
-//		return result;
-//	}
+	public List<List<String>> getJointMovesStrings(String matchID) throws SQLException {
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		List<List<String>> result = new LinkedList<List<String>>();
+		
+		try {
+			ps = con.prepareStatement("SELECT `step_number`, `roleindex`, `move` FROM `moves` WHERE `match_id` = ? ORDER BY `step_number`, `roleindex`;");
+			ps.setString(1, matchID);
+			rs = ps.executeQuery();
+			
+			List<String> jointMove = null;
+			int stepNumber = 0;
+			while (rs.next()) {
+				int roleIndex = rs.getInt("roleindex");
+				if (roleIndex == 0) {
+					stepNumber++;
+					if (jointMove != null) {
+						result.add(jointMove);
+					}
+					jointMove = new LinkedList<String>();
+				}
+				assert(jointMove != null);
+				jointMove.add(rs.getString("move"));
+
+				assert(rs.getInt("step_number") == stepNumber);
+				assert(roleIndex == jointMove.size() - 1);
+			}
+			if (jointMove != null) {
+				result.add(jointMove);
+			}
+		} finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+			if (rs != null)
+				try {rs.close();} catch (SQLException e) {}
+		} 
+
+		return result;
+	}
 	
 	public List<String> getJointMove(String matchID, int stepNumber) throws SQLException {
 		Connection con = getConnection();
@@ -1157,37 +1160,37 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return result;
 	}
 
-//	private List<String> getXMLStates(String matchID) throws SQLException {
-//		Connection con = getConnection();
-//		PreparedStatement ps = null;
-//		ResultSet rs = null;
-//
-//		List<String> result = new LinkedList<String>();
-//
-//		try {
-//			ps = con.prepareStatement("SELECT `step_number`, `state` FROM `states` WHERE `match_id` = ? ORDER BY `step_number`;");
-//			ps.setString(1, matchID);
-//			rs = ps.executeQuery();
-//			
-//			int stepNumber = 1;
-//			while (rs.next()) {
-//				assert(rs.getInt("step_number") == stepNumber);
-//				result.add(rs.getString("state"));
-//				stepNumber++;
-//			}
-//		} finally { 
-//			if (con != null)
-//				try {con.close();} catch (SQLException e) {}
-//			if (ps != null)
-//				try {ps.close();} catch (SQLException e) {}
-//			if (rs != null)
-//				try {rs.close();} catch (SQLException e) {}
-//		}
-//
-//		return result;
-//	}
+	public List<String> getXMLStates(String matchID) throws SQLException {
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
 
-	protected String getXMLState(String matchID, int stepNumber) throws SQLException {
+		List<String> result = new LinkedList<String>();
+
+		try {
+			ps = con.prepareStatement("SELECT `step_number`, `state` FROM `states` WHERE `match_id` = ? ORDER BY `step_number`;");
+			ps.setString(1, matchID);
+			rs = ps.executeQuery();
+			
+			int stepNumber = 1;
+			while (rs.next()) {
+				assert(rs.getInt("step_number") == stepNumber);
+				result.add(rs.getString("state"));
+				stepNumber++;
+			}
+		} finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+			if (rs != null)
+				try {rs.close();} catch (SQLException e) {}
+		}
+
+		return result;
+	}
+
+	public String getXMLState(String matchID, int stepNumber) throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -1213,7 +1216,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		}
 	}
 
-	protected int getNumberOfXMLStates(String matchID) throws SQLException {
+	public int getNumberOfXMLStates(String matchID) throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		ResultSet rs = null;

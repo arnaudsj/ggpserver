@@ -20,14 +20,20 @@
 package tud.ggpserver.datamodel.matches;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.impl.State;
+import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
+import tud.ggpserver.datamodel.dblists.ErrorMessageAccessor;
+import tud.ggpserver.datamodel.dblists.JointMovesAccessor;
+import tud.ggpserver.datamodel.dblists.StaticDBBackedList;
+import tud.ggpserver.datamodel.dblists.XMLStateAccessor;
 
 public class AbortedMatch<TermType extends TermInterface, ReasonerStateInfoType>
 		extends ServerMatch<TermType, ReasonerStateInfoType> {
@@ -49,4 +55,28 @@ public class AbortedMatch<TermType extends TermInterface, ReasonerStateInfoType>
 		return ServerMatch.STATUS_ABORTED;
 	}
 	
+	
+	@Override
+	public List<List<String>> getJointMovesStrings() {
+		if (jointMovesStrings == null) {
+			jointMovesStrings = new StaticDBBackedList<List<String>>(new JointMovesAccessor(getMatchID(), getDB()), true); 
+		}
+		return jointMovesStrings;
+	}
+
+	@Override
+	public List<String> getXmlStates() {
+		if (xmlStates == null) {
+			xmlStates = new StaticDBBackedList<String>(new XMLStateAccessor(getMatchID(), getDB(), getGame().getStylesheet()), false);
+		}
+		return xmlStates;
+	}
+
+	@Override
+	public List<List<GameControllerErrorMessage>> getErrorMessages() {
+		if (errorMessages == null) {
+			errorMessages = new StaticDBBackedList<List<GameControllerErrorMessage>>(new ErrorMessageAccessor(getMatchID(), getDB()), true);
+		}
+		return errorMessages;
+	}	
 }
