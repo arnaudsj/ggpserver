@@ -154,17 +154,12 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 
 	@Override
 	public List<List<GameControllerErrorMessage>> getErrorMessages() {
-		if (errorMessages == null) {
-			// error messages shouldn't be cached for a running match, because
-			// sometimes there is one more state than error messages, and the db
-			// can't know if there was no error, or if it hasn't been written
-			// yet, so a wrong (empty) result might get cached for the currently
-			// running state.
-			boolean caching = false;
-			
-			errorMessages = new DynamicDBBackedList<List<GameControllerErrorMessage>>(new ErrorMessageAccessor(getMatchID(), getDB()), caching);
-		}
-		return errorMessages;
+		// error messages shouldn't be cached for a running match, because
+		// sometimes there is one more state than error messages, and the db
+		// can't know if there was no error, or if it hasn't been written
+		// yet, so a wrong (empty) result might get cached for the currently
+		// running state.
+		return new DynamicDBBackedList<List<GameControllerErrorMessage>>(new ErrorMessageAccessor(getMatchID(), getDB()), true);
 	}
 
 	@Override
