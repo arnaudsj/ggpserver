@@ -47,6 +47,10 @@ import tud.gamecontroller.scrambling.GameScramblerInterface;
 import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DuplicateInstanceException;
+import tud.ggpserver.datamodel.dblists.DynamicDBBackedList;
+import tud.ggpserver.datamodel.dblists.ErrorMessageAccessor;
+import tud.ggpserver.datamodel.dblists.JointMovesAccessor;
+import tud.ggpserver.datamodel.dblists.XMLStateAccessor;
 
 
 public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
@@ -130,6 +134,39 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 		return ServerMatch.STATUS_RUNNING;
 	}
 	
+	@Override
+	public List<List<String>> getJointMovesStrings() {
+		{
+			if (jointMovesStrings == null) {
+				jointMovesStrings = new DynamicDBBackedList<List<String>>(new JointMovesAccessor(getMatchID(), getDB()), true); 
+			}
+			return jointMovesStrings;
+		}
+	}
+
+	@Override
+	public List<String> getXmlStates() {
+		if (xmlStates == null) {
+			xmlStates = new DynamicDBBackedList<String>(new XMLStateAccessor(getMatchID(), getDB(), getGame().getStylesheet()), false);
+		}
+		return xmlStates;
+	}
+
+	@Override
+	public List<List<GameControllerErrorMessage>> getErrorMessages() {
+		if (errorMessages == null) {
+			// error messages shouldn't be cached for a running match, because
+			// sometimes there is one more state than error messages, and the db
+			// can't know if there was no error, or if it hasn't been written
+			// yet, so a wrong (empty) result might get cached for the currently
+			// running state.
+			boolean caching = false;
+			
+			errorMessages = new DynamicDBBackedList<List<GameControllerErrorMessage>>(new ErrorMessageAccessor(getMatchID(), getDB()), caching);
+		}
+		return errorMessages;
+	}
+
 	@Override
 	public List<? extends Player<TermType>> getOrderedPlayers() {
 		if (players == null) {
@@ -236,7 +273,7 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 	 */
 	public void notifyErrorMessage(GameControllerErrorMessage errorMessage) {
 		try {
-			getDB().addErrorMessage(getMatchID(), stepNumber , errorMessage);
+			getDB().addErrorMessage(getMatchID(), stepNumber, errorMessage);
 		} catch (SQLException e) {
 			logger.severe("GameControllerErrorMessage - exception: " + e); //$NON-NLS-1$
 		}
@@ -261,10 +298,11 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 		// update jointMoves
 		jointMoves.add(jointMove);
 		
-		assert(stepNumber - 1 == jointMoves.size());
+
+		assert(stepNumber == jointMoves.size());
 		
 		try {
-			getDB().addJointMove(getMatchID(), stepNumber - 1, jointMove);
+			getDB().addJointMove(getMatchID(), stepNumber, jointMove);
 		} catch (SQLException e) {
 			logger.severe("JointMoveInterface<? extends TermInterface> - exception: " + e); //$NON-NLS-1$
 		} catch (DuplicateInstanceException e) {
@@ -288,5 +326,4 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 			logger.severe("StateInterface<? extends TermInterface,?>, Map<? extends RoleInterface<?>,Integer> - exception: " + e); //$NON-NLS-1$
 		}
 	}
-	
 }

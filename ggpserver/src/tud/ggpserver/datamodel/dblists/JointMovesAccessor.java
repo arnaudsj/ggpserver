@@ -39,7 +39,7 @@ public class JointMovesAccessor implements DBAccessor<List<String>>{
 	}
 
 	public List<String> getElement(int stepNumber) throws SQLException {
-		return db.getJointMove(matchID, stepNumber);
+		return db.getJointMove(matchID, stepNumber + 1);   // stepNumber starts from 0, in DB from 1
 	}
 
 	public int getSize() throws SQLException {

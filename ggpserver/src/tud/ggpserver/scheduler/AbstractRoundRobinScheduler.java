@@ -144,6 +144,7 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 										= new GameController<TermType, ReasonerStateInfoType>(match);
 								gameController.addListener(match);
 								gameController.runGame();
+								match.toFinished();
 								playerStatusTracker.updateDeadPlayers(match);
 							} catch (InterruptedException e1) {
 								logger.info("Thread for match " + matchID + " - INTERRUPT");

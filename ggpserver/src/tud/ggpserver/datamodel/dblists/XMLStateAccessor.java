@@ -44,7 +44,7 @@ public class XMLStateAccessor implements DBAccessor<String> {
 	}
 
 	public String getElement(int stepNumber) throws SQLException {
-		String xmlState = db.getXMLState(matchID, stepNumber);
+		String xmlState = db.getXMLState(matchID, stepNumber + 1);   // stepNumber starts from 0, in DB from 1
 
 		// this is a hack to show old matches with the right stylesheets
 		// (e.g., if the stylesheet for a game was changed after the match)

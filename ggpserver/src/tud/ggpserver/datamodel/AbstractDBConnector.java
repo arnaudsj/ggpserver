@@ -931,6 +931,8 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 
+		assert (stepNumber > 0);
+
 		try {
 			ps = con.prepareStatement("INSERT INTO `errormessages` (`match_id` , `step_number`, `type`, `message`, `player`) VALUES (?, ?, ?, ?, ?);");
 			ps.setString(1, matchID);
@@ -958,6 +960,8 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	public void addJointMove(String matchID, int stepNumber, JointMoveInterface<? extends TermInterface> jointMove) throws SQLException, DuplicateInstanceException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
+		
+		assert (stepNumber > 0);
 
 		try {
 
@@ -990,6 +994,8 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		
+		assert (stepNumber > 0);
+
 		try {
 			ps = con.prepareStatement("INSERT INTO `states` (`match_id` , `step_number`, `state`) VALUES (?, ?, ?);");
 			ps.setString(1, matchID);
@@ -1032,6 +1038,8 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			
 			while (rs.next()) {
 				int errorMsgStepNumber = rs.getInt("step_number");   // step number counting starts with 1 
+				assert (errorMsgStepNumber > 0);
+
 				if (errorMsgStepNumber > numberOfStates) {
 					String message = "errorMsgStepNumber bigger than numberOfStates! Causing match id: " + matchID;
 					logger.severe(message);        //$NON-NLS-1$s
@@ -1054,17 +1062,22 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	
 	
 	
+	/**
+	 * @param stepNumber starts from 1
+	 */
 	public List<GameControllerErrorMessage> getErrorMessages(String matchID, int stepNumber) throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
+		assert (stepNumber > 0);
 
 		List<GameControllerErrorMessage> result = new ArrayList<GameControllerErrorMessage>();
 		
 		try {
 			ps = con.prepareStatement("SELECT `type`, `message`, `player` FROM `errormessages` WHERE `match_id` = ? AND `step_number` = ? ;");
 			ps.setString(1, matchID);
-			ps.setInt(2, stepNumber + 1);   // stepNumber starts from 0, in DB from 1
+			ps.setInt(2, stepNumber);
 			rs = ps.executeQuery();
 			
 			while (rs.next()) {
@@ -1108,10 +1121,10 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 					jointMove = new LinkedList<String>();
 				}
 				assert(jointMove != null);
-				jointMove.add(rs.getString("move"));
-
+				assert (stepNumber > 0);
 				assert(rs.getInt("step_number") == stepNumber);
-				assert(roleIndex == jointMove.size() - 1);
+				assert(roleIndex == jointMove.size());
+				jointMove.add(rs.getString("move"));
 			}
 			if (jointMove != null) {
 				result.add(jointMove);
@@ -1135,10 +1148,12 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 
 		List<String> result = new LinkedList<String>();
 		
+		assert (stepNumber > 0);
+
 		try {
 			ps = con.prepareStatement("SELECT `roleindex`, `move` FROM `moves` WHERE `match_id` = ? AND `step_number` = ? ORDER BY `roleindex`;");
 			ps.setString(1, matchID);
-			ps.setInt(2, stepNumber + 1);   // stepNumber starts from 0, in DB from 1
+			ps.setInt(2, stepNumber);
 			rs = ps.executeQuery();
 			
 			while (rs.next()) {
@@ -1195,10 +1210,12 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
+		assert (stepNumber > 0);
+
 		try {
 			ps = con.prepareStatement("SELECT `state` FROM `states` WHERE `match_id` = ? AND `step_number` = ?;");
 			ps.setString(1, matchID);
-			ps.setInt(2, stepNumber + 1);   // stepNumber starts from 0, in DB from 1
+			ps.setInt(2, stepNumber);
 			rs = ps.executeQuery();
 			
 			if (rs.next()) {

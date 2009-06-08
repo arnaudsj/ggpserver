@@ -40,7 +40,7 @@ public class ErrorMessageAccessor implements DBAccessor<List<GameControllerError
 	}
 
 	public List<GameControllerErrorMessage> getElement(int stepNumber) throws SQLException {
-		return db.getErrorMessages(matchID, stepNumber);
+		return db.getErrorMessages(matchID, stepNumber + 1);  // stepNumber counting in DB starts from 1
 	}
 
 	public int getSize() throws SQLException {

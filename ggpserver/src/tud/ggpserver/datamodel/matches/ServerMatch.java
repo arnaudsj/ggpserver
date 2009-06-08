@@ -34,10 +34,6 @@ import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
-import tud.ggpserver.datamodel.dblists.DynamicDBBackedList;
-import tud.ggpserver.datamodel.dblists.ErrorMessageAccessor;
-import tud.ggpserver.datamodel.dblists.JointMovesAccessor;
-import tud.ggpserver.datamodel.dblists.XMLStateAccessor;
 
 public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateInfoType>
 		extends Match<TermType, ReasonerStateInfoType> {
@@ -157,31 +153,16 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 
 	/////////////////////// joint moves strings ///////////////////////
 
-	public List<List<String>> getJointMovesStrings() {
-		if (jointMovesStrings == null) {
-			jointMovesStrings = new DynamicDBBackedList<List<String>>(new JointMovesAccessor(getMatchID(), getDB()), true); 
-		}
-		return jointMovesStrings;
-	}
+	public abstract List<List<String>> getJointMovesStrings();
 
 	/////////////////////// XML states ///////////////////////
 	
-	public List<String> getXmlStates() {
-		if (xmlStates == null) {
-			xmlStates = new DynamicDBBackedList<String>(new XMLStateAccessor(getMatchID(), getDB(), getGame().getStylesheet()), false);
-		}
-		return xmlStates;
-	}
+	public abstract List<String> getXmlStates();
 
 	/////////////////////// error messages ///////////////////////
 	
-	public List<List<GameControllerErrorMessage>> getErrorMessages() {
-		if (errorMessages == null) {
-			errorMessages = new DynamicDBBackedList<List<GameControllerErrorMessage>>(new ErrorMessageAccessor(getMatchID(), getDB()), true);
-		}
-		return errorMessages;
-	}
-
+	public abstract List<List<GameControllerErrorMessage>> getErrorMessages();
+	
 	public boolean getHasErrors() {
 		for (List<GameControllerErrorMessage> errorMessagesSingleState : getErrorMessages()) {
 			if (!errorMessagesSingleState.isEmpty()) {
