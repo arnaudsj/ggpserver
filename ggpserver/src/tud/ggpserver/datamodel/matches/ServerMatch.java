@@ -95,7 +95,7 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 			orderedPlayerInfos = new LinkedList<PlayerInfo>();
 			for (RoleInterface<TermType> role : getGame().getOrderedRoles()) {
 				PlayerInfo playerInfo = rolesToPlayerInfos.get(role);
-//				assert (playerInfo != null);   // TODO
+				assert (playerInfo != null);
 				orderedPlayerInfos.add(playerInfo);
 			}
 		}
@@ -107,7 +107,7 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 	}
 
 	public Collection<? extends PlayerInfo> getPlayerInfos() {
-		return rolesToPlayerInfos.values();
+		return new ArrayList<PlayerInfo>(rolesToPlayerInfos.values());
 	}
 
 	public Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> getRolesToPlayerInfos() {
@@ -151,7 +151,7 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 				orderedGoalValues.add(goalValues.get(role));
 			}
 		}
-		return orderedGoalValues;
+		return new ArrayList<Integer>(orderedGoalValues);
 	}
 
 	/////////////////////// joint moves strings ///////////////////////
@@ -247,11 +247,11 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 		buffer.append(" rolesToPlayerInfos: ");
 		buffer.append(rolesToPlayerInfos);
 		buffer.append(" number of states: ");
-		buffer.append(xmlStates.size());
+		buffer.append(getXmlStates().size());
 		buffer.append(" jointMovesStrings: ");
-		buffer.append(jointMovesStrings);
+		buffer.append(getJointMovesStrings());
 		buffer.append(" errorMessages: ");
-		buffer.append(errorMessages);
+		buffer.append(getErrorMessages());
 		buffer.append("]");
 		return buffer.toString();
 	}

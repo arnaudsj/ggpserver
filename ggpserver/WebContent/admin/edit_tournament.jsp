@@ -52,13 +52,21 @@
 <div id="content" style="width:auto">  <%-- width:auto is used in conjunction with removing the navigation menu --%>
 <div id="ctitle">Edit Tournament</div>
 
-<!-- pager --> <jsp:directive.include file="/inc/pager_title.jsp" /> <jsp:directive.include
-	file="/inc/pager.jsp" />
 
-<c:url value="process_save_tournament.jsp" var="saveURL">
-<!--	<c:param name="tournamentID" value="${pager.tournamentID}"/>-->
+<!-- pager --> 
+<jsp:directive.include file="/inc/pager_title.jsp" /> 
+
+<c:url var="adminpageURL" value="index.jsp" />
+<a href="${adminpageURL}">&lt;&lt;&lt; back to admin page <br></a>
+<jsp:directive.include file="/inc/pager.jsp" />
+
+
+<c:url value="process_save_tournament.jsp" var="saveChangesURL">
+	<c:param name="tournamentID" value="${pager.tournamentID}"/>
+	<c:param name="page" value="${pager.page}" />
 </c:url>
-<form name="theForm" action="${saveURL}" method="post">
+
+<form name="theForm" action="${saveChangesURL}" method="post">
 
 <table>
 	<thead>
@@ -184,15 +192,24 @@
 				</td>
 
 				<%-- action "start" [only NEW] --%>
-				<% // TODO: if running: action stop %>
 				<td class="nopadding"><c:choose>
 					<c:when test="${ match.status == 'new' }">
 						<c:url value="process_edit_tournament.jsp" var="startURL">
 							<c:param name="tournamentID" value="${pager.tournamentID}"/>
 							<c:param name="action" value="<%= EditTournament.START_MATCH %>"/>
 							<c:param name="matchID" value="${match.matchID}" />
+							<c:param name="page" value="${pager.page}" />
 						</c:url>
 						<div class="start"><a href='<c:out value="${startURL}" />'><span>start</span></a></div>
+					</c:when>
+					<c:when test="${ match.status == 'running' }">
+						<c:url value="process_edit_tournament.jsp" var="abortURL">
+							<c:param name="tournamentID" value="${pager.tournamentID}"/>
+							<c:param name="action" value="<%= EditTournament.ABORT_MATCH %>"/>
+							<c:param name="matchID" value="${match.matchID}" />
+							<c:param name="page" value="${pager.page}" />
+						</c:url>
+						<div class="abort"><a href='<c:out value="${abortURL}" />'><span>abort</span></a></div>
 					</c:when>
 					<c:otherwise>
 						<div class="start-bw"></div>
@@ -205,6 +222,7 @@
 						<c:param name="tournamentID" value="${pager.tournamentID}"/>
 						<c:param name="action" value="<%= EditTournament.DELETE_MATCH %>"/>
 						<c:param name="matchID" value="${match.matchID}" />
+						<c:param name="page" value="${pager.page}" />
 					</c:url>
 
 					<c:choose>
@@ -225,6 +243,7 @@
 					<c:param name="tournamentID" value="${pager.tournamentID}"/>
 					<c:param name="action" value="<%= EditTournament.CLONE_MATCH %>"/>
 					<c:param name="matchID" value="${match.matchID}" />
+							<c:param name="page" value="${pager.page}" />
 				</c:url>
 				<div class="clone"><a href='<c:out value="${cloneURL}" />'><span>clone</span></a></div>
 				</td>
@@ -245,6 +264,7 @@
 				<c:url value="process_edit_tournament.jsp" var="addMatchURL">
 					<c:param name="tournamentID" value="${pager.tournamentID}"/>
 					<c:param name="action" value="<%= EditTournament.ADD_MATCH %>"/>
+					<c:param name="page" value="${pager.page}" />
 				</c:url>
 				<a href='<c:out value="${addMatchURL}" />'>Add new match</a>
 			</td>		
@@ -252,11 +272,8 @@
 	</tbody>
 </table>
 
-<%-- "save changes" --%>
-<c:url value="process_save_changes.jsp" var="saveChangesURL">
-	<c:param name="tournamentID" value="${pager.tournamentID}"/>
-</c:url>
-<center><input type="submit" name="submitButton" value="Save" style="color:#c0c0c0; font-size:14pt; font-weight:bold;" onclick="window.location='${saveChangesURL}'"></center>
+
+<center><input type="submit" name="submitButton" value="Save" style="color:#c0c0c0; font-size:14pt; font-weight:bold;"></center>
 
 </form>
 

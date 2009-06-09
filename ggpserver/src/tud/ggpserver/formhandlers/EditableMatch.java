@@ -1,3 +1,22 @@
+/*
+    Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+
+    This file is part of GGP Server.
+
+    GGP Server is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    GGP Server is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GGP Server.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 package tud.ggpserver.formhandlers;
 
 import java.sql.SQLException;
@@ -8,6 +27,7 @@ import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
+import tud.ggpserver.datamodel.RemotePlayerInfo;
 import tud.ggpserver.datamodel.matches.NewMatch;
 
 
@@ -62,6 +82,11 @@ public class EditableMatch {
 			db.setMatchPlayclock(shadowedMatch.getMatchID(), playclock);
 		}
 		
+		RemotePlayerInfo duplicatePlayer = duplicateRemotePlayer(playerInfos);
+		if (duplicatePlayer != null) {
+			throw new IllegalArgumentException("A RemotePlayer cannot play two roles in the same game! MatchID: " + shadowedMatch.getMatchID() + ", offending player: " + duplicatePlayer.getName());
+		}
+		
 		List<PlayerInfo> shadowedPlayerInfos = shadowedMatch.getOrderedPlayerInfos();
 		for (int i = 0; i < playerInfos.size(); i++) {
 			PlayerInfo shadowedPlayerInfo = shadowedPlayerInfos.get(i);
@@ -76,5 +101,21 @@ public class EditableMatch {
 		if (!shadowedMatch.getGame().equals(game)) {
 			db.setMatchGame(shadowedMatch, game);
 		}
+	}
+
+
+	private RemotePlayerInfo duplicateRemotePlayer(List<PlayerInfo> shadowedPlayerInfos) {
+		List<RemotePlayerInfo> seenPlayers = new ArrayList<RemotePlayerInfo>();
+		
+		for (PlayerInfo playerInfo : shadowedPlayerInfos) {
+			if (playerInfo instanceof RemotePlayerInfo) {
+				if (seenPlayers.contains(playerInfo)) {
+					return (RemotePlayerInfo) playerInfo;
+				}
+				seenPlayers.add((RemotePlayerInfo) playerInfo);
+			}
+		}
+		
+		return null;
 	}
 }

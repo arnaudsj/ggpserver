@@ -325,6 +325,17 @@ span.highlight {
   visibility:          hidden;
 }
 
+/* action: abort a match */
+.abort {
+  background: url(icons/sweetie/png-8/24-control-stop.png) no-repeat;
+  display:             inline-block;
+  height:              24px;
+  width:               24px;
+}
+.abort a span {
+  visibility:          hidden;
+}
+
 /* action: delete a match */
 .delete {
   background: url(icons/sweetie/png-8/24-em-cross.png) no-repeat;

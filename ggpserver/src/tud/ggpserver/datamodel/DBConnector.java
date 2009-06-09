@@ -346,7 +346,7 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 			for (ServerMatch match : new LinkedList<ServerMatch<Term, GameState>>(matches.values())) {
 					// new LinkedList(...) necessary to avoid concurrent iteration and modification
 				if (match.getPlayerInfos().contains(player)) {
-					matches.remove(match.getMatchID());
+					clearCacheForMatch(match.getMatchID());
 				}
 			}
 		}

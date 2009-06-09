@@ -17,25 +17,31 @@
     along with GGP Server.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package tud.ggpserver.scheduler;
+package tud.ggpserver.formhandlers;
 
-import tud.gamecontroller.game.javaprover.Term;
+import java.sql.SQLException;
+import java.util.List;
+
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
-import cs227b.teamIago.util.GameState;
+import tud.ggpserver.datamodel.Tournament;
 
-public class RoundRobinScheduler extends AbstractRoundRobinScheduler<Term, GameState> {
-	private static AbstractRoundRobinScheduler instance = null;
-	
+public class ShowTournaments extends AbstractPager {
+
 	@SuppressWarnings("unchecked")
-	private RoundRobinScheduler(AbstractDBConnector dbConnector) {
-		super(dbConnector);
+	public List<Tournament> getTournaments() throws SQLException {
+		AbstractDBConnector db = DBConnectorFactory.getDBConnector();
+		return db.getTournaments();
+	}
+	
+	
+	@Override
+	public String getTableName() {
+		return "tournaments";
 	}
 
-	public static synchronized AbstractRoundRobinScheduler getInstance() {
-		if (instance == null) {
-			instance = new RoundRobinScheduler(DBConnectorFactory.getDBConnector());
-		}
-		return instance;
+	@Override
+	public String getTargetJsp() {
+		return "show_tournaments.jsp";
 	}
 }

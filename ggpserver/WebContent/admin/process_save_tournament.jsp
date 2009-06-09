@@ -21,11 +21,13 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%> 
 
 <jsp:useBean id="saveTournament" class="tud.ggpserver.formhandlers.SaveTournament" scope="request">
+	<jsp:setProperty name="saveTournament" property="page" />
 </jsp:useBean>
 
 <% saveTournament.parseParameterMap(request.getParameterMap()); %>
 
 <c:url var="forwardURL" value="edit_tournament.jsp">
 	<c:param name="tournamentID" value="${saveTournament.tournamentID}"/>
+	<c:param name="page" value="${saveTournament.page}" />
 </c:url>
 <jsp:forward page="edit_tournament.jsp"/>

@@ -1,3 +1,22 @@
+/*
+    Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+
+    This file is part of GGP Server.
+
+    GGP Server is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    GGP Server is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GGP Server.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 package tud.ggpserver.formhandlers;
 
 import java.sql.SQLException;
@@ -6,18 +25,25 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import cs227b.teamIago.util.GameState;
+
 import tud.gamecontroller.game.RoleInterface;
+import tud.gamecontroller.game.javaprover.Term;
 import tud.gamecontroller.players.LegalPlayerInfo;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.players.RandomPlayerInfo;
 import tud.ggpserver.datamodel.Game;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
 import tud.ggpserver.datamodel.Tournament;
+import tud.ggpserver.datamodel.matches.NewMatch;
+import tud.ggpserver.datamodel.matches.RunningMatch;
 import tud.ggpserver.datamodel.matches.ServerMatch;
+import tud.ggpserver.scheduler.JavaProverTournamentScheduler;
 
 public class EditTournament extends ShowMatches {
 	public static final String ADD_MATCH = "add_match";
 	public static final String START_MATCH = "start_match";
+	public static final String ABORT_MATCH = "abort_match";
 	public static final String DELETE_MATCH = "delete_match";
 	public static final String CLONE_MATCH = "clone_match";
 	
@@ -69,7 +95,9 @@ public class EditTournament extends ShowMatches {
 	public boolean isValid() {
 		if (action.equals(ADD_MATCH)) {
 			return true;
-		} else if (action.equals(START_MATCH) && match != null) {
+		} else if (action.equals(START_MATCH) && match != null && match instanceof NewMatch) {
+			return true;
+		} else if (action.equals(ABORT_MATCH) && match != null && match instanceof RunningMatch) {
 			return true;
 		} else if (action.equals(DELETE_MATCH) && match != null) {
 			return true;
@@ -79,15 +107,20 @@ public class EditTournament extends ShowMatches {
 		return false;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void performAction() throws SQLException {
 		if (!isValid()) {
-			throw new InternalError("performAction() called without checking isValid() first!");
+			throw new IllegalStateException("performAction() called without checking isValid() first!");
 		}
 
 		if (action.equals(ADD_MATCH)) {
 			addMatch();
 		} else if (action.equals(START_MATCH)) {
-			startMatch(match);
+			assert (match instanceof NewMatch);       // checked in isValid()
+			startMatch((NewMatch) match);
+		} else if (action.equals(ABORT_MATCH)) {
+			assert (match instanceof RunningMatch);   // checked in isValid()
+			abortMatch((RunningMatch) match);
 		} else if (action.equals(DELETE_MATCH)) {
 			deleteMatch(match);
 		} else {
@@ -114,12 +147,28 @@ public class EditTournament extends ShowMatches {
 		correctlyPerformed = true;
 	}
 
-	private void startMatch(ServerMatch match) {
-		// XXX: Auto-generated method stub
+	@SuppressWarnings("unchecked")
+	private void startMatch(NewMatch match) {
+		JavaProverTournamentScheduler.getInstance(tournament).start(match);
+		correctlyPerformed = true;
+	}
+
+	@SuppressWarnings("unchecked")
+	private void abortMatch(RunningMatch match) {
+		JavaProverTournamentScheduler.getInstance(tournament).abort(match);
 		correctlyPerformed = true;
 	}
 
 	private void deleteMatch(ServerMatch match) throws SQLException {
+		JavaProverTournamentScheduler scheduler = JavaProverTournamentScheduler.getInstance(tournament);
+		if (scheduler.isRunning(match)) {
+			assert (match instanceof RunningMatch);
+			try {
+				scheduler.abort((RunningMatch<Term, GameState>) match);
+			} catch (IllegalStateException e) {
+				// Match wasn't running any more, ignore
+			}
+		}
 		db.deleteMatch(match.getMatchID());
 		correctlyPerformed = true;
 	}

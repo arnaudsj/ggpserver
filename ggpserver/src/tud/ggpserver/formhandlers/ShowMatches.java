@@ -35,7 +35,9 @@ public class ShowMatches extends AbstractPager {
 	private List<RunningMatch> matches = null;
 
 	@SuppressWarnings("unchecked")
-	protected final static AbstractDBConnector db = DBConnectorFactory.getDBConnector();
+	protected final AbstractDBConnector db = DBConnectorFactory.getDBConnector();
+	
+	private int rowCountMatches = -1;
 	
 	@SuppressWarnings("unchecked")
 	public List<RunningMatch> getMatches() throws SQLException {
@@ -51,8 +53,10 @@ public class ShowMatches extends AbstractPager {
 	
 	@Override
 	protected int getRowCount() throws SQLException {
-		// TODO: caching
-		return db.getRowCountMatches(playerName, gameName, tournamentID, excludeNewMatches());
+		if (rowCountMatches == -1) {
+			rowCountMatches = db.getRowCountMatches(playerName, gameName, tournamentID, excludeNewMatches());
+		}
+		return rowCountMatches;
 	}
 
 	public String getPlayerName() {

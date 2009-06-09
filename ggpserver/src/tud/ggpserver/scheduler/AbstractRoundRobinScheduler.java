@@ -42,7 +42,7 @@ import tud.ggpserver.datamodel.Game;
 import tud.ggpserver.datamodel.matches.NewMatch;
 import tud.ggpserver.datamodel.matches.RunningMatch;
 
-public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface, ReasonerStateInfoType> {
+public class AbstractRoundRobinScheduler<TermType extends TermInterface, ReasonerStateInfoType> {
 	public static final String ROUND_ROBIN_TOURNAMENT_ID = "round_robin_tournament";
 	private static final Logger logger = Logger.getLogger(AbstractRoundRobinScheduler.class.getName());
 	private static final Random random = new Random();
@@ -64,8 +64,7 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		this.playerStatusTracker = new PlayerStatusTracker<TermType, ReasonerStateInfoType>(db);
 	}
 
-	// TODO: synchronization
-	public void start() {
+	public synchronized void start() {
 		if (!running) {
 			setRunning(true);
 			
@@ -96,7 +95,7 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		}
 	}
 	
-	public void stop() {
+	public synchronized void stop() {
 		if (running) {
 			gameThread.interrupt();
 			try {
@@ -108,11 +107,11 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 	}
 
 	
-	public Game<TermType, ReasonerStateInfoType> getNextPlayedGame() throws SQLException {
+	public synchronized Game<TermType, ReasonerStateInfoType> getNextPlayedGame() throws SQLException {
 		return gamePicker.getNextPlayedGame();
 	}
 
-	public void setNextPlayedGame(Game<TermType, ReasonerStateInfoType> nextPlayedGame) throws SQLException {
+	public synchronized void setNextPlayedGame(Game<TermType, ReasonerStateInfoType> nextPlayedGame) throws SQLException {
 		gamePicker.setNextPlayedGame(nextPlayedGame);
 	}
 	
@@ -120,10 +119,14 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		return running;
 	}
 
+	// this method has default visibility so it can be accessed from within the
+	// anonymous inner Thread classes without overhead
 	void setRunning(boolean running) {
 		this.running = running;
 	}
 
+	// this method has default visibility so it can be accessed from within the
+	// anonymous inner Thread classes without overhead
 	void runMatches() throws InterruptedException, SQLException {
 		while (true) {
 			List<NewMatch<TermType, ReasonerStateInfoType>> currentMatches = createMatches();
@@ -196,7 +199,7 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		
 		Game<TermType, ReasonerStateInfoType> nextGame = gamePicker.pickNextGame();
 		Collection<? extends PlayerInfo> activePlayers = playerStatusTracker.waitForActivePlayers();
-		// TODO: If there are no enabled games, gamePicker.pickNextGame() will return null.
+		// If there are no enabled games, gamePicker.pickNextGame() will return null.
 		// In order to handle this case correctly, one would have to replace gamePicker.pickNextGame()
 		// by some function waitForEnabledGames(), similar to playerStatusTracker.waitForActivePlayers().
 		// ATM, we will just run into a NullPointerException somewhere down the line, so let's hope that

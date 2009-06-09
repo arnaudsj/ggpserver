@@ -19,23 +19,28 @@
 
 package tud.ggpserver.scheduler;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import tud.gamecontroller.game.javaprover.Term;
-import tud.ggpserver.datamodel.AbstractDBConnector;
-import tud.ggpserver.datamodel.DBConnectorFactory;
+import tud.ggpserver.datamodel.Tournament;
 import cs227b.teamIago.util.GameState;
 
-public class RoundRobinScheduler extends AbstractRoundRobinScheduler<Term, GameState> {
-	private static AbstractRoundRobinScheduler instance = null;
-	
-	@SuppressWarnings("unchecked")
-	private RoundRobinScheduler(AbstractDBConnector dbConnector) {
-		super(dbConnector);
+public class JavaProverTournamentScheduler extends TournamentScheduler<Term, GameState> {
+	private static final Map<Tournament<Term, GameState>, JavaProverTournamentScheduler> instances 
+			= new HashMap<Tournament<Term, GameState>, JavaProverTournamentScheduler>();
+
+	private JavaProverTournamentScheduler() {
 	}
 
-	public static synchronized AbstractRoundRobinScheduler getInstance() {
-		if (instance == null) {
-			instance = new RoundRobinScheduler(DBConnectorFactory.getDBConnector());
+	@SuppressWarnings("unchecked")
+	public static synchronized JavaProverTournamentScheduler getInstance(Tournament tournament) {
+		JavaProverTournamentScheduler result = instances.get(tournament);
+		if (result == null) {
+			result = new JavaProverTournamentScheduler();
+			instances.put(tournament, result);
 		}
-		return instance;
+
+		return result;
 	}
 }

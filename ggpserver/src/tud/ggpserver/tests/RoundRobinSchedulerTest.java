@@ -56,7 +56,7 @@ public class RoundRobinSchedulerTest {
 	 * This is only necessary when running the program directly, e.g. as a JUnit
 	 * test. When run as a WebApp, Tomcat takes care of this.
 	 */
-	private static void setupJNDI() throws NamingException, RemoteException {
+	public static void setupJNDI() throws NamingException, RemoteException {
 		startRegistry();
 		MysqlConnectionPoolDataSource dataSource = new MysqlConnectionPoolDataSource();
 		dataSource.setUser("ggpserver");
