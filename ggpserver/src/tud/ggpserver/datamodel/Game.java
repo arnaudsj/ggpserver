@@ -22,9 +22,8 @@ package tud.ggpserver.datamodel;
 import tud.gamecontroller.ReasonerFactory;
 import tud.gamecontroller.term.TermInterface;
 
-public class Game<
-	TermType extends TermInterface,
-	ReasonerStateInfoType> extends tud.gamecontroller.game.impl.Game<TermType, ReasonerStateInfoType> {
+public class Game<TermType extends TermInterface, ReasonerStateInfoType>
+		extends tud.gamecontroller.game.impl.Game<TermType, ReasonerStateInfoType> {
 
 	private boolean enabled;
 	

@@ -322,6 +322,10 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			Tournament<TermType, ReasonerStateInfoType> tournament,
 			Date startTime) throws DuplicateInstanceException, SQLException {
 
+		if (matchID == null ||  game == null || startclock <= 0 || playclock <=0 || rolesToPlayerInfos == null || tournament == null || startTime == null || game.getNumberOfRoles() != rolesToPlayerInfos.size()) {
+			throw new IllegalArgumentException();
+		}
+		
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		try {
@@ -345,7 +349,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			Integer roleindex = 0;
 			for (RoleInterface<TermType> role : game.getOrderedRoles()) {
 				ps.setString(2, rolesToPlayerInfos.get(role).getName());
-				ps.setString(3, roleindex.toString());
+				ps.setInt(3, roleindex);
 		
 				ps.executeUpdate();
 				roleindex++;
@@ -883,14 +887,14 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	}
 	
 	
-	public void setMatchStatus(ServerMatch<TermType, ReasonerStateInfoType> match, String status) throws SQLException {
+	public void setMatchStatus(String matchID, String status) throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 
 		try {
 			ps = con.prepareStatement("UPDATE `ggpserver`.`matches` SET `status` = ? WHERE `matches`.`match_id` = ? LIMIT 1 ;");
 			ps.setString(1, status);
-			ps.setString(2, match.getMatchID());
+			ps.setString(2, matchID);
 			ps.executeUpdate();
 		} finally { 
 			if (con != null)
@@ -908,9 +912,9 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			
 			List<? extends RoleInterface<?>> orderedRoles = match.getGame().getOrderedRoles();
 			
+			ps = con.prepareStatement("UPDATE `ggpserver`.`match_players` SET `goal_value` = ? WHERE `match_players`.`match_id` = ? AND `match_players`.`roleindex` = ? LIMIT 1 ;");
+			
 			for (int roleIndex = 0; roleIndex < orderedRoles.size(); roleIndex++) {
-				ps = con.prepareStatement("UPDATE `ggpserver`.`match_players` SET `goal_value` = ? WHERE `match_players`.`match_id` = ? AND `match_players`.`roleindex` = ? LIMIT 1 ;");
-				
 				ps.setInt(1, goalValues.get(orderedRoles.get(roleIndex)));
 				ps.setString(2, match.getMatchID());
 				ps.setInt(3, roleIndex);
@@ -921,7 +925,207 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				try {con.close();} catch (SQLException e) {}
 			if (ps != null)
 				try {ps.close();} catch (SQLException e) {}
-		} 
+		}
+	}
+	
+	public void setMatchStartclock(String matchID, int startclock) throws SQLException {
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+
+		try {
+			ps = con.prepareStatement("UPDATE `matches` SET `start_clock` = ? WHERE `matches`.`match_id` = ? LIMIT 1 ;");
+			ps.setInt(1, startclock);
+			ps.setString(2, matchID);
+			
+			ps.executeUpdate();
+		} finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+		}
+	}
+
+	public void setMatchPlayclock(String matchID, int playclock) throws SQLException {
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+
+		try {
+			ps = con.prepareStatement("UPDATE `matches` SET `play_clock` = ? WHERE `matches`.`match_id` = ? LIMIT 1 ;");
+			ps.setInt(1, playclock);
+			ps.setString(2, matchID);
+			
+			ps.executeUpdate();
+		} finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+		}
+	}
+
+	public void setMatchPlayerInfo(String matchID, int roleIndex,
+			PlayerInfo playerInfo) throws SQLException {
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+
+		try {
+//			ps = con.prepareStatement("INSERT INTO `match_players` (`match_id`, `player`, `roleindex`) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE `player` = ? ;");
+			ps = con.prepareStatement("UPDATE `match_players` SET `player` = ? WHERE `match_id` = ? AND `roleindex` = ? ;");
+
+			ps.setString(1, playerInfo.getName());
+			ps.setString(2, matchID);
+			ps.setInt(3, roleIndex);
+			ps.executeUpdate();
+		} finally {
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+		}
+	}
+
+	public void setMatchGame(NewMatch<TermType, ReasonerStateInfoType> match, GameInterface<TermType, State<TermType, ReasonerStateInfoType>> newGame) throws SQLException {
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+		
+		try {
+			String oldMatchID = match.getMatchID();
+			
+			// updateMatchID
+			String newMatchID = updateMatchID(oldMatchID, newGame);
+			
+			// delete old player infos
+			// we cannot just UPDATE, but must DELETE and then INSERT, since the
+			// number of roles between old + new game can differ.
+			ps = con.prepareStatement("DELETE LOW_PRIORITY FROM `match_players` WHERE `match_id` = ?");
+			ps.setString(1, oldMatchID);
+			ps.executeUpdate();
+			ps.close();
+			
+			// store new player infos
+			ps = con.prepareStatement("INSERT INTO `match_players` (`match_id`, `player`, `roleindex`) VALUES (?, ?, ?) ;");
+			ps.setString(1, newMatchID);
+			
+			List<PlayerInfo> newPlayerInfos = makeNewPlayerInfos(match.getOrderedPlayerInfos(), newGame);
+			int roleIndex = 0;
+			for (PlayerInfo playerInfo : newPlayerInfos) {
+				ps.setString(2, playerInfo.getName());
+				ps.setInt(3, roleIndex);
+				ps.executeUpdate();
+				
+				roleIndex++;
+			}
+			ps.close();
+
+			ps = con.prepareStatement("UPDATE `matches` SET `game` = ? WHERE `match_id` = ? LIMIT 1 ;");
+		
+			ps.setString(1, newGame.getName());
+			ps.setString(2, newMatchID);
+			ps.executeUpdate();
+
+		} finally {
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+		}
+		
+	}
+
+	/**
+	 * Updates a match with a generated match ID.
+	 * @throws SQLException 
+	 */
+	private String updateMatchID(String oldMatchID,
+			GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game) throws SQLException {
+		
+		long number = System.currentTimeMillis();
+		
+		while (true) {
+			String newMatchID = generateMatchID(game, Long.toString(number));
+			try {
+				updateMatchID(oldMatchID, newMatchID);
+				return newMatchID;
+			} catch (DuplicateInstanceException e) {
+				number++;
+			}
+		}
+	}	
+
+	private void updateMatchID(String oldMatchID, String newMatchID) throws DuplicateInstanceException, SQLException {
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+		try {
+			ps = con.prepareStatement("UPDATE `matches` SET `match_id` = ? WHERE `match_id` = ? LIMIT 1 ;");
+
+			ps.setString(1, newMatchID);
+			ps.setString(2, oldMatchID);
+			ps.executeUpdate();
+			ps.close();
+			
+			// Strictly speaking, the following would be necessary, but is already done by setMatchGame().
+			// also, we cannot just UPDATE, but must DELETE + INSERT (see setMatchGame()).
+			
+//			ps = con.prepareStatement("UPDATE `match_players` SET `match_id` = ? WHERE `match_id` = ? ;");
+//
+//			ps.setString(1, newMatchID);
+//			ps.setString(2, oldMatchID);
+//			ps.executeUpdate();
+//			ps.close();
+
+			// The following updates are unnecessary, because updateMatchID must
+			// only be called on "new" matches, which don't have states,
+			// errormessages or moves.
+			//			ps = con.prepareStatement("UPDATE `errormessages` SET `match_id` = ? WHERE `match_id` = ?;");
+//
+//			ps.setString(1, newMatchID);
+//			ps.setString(2, oldMatchID);
+//			ps.executeUpdate();
+//			ps.close();
+//			
+//			ps = con.prepareStatement("UPDATE `states` SET `match_id` = ? WHERE `match_id` = ? ;");
+//
+//			ps.setString(1, newMatchID);
+//			ps.setString(2, oldMatchID);
+//			ps.executeUpdate();
+//			ps.close();
+//			
+//			ps = con.prepareStatement("UPDATE `moves` SET `match_id` = ? WHERE `match_id` = ? ;");
+//
+//			ps.setString(1, newMatchID);
+//			ps.setString(2, oldMatchID);
+//			ps.executeUpdate();
+//			ps.close();
+			
+		} catch (MySQLIntegrityConstraintViolationException e) {
+			// MySQLIntegrityConstraintViolationException means here that the key could not be inserted
+			throw new DuplicateInstanceException(e);
+		} finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+		}
+	}
+
+	private List<PlayerInfo> makeNewPlayerInfos(
+			List<? extends PlayerInfo> oldPlayerInfos,
+			GameInterface<TermType, State<TermType, ReasonerStateInfoType>> newGame) {
+		List<PlayerInfo> newPlayerInfos; 
+		
+		if (oldPlayerInfos.size() >= newGame.getNumberOfRoles()) {
+			// more players than roles --> truncate
+			newPlayerInfos = new LinkedList<PlayerInfo>(oldPlayerInfos.subList(0, newGame.getNumberOfRoles()));
+		} else {
+			// less players than roles --> add random players
+			newPlayerInfos = new LinkedList<PlayerInfo>(oldPlayerInfos);
+			while (newPlayerInfos.size() < newGame.getNumberOfRoles()) {
+				newPlayerInfos.add(new RandomPlayerInfo(newPlayerInfos.size() - 1));
+			}
+		}
+		
+		return newPlayerInfos;
 	}
 
 	/**

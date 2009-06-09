@@ -51,7 +51,8 @@ public class ShowMatches extends AbstractPager {
 	
 	@Override
 	protected int getRowCount() throws SQLException {
-		return db.getRowCountMatches(playerName, gameName, tournamentID, true);
+		// TODO: caching
+		return db.getRowCountMatches(playerName, gameName, tournamentID, excludeNewMatches());
 	}
 
 	public String getPlayerName() {

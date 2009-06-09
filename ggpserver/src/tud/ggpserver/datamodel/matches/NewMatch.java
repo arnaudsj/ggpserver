@@ -52,7 +52,7 @@ public class NewMatch<TermType extends TermInterface, ReasonerStateInfoType>
 	 * This object must not be used any more after calling this method.
 	 */
 	public RunningMatch<TermType, ReasonerStateInfoType> toRunning() throws SQLException {
-		getDB().setMatchStatus(this, ServerMatch.STATUS_RUNNING);
+		getDB().setMatchStatus(getMatchID(), ServerMatch.STATUS_RUNNING);
 		return getDB().getRunningMatch(getMatchID());
 	}
 	

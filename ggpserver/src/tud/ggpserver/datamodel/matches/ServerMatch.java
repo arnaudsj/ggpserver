@@ -19,6 +19,7 @@
 
 package tud.ggpserver.datamodel.matches;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -93,10 +94,12 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 		if (orderedPlayerInfos == null) {
 			orderedPlayerInfos = new LinkedList<PlayerInfo>();
 			for (RoleInterface<TermType> role : getGame().getOrderedRoles()) {
-				orderedPlayerInfos.add(rolesToPlayerInfos.get(role));
+				PlayerInfo playerInfo = rolesToPlayerInfos.get(role);
+//				assert (playerInfo != null);   // TODO
+				orderedPlayerInfos.add(playerInfo);
 			}
 		}
-		return orderedPlayerInfos;
+		return new ArrayList<PlayerInfo>(orderedPlayerInfos);   // defensive copy, needed e.g. in EditableMatch
 	}
 
 	public PlayerInfo getPlayerInfo(RoleInterface<TermType> role) {

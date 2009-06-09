@@ -116,7 +116,7 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 	 * This object must not be used any more after calling this method.
 	 */
 	public AbortedMatch<TermType, ReasonerStateInfoType> toAborted() throws SQLException {
-		getDB().setMatchStatus(this, ServerMatch.STATUS_ABORTED);
+		getDB().setMatchStatus(getMatchID(), ServerMatch.STATUS_ABORTED);
 		return getDB().getAbortedMatch(getMatchID());
 	}
 	
@@ -125,7 +125,7 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 	 * This object must not be used any more after calling this method.
 	 */
 	public FinishedMatch<TermType, ReasonerStateInfoType> toFinished() throws SQLException {
-		getDB().setMatchStatus(this, ServerMatch.STATUS_FINISHED);
+		getDB().setMatchStatus(getMatchID(), ServerMatch.STATUS_FINISHED);
 		return getDB().getFinishedMatch(getMatchID());
 	}
 

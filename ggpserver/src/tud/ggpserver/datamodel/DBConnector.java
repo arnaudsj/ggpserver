@@ -226,17 +226,63 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 		}
 	}
 	
-	private void clearCacheForMatch(String matchID) {
+	@Override
+	public void setMatchStatus(String matchID, String status) throws SQLException {
 		synchronized (matches) {
-			matches.remove(matchID);
+			clearCacheForMatch(matchID);
+			super.setMatchStatus(matchID, status);
 		}
 	}
 
+
 	@Override
-	public void setMatchStatus(ServerMatch<Term, GameState> match, String status) throws SQLException {
+	public void setMatchPlayclock(String matchID, int playclock) throws SQLException {
+		synchronized (matches) {
+			clearCacheForMatch(matchID);
+			super.setMatchPlayclock(matchID, playclock);
+		}
+	}
+
+
+	@Override
+	public void setMatchPlayerInfo(String matchID, int roleNumber, PlayerInfo playerInfo) throws SQLException {
+		synchronized (matches) {
+			clearCacheForMatch(matchID);
+			super.setMatchPlayerInfo(matchID, roleNumber, playerInfo);
+		}
+	}
+
+
+	@Override
+	public void setMatchStartclock(String matchID, int startclock) throws SQLException {
+		synchronized (matches) {
+			clearCacheForMatch(matchID);
+			super.setMatchStartclock(matchID, startclock);
+		}
+	}
+
+	
+	@Override
+	public void setMatchGame(NewMatch<Term, GameState> match, GameInterface<Term, State<Term, GameState>> newGame) throws SQLException {
 		synchronized (matches) {
 			clearCacheForMatch(match.getMatchID());
-			super.setMatchStatus(match, status);
+			super.setMatchGame(match, newGame);
+		}
+	}
+
+
+	@Override
+	public void setMatchGoalValues(ServerMatch<Term, GameState> match, Map<? extends RoleInterface<?>, Integer> goalValues) throws SQLException {
+		synchronized (matches) {
+			clearCacheForMatch(match.getMatchID());
+			super.setMatchGoalValues(match, goalValues);
+		}
+	}
+
+
+	private void clearCacheForMatch(String matchID) {
+		synchronized (matches) {
+			matches.remove(matchID);
 		}
 	}
 
