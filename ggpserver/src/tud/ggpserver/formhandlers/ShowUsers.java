@@ -29,7 +29,7 @@ import tud.ggpserver.datamodel.User;
 public class ShowUsers extends AbstractPager {
 
 	public List<User> getUsers() throws SQLException {
-		return DBConnectorFactory.getDBConnector().getUsers(startRow, numDisplayedRows);
+		return DBConnectorFactory.getDBConnector().getUsers(getStartRow(), getNumDisplayedRows());
 	}
 	
 	@Override

@@ -38,11 +38,31 @@ public class ShowMatches extends AbstractPager {
 	protected final AbstractDBConnector db = DBConnectorFactory.getDBConnector();
 	
 	private int rowCountMatches = -1;
+	private int startRow = -1;
+	
+
+	@Override
+	public int getStartRow() {
+		if (startRow == -1) {
+			try {
+				// startRow hasn't been set --> display last page
+				startRow = calcStartRowFromPage(getNumberOfPages());
+			} catch (SQLException e) {
+				startRow = 0;
+			}
+		}
+		return startRow ;
+	}
+	
+	@Override
+	protected void setStartRow(int startRow) {
+		this.startRow = startRow;
+	}
 	
 	@SuppressWarnings("unchecked")
 	public List<RunningMatch> getMatches() throws SQLException {
 		if (matches == null) {
-			matches = db.getMatches(startRow, numDisplayedRows, playerName, gameName, tournamentID, excludeNewMatches());
+			matches = db.getMatches(getStartRow(), getNumDisplayedRows(), playerName, gameName, tournamentID, excludeNewMatches());
 		}
 		return matches;
 	}

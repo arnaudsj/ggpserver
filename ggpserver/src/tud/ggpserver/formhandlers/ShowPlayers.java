@@ -31,7 +31,7 @@ public class ShowPlayers extends AbstractPager {
 	private static final Logger logger = Logger.getLogger(ShowPlayers.class.getName());
 
 	public List<PlayerInfo> getPlayers() throws SQLException {
-		List<PlayerInfo> result = DBConnectorFactory.getDBConnector().getPlayerInfos(startRow, numDisplayedRows);
+		List<PlayerInfo> result = DBConnectorFactory.getDBConnector().getPlayerInfos(getStartRow(), getNumDisplayedRows());
 		
 		if (!onlyRemotePlayerInfos(result)) {
 			logger.severe("DBConnector.getPlayerInfos() returned a PlayerInfo that was not a RemotePlayerInfo!"); //$NON-NLS-1$

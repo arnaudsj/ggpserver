@@ -27,35 +27,39 @@ import java.util.List;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 
 public abstract class AbstractPager {
-	protected int startRow = -1;
-	protected int numDisplayedRows = 30;
-	protected int maxNumDisplayedLinks = 21; // numbers with maxNumDisplayedLinks % 4 == 1 work best here
+	private int startRow;
+	private int numDisplayedRows = 30;
+	private int maxNumDisplayedLinks = 21; // numbers with maxNumDisplayedLinks % 4 == 1 work best here
 	
 	public AbstractPager() {
 		super();
 	}
-	
-	public int getNumDisplayedRows() {
+
+	protected int getNumDisplayedRows() {
 		return numDisplayedRows;
 	}
 
-	public void setNumDisplayedRows(int numDisplayedRows) {
+	protected void setNumDisplayedRows(int numDisplayedRows) {
 		this.numDisplayedRows = numDisplayedRows;
 	}
 
-	public void setMaxNumDisplayedLinks(int maxNumDisplayedLinks) {
+	protected int getMaxNumDisplayedLinks() {
+		return maxNumDisplayedLinks;
+	}
+
+	protected void setMaxNumDisplayedLinks(int maxNumDisplayedLinks) {
 		this.maxNumDisplayedLinks = maxNumDisplayedLinks;
 	}
 
-	public int getStartRow() throws SQLException {
-		if(startRow == -1) {
-			// first row of last page
-			startRow = (getNumberOfPages() - 1) * numDisplayedRows;
-		}
+	/**
+	 * Needs to be public (called from pager.jsp)
+	 * @throws SQLException 
+	 */
+	public int getStartRow() {
 		return startRow;
 	}
 
-	public void setStartRow(int startRow) {
+	protected void setStartRow(int startRow) {
 		this.startRow = startRow;
 	}
 
@@ -63,22 +67,22 @@ public abstract class AbstractPager {
 		int numReallyDisplayedRows;
 		
 		if (getPage() == getNumberOfPages()) {   // last page
-			numReallyDisplayedRows = getRowCount() - (getNumberOfPages() - 1) * numDisplayedRows;
+			numReallyDisplayedRows = getRowCount() - (getNumberOfPages() - 1) * getNumDisplayedRows();
 		} else {   // not last page
-			numReallyDisplayedRows = numDisplayedRows;
+			numReallyDisplayedRows = getNumDisplayedRows();
 		}
 		return getStartRow() + numReallyDisplayedRows - 1;
 		
 	}
 
 	public int getNumberOfPages() throws SQLException {
-		return (getRowCount() - 1) / numDisplayedRows + 1;
+		return (getRowCount() - 1) / getNumDisplayedRows() + 1;
 	}
 
 	public List<Integer> getLinkedPages() throws SQLException {
-		final int numPages=getNumberOfPages();
+		final int numPages = getNumberOfPages();
 		
-		if(numPages <= maxNumDisplayedLinks){
+		if(numPages <= getMaxNumDisplayedLinks()){
 			// show links to all pages
 			return new AbstractList<Integer>(){
 				@Override
@@ -103,9 +107,9 @@ public abstract class AbstractPager {
 		// If the regions overlap we move the middle part in the other direction so we always get exactly maxNumDisplayedLinks. 
 		LinkedList<Integer> result=new LinkedList<Integer>();
 		
-		int lastPageStart = (maxNumDisplayedLinks - 1) / 4;
-		int firstPageEnd = numPages + 1 - maxNumDisplayedLinks / 4;
-		int numMiddlePages = maxNumDisplayedLinks - lastPageStart - (numPages + 1 - firstPageEnd);
+		int lastPageStart = (getMaxNumDisplayedLinks() - 1) / 4;
+		int firstPageEnd = numPages + 1 - getMaxNumDisplayedLinks() / 4;
+		int numMiddlePages = getMaxNumDisplayedLinks() - lastPageStart - (numPages + 1 - firstPageEnd); 
 		int firstPageMiddle = getPage() - (numMiddlePages - 1) / 2;
 		int lastPageMiddle = firstPageMiddle + numMiddlePages - 1;
 		if(lastPageStart >= firstPageMiddle){
@@ -124,13 +128,13 @@ public abstract class AbstractPager {
 		}
 		int i;
 		for(i=1; i<=lastPageStart; i++){
-			result.add(i);
+			result.add(i);	
 		}
 		for(i=firstPageMiddle; i<=lastPageMiddle; i++){
-			result.add(i);
+			result.add(i);	
 		}
 		for(i=firstPageEnd; i<=numPages; i++){
-			result.add(i);
+			result.add(i);	
 		}
 		return result;
 	}
@@ -139,20 +143,27 @@ public abstract class AbstractPager {
 		return DBConnectorFactory.getDBConnector().getRowCount(getTableName());
 	}
 
-	public int getPage() throws SQLException {
-		return (getStartRow() / numDisplayedRows) + 1;
+	public int getPage() {
+		return (getStartRow() / getNumDisplayedRows()) + 1;
 	}
 
 	/**
 	 * starts with 1
 	 */
 	public void setPage(int page) throws SQLException {
-		if (page < 0 || page > getNumberOfPages()) {
-			throw new IllegalArgumentException("Page negative or > number of pages.");
+		if (page < 1 || page > getNumberOfPages()) {
+			throw new IllegalArgumentException("Page number < 1 or > number of pages.");
 		}
-		startRow = (page - 1) * numDisplayedRows;
+		this.setStartRow(calcStartRowFromPage(page));
 	}
 
+	/**
+	 * @return the correct start row such that the given page number is displayed
+	 */
+	protected int calcStartRowFromPage(int page) {
+		return (page - 1) * getNumDisplayedRows();
+	}
+	
 	/**
 	 * This is the URL of the page that the result pages will link to (without the "page" parameter).
 	 */

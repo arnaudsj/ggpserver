@@ -46,8 +46,8 @@
 	
 	<h1 class="notopborder">Recent changes</h1>
 		<ul>
-			<li>The server now runs serveral matches in parallel. (Every player still plays just one match at a time.)</li>
-			<li>A player that does not submit a legal move for three matches in a row is set to inactive and has to be reactivated manually.</li>
+			<li>The server now supports manual creation of tournaments. For now, this functionality is limited to admins in order to avoid the permission complexities of who may schedule what player for which tournament.</li>
+			<li>The show_matches.jsp overview page now goes automatically to the last page.</li>
 		</ul>
 
 	<h1 class="notopborder">Sourceforge project</h1>

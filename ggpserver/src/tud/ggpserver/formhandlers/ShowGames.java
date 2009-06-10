@@ -28,7 +28,7 @@ import tud.ggpserver.datamodel.Game;
 public class ShowGames extends AbstractPager {
 	@SuppressWarnings("unchecked")
 	public List<Game<?, ?>> getGames() throws SQLException {
-		return DBConnectorFactory.getDBConnector().getGames(startRow, numDisplayedRows);
+		return DBConnectorFactory.getDBConnector().getGames(getStartRow(), getNumDisplayedRows());
 	}
 
 	@Override
