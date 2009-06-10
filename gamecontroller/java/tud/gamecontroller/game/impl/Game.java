@@ -135,16 +135,16 @@ public class Game<
 	public String toString() {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("[Game:");
-		buffer.append(" reasonerFactory: ");
-		buffer.append(reasonerFactory);
 		buffer.append(" name: ");
 		buffer.append(name);
+		buffer.append(" reasonerFactory: ");
+		buffer.append(reasonerFactory);
 		buffer.append(" stylesheet: ");
 		buffer.append(stylesheet);
-		buffer.append(" gameDescription: ");
-		buffer.append(gameDescription);
-		buffer.append(" kifGameDescription: ");
-		buffer.append(kifGameDescription);
+//		buffer.append(" gameDescription: ");
+//		buffer.append(gameDescription);
+//		buffer.append(" kifGameDescription: ");
+//		buffer.append(kifGameDescription);
 		buffer.append(" roles: ");
 		buffer.append(roles);
 		buffer.append("]");
