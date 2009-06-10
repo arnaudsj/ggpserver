@@ -27,7 +27,7 @@ import java.util.List;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 
 public abstract class AbstractPager {
-	protected int startRow = 0;
+	protected int startRow = -1;
 	protected int numDisplayedRows = 30;
 	protected int maxNumDisplayedLinks = 21; // numbers with maxNumDisplayedLinks % 4 == 1 work best here
 	
@@ -47,7 +47,11 @@ public abstract class AbstractPager {
 		this.maxNumDisplayedLinks = maxNumDisplayedLinks;
 	}
 
-	public int getStartRow() {
+	public int getStartRow() throws SQLException {
+		if(startRow == -1) {
+			// first row of last page
+			startRow = (getNumberOfPages() - 1) * numDisplayedRows;
+		}
 		return startRow;
 	}
 
@@ -63,7 +67,7 @@ public abstract class AbstractPager {
 		} else {   // not last page
 			numReallyDisplayedRows = numDisplayedRows;
 		}
-		return startRow + numReallyDisplayedRows - 1;
+		return getStartRow() + numReallyDisplayedRows - 1;
 		
 	}
 
@@ -101,7 +105,7 @@ public abstract class AbstractPager {
 		
 		int lastPageStart = (maxNumDisplayedLinks - 1) / 4;
 		int firstPageEnd = numPages + 1 - maxNumDisplayedLinks / 4;
-		int numMiddlePages = maxNumDisplayedLinks - lastPageStart - (numPages + 1 - firstPageEnd); 
+		int numMiddlePages = maxNumDisplayedLinks - lastPageStart - (numPages + 1 - firstPageEnd);
 		int firstPageMiddle = getPage() - (numMiddlePages - 1) / 2;
 		int lastPageMiddle = firstPageMiddle + numMiddlePages - 1;
 		if(lastPageStart >= firstPageMiddle){
@@ -120,13 +124,13 @@ public abstract class AbstractPager {
 		}
 		int i;
 		for(i=1; i<=lastPageStart; i++){
-			result.add(i);	
+			result.add(i);
 		}
 		for(i=firstPageMiddle; i<=lastPageMiddle; i++){
-			result.add(i);	
+			result.add(i);
 		}
 		for(i=firstPageEnd; i<=numPages; i++){
-			result.add(i);	
+			result.add(i);
 		}
 		return result;
 	}
@@ -135,8 +139,8 @@ public abstract class AbstractPager {
 		return DBConnectorFactory.getDBConnector().getRowCount(getTableName());
 	}
 
-	public int getPage() {
-		return (startRow / numDisplayedRows) + 1;
+	public int getPage() throws SQLException {
+		return (getStartRow() / numDisplayedRows) + 1;
 	}
 
 	/**
