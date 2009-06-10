@@ -20,6 +20,8 @@
 package tud.ggpserver.formhandlers;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import tud.ggpserver.datamodel.AbstractDBConnector;
@@ -112,9 +114,31 @@ public class ShowMatches extends AbstractPager {
 
 	@Override
 	public String getTargetJsp() {
-		if (playerName == null) {
-			return "show_matches.jsp";
+		String result = "show_matches.jsp";
+		List<String> parameters = new ArrayList<String>(3);
+		
+		if (playerName != null) {
+			parameters.add("playerName=" + playerName);
 		}
-		return "show_matches.jsp?playerName=" + playerName;
+		if (gameName != null) {
+			parameters.add("gameName=" + gameName);
+		}
+		if (tournamentID != null) {
+			parameters.add("tournamentID=" + tournamentID);
+		}
+		
+		if (!parameters.isEmpty()) {
+			result += "?";
+		}
+		
+		Iterator<String> it = parameters.iterator();
+		while (it.hasNext()) {
+			result += it.next();
+			if (it.hasNext()) {
+				result += "&";
+			}
+		}
+		
+		return result;
 	}
 }
