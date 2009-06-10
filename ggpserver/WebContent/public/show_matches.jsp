@@ -22,10 +22,10 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%> 
 <jsp:useBean id="pager" class="tud.ggpserver.formhandlers.ShowMatches" scope="page">
 	<c:catch> <% // this is for catching NumberFormatExceptions and the like %>
-		<jsp:setProperty name="pager" property="page"/>
 		<jsp:setProperty name="pager" property="playerName"/>
 		<jsp:setProperty name="pager" property="gameName"/>
 		<jsp:setProperty name="pager" property="tournamentID"/>
+		<jsp:setProperty name="pager" property="page"/>
 	</c:catch>
 </jsp:useBean>
 
