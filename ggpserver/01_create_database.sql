@@ -379,7 +379,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 --
 
 INSERT INTO `users` (`user_name`, `user_pass`) VALUES
-('admin', '64acb644acc172824a5c0aa3bf1c6686d09ada13'),
+('admin', '64acb644acc172824a5c0aa3bf1c6686d09ada13');
 
 -- --------------------------------------------------------
 
@@ -399,7 +399,7 @@ CREATE TABLE IF NOT EXISTS `user_roles` (
 --
 
 INSERT INTO `user_roles` (`user_name`, `role_name`) VALUES
-('admin', 'admin'),
+('admin', 'admin');
 
 
 -- --------------------------------------------------------
