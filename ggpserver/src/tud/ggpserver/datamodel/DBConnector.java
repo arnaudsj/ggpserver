@@ -175,7 +175,8 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 		
 		// also remove all cached matches of this game (to prevent the stale-stylesheet-bug).
 		synchronized (matches) {
-			for (ServerMatch match : matches.values()) {
+			for (ServerMatch match : new LinkedList<ServerMatch>(matches.values())) {
+					// new LinkedList(...) necessary to avoid concurrent iteration and modification
 				if (match.getGame().equals(game)) {
 					matches.remove(match.getMatchID());
 				}
