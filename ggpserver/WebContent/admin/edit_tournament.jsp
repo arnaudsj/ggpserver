@@ -135,7 +135,7 @@
 						<c:choose>
 							<c:when test="${match.status == 'new'}">
 								<select name="playerInfos+${match.matchID}" size="1" onchange="document.theForm.submitButton.style.color = '#ff0000';" style="max-width:120px;">
-									<c:forEach var="playerinfo" items="${pager.enabledPlayerInfos}">
+									<c:forEach var="playerinfo" items="${pager.playerInfos}">
 										<c:choose>
 											<c:when test='${playerinfo.name == selectedplayerinfo.name}'>
 												<option value="${playerinfo.name}" selected="selected" ><c:out value="${playerinfo.name}" /></option>
@@ -188,7 +188,7 @@
 				<td class="nopadding"><c:url value="../public/view_match.jsp" var="viewURL">
 					<c:param name="matchID" value="${match.matchID}" />
 				</c:url>
-				<div class="view"><a href='<c:out value="${viewURL}" />'><span>view</span></a></div>
+				<a href='<c:out value="${viewURL}" />'><div class="view" title="view match"><span>view</span></div></a>
 				</td>
 
 				<%-- action "start" [only NEW] --%>
@@ -200,7 +200,7 @@
 							<c:param name="matchID" value="${match.matchID}" />
 							<c:param name="page" value="${pager.page}" />
 						</c:url>
-						<div class="start"><a href='<c:out value="${startURL}" />'><span>start</span></a></div>
+						<a href='<c:out value="${startURL}" />'><div class="start" title="start match"><span>start</span></div></a>
 					</c:when>
 					<c:when test="${ match.status == 'running' }">
 						<c:url value="process_edit_tournament.jsp" var="abortURL">
@@ -209,7 +209,7 @@
 							<c:param name="matchID" value="${match.matchID}" />
 							<c:param name="page" value="${pager.page}" />
 						</c:url>
-						<div class="abort"><a href='<c:out value="${abortURL}" />'><span>abort</span></a></div>
+						<a href='<c:out value="${abortURL}" />'><div class="abort" title="abort match"><span>abort</span></div></a>
 					</c:when>
 					<c:otherwise>
 						<div class="start-bw"></div>
@@ -234,7 +234,7 @@
 						</c:otherwise>
 					</c:choose>
 
-					<div class="delete"><a href='<c:out value="${realDeleteURL}" />'><span>delete</span></a></div>
+					<a href='<c:out value="${realDeleteURL}" />'><div class="delete" title="delete match"><span>delete</span></div></a>
 				</td>
 
 				<%-- action "clone" [all] --%>
@@ -245,7 +245,7 @@
 					<c:param name="matchID" value="${match.matchID}" />
 							<c:param name="page" value="${pager.page}" />
 				</c:url>
-				<div class="clone"><a href='<c:out value="${cloneURL}" />'><span>clone</span></a></div>
+				<a href='<c:out value="${cloneURL}" />'><div class="clone" title="clone match"><span>clone</span></div></a>
 				</td>
 			</tr>
 		</c:forEach>

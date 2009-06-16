@@ -698,6 +698,10 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return result;
 	}
 	
+	public List<RemotePlayerInfo> getPlayerInfos() throws SQLException {
+		return getPlayerInfos(null);
+	}
+		
 	public List<RemotePlayerInfo> getPlayerInfos(String status) throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
@@ -709,8 +713,12 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			// AbstractRoundRobinScheduler.createPlayerInfos()
 		
 		try {
-			ps = con.prepareStatement("SELECT `name` FROM `players` WHERE `status` = ?;");
-			ps.setString(1, status);
+			if (status != null) {
+				ps = con.prepareStatement("SELECT `name` FROM `players` WHERE `status` = ?;");
+				ps.setString(1, status);
+			} else {
+				ps = con.prepareStatement("SELECT `name` FROM `players`;");
+			}
 			rs = ps.executeQuery();
 			
 			while (rs.next()) {

@@ -96,6 +96,7 @@ public class EditTournament extends ShowMatches {
 		if (action.equals(ADD_MATCH)) {
 			return true;
 		} else if (action.equals(START_MATCH) && match != null && match instanceof NewMatch) {
+			// TODO: should we check that all players are active ?
 			return true;
 		} else if (action.equals(ABORT_MATCH) && match != null && match instanceof RunningMatch) {
 			return true;
@@ -159,6 +160,7 @@ public class EditTournament extends ShowMatches {
 		correctlyPerformed = true;
 	}
 
+	@SuppressWarnings("unchecked")
 	private void deleteMatch(ServerMatch match) throws SQLException {
 		JavaProverTournamentScheduler scheduler = JavaProverTournamentScheduler.getInstance(tournament);
 		if (scheduler.isRunning(match)) {
@@ -189,6 +191,16 @@ public class EditTournament extends ShowMatches {
 		result.add(new RandomPlayerInfo(-1));
 		result.add(new LegalPlayerInfo(-1));
 		result.addAll(db.getPlayerInfos(RemotePlayerInfo.STATUS_ACTIVE));
+
+		return result;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<PlayerInfo> getPlayerInfos() throws SQLException {
+		List<PlayerInfo> result = new LinkedList<PlayerInfo>();
+		result.add(new RandomPlayerInfo(-1));
+		result.add(new LegalPlayerInfo(-1));
+		result.addAll(db.getPlayerInfos());
 
 		return result;
 	}

@@ -289,6 +289,9 @@ span.highlight {
   height:              22px;
   width:               22px;
 }
+.view span {
+  visibility:          hidden;
+}
 .view a span {
   visibility:          hidden;
 }
@@ -299,6 +302,9 @@ span.highlight {
   display:             inline-block;
   height:              22px;
   width:               22px;
+}
+.edit span {
+  visibility:          hidden;
 }
 .edit a span {
   visibility:          hidden;
@@ -311,6 +317,9 @@ span.highlight {
   height:              24px;
   width:               24px;
 }
+.start span {
+  visibility:          hidden;
+}
 .start a span {
   visibility:          hidden;
 }
@@ -320,6 +329,9 @@ span.highlight {
   display:             inline-block;
   height:              24px;
   width:               24px;
+}
+.start-bw span {
+  visibility:          hidden;
 }
 .start-bw a span {
   visibility:          hidden;
@@ -332,6 +344,9 @@ span.highlight {
   height:              24px;
   width:               24px;
 }
+.abort span {
+  visibility:          hidden;
+}
 .abort a span {
   visibility:          hidden;
 }
@@ -343,6 +358,9 @@ span.highlight {
   height:              24px;
   width:               24px;
 }
+.delete span {
+  visibility:          hidden;
+}
 .delete a span {
   visibility:          hidden;
 }
@@ -352,6 +370,9 @@ span.highlight {
   display:             inline-block;
   height:              24px;
   width:               24px;
+}
+.delete-bw span {
+  visibility:          hidden;
 }
 .delete-bw a span {
   visibility:          hidden;
@@ -363,6 +384,9 @@ span.highlight {
   display:             inline-block;
   height:              24px;
   width:               24px;
+}
+.clone span {
+  visibility:          hidden;
 }
 .clone a span {
   visibility:          hidden;
@@ -381,6 +405,9 @@ span.highlight {
   height:              16px;
   width:               16px;
 }*/
+.errors span {
+  visibility:          hidden;
+}
 .errors a span {
   visibility:          hidden;
 }
@@ -391,6 +418,9 @@ span.highlight {
   display:             inline-block;
   height:              16px;
   width:               16px;
+}
+.errors_bw span {
+  visibility:          hidden;
 }
 .errors_bw a span {
   visibility:          hidden;

@@ -46,17 +46,13 @@ public class SaveTournament {
 			if (key.equals("tournamentID")) {
 				parseTournamentID(params);
 			} else if (key.startsWith("gameName+")) {
-				String matchID = key.substring(9);
-				parseGameName(matchID, params);
+				parseGameName(key.substring(9), params);
 			} else if (key.startsWith("startclock+")) {
-				String matchID = key.substring(11);
-				parseStartClock(matchID, params);
+				parseStartClock(key.substring(11), params);
 			} else if (key.startsWith("playclock+")) {
-				String matchID = key.substring(10);
-				parsePlayClock(matchID, params);
+				parsePlayClock(key.substring(10), params);
 			} else if (key.startsWith("playerInfos+")) {
-				String matchID = key.substring(12);
-				parsePlayerInfos(matchID, params);
+				parsePlayerInfos(key.substring(12), params);
 			} else {
 				System.err.print("Unknown parameter: " + key + " (values ");
 				for (String value : params) {

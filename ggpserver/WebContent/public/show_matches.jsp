@@ -50,6 +50,9 @@
 	    <c:if test="${ pager.playerName != null }">
 	     for ${pager.playerName}
 	    </c:if>
+	    <c:if test="${ pager.tournamentID != null }">
+	     of ${pager.tournamentID}
+	    </c:if>
      </div>
 
 	<!-- pager -->
