@@ -1,5 +1,5 @@
 <%--
-    Copyright (C) 2009 Martin Günther (mintar@gmx.de)
+    Copyright (C) 2009 Martin Gï¿½nther (mintar@gmx.de)
 
     This file is part of GGP Server.
 
@@ -19,4 +19,4 @@
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
-	<h1 class="notopborder">Showing page ${pager.page} of ${pager.numberOfPages} (${pager.tableName} ${pager.startRow + 1} to ${pager.endRow + 1})</h1>
+	<h1 class="notopborder">Page ${pager.page} of ${pager.numberOfPages} (${pager.tableName} ${pager.startRow + 1} to ${pager.endRow + 1})</h1>
