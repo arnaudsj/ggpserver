@@ -19,6 +19,8 @@
 			<xsl:with-param name="DefaultCellContent">no</xsl:with-param>
 			<xsl:with-param name="DefaultCell">no</xsl:with-param>
 			<xsl:with-param name="CellFluentName">CELL</xsl:with-param>
+			<xsl:with-param name="xArgIdx">2</xsl:with-param>
+			<xsl:with-param name="yArgIdx">1</xsl:with-param>
 		</xsl:call-template>
 		
 		<!-- show remaining fluents -->
@@ -35,8 +37,9 @@
 		<div>
 			<xsl:attribute name="class">
 				<xsl:choose>
-					<xsl:when test="fact[prop-f='CELL' and arg[3]='GREEN'] and not(fact[prop-f='CELL' and contains(arg[1],$col) and contains(arg[2],$row)])">cellInvisible</xsl:when>
-					<xsl:when test="fact[prop-f='FRINGE' and substring-after(arg[1],'C')=$col and substring-after(arg[2],'C')=$row]">cellLight</xsl:when>
+					<xsl:when test="fact[prop-f='CELL' and arg[3]='GREEN'] and not(fact[prop-f='CELL' and contains(arg[1],$row) and contains(arg[2],$col)])">cellInvisible</xsl:when>
+					<xsl:when test="fact[prop-f='FRINGE' and substring-after(arg[1],'C')=$row and substring-after(arg[2],'C')=$col] and 
+									(fact[prop-f='ROWSELECTED' and substring-after(arg[1],'C')=$row] or not(fact[prop-f='ROWSELECTED']))">cellLight</xsl:when>
 					<xsl:otherwise><xsl:value-of select="$defaultClass"/></xsl:otherwise>
 				</xsl:choose>
 			</xsl:attribute>
