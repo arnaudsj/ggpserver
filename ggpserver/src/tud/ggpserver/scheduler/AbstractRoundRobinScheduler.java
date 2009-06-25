@@ -49,6 +49,7 @@ public class AbstractRoundRobinScheduler<TermType extends TermInterface, Reasone
 	private static final long DELAY_BETWEEN_GAMES = 2000;   // wait two seconds
 
 	private boolean running = false;
+	private boolean stopAfterCurrentMatches = false;
 	private final AbstractDBConnector<TermType, ReasonerStateInfoType> db;
 
 	private Thread gameThread;
@@ -67,6 +68,7 @@ public class AbstractRoundRobinScheduler<TermType extends TermInterface, Reasone
 	public synchronized void start() {
 		if (!running) {
 			setRunning(true);
+			stopAfterCurrentMatches=false;
 			
 			gameThread=new Thread(){
 				@Override
@@ -92,6 +94,8 @@ public class AbstractRoundRobinScheduler<TermType extends TermInterface, Reasone
 				}
 			};
 			gameThread.start();
+		}else if(stopAfterCurrentMatches){ // stop the stop
+			stopAfterCurrentMatches = false;
 		}
 	}
 	
@@ -106,6 +110,9 @@ public class AbstractRoundRobinScheduler<TermType extends TermInterface, Reasone
 		}
 	}
 
+	public void stopGracefully() {
+		stopAfterCurrentMatches = true;
+	}
 	
 	public synchronized Game<TermType, ReasonerStateInfoType> getNextPlayedGame() throws SQLException {
 		return gamePicker.getNextPlayedGame();
@@ -118,6 +125,10 @@ public class AbstractRoundRobinScheduler<TermType extends TermInterface, Reasone
 	public boolean isRunning() {
 		return running;
 	}
+	
+	public boolean isBeingStopped() {
+		return running && stopAfterCurrentMatches;
+	}
 
 	// this method has default visibility so it can be accessed from within the
 	// anonymous inner Thread classes without overhead
@@ -128,7 +139,7 @@ public class AbstractRoundRobinScheduler<TermType extends TermInterface, Reasone
 	// this method has default visibility so it can be accessed from within the
 	// anonymous inner Thread classes without overhead
 	void runMatches() throws InterruptedException, SQLException {
-		while (true) {
+		while (!stopAfterCurrentMatches) {
 			List<NewMatch<TermType, ReasonerStateInfoType>> currentMatches = createMatches();
 			
 			matchThreads = new LinkedList<Thread>();
@@ -173,6 +184,8 @@ public class AbstractRoundRobinScheduler<TermType extends TermInterface, Reasone
 			
 			Thread.sleep(DELAY_BETWEEN_GAMES);
 		}
+
+		setRunning(false);
 	}
 
 	@SuppressWarnings("unchecked")

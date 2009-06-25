@@ -36,12 +36,18 @@ public class AdminPage {
 	public boolean isRunning() {
 		return RoundRobinScheduler.getInstance().isRunning();
 	}
-	
+
+	public boolean isBeingStopped() {
+		return RoundRobinScheduler.getInstance().isBeingStopped();
+	}
+
 	public void setAction(String action) {
 		if (action.equals("start")) {
 			RoundRobinScheduler.getInstance().start();
 		} else if (action.equals("stop")) {
 			RoundRobinScheduler.getInstance().stop();
+		} else if (action.equals("stopGracefully")) {
+			RoundRobinScheduler.getInstance().stopGracefully();
 		}
 	}
 

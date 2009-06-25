@@ -97,9 +97,11 @@
 </table>
 
 <h1>Game Description</h1>
-<p style="font-family: monospace; font-size:medium">
-<code>${viewGame.gameDescription}</code>
-</p> 
+	<c:url value="download_gdl.jsp" var="downloadURL">
+		<c:param name="name" value="${viewGame.name}" />
+	</c:url>
+	<div class="download"><a href='<c:out value="${downloadURL}" />'><span>Download</span></a></div>
+	<pre><code>${viewGame.plainGameDescription}</code></pre>
 
 
 </div>

@@ -46,10 +46,13 @@ public class ViewGame {
 	}
 	
 	public String getGameDescription() throws SQLException {
-		
 		//		return new KIFSyntaxFormatter(getGame().getKIFGameDescription()).getFormattedGameDescription();
-		return StringEscapeUtils.escapeHtml(getGame().getGameDescription())
+		return StringEscapeUtils.escapeHtml(getPlainGameDescription())
 			.replaceAll(" ", "&nbsp;")
 			.replace("\n", "<br/>");
+	}
+
+	public String getPlainGameDescription() throws SQLException {
+		return getGame().getGameDescription();
 	}
 }

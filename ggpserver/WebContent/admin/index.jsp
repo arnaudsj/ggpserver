@@ -48,22 +48,28 @@
     <div id="ctitle">Admin page</div>
     <h1 class="notopborder">Scheduler</h1>
     
+	<c:url value="index.jsp" var="urlStopGracefully">
+		<c:param name="action" value="stopGracefully" />
+	</c:url>
+	<c:url value="index.jsp" var="urlStop">
+		<c:param name="action" value="stop" />
+	</c:url>
+	<c:url value="index.jsp" var="urlStart">
+		<c:param name="action" value="start" />
+	</c:url>
     <c:choose>
+    	<c:when test="${adminPage.beingStopped}">
+			The round-robin scheduler <b>will be stopped</b>. You can <a href='<c:out value="${urlStop}" />'>stop it immediately</a> or <a href='<c:out value="${urlStart}" />'>restart it</a>.
+    	</c:when>
     	<c:when test="${adminPage.running}">
-			<c:url value="index.jsp" var="url">
-				<c:param name="action" value="stop" />
-			</c:url>
-			The round-robin scheduler is <b>running</b>. Click <a href='<c:out value="${url}" />'>here</a> to stop it.
+			The round-robin scheduler is <b>running</b>. You can <a href='<c:out value="${urlStopGracefully}" />'>stop it</a> (after the currently running matches) or <a href='<c:out value="${urlStop}" />'>stop it immediately</a>.
     	</c:when>
     	<c:otherwise>
-			<c:url value="index.jsp" var="url">
-				<c:param name="action" value="start" />
-			</c:url>
-			The round-robin scheduler is <b>not running</b>. Click <a href='<c:out value="${url}" />'>here</a> to start it.
+			The round-robin scheduler is <b>not running</b>. You can <a href='<c:out value="${urlStart}" />'>start it</a>.
     	</c:otherwise>
     </c:choose>
-    
-	
+ 
+
 	<h1>Scheduler options</h1>
 	<c:url var="schedulerOptionsURL" value="process_scheduler_options.jsp" />
 	<form action="${schedulerOptionsURL}" method="post">
