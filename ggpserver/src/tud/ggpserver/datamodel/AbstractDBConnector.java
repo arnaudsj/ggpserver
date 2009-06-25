@@ -144,7 +144,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		User result = null;
 
 		try { 
-//			ps = con.prepareStatement("SELECT `user_name` FROM `users` WHERE `user_name` = ?;");
+//			ps = con.prepareStatement("SELECT `user_name` FROM `users` WHERE `user_name` = ? ;");
 //			ps = con.prepareStatement("SELECT `role_name` FROM `user_roles` WHERE `user_name` = ? ;");   // (*)
 			ps = con.prepareStatement("SELECT `r`.`user_name`, `r`.`role_name` " + 
 					"FROM `users` AS `u`, `user_roles` as `r` " + 
@@ -232,7 +232,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		
 		try { 
 			
-			ps = con.prepareStatement("SELECT `host` , `port` , `owner` , `status` FROM `players` WHERE `name` = ?;");
+			ps = con.prepareStatement("SELECT `host` , `port` , `owner` , `status` FROM `players` WHERE `name` = ? ;");
 			ps.setString(1, name);
 			rs = ps.executeQuery();
 			
@@ -288,7 +288,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		Game<TermType,ReasonerStateInfoType> result = null;
 		
 		try { 
-			ps = con.prepareStatement("SELECT `gamedescription` , `stylesheet`, `enabled` FROM `games` WHERE `name` = ?;");
+			ps = con.prepareStatement("SELECT `gamedescription` , `stylesheet`, `enabled` FROM `games` WHERE `name` = ? ;");
 			ps.setString(1, name);
 			rs = ps.executeQuery();
 			
@@ -408,7 +408,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		ServerMatch<TermType, ReasonerStateInfoType> result = null;
 
 		try {
-			ps = con.prepareStatement("SELECT `game` , `start_clock` , `play_clock` , `start_time` , `status` FROM `matches` WHERE `match_id` = ?;");
+			ps = con.prepareStatement("SELECT `game` , `start_clock` , `play_clock` , `start_time` , `status` FROM `matches` WHERE `match_id` = ? ;");
 			ps.setString(1, matchID);
 			rs = ps.executeQuery();
 			
@@ -419,7 +419,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				Timestamp startTime = rs.getTimestamp("start_time");
 				String status = rs.getString("status");
 				
-				ps_roles = con.prepareStatement("SELECT `player` , `roleindex` , `goal_value` FROM `match_players` WHERE `match_id` = ?;");
+				ps_roles = con.prepareStatement("SELECT `player` , `roleindex` , `goal_value` FROM `match_players` WHERE `match_id` = ? ;");
 				ps_roles.setString(1, matchID);
 
 				ResultSet rs_roles = ps_roles.executeQuery();
@@ -570,7 +570,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 
 		try {
 			statement = con.createStatement();
-			statement.execute("SELECT COUNT( * ) FROM `" + tableName + "`;");
+			statement.execute("SELECT COUNT( * ) FROM `" + tableName + "` ;");
 			rs = statement.getResultSet();
 			
 			if (rs.next()) {
@@ -596,7 +596,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		List<Game<?, ?>> result = new LinkedList<Game<?, ?>>();
 		
 		try {
-			ps = con.prepareStatement("SELECT `name` FROM `games` LIMIT ? , ?;");
+			ps = con.prepareStatement("SELECT `name` FROM `games` ORDER BY `name` LIMIT ? , ? ;");
 			ps.setInt(1, startRow);
 			ps.setInt(2, numDisplayedRows);
 			rs = ps.executeQuery();
@@ -624,7 +624,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		List<Game<TermType,ReasonerStateInfoType>> result = new LinkedList<Game<TermType,ReasonerStateInfoType>>();
 		
 		try {
-			ps = con.prepareStatement("SELECT `name` FROM `games` WHERE `enabled`=TRUE;");
+			ps = con.prepareStatement("SELECT `name` FROM `games` WHERE `enabled`=TRUE ORDER BY `name` ;");
 			rs = ps.executeQuery();
 			
 			while (rs.next()) {
@@ -650,7 +650,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		List<User> result = new LinkedList<User>();
 		
 		try {
-			ps = con.prepareStatement("SELECT `user_name` FROM `users` LIMIT ? , ?;");
+			ps = con.prepareStatement("SELECT `user_name` FROM `users` ORDER BY `user_name` LIMIT ? , ? ;");
 			ps.setInt(1, startRow);
 			ps.setInt(2, numDisplayedRows);
 			rs = ps.executeQuery();
@@ -678,7 +678,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		List<PlayerInfo> result = new LinkedList<PlayerInfo>();
 		
 		try {
-			ps = con.prepareStatement("SELECT `name` FROM `players` LIMIT ? , ?;");
+			ps = con.prepareStatement("SELECT `name` FROM `players` ORDER BY `name` LIMIT ? , ? ;");
 			ps.setInt(1, startRow);
 			ps.setInt(2, numDisplayedRows);
 			rs = ps.executeQuery();
@@ -714,10 +714,10 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		
 		try {
 			if (status != null) {
-				ps = con.prepareStatement("SELECT `name` FROM `players` WHERE `status` = ?;");
+				ps = con.prepareStatement("SELECT `name` FROM `players` WHERE `status` = ? ORDER BY `name` ;");
 				ps.setString(1, status);
 			} else {
-				ps = con.prepareStatement("SELECT `name` FROM `players`;");
+				ps = con.prepareStatement("SELECT `name` FROM `players` ORDER BY `name` ;");
 			}
 			rs = ps.executeQuery();
 			
@@ -747,7 +747,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		List<RemotePlayerInfo> result = new LinkedList<RemotePlayerInfo>();
 		
 		try {
-			ps = con.prepareStatement("SELECT `name` FROM `players` WHERE `owner` = ?;");
+			ps = con.prepareStatement("SELECT `name` FROM `players` WHERE `owner` = ? ORDER BY `name` ;");
 			ps.setString(1, userName);
 			rs = ps.executeQuery();
 			
@@ -854,7 +854,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		}
 		String from =          "FROM `matches` AS `m`";
 		String where =         "WHERE TRUE";
-		final String orderBy = "ORDER BY `m`.`start_time`";
+		String orderBy =       "ORDER BY `m`.`start_time`";
 		final String limit =   "LIMIT ? , ?";
 
 		List<Object> parameters = new LinkedList<Object>();
@@ -874,7 +874,10 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			parameters.add(tournamentID);
 		}
 		if (excludeNew) {
-			where += " AND `m`.`status` != 'new'";
+			where += " AND `m`.`status` != '" + ServerMatch.STATUS_NEW + "'";
+		}else{
+			// show the new matches last
+			orderBy = "ORDER BY CASE WHEN `m`.`status`!='" + ServerMatch.STATUS_NEW + "' THEN 1 ELSE 2 END, `m`.`start_time`";
 		}
 		parameters.add(startRow);
 		parameters.add(numDisplayedRows);
@@ -898,9 +901,14 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	public void setMatchStatus(String matchID, String status) throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
-
+		
 		try {
-			ps = con.prepareStatement("UPDATE `ggpserver`.`matches` SET `status` = ? WHERE `matches`.`match_id` = ? LIMIT 1 ;");
+			
+			String setStartTime = "";
+			if(status == ServerMatch.STATUS_RUNNING) {
+				setStartTime = ", `start_time` = CURRENT_TIMESTAMP";				
+			}
+			ps = con.prepareStatement("UPDATE `ggpserver`.`matches` SET `status` = ? " + setStartTime + " WHERE `matches`.`match_id` = ? LIMIT 1 ;");
 			ps.setString(1, status);
 			ps.setString(2, matchID);
 			ps.executeUpdate();
@@ -1244,7 +1252,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		}
 		
 		try {
-			ps = con.prepareStatement("SELECT `step_number`, `type`, `message`, `player` FROM `errormessages` WHERE `match_id` = ? ORDER BY `step_number`;");
+			ps = con.prepareStatement("SELECT `step_number`, `type`, `message`, `player` FROM `errormessages` WHERE `match_id` = ? ORDER BY `step_number` ;");
 			ps.setString(1, matchID);
 			rs = ps.executeQuery();
 			
@@ -1287,7 +1295,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		List<GameControllerErrorMessage> result = new ArrayList<GameControllerErrorMessage>();
 		
 		try {
-			ps = con.prepareStatement("SELECT `type`, `message`, `player` FROM `errormessages` WHERE `match_id` = ? AND `step_number` = ? ;");
+			ps = con.prepareStatement("SELECT `type`, `message`, `player` FROM `errormessages` WHERE `match_id` = ? AND `step_number` = ? ORDER BY `player` ;");
 			ps.setString(1, matchID);
 			ps.setInt(2, stepNumber);
 			rs = ps.executeQuery();
@@ -1317,7 +1325,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		List<List<String>> result = new LinkedList<List<String>>();
 		
 		try {
-			ps = con.prepareStatement("SELECT `step_number`, `roleindex`, `move` FROM `moves` WHERE `match_id` = ? ORDER BY `step_number`, `roleindex`;");
+			ps = con.prepareStatement("SELECT `step_number`, `roleindex`, `move` FROM `moves` WHERE `match_id` = ? ORDER BY `step_number`, `roleindex` ;");
 			ps.setString(1, matchID);
 			rs = ps.executeQuery();
 			
@@ -1363,7 +1371,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		assert (stepNumber > 0);
 
 		try {
-			ps = con.prepareStatement("SELECT `roleindex`, `move` FROM `moves` WHERE `match_id` = ? AND `step_number` = ? ORDER BY `roleindex`;");
+			ps = con.prepareStatement("SELECT `roleindex`, `move` FROM `moves` WHERE `match_id` = ? AND `step_number` = ? ORDER BY `roleindex` ;");
 			ps.setString(1, matchID);
 			ps.setInt(2, stepNumber);
 			rs = ps.executeQuery();
@@ -1395,7 +1403,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		List<String> result = new LinkedList<String>();
 
 		try {
-			ps = con.prepareStatement("SELECT `step_number`, `state` FROM `states` WHERE `match_id` = ? ORDER BY `step_number`;");
+			ps = con.prepareStatement("SELECT `step_number`, `state` FROM `states` WHERE `match_id` = ? ORDER BY `step_number` ;");
 			ps.setString(1, matchID);
 			rs = ps.executeQuery();
 			
@@ -1425,7 +1433,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		assert (stepNumber > 0);
 
 		try {
-			ps = con.prepareStatement("SELECT `state` FROM `states` WHERE `match_id` = ? AND `step_number` = ?;");
+			ps = con.prepareStatement("SELECT `state` FROM `states` WHERE `match_id` = ? AND `step_number` = ? ;");
 			ps.setString(1, matchID);
 			ps.setInt(2, stepNumber);
 			rs = ps.executeQuery();
@@ -1662,7 +1670,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		List<Tournament<TermType , ReasonerStateInfoType>> result = new LinkedList<Tournament<TermType , ReasonerStateInfoType>>();
 		
 		try {
-			ps = con.prepareStatement("SELECT `tournament_id` FROM `tournaments`");
+			ps = con.prepareStatement("SELECT `tournament_id` FROM `tournaments` ORDER BY `tournament_id` ;");
 			rs = ps.executeQuery();
 			
 			while (rs.next()) {
