@@ -59,7 +59,16 @@ public class Game<
 			sb.append(line + "\n"); // artificial EOLN marker
 		}
 		
-		this.name = gameFile.getName();
+		String fileName = gameFile.getName();
+		
+		int firstDot = fileName.indexOf(".");
+		if (firstDot == -1) {
+			// no "." in filename
+			this.name = fileName;
+		} else {
+			this.name = fileName.substring(0, firstDot);
+		}
+		
 		this.reasonerFactory=reasonerFactory;
 		this.gameDescription=sb.toString();
 		ReasonerInterface<TermType, ReasonerStateInfoType> reasoner = reasonerFactory
