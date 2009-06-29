@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<gametrace>
+  <game>maze</game>
+  <steps>
+    <step nb="1">
+      <state>
+        <fluent>(cell a)</fluent>
+        <fluent>(gold c)</fluent>
+        <fluent>(step 1)</fluent>
+      </state>
+      <legal_moves>
+        <move role="robot">move</move>
+      </legal_moves>
+      <moves>
+        <move role="robot">move</move>
+      </moves>
+    </step>
+    <step nb="2">
+      <state>
+        <fluent>(cell b)</fluent>
+        <fluent>(gold c)</fluent>
+        <fluent>(step 2)</fluent>
+      </state>
+      <legal_moves>
+        <move role="robot">move</move>
+      </legal_moves>
+      <moves>
+        <move role="robot">move</move>
+      </moves>
+    </step>
+    <step nb="3">
+      <state>
+        <fluent>(cell c)</fluent>
+        <fluent>(gold c)</fluent>
+        <fluent>(step 3)</fluent>
+      </state>
+      <legal_moves>
+        <move role="robot">grab</move>
+        <move role="robot">move</move>
+      </legal_moves>
+      <moves>
+        <move role="robot">move</move>
+      </moves>
+    </step>
+    <step nb="4">
+      <state>
+        <fluent>(cell d)</fluent>
+        <fluent>(gold c)</fluent>
+        <fluent>(step 4)</fluent>
+      </state>
+      <legal_moves>
+        <move role="robot">move</move>
+      </legal_moves>
+      <moves>
+        <move role="robot">move</move>
+      </moves>
+    </step>
+    <step nb="5">
+      <state>
+        <fluent>(cell a)</fluent>
+        <fluent>(gold c)</fluent>
+        <fluent>(step 5)</fluent>
+      </state>
+      <legal_moves>
+        <move role="robot">move</move>
+      </legal_moves>
+      <moves>
+        <move role="robot">move</move>
+      </moves>
+    </step>
+    <step nb="6">
+      <state>
+        <fluent>(cell b)</fluent>
+        <fluent>(gold c)</fluent>
+        <fluent>(step 6)</fluent>
+      </state>
+      <legal_moves>
+        <move role="robot">move</move>
+      </legal_moves>
+      <moves>
+        <move role="robot">move</move>
+      </moves>
+    </step>
+    <step nb="7">
+      <state>
+        <fluent>(cell c)</fluent>
+        <fluent>(gold c)</fluent>
+        <fluent>(step 7)</fluent>
+      </state>
+      <legal_moves>
+        <move role="robot">grab</move>
+        <move role="robot">move</move>
+      </legal_moves>
+      <moves>
+        <move role="robot">move</move>
+      </moves>
+    </step>
+    <step nb="8">
+      <state>
+        <fluent>(cell d)</fluent>
+        <fluent>(gold c)</fluent>
+        <fluent>(step 8)</fluent>
+      </state>
+      <legal_moves>
+        <move role="robot">move</move>
+      </legal_moves>
+      <moves>
+        <move role="robot">move</move>
+      </moves>
+    </step>
+    <step nb="9">
+      <state>
+        <fluent>(cell a)</fluent>
+        <fluent>(gold c)</fluent>
+        <fluent>(step 9)</fluent>
+      </state>
+      <legal_moves>
+        <move role="robot">move</move>
+      </legal_moves>
+      <moves>
+        <move role="robot">move</move>
+      </moves>
+    </step>
+    <step nb="10">
+      <state>
+        <fluent>(cell b)</fluent>
+        <fluent>(gold c)</fluent>
+        <fluent>(step 10)</fluent>
+      </state>
+      <terminal/>
+      <goal_values>
+        <goal_value role="robot">0</goal_value>
+      </goal_values>
+    </step>
+  </steps>
+</gametrace>

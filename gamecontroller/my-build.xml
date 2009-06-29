@@ -33,11 +33,21 @@
         <delete dir="bin"/>
         <delete file="gamecontroller.jar"/>
     </target>
-    <target depends="cli-jar, gui-jar, jar" name="jars"/>
+    <target depends="cli-jar, gui-jar, jar, retracer-jar" name="jars"/>
     <target depends="build" name="jar">
 	    <jar destfile="gamecontroller.jar" basedir="bin"/>
     </target>
-    <target depends="build" name="cli-jar">
+    <target depends="build" name="retracer-jar">
+	    <jar destfile="gamecontroller-retracer.jar"
+			 manifest="java/gamecontroller-javaprover-retracer-Manifest">
+			<fileset dir="bin">
+				<exclude name="stanfordlogic/"/>
+				<exclude name="de/"/>
+				<exclude name="tud/gamecontroller/gui/"/>
+			</fileset>
+		 </jar>
+    </target>
+	<target depends="build" name="cli-jar">
 	    <jar destfile="gamecontroller-cli.jar"
 			 manifest="java/gamecontroller-javaprover-cli-Manifest">
 			<fileset dir="bin">

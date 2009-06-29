@@ -1,0 +1,1330 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<gametrace>
+  <game>8puzzle</game>
+  <steps>
+    <step nb="1">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 5)</fluent>
+        <fluent>(cell 2 2 4)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 2)</fluent>
+        <fluent>(cell 3 2 1)</fluent>
+        <fluent>(cell 3 3 b)</fluent>
+        <fluent>(step 0)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 2 3)</move>
+        <move role="player">(move 3 2)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 3 2)</move>
+      </moves>
+    </step>
+    <step nb="2">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 5)</fluent>
+        <fluent>(cell 2 2 4)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 2)</fluent>
+        <fluent>(cell 3 2 b)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 1)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 2 2)</move>
+        <move role="player">(move 3 1)</move>
+        <move role="player">(move 3 3)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 3 3)</move>
+      </moves>
+    </step>
+    <step nb="3">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 5)</fluent>
+        <fluent>(cell 2 2 4)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 2)</fluent>
+        <fluent>(cell 3 2 1)</fluent>
+        <fluent>(cell 3 3 b)</fluent>
+        <fluent>(step 2)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 2 3)</move>
+        <move role="player">(move 3 2)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 2 3)</move>
+      </moves>
+    </step>
+    <step nb="4">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 5)</fluent>
+        <fluent>(cell 2 2 4)</fluent>
+        <fluent>(cell 2 3 b)</fluent>
+        <fluent>(cell 3 1 2)</fluent>
+        <fluent>(cell 3 2 1)</fluent>
+        <fluent>(cell 3 3 3)</fluent>
+        <fluent>(step 3)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 3)</move>
+        <move role="player">(move 2 2)</move>
+        <move role="player">(move 3 3)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 2 2)</move>
+      </moves>
+    </step>
+    <step nb="5">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 5)</fluent>
+        <fluent>(cell 2 2 b)</fluent>
+        <fluent>(cell 2 3 4)</fluent>
+        <fluent>(cell 3 1 2)</fluent>
+        <fluent>(cell 3 2 1)</fluent>
+        <fluent>(cell 3 3 3)</fluent>
+        <fluent>(step 4)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 2)</move>
+        <move role="player">(move 2 1)</move>
+        <move role="player">(move 2 3)</move>
+        <move role="player">(move 3 2)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 2 3)</move>
+      </moves>
+    </step>
+    <step nb="6">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 5)</fluent>
+        <fluent>(cell 2 2 4)</fluent>
+        <fluent>(cell 2 3 b)</fluent>
+        <fluent>(cell 3 1 2)</fluent>
+        <fluent>(cell 3 2 1)</fluent>
+        <fluent>(cell 3 3 3)</fluent>
+        <fluent>(step 5)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 3)</move>
+        <move role="player">(move 2 2)</move>
+        <move role="player">(move 3 3)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 2 2)</move>
+      </moves>
+    </step>
+    <step nb="7">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 5)</fluent>
+        <fluent>(cell 2 2 b)</fluent>
+        <fluent>(cell 2 3 4)</fluent>
+        <fluent>(cell 3 1 2)</fluent>
+        <fluent>(cell 3 2 1)</fluent>
+        <fluent>(cell 3 3 3)</fluent>
+        <fluent>(step 6)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 2)</move>
+        <move role="player">(move 2 1)</move>
+        <move role="player">(move 2 3)</move>
+        <move role="player">(move 3 2)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 2 1)</move>
+      </moves>
+    </step>
+    <step nb="8">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 b)</fluent>
+        <fluent>(cell 2 2 5)</fluent>
+        <fluent>(cell 2 3 4)</fluent>
+        <fluent>(cell 3 1 2)</fluent>
+        <fluent>(cell 3 2 1)</fluent>
+        <fluent>(cell 3 3 3)</fluent>
+        <fluent>(step 7)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 1)</move>
+        <move role="player">(move 2 2)</move>
+        <move role="player">(move 3 1)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 2 2)</move>
+      </moves>
+    </step>
+    <step nb="9">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 5)</fluent>
+        <fluent>(cell 2 2 b)</fluent>
+        <fluent>(cell 2 3 4)</fluent>
+        <fluent>(cell 3 1 2)</fluent>
+        <fluent>(cell 3 2 1)</fluent>
+        <fluent>(cell 3 3 3)</fluent>
+        <fluent>(step 8)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 2)</move>
+        <move role="player">(move 2 1)</move>
+        <move role="player">(move 2 3)</move>
+        <move role="player">(move 3 2)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 2 3)</move>
+      </moves>
+    </step>
+    <step nb="10">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 5)</fluent>
+        <fluent>(cell 2 2 4)</fluent>
+        <fluent>(cell 2 3 b)</fluent>
+        <fluent>(cell 3 1 2)</fluent>
+        <fluent>(cell 3 2 1)</fluent>
+        <fluent>(cell 3 3 3)</fluent>
+        <fluent>(step 9)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 3)</move>
+        <move role="player">(move 2 2)</move>
+        <move role="player">(move 3 3)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 3 3)</move>
+      </moves>
+    </step>
+    <step nb="11">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 5)</fluent>
+        <fluent>(cell 2 2 4)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 2)</fluent>
+        <fluent>(cell 3 2 1)</fluent>
+        <fluent>(cell 3 3 b)</fluent>
+        <fluent>(step 10)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 2 3)</move>
+        <move role="player">(move 3 2)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 3 2)</move>
+      </moves>
+    </step>
+    <step nb="12">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 5)</fluent>
+        <fluent>(cell 2 2 4)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 2)</fluent>
+        <fluent>(cell 3 2 b)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 11)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 2 2)</move>
+        <move role="player">(move 3 1)</move>
+        <move role="player">(move 3 3)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 2 2)</move>
+      </moves>
+    </step>
+    <step nb="13">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 5)</fluent>
+        <fluent>(cell 2 2 b)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 2)</fluent>
+        <fluent>(cell 3 2 4)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 12)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 2)</move>
+        <move role="player">(move 2 1)</move>
+        <move role="player">(move 2 3)</move>
+        <move role="player">(move 3 2)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 3 2)</move>
+      </moves>
+    </step>
+    <step nb="14">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 5)</fluent>
+        <fluent>(cell 2 2 4)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 2)</fluent>
+        <fluent>(cell 3 2 b)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 13)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 2 2)</move>
+        <move role="player">(move 3 1)</move>
+        <move role="player">(move 3 3)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 3 1)</move>
+      </moves>
+    </step>
+    <step nb="15">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 5)</fluent>
+        <fluent>(cell 2 2 4)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 b)</fluent>
+        <fluent>(cell 3 2 2)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 14)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 2 1)</move>
+        <move role="player">(move 3 2)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 2 1)</move>
+      </moves>
+    </step>
+    <step nb="16">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 b)</fluent>
+        <fluent>(cell 2 2 4)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 5)</fluent>
+        <fluent>(cell 3 2 2)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 15)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 1)</move>
+        <move role="player">(move 2 2)</move>
+        <move role="player">(move 3 1)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 2 2)</move>
+      </moves>
+    </step>
+    <step nb="17">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 4)</fluent>
+        <fluent>(cell 2 2 b)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 5)</fluent>
+        <fluent>(cell 3 2 2)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 16)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 2)</move>
+        <move role="player">(move 2 1)</move>
+        <move role="player">(move 2 3)</move>
+        <move role="player">(move 3 2)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 3 2)</move>
+      </moves>
+    </step>
+    <step nb="18">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 4)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 5)</fluent>
+        <fluent>(cell 3 2 b)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 17)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 2 2)</move>
+        <move role="player">(move 3 1)</move>
+        <move role="player">(move 3 3)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 3 1)</move>
+      </moves>
+    </step>
+    <step nb="19">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 4)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 b)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 18)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 2 1)</move>
+        <move role="player">(move 3 2)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 2 1)</move>
+      </moves>
+    </step>
+    <step nb="20">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 b)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 19)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 1)</move>
+        <move role="player">(move 2 2)</move>
+        <move role="player">(move 3 1)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 1 1)</move>
+      </moves>
+    </step>
+    <step nb="21">
+      <state>
+        <fluent>(cell 1 1 b)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 8)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 20)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 2)</move>
+        <move role="player">(move 2 1)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 2 1)</move>
+      </moves>
+    </step>
+    <step nb="22">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 b)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 21)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 1)</move>
+        <move role="player">(move 2 2)</move>
+        <move role="player">(move 3 1)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 1 1)</move>
+      </moves>
+    </step>
+    <step nb="23">
+      <state>
+        <fluent>(cell 1 1 b)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 8)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 22)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 2)</move>
+        <move role="player">(move 2 1)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 2 1)</move>
+      </moves>
+    </step>
+    <step nb="24">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 b)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 23)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 1)</move>
+        <move role="player">(move 2 2)</move>
+        <move role="player">(move 3 1)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 1 1)</move>
+      </moves>
+    </step>
+    <step nb="25">
+      <state>
+        <fluent>(cell 1 1 b)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 8)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 24)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 2)</move>
+        <move role="player">(move 2 1)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 1 2)</move>
+      </moves>
+    </step>
+    <step nb="26">
+      <state>
+        <fluent>(cell 1 1 7)</fluent>
+        <fluent>(cell 1 2 b)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 8)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 25)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 1)</move>
+        <move role="player">(move 1 3)</move>
+        <move role="player">(move 2 2)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 1 3)</move>
+      </moves>
+    </step>
+    <step nb="27">
+      <state>
+        <fluent>(cell 1 1 7)</fluent>
+        <fluent>(cell 1 2 6)</fluent>
+        <fluent>(cell 1 3 b)</fluent>
+        <fluent>(cell 2 1 8)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 26)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 2)</move>
+        <move role="player">(move 2 3)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 1 2)</move>
+      </moves>
+    </step>
+    <step nb="28">
+      <state>
+        <fluent>(cell 1 1 7)</fluent>
+        <fluent>(cell 1 2 b)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 8)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 27)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 1)</move>
+        <move role="player">(move 1 3)</move>
+        <move role="player">(move 2 2)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 1 1)</move>
+      </moves>
+    </step>
+    <step nb="29">
+      <state>
+        <fluent>(cell 1 1 b)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 8)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 28)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 2)</move>
+        <move role="player">(move 2 1)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 2 1)</move>
+      </moves>
+    </step>
+    <step nb="30">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 b)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 29)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 1)</move>
+        <move role="player">(move 2 2)</move>
+        <move role="player">(move 3 1)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 1 1)</move>
+      </moves>
+    </step>
+    <step nb="31">
+      <state>
+        <fluent>(cell 1 1 b)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 8)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 30)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 2)</move>
+        <move role="player">(move 2 1)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 1 2)</move>
+      </moves>
+    </step>
+    <step nb="32">
+      <state>
+        <fluent>(cell 1 1 7)</fluent>
+        <fluent>(cell 1 2 b)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 8)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 31)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 1)</move>
+        <move role="player">(move 1 3)</move>
+        <move role="player">(move 2 2)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 1 3)</move>
+      </moves>
+    </step>
+    <step nb="33">
+      <state>
+        <fluent>(cell 1 1 7)</fluent>
+        <fluent>(cell 1 2 6)</fluent>
+        <fluent>(cell 1 3 b)</fluent>
+        <fluent>(cell 2 1 8)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 32)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 2)</move>
+        <move role="player">(move 2 3)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 1 2)</move>
+      </moves>
+    </step>
+    <step nb="34">
+      <state>
+        <fluent>(cell 1 1 7)</fluent>
+        <fluent>(cell 1 2 b)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 8)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 33)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 1)</move>
+        <move role="player">(move 1 3)</move>
+        <move role="player">(move 2 2)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 1 1)</move>
+      </moves>
+    </step>
+    <step nb="35">
+      <state>
+        <fluent>(cell 1 1 b)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 8)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 34)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 2)</move>
+        <move role="player">(move 2 1)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 1 2)</move>
+      </moves>
+    </step>
+    <step nb="36">
+      <state>
+        <fluent>(cell 1 1 7)</fluent>
+        <fluent>(cell 1 2 b)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 8)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 35)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 1)</move>
+        <move role="player">(move 1 3)</move>
+        <move role="player">(move 2 2)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 1 1)</move>
+      </moves>
+    </step>
+    <step nb="37">
+      <state>
+        <fluent>(cell 1 1 b)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 8)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 36)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 2)</move>
+        <move role="player">(move 2 1)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 2 1)</move>
+      </moves>
+    </step>
+    <step nb="38">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 b)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 37)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 1)</move>
+        <move role="player">(move 2 2)</move>
+        <move role="player">(move 3 1)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 2 2)</move>
+      </moves>
+    </step>
+    <step nb="39">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 2)</fluent>
+        <fluent>(cell 2 2 b)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 38)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 2)</move>
+        <move role="player">(move 2 1)</move>
+        <move role="player">(move 2 3)</move>
+        <move role="player">(move 3 2)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 2 1)</move>
+      </moves>
+    </step>
+    <step nb="40">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 b)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 39)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 1)</move>
+        <move role="player">(move 2 2)</move>
+        <move role="player">(move 3 1)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 1 1)</move>
+      </moves>
+    </step>
+    <step nb="41">
+      <state>
+        <fluent>(cell 1 1 b)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 8)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 40)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 2)</move>
+        <move role="player">(move 2 1)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 1 2)</move>
+      </moves>
+    </step>
+    <step nb="42">
+      <state>
+        <fluent>(cell 1 1 7)</fluent>
+        <fluent>(cell 1 2 b)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 8)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 41)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 1)</move>
+        <move role="player">(move 1 3)</move>
+        <move role="player">(move 2 2)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 1 1)</move>
+      </moves>
+    </step>
+    <step nb="43">
+      <state>
+        <fluent>(cell 1 1 b)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 8)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 42)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 2)</move>
+        <move role="player">(move 2 1)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 2 1)</move>
+      </moves>
+    </step>
+    <step nb="44">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 b)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 43)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 1)</move>
+        <move role="player">(move 2 2)</move>
+        <move role="player">(move 3 1)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 3 1)</move>
+      </moves>
+    </step>
+    <step nb="45">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 4)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 b)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 44)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 2 1)</move>
+        <move role="player">(move 3 2)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 3 2)</move>
+      </moves>
+    </step>
+    <step nb="46">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 4)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 5)</fluent>
+        <fluent>(cell 3 2 b)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 45)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 2 2)</move>
+        <move role="player">(move 3 1)</move>
+        <move role="player">(move 3 3)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 2 2)</move>
+      </moves>
+    </step>
+    <step nb="47">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 4)</fluent>
+        <fluent>(cell 2 2 b)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 5)</fluent>
+        <fluent>(cell 3 2 2)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 46)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 2)</move>
+        <move role="player">(move 2 1)</move>
+        <move role="player">(move 2 3)</move>
+        <move role="player">(move 3 2)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 3 2)</move>
+      </moves>
+    </step>
+    <step nb="48">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 4)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 5)</fluent>
+        <fluent>(cell 3 2 b)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 47)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 2 2)</move>
+        <move role="player">(move 3 1)</move>
+        <move role="player">(move 3 3)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 3 3)</move>
+      </moves>
+    </step>
+    <step nb="49">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 4)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 5)</fluent>
+        <fluent>(cell 3 2 1)</fluent>
+        <fluent>(cell 3 3 b)</fluent>
+        <fluent>(step 48)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 2 3)</move>
+        <move role="player">(move 3 2)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 3 2)</move>
+      </moves>
+    </step>
+    <step nb="50">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 4)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 5)</fluent>
+        <fluent>(cell 3 2 b)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 49)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 2 2)</move>
+        <move role="player">(move 3 1)</move>
+        <move role="player">(move 3 3)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 3 1)</move>
+      </moves>
+    </step>
+    <step nb="51">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 4)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 b)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 50)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 2 1)</move>
+        <move role="player">(move 3 2)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 2 1)</move>
+      </moves>
+    </step>
+    <step nb="52">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 b)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 51)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 1)</move>
+        <move role="player">(move 2 2)</move>
+        <move role="player">(move 3 1)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 3 1)</move>
+      </moves>
+    </step>
+    <step nb="53">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 4)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 b)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 52)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 2 1)</move>
+        <move role="player">(move 3 2)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 2 1)</move>
+      </moves>
+    </step>
+    <step nb="54">
+      <state>
+        <fluent>(cell 1 1 8)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 b)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 53)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 1)</move>
+        <move role="player">(move 2 2)</move>
+        <move role="player">(move 3 1)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 1 1)</move>
+      </moves>
+    </step>
+    <step nb="55">
+      <state>
+        <fluent>(cell 1 1 b)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 8)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 54)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 2)</move>
+        <move role="player">(move 2 1)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 1 2)</move>
+      </moves>
+    </step>
+    <step nb="56">
+      <state>
+        <fluent>(cell 1 1 7)</fluent>
+        <fluent>(cell 1 2 b)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 8)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 55)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 1)</move>
+        <move role="player">(move 1 3)</move>
+        <move role="player">(move 2 2)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 1 1)</move>
+      </moves>
+    </step>
+    <step nb="57">
+      <state>
+        <fluent>(cell 1 1 b)</fluent>
+        <fluent>(cell 1 2 7)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 8)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 56)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 2)</move>
+        <move role="player">(move 2 1)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 1 2)</move>
+      </moves>
+    </step>
+    <step nb="58">
+      <state>
+        <fluent>(cell 1 1 7)</fluent>
+        <fluent>(cell 1 2 b)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 8)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 57)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 1)</move>
+        <move role="player">(move 1 3)</move>
+        <move role="player">(move 2 2)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 2 2)</move>
+      </moves>
+    </step>
+    <step nb="59">
+      <state>
+        <fluent>(cell 1 1 7)</fluent>
+        <fluent>(cell 1 2 2)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 8)</fluent>
+        <fluent>(cell 2 2 b)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 58)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 2)</move>
+        <move role="player">(move 2 1)</move>
+        <move role="player">(move 2 3)</move>
+        <move role="player">(move 3 2)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 1 2)</move>
+      </moves>
+    </step>
+    <step nb="60">
+      <state>
+        <fluent>(cell 1 1 7)</fluent>
+        <fluent>(cell 1 2 b)</fluent>
+        <fluent>(cell 1 3 6)</fluent>
+        <fluent>(cell 2 1 8)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 59)</fluent>
+      </state>
+      <legal_moves>
+        <move role="player">(move 1 1)</move>
+        <move role="player">(move 1 3)</move>
+        <move role="player">(move 2 2)</move>
+      </legal_moves>
+      <moves>
+        <move role="player">(move 1 3)</move>
+      </moves>
+    </step>
+    <step nb="61">
+      <state>
+        <fluent>(cell 1 1 7)</fluent>
+        <fluent>(cell 1 2 6)</fluent>
+        <fluent>(cell 1 3 b)</fluent>
+        <fluent>(cell 2 1 8)</fluent>
+        <fluent>(cell 2 2 2)</fluent>
+        <fluent>(cell 2 3 3)</fluent>
+        <fluent>(cell 3 1 4)</fluent>
+        <fluent>(cell 3 2 5)</fluent>
+        <fluent>(cell 3 3 1)</fluent>
+        <fluent>(step 60)</fluent>
+      </state>
+      <terminal/>
+      <goal_values>
+        <goal_value role="player">0</goal_value>
+      </goal_values>
+    </step>
+  </steps>
+</gametrace>
