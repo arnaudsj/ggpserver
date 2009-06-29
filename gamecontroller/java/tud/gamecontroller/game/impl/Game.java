@@ -19,6 +19,10 @@
 
 package tud.gamecontroller.game.impl;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -36,13 +40,38 @@ public class Game<
 		State<TermType, ReasonerStateInfoType>> {
 
 	private final ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory;
-	
+
 	private String name;
 //	private List<RoleInterface<TermType>> orderedRoles=null;
 	private String stylesheet = null;  // this can remain null (no stylesheet will be used)
 	private String gameDescription = null;
 	private final String kifGameDescription;
 	private final List<? extends RoleInterface<TermType>> roles;
+
+	public Game(File gameFile, ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory) throws IOException {
+		StringBuffer sb = new StringBuffer();
+
+		BufferedReader br = new BufferedReader(new FileReader(gameFile));
+		String line;
+
+		while ((line = br.readLine()) != null) {
+			line = line.trim();
+			sb.append(line + "\n"); // artificial EOLN marker
+		}
+		
+		this.name = gameFile.getName();
+		this.reasonerFactory=reasonerFactory;
+		this.gameDescription=sb.toString();
+		ReasonerInterface<TermType, ReasonerStateInfoType> reasoner = reasonerFactory
+				.createReasoner(gameDescription, name);
+		roles = reasoner.getRoles();
+		kifGameDescription = reasoner.getKIFGameDescription();
+	}
+
+	public Game(File gameFile, ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory, String stylesheet) throws IOException {
+		this(gameFile, reasonerFactory);
+		this.stylesheet = stylesheet;
+	}
 
 	public Game(String gameDescription, String name, ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory) {
 		this.name=name;
@@ -58,7 +87,7 @@ public class Game<
 		this(gameDescription, name, reasonerFactory);
 		this.stylesheet = stylesheet;
 	}
-	
+
 	public State<TermType, ReasonerStateInfoType> getInitialState() {
 		ReasonerInterface<TermType, ReasonerStateInfoType> reasoner = reasonerFactory.createReasoner(gameDescription, name);
 		return new State<TermType,ReasonerStateInfoType>(reasoner , reasoner.getInitialState());
@@ -92,7 +121,7 @@ public class Game<
 	}
 
 	/**
-	 * 
+	 *
 	 * @return the rules of the game including comments and whitespace
 	 */
 	public String getGameDescription() {

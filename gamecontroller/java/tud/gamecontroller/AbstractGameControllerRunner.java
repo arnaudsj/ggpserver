@@ -19,9 +19,7 @@
 
 package tud.gamecontroller;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -127,20 +125,14 @@ public abstract class AbstractGameControllerRunner<
 	protected abstract int getStartClock();
 
 	protected Game<TermType, ReasonerStateInfoType> createGame(File gameFile){
-		StringBuffer sb = new StringBuffer();
+		Game<TermType, ReasonerStateInfoType> game = null;
 		try{
-		BufferedReader br = new BufferedReader(new FileReader(gameFile));
-		String line;
-
-		while((line=br.readLine())!=null){
-			line = line.trim();
-			sb.append(line + "\n"); // artificial EOLN marker
-		}
+			game = new Game<TermType, ReasonerStateInfoType>(gameFile, reasonerFactory);
 		} catch (IOException e){
 			System.out.println(e);
 			System.exit(-1);
 		}
-		return createGame(sb.toString(), gameFile.getName());
+		return game;
 	}
 
 	protected Game<TermType, ReasonerStateInfoType> createGame(String gameDescription, String name){
