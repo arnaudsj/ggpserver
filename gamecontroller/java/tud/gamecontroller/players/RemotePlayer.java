@@ -132,13 +132,15 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 
 	private String sendMsg(String msg, int timeout, MessageSentNotifier notifier) {
 		String reply=null;
-		Socket s;
+		Socket s=null;
+		OutputStream out=null;
+		InputStream is=null;
 		try {
 			logger.info("Begin creating Socket for " + host + ":" + port);
 			s = new Socket(getHostAddress(), port);
 			logger.info("Done creating Socket for " + host + ":" + port);
 			
-			OutputStream out=s.getOutputStream();
+			out=s.getOutputStream();
 			PrintWriter pw=new PrintWriter(out);
 			pw.print("POST / HTTP/1.0\r\n");
 			pw.print("Accept: text/delim\r\n");
@@ -153,7 +155,7 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 			logger.info("message to "+this.getName()+" sent: \"" + msg+ "\"");
 			notifier.messageWasSent();
 			
-			InputStream is = s.getInputStream();
+			is = s.getInputStream();
 			if ( is == null) return null;
 			BufferedReader in = new BufferedReader( new InputStreamReader( is ));
 			String line;
@@ -169,8 +171,6 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 				if(reply==null) reply=line;
 				else reply += line;
 			}
-			out.close();
-			in.close();
 		} catch (InterruptedIOException e) {
 			e.printStackTrace();
 			Thread.currentThread().interrupt();
@@ -189,12 +189,18 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 			// the GameController will wait forever if the exception occurred
 			// before the sending of the message
 			notifier.messageWasSent();
+		} finally {
+			try{
+				if(out!=null) out.close();
+				if(is!=null) is.close();
+				if(s!=null) s.close();
+			}catch(Exception ex){ };
 		}
 		return reply;
 	}
 
 
-	private void logErrorMessage(String message, String type) {
+	private void logErrorMessage(String type, String message) {
 		GameControllerErrorMessage errorMessage = new GameControllerErrorMessage(type, message, this.getName());
 		if (match instanceof ErrorMessageListener) {
 			((ErrorMessageListener) match).notifyErrorMessage(errorMessage);
