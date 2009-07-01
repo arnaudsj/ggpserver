@@ -93,17 +93,37 @@ public class XMLGameStateWriter
 	}
 	
 	private void writeState(StateInterface<? extends TermInterface,?> currentState, Map<?, Integer> goalValues) {
-		ByteArrayOutputStream os = createXMLOutputStream(match, currentState, moves, goalValues, stylesheet);
+		ByteArrayOutputStream os = null; 
+		FileOutputStream fileOutputStream = null;
 		
 		try {
-			(new FileOutputStream(new File(matchDir+File.separator+"step_"+step+".xml"))).write(os.toByteArray());
+			os = createXMLOutputStream(match, currentState, moves, goalValues, stylesheet);
+			fileOutputStream = new FileOutputStream(new File(matchDir+File.separator+"step_"+step+".xml"));
+			fileOutputStream.write(os.toByteArray());
 			if(goalValues!=null){ // write the final state twice (once as step_X.xml and once as finalstate.xml)
-				(new FileOutputStream(new File(matchDir+File.separator+"finalstate.xml"))).write(os.toByteArray());
+				fileOutputStream.close();
+				fileOutputStream = new FileOutputStream(new File(matchDir+File.separator+"finalstate.xml"));
+				fileOutputStream.write(os.toByteArray());
 			}
 		} catch (FileNotFoundException ex) {
 			Logger.getLogger("tud.gamecontroller").warning("Exception occured while generation xml:"+ex.getMessage());
 		} catch (IOException ex) {
 			Logger.getLogger("tud.gamecontroller").warning("Exception occured while generation xml:"+ex.getMessage());
+		} finally {
+			if (os != null) {
+				try {
+					os.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (fileOutputStream != null) {
+				try {
+					fileOutputStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 
