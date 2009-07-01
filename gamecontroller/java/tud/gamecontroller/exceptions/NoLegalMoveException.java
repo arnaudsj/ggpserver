@@ -26,6 +26,7 @@ package tud.gamecontroller.exceptions;
  * @author martin
  */
 public class NoLegalMoveException extends RuntimeException {
+	private static final long serialVersionUID = -8667653261242126576L;
 
 	public NoLegalMoveException(Throwable cause) {
 		super(cause);
