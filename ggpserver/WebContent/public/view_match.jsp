@@ -27,6 +27,7 @@
 		// this is for catching NumberFormatExceptions and the like
 		%>
 		<jsp:setProperty name="viewMatch" property="matchID" />
+		<jsp:setProperty name="viewMatch" property="playerName" />
 	</c:catch>
 </jsp:useBean>
 
@@ -46,50 +47,72 @@
 <table>
 	<tbody>
 		<tr>
-			<td><b>match name</b></td>
-			<td><c:out value="${match.matchID}"></c:out></td>
+			<th>match name</th>
+			<td><c:out value="${match.matchID}" /></td>
 		</tr>
 		<tr>
-			<td><b>game</b></td>
-			<td><c:url value="view_game.jsp" var="gameURL">
-				<c:param name="name" value="${match.game.name}" />
-			</c:url> <a href='<c:out value="${gameURL}" />'>${match.game.name}</a></td>
-		<tr>
-			<td><b>status</b></td>
-			<td><c:out value="${match.status}"></c:out></td>
-		</tr>
-		<tr>
-			<td><b>start clock</b></td>
-			<td><c:out value="${match.startclock}"></c:out></td>
-		</tr>
-		<tr>
-			<td><b>play clock</b></td>
-			<td><c:out value="${match.playclock}"></c:out></td>
-		</tr>
-		<tr>
-			<td><b>start time</b></td>
-			<td><c:out value="${match.startTime}"></c:out></td>
-		</tr>
-		<tr>
-			<td><b>players</b></td>
-			<td><c:forEach var="playerinfo"
-				items="${match.orderedPlayerInfos}">
-				<c:url value="view_player.jsp" var="playerURL">
-					<c:param name="name" value="${playerinfo.name}" />
+			<th>game</th>
+			<td>
+				<c:url value="view_game.jsp" var="gameURL">
+					<c:param name="name" value="${match.game.name}" />
 				</c:url>
-				<a href='<c:out value="${playerURL}" />'>${playerinfo.name}</a>
-			</c:forEach></td>
+				<a href='<c:out value="${gameURL}" />'>${match.game.name}</a>
+			</td>
+		<tr>
+			<th>status</th>
+			<td><c:out value="${match.status}" /></td>
 		</tr>
 		<tr>
-			<td><b>goal values</b></td>
+			<th>start clock</th>
+			<td><c:out value="${match.startclock}" /></td>
+		</tr>
+		<tr>
+			<th>play clock</th>
+			<td><c:out value="${match.playclock}" /></td>
+		</tr>
+		<tr>
+			<th>start time</th>
+			<td><c:out value="${match.startTime}" /></td>
+		</tr>
+		<tr>
+			<th>players</th>
+			<td>
+				<c:forEach var="playerinfo"
+					items="${match.orderedPlayerInfos}">
+					<c:url value="view_player.jsp" var="playerURL">
+						<c:param name="name" value="${playerinfo.name}" />
+					</c:url>
+	
+					<a href='<c:out value="${playerURL}" />'>
+					<c:choose>
+						<c:when test="${ playerinfo.name == viewMatch.playerName }">
+							<span class="highlight"><c:out value="${playerinfo.name}" /></span>
+						</c:when>
+						<c:otherwise>
+							<c:out value="${playerinfo.name}" />
+						</c:otherwise>
+					</c:choose>
+					</a>
+				</c:forEach>
+			</td>
+		</tr>
+		<tr>
+			<th>goal values</th>
 			<td><c:choose>
 				<c:when test="${match.orderedGoalValues == null}">
 							---
 						</c:when>
 				<c:otherwise>
-					<c:forEach var="goalvalue" items="${match.orderedGoalValues}">
-								${goalvalue}
-							</c:forEach>
+					<c:forEach var="roleindex" begin="0" end="${match.game.numberOfRoles - 1}">
+						<c:choose>
+							<c:when test="${ match.orderedPlayerInfos[roleindex].name == viewMatch.playerName }">
+								<span class="highlight">${match.orderedGoalValues[roleindex]}</span>
+							</c:when>
+							<c:otherwise>
+								${match.orderedGoalValues[roleindex]}
+							</c:otherwise>
+						</c:choose>
+					</c:forEach>
 				</c:otherwise>
 			</c:choose></td>
 		</tr>
@@ -124,26 +147,51 @@
 				</c:otherwise>
 			</c:choose>
 			<tr class="${rowClass}">
-				<!--			<td><c:out value="${stepNumber}"></c:out></td>-->
-				<td><c:url value="view_state.jsp" var="stateURL">
-					<c:param name="matchID" value="${match.matchID}" />
-					<c:param name="stepNumber" value="${stepNumber}" />
-				</c:url> <a href='<c:out value="${stateURL}" />'>state ${stepNumber}</a></td>
-				<td><c:forEach var="move" items="${viewMatch.moves}">
-					<c:out value="${move}"></c:out>&nbsp;
-					</c:forEach></td>
+				<!--			<td><c:out value="${stepNumber}" /></td>-->
 				<td>
-				<center><c:choose>
-					<c:when test="<%= !viewMatch.getErrorMessages().isEmpty() %>">
-						<c:url value="view_errors.jsp" var="errorURL">
-							<c:param name="matchID" value="${match.matchID}" />
-						</c:url>
-						<div class="errors"><a href='<c:out value="${errorURL}" />'><span>errors</span></a></div>
-					</c:when>
-					<c:otherwise>
-						<div class="no_errors"></div>
-					</c:otherwise>
-				</c:choose></center>
+					<c:url value="view_state.jsp" var="stateURL">
+						<c:param name="matchID" value="${match.matchID}" />
+						<c:param name="stepNumber" value="${stepNumber}" />
+					</c:url>
+					<a href='<c:out value="${stateURL}" />'>state ${stepNumber}</a>
+				</td>
+				<td>
+					<c:forEach var="move" items="${viewMatch.moves}">
+						<c:out value="${move}" />&nbsp;
+					</c:forEach>
+				</td>
+				<td>
+					<center>
+						<c:choose>
+							<c:when test="<%= !viewMatch.getErrorMessages().isEmpty() %>">
+								<c:choose>
+									<c:when test="${ viewMatch.playerName == null }">
+										<c:set var="errorclass" value="errors" />
+									</c:when>
+									<c:when test="<%= viewMatch.hasErrorForPlayer() %>">
+										<c:set var="errorclass" value="errors" />
+									</c:when>
+									<c:otherwise>
+										<c:set var="errorclass" value="errors_bw" />
+									</c:otherwise>
+								</c:choose>
+								<c:url value="view_errors.jsp" var="errorURL">
+									<c:param name="matchID" value="${match.matchID}" />
+									<c:if test="${ viewMatch.playerName != null }">
+										<c:param name="playerName" value="${viewMatch.playerName}" />
+									</c:if>
+								</c:url>
+								<div class="${errorclass}">
+									<a href='<c:out value="${errorURL}" />#step<c:out value="${stepNumber}" />'>
+										<span>errors</span>
+									</a>
+								</div>
+							</c:when>
+							<c:otherwise>
+								<div class="no_errors" />
+							</c:otherwise>
+						</c:choose>
+					</center>
 				</td>
 			</tr>
 		</c:forEach>

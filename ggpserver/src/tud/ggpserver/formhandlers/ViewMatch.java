@@ -34,6 +34,16 @@ public class ViewMatch {
 
 	private ServerMatch<?, ?> match;
 	private int stepNumber = 1;
+	private String playerName = null;
+	private List<GameControllerErrorMessage> errorMessagesForStep = null;
+
+	public String getPlayerName() {
+		return playerName;
+	}
+
+	public void setPlayerName(String playerName) {
+		this.playerName = playerName;
+	}
 
 	public int getStepNumber() {
 		return stepNumber;
@@ -41,16 +51,22 @@ public class ViewMatch {
 
 	public void setStepNumber(int stepNumber) {
 		this.stepNumber = stepNumber;
+		errorMessagesForStep = null;
 	}
 
 	public void setMatchID(String matchID) throws SQLException {
 		match = DBConnectorFactory.getDBConnector().getMatch(matchID);
+		errorMessagesForStep = null;
 	}
 
-	public ServerMatch getMatch() {
+	public ServerMatch<?, ?> getMatch() {
 		return match;
 	}
 	
+	/**
+	 * 
+	 * @return a list of moves as Strings for the current stepNumber and match
+	 */
 	public List<String> getMoves() {
 		if ((stepNumber < 1) || stepNumber > (match.getXmlStates().size() - 1)) {  // -1, because there is one less jointmove than states
 			return new LinkedList<String>();
@@ -58,16 +74,38 @@ public class ViewMatch {
 		return match.getJointMovesStrings().get(stepNumber - 1);
 	}
 	
+	/**
+	 * 
+	 * @return true if playerName==null or the list of error messages for
+	 *         the current stepNumber and match contains a message with the current playerName
+	 */
+	public boolean hasErrorForPlayer() {
+		if(playerName == null)
+			return true;
+		for(GameControllerErrorMessage msg : getErrorMessages()){
+			if(playerName.equals(msg.getPlayerName()))
+				return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * 
+	 * @return the list of error messages for the current stepNumber and match
+	 */
 	public List<GameControllerErrorMessage> getErrorMessages() {
-		int numberOfStates = match.getXmlStates().size();
-		if ((stepNumber < 1) || (stepNumber > numberOfStates)) {
-			return new LinkedList<GameControllerErrorMessage>();
+		if(errorMessagesForStep==null){
+			int numberOfStates = match.getXmlStates().size();
+			if ((stepNumber < 1) || (stepNumber > numberOfStates)) {
+				return new LinkedList<GameControllerErrorMessage>();
+			}
+			if (numberOfStates > match.getErrorMessages().size()) {
+				String message = "getErrorMessages().size() smaller than getNumberOfStates()! Causing match: " + match.toString();
+				logger.severe(message);
+				throw new InternalError(message);
+			}
+			errorMessagesForStep = match.getErrorMessages().get(stepNumber - 1);
 		}
-		if (numberOfStates > match.getErrorMessages().size()) {
-			String message = "getErrorMessages().size() smaller than getNumberOfStates()! Causing match: " + match.toString();
-			logger.severe(message);
-			throw new InternalError(message);
-		}
-		return match.getErrorMessages().get(stepNumber - 1);
+		return errorMessagesForStep;
 	}
 }

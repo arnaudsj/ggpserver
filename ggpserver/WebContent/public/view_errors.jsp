@@ -27,6 +27,7 @@
 		// this is for catching NumberFormatExceptions and the like
 		%>
 		<jsp:setProperty name="viewErrors" property="matchID" />
+		<jsp:setProperty name="viewErrors" property="playerName"/>
 		<% // <jsp:setProperty name="viewErrors" property="stepNumber" /> %> 
 	</c:catch>
 </jsp:useBean>
@@ -69,11 +70,24 @@
 				</c:choose>
 				
 				<tr class="${rowClass}">
-					<td>step <c:out value="${stepNumber}"></c:out></td>
 					<td>
+						<a name='step<c:out value="${stepNumber}" />'> </a>
+						step <c:out value="${stepNumber}" />
+					</td>
+					<td>
+						
 						<ul>
 							<c:forEach var="error" items="${viewErrors.errorMessages}">
-								<li><c:out value="${error.message}"></c:out></li>
+								<li>
+									<c:choose>
+										<c:when test="${ error.playerName == viewErrors.playerName }">
+											<span class="highlight"><c:out value="${error.message}" /></span>
+										</c:when>
+										<c:otherwise>
+											<c:out value="${error.message}" />
+										</c:otherwise>
+									</c:choose>
+								</li>
 							</c:forEach>
 						</ul>
 					</td>
