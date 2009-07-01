@@ -49,12 +49,27 @@ public class MatchTraceWriter {
 	/**
 	 * @throws java.io.IOException if the output file cannot be written to
 	 */
-	public void write(MatchTrace trace, File outputFile)
-			throws IOException {
-		Document xmldoc = createXML(trace);
-		ByteArrayOutputStream outputStream = createXMLOutputStream(xmldoc);
+	public void write(MatchTrace trace, File outputFile) throws IOException {
+		ByteArrayOutputStream outputStream = null;
+		FileOutputStream fileOutputStream = null;
+		try {
+			Document xmldoc = createXML(trace);
+			outputStream = createXMLOutputStream(xmldoc);
 
-		(new FileOutputStream(outputFile)).write(outputStream.toByteArray());
+			fileOutputStream = (new FileOutputStream(outputFile));
+			fileOutputStream.write(outputStream.toByteArray());
+		} finally {
+			try {
+				if (outputStream != null) outputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			try {
+				if (fileOutputStream != null) fileOutputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	private ByteArrayOutputStream createXMLOutputStream(Document xmldoc) {

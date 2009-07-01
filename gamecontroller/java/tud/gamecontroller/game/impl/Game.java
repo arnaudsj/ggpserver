@@ -50,31 +50,38 @@ public class Game<
 
 	public Game(File gameFile, ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory) throws IOException {
 		StringBuffer sb = new StringBuffer();
+		BufferedReader br = null;
+		
+		try {
+			br = new BufferedReader(new FileReader(gameFile));
+			String line;
 
-		BufferedReader br = new BufferedReader(new FileReader(gameFile));
-		String line;
-
-		while ((line = br.readLine()) != null) {
-			line = line.trim();
-			sb.append(line + "\n"); // artificial EOLN marker
+			while ((line = br.readLine()) != null) {
+				line = line.trim();
+				sb.append(line + "\n"); // artificial EOLN marker
+			}
+			
+			String fileName = gameFile.getName();
+			
+			int firstDot = fileName.indexOf(".");
+			if (firstDot == -1) {
+				// no "." in filename
+				this.name = fileName;
+			} else {
+				this.name = fileName.substring(0, firstDot);
+			}
+			
+			this.reasonerFactory=reasonerFactory;
+			this.gameDescription=sb.toString();
+			ReasonerInterface<TermType, ReasonerStateInfoType> reasoner = reasonerFactory
+					.createReasoner(gameDescription, name);
+			roles = reasoner.getRoles();
+			kifGameDescription = reasoner.getKIFGameDescription();
+		} finally {
+			if (br != null) {
+				br.close();
+			}
 		}
-		
-		String fileName = gameFile.getName();
-		
-		int firstDot = fileName.indexOf(".");
-		if (firstDot == -1) {
-			// no "." in filename
-			this.name = fileName;
-		} else {
-			this.name = fileName.substring(0, firstDot);
-		}
-		
-		this.reasonerFactory=reasonerFactory;
-		this.gameDescription=sb.toString();
-		ReasonerInterface<TermType, ReasonerStateInfoType> reasoner = reasonerFactory
-				.createReasoner(gameDescription, name);
-		roles = reasoner.getRoles();
-		kifGameDescription = reasoner.getKIFGameDescription();
 	}
 
 	public Game(File gameFile, ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory, String stylesheet) throws IOException {

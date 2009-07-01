@@ -20,19 +20,20 @@
 
 package tud.gamecontroller.traces;
 
+import static org.junit.Assert.assertTrue;
+import static tud.gamecontroller.traces.MatchTraceReaderWriterTest.equalFiles;
+
 import java.io.File;
 import java.io.IOException;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
+
 import javax.xml.transform.TransformerFactoryConfigurationError;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.xml.sax.SAXException;
-import static org.junit.Assert.*;
-import static tud.gamecontroller.traces.MatchTraceReaderWriterTest.*;
 
 public class MatchTraceBuilderTest {
 
@@ -56,7 +57,7 @@ public class MatchTraceBuilderTest {
     }
 	
 	@Test
-	public void testBuilder() throws InterruptedException, IOException, TransformerFactoryConfigurationError, TransformerFactoryConfigurationError, TransformerException, TransformerException, ParserConfigurationException, SAXException {
+	public void testBuilder() throws IOException, TransformerFactoryConfigurationError, TransformerFactoryConfigurationError, SAXException {
 		File inputDir = new File("testdata/traces/");
 		File gamesDir = new File("testdata/games/");
 		
@@ -69,7 +70,8 @@ public class MatchTraceBuilderTest {
 			RetraceGameControllerRunner.retrace(inputFile, outputFile, gameFile);
 			
 			assertTrue("retrace did not produce identical output: " + inputFile, equalFiles(inputFile, outputFile));
-			outputFile.delete();
+			assertTrue("could not delete output file", outputFile.delete());
+
 		}
 	}
 

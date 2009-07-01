@@ -49,7 +49,7 @@ public class JPlayerTable extends JTable {
 		return tcr;
 	}
 
-	private class PlayerTypeCellEditor extends DefaultCellEditor{
+	private static class PlayerTypeCellEditor extends DefaultCellEditor{
 
 		private static final long serialVersionUID = 7990970130621681632L;
 
@@ -58,7 +58,7 @@ public class JPlayerTable extends JTable {
 		}
 	}
 	
-	private class PlayerTypeRenderer extends DefaultTableCellRenderer {
+	private static class PlayerTypeRenderer extends DefaultTableCellRenderer {
 		/**
 		 * 
 		 */

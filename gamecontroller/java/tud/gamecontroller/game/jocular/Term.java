@@ -93,7 +93,7 @@ public class Term extends AbstractTerm<stanfordlogic.prover.Term> {
 		try{
 			return nativeTerm.toString(symbolTable);
 		}catch(Exception ex){
-			return null;
+			return "";
 		}
 	}
 }

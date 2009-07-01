@@ -39,15 +39,15 @@ public class RetraceGameControllerRunner {
 			}
 		};
 		
-		GameInterface<Term, State<Term, GameState>> game = new Game(gameFile, reasonerFactory);
+		GameInterface<Term, State<Term, GameState>> game = new Game<Term, GameState>(gameFile, reasonerFactory);
 		
 		/* create players */
-		Map<RoleInterface<Term>, Player> players = new HashMap<RoleInterface<Term>, Player>();
+		Map<RoleInterface<Term>, Player<Term>> players = new HashMap<RoleInterface<Term>, Player<Term>>();
 		MatchTrace trace = new MatchTraceReader().read(inputFile);
 		
 		List<? extends RoleInterface<Term>> roles = game.getOrderedRoles();
 		for (RoleInterface<Term> role : roles) {
-			Player player = new MovelistPlayer(role.getKIFForm().toLowerCase(), trace.getMovesForRole(role.getKIFForm().toLowerCase()));
+			Player<Term> player = new MovelistPlayer<Term>(role.getKIFForm().toLowerCase(), trace.getMovesForRole(role.getKIFForm().toLowerCase()));
 			players.put(role, player);
 		}
 		
@@ -55,7 +55,7 @@ public class RetraceGameControllerRunner {
 		String matchID = "retracematch";
 		int startclock = 500;
 		int playclock = 500;
-		RunnableMatchInterface<Term, State<Term, GameState>> match = new RunnableMatch(matchID, game, startclock, playclock, players);
+		RunnableMatchInterface<Term, State<Term, GameState>> match = new RunnableMatch<Term, GameState>(matchID, game, startclock, playclock, players);
 
 		/* create game controller */
 		JavaProverGameController gameController = new JavaProverGameController(match);

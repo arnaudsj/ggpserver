@@ -64,7 +64,7 @@ public class Term extends AbstractTerm<Expression>{
 		}
 	}
 	
-	private class TermList extends AbstractList<TermInterface>{
+	private static class TermList extends AbstractList<TermInterface>{
 		private ExpList expList;
 
 		public TermList(ExpList l){
