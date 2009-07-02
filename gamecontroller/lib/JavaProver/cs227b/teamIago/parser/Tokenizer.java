@@ -50,10 +50,33 @@ public class Tokenizer {
 				}
 				// Jump to next line
 				start = gdl.indexOf('\n',i);
-				if (start == -1) i = len; // if last line, skip remainder of string
-				lineNum++;
-				i = start;
-				start++;
+				if (start == -1){
+					i = len; // if last line, skip remainder of string
+				}else{
+					lineNum++;
+					i = start;
+					start++;
+				}
+			} else if (ch == '#' && i+1<len && gdl.charAt(i+1)=='|') {
+				// Skip comment
+				if (start != i) {
+					_tokens.add(gdl.substring(start,i));
+					_lineNums.add(new Integer(lineNum));
+				}
+				// Jump to end of comment
+				start = gdl.indexOf("|#",i+1);
+				if (start == -1){
+					i = len; // if comment is not closed, skip remainder of string
+				}else{
+					// count lines in comment
+					i = gdl.indexOf('\n', i+1);
+					while(i != -1 && i<start) {
+						lineNum++;
+						i = gdl.indexOf('\n', i+1);
+					}
+					i = start+1;
+					start+=2;
+				}
 			}
 		}
 		tokens = _tokens;
