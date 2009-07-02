@@ -184,7 +184,7 @@ public class GameController<
 				String message = "Illegal move \""+move+"\" from "+player+ " in step "+step;
 				GameControllerErrorMessage errorMessage = new GameControllerErrorMessage(GameControllerErrorMessage.ILLEGAL_MOVE, message, player.getName());
 				if (match instanceof ErrorMessageListener) {
-					((ErrorMessageListener) match).notifyErrorMessage(errorMessage);
+					((ErrorMessageListener<?, ?>) match).notifyErrorMessage(errorMessage);
 				}
 				logger.log(Level.SEVERE, message, errorMessage);
 				jointMove.put(role,currentState.getLegalMove(role));
