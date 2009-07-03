@@ -27,6 +27,7 @@ import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
@@ -52,6 +53,12 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 	private MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory;
 	private GameScramblerInterface gameScrambler;
 	private Logger logger;
+
+	/**
+	 * the maximum time (milliseconds) to wait until the connection to the player is established
+	 * (the start/playclock only start after that)
+	 */
+	private static final int CONNECTION_TIMEOUT = 2000;
 	
 	public RemotePlayer(String name, String host, int port, MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory, GameScramblerInterface gamescrambler) {
 		super(name);
@@ -137,7 +144,11 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 		InputStream is=null;
 		try {
 			logger.info("Begin creating Socket for " + host + ":" + port);
-			s = new Socket(getHostAddress(), port);
+			s = new Socket();
+			s.connect(new InetSocketAddress(getHostAddress(), port), CONNECTION_TIMEOUT);
+			notifier.messageWasSent();
+			// TODO: rename this to notifier.connectionEstablished() or similar
+			//       the actual sending of the message is already counted towards the startclock/playclock
 			logger.info("Done creating Socket for " + host + ":" + port);
 			
 			out=s.getOutputStream();
@@ -153,7 +164,6 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 			pw.print(msg);
 			pw.flush();
 			logger.info("message to "+this.getName()+" sent: \"" + msg+ "\"");
-			notifier.messageWasSent();
 			
 			is = s.getInputStream();
 			if ( is == null) return null;
@@ -177,24 +187,19 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 		} catch (UnknownHostException e) {
 			String message = "error: unknown host \""+ host+ "\"";
 			logErrorMessage(GameControllerErrorMessage.UNKNOWN_HOST, message);
-
-			// call the notifier in case of an exception, otherwise 
-			// the GameController will wait forever if the exception occurred
-			// before the sending of the message
-			notifier.messageWasSent();
 		} catch (IOException e) {
 			String message = "error: io error for "+ this+" : "+e.getMessage();
 			logErrorMessage(GameControllerErrorMessage.IO_ERROR, message);
-			// call the notifier in case of an exception, otherwise 
-			// the GameController will wait forever if the exception occurred
-			// before the sending of the message
-			notifier.messageWasSent();
 		} finally {
 			try{
 				if(out!=null) out.close();
 				if(is!=null) is.close();
 				if(s!=null) s.close();
 			}catch(Exception ex){ };
+			// call the notifier in case of an exception, otherwise
+			// the GameController will wait forever if the exception occurred
+			// before the sending of the message
+			notifier.messageWasSent();
 		}
 		return reply;
 	}

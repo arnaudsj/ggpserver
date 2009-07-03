@@ -74,14 +74,14 @@ public abstract class AbstractPlayerThread<
 	public abstract void run();
 	
 	private void waitUntilMessageIsSent() {
-		synchronized (messageSent) {
-			while (!messageSent.isTrue()){
-				try {
+		try {
+			synchronized (messageSent) {
+				while (!messageSent.isTrue()){
 					messageSent.wait();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
 				}
 			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 		deadline=System.currentTimeMillis()+timeout;
 		synchronized (deadlineSet) {
@@ -101,11 +101,7 @@ public abstract class AbstractPlayerThread<
 			timeLeft=1;
 		}
 		if(isAlive()){
-//			try {
-				join(timeLeft);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
+			join(timeLeft);
 		}
 		if(isAlive()){
 			interrupt();
