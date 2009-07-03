@@ -83,7 +83,7 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 			AbstractDBConnector<TermType, ReasonerStateInfoType> db) {
 		super(matchID, game, startclock, playclock);
 		this.rolesToPlayerInfos = rolesToPlayerInfos;
-		this.startTime = startTime;
+		this.startTime = new Date(startTime.getTime());
 		this.db = db;
 	}
 
