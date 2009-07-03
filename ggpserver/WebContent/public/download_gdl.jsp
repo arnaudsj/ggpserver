@@ -22,7 +22,7 @@
 	ViewGame viewGame = new ViewGame();
 	viewGame.setName(request.getParameter("name"));
 
-	String gameDescription = viewGame.getPlainGameDescription();
+	String gameDescription = viewGame.getGame().getGameDescription();
 
 	//set response headers
 	response.setContentType("text/plain");

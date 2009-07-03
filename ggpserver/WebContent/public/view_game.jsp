@@ -101,9 +101,7 @@
 		<c:param name="name" value="${viewGame.name}" />
 	</c:url>
 	<div class="download"><a href='<c:out value="${downloadURL}" />'><span>Download</span></a></div>
-	<pre><code>${viewGame.plainGameDescription}</code></pre>
-
-
+	<pre><code><c:out value="${viewGame.game.gameDescription}" /></code></pre>
 </div>
 <!--end div "content"--> <jsp:directive.include file="/inc/footer.jsp" />
 </div>

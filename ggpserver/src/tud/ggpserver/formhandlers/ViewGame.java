@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+    Copyright (C) 2009 Martin Günther <mintar@gmx.de>
 
     This file is part of GGP Server.
 
@@ -21,8 +21,6 @@ package tud.ggpserver.formhandlers;
 
 import java.sql.SQLException;
 
-import org.apache.commons.lang.StringEscapeUtils;
-
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.Game;
 
@@ -37,22 +35,11 @@ public class ViewGame {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public Game getGame() throws SQLException {
 		if(game == null){
 			game = DBConnectorFactory.getDBConnector().getGame(name);
 		}
 		return game;
-	}
-	
-	public String getGameDescription() throws SQLException {
-		//		return new KIFSyntaxFormatter(getGame().getKIFGameDescription()).getFormattedGameDescription();
-		return StringEscapeUtils.escapeHtml(getPlainGameDescription())
-			.replaceAll(" ", "&nbsp;")
-			.replace("\n", "<br/>");
-	}
-
-	public String getPlainGameDescription() throws SQLException {
-		return getGame().getGameDescription();
 	}
 }

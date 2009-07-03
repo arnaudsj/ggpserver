@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context>
+<Context path="/ggpserver">
   <Logger className="org.apache.catalina.logger.FileLogger"
              prefix="localhost_ggpserver_log." suffix=".txt"
              timestamp="true"/>
