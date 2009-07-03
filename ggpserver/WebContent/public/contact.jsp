@@ -41,16 +41,16 @@ project page</a>.<br>
 If you have any comments, questions, ideas or bug reports, the
 developers would love to hear from you. You can contact us at
 <ul>
-	<li>Martin Günther, mart<a
-		href="http://mailhide.recaptcha.net/d?k=012MepILrcW2M7NebsmFqnMw==&amp;c=SYUHbhC1KajulRxTXkwm7tnUlrWoNYoXNetmxbAvdOmRfKqZGn9bAJaKckW_khgX"
-		onclick="window.open('http://mailhide.recaptcha.net/d?k=012MepILrcW2M7NebsmFqnMw==&amp;c=SYUHbhC1KajulRxTXkwm7tnUlrWoNYoXNetmxbAvdOmRfKqZGn9bAJaKckW_khgX', '', 'toolbar=0,scrollbars=0,location=0,statusbar=0,menubar=0,resizable=0,width=500,height=300'); return false;"
-		title="Reveal this e-mail address">...</a>@inf.tu-dresden.de (click "..." to
-	reveal address)</li>
+	<li>Martin Günther, m<a 
+		href="http://mailhide.recaptcha.net/d?k=01zsa6DOZIFP-LVBX-Dr5daA==&amp;c=rdRgrfQB7TsjiAFTC66dOw==" 
+		onclick="window.open('http://mailhide.recaptcha.net/d?k=01zsa6DOZIFP-LVBX-Dr5daA==&amp;c=rdRgrfQB7TsjiAFTC66dOw==', '', 'toolbar=0,scrollbars=0,location=0,statusbar=0,menubar=0,resizable=0,width=500,height=300'); return false;" 
+		title="Reveal this e-mail address">...</a>@gmx.de (click "..." to
+		reveal address)</li>
 	<li>Stephan Schiffel, step<a
 		href="http://mailhide.recaptcha.net/d?k=012MepILrcW2M7NebsmFqnMw==&amp;c=ACM1GYRQTkWmqoHGAtfmsyF_nQUIOA1wNcSp9Nt2omv489Wt9SYyd-eVtuNXr8Kn"
 		onclick="window.open('http://mailhide.recaptcha.net/d?k=012MepILrcW2M7NebsmFqnMw==&amp;c=ACM1GYRQTkWmqoHGAtfmsyF_nQUIOA1wNcSp9Nt2omv489Wt9SYyd-eVtuNXr8Kn', '', 'toolbar=0,scrollbars=0,location=0,statusbar=0,menubar=0,resizable=0,width=500,height=300'); return false;"
 		title="Reveal this e-mail address">...</a>@inf.tu-dresden.de (click "..." to
-	reveal address)</li>
+		reveal address)</li>
 </ul>
 
 
