@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+    Copyright (C) 2009 Martin Günther <mintar@gmx.de>
 
     This file is part of GGP Server.
 
@@ -22,54 +22,73 @@ package tud.ggpserver.formhandlers;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 
 public class SaveTournament {
+	/**
+	 * Logger for this class
+	 */
+	private static final Logger logger = Logger.getLogger(SaveTournament.class.getName());
+
+	/**
+	 * Full parameter names
+	 */
+	public static final String PARAM_TOURNAMENT_ID = "tournamentID";
+
+	/**
+	 * Parameter prefixes.
+	 */
+	public static final String PREFIX_GAME_NAME = "gameName+";
+	public static final String PREFIX_PLAYER_INFOS = "playerInfos+";
+	public static final String PREFIX_PLAY_CLOCK = "playclock+";
+	public static final String PREFIX_START_CLOCK = "startclock+";
+
 	private String tournamentID;
 	private int page;
 
 	private Map<String, EditableMatch> editableMatches = new HashMap<String, EditableMatch>();
-	
+
 	public void setTournamentID(String tournamentID) {
 		this.tournamentID = tournamentID;
-		System.out.println("tournamentID: " + tournamentID);
+		logger.config("String - tournamentID: " + tournamentID); //$NON-NLS-1$
 	}
 
 	public String getTournamentID() {
 		return tournamentID;
 	}
-	
+
 	public void parseParameterMap(Map<String, String[]> parameterMap) throws SQLException {
 		for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
 			String key = entry.getKey();
 			String[] params = entry.getValue();
-			if (key.equals("tournamentID")) {
+			if (key.equals(PARAM_TOURNAMENT_ID)) {
 				parseTournamentID(params);
-			} else if (key.startsWith("gameName+")) {
-				parseGameName(key.substring(9), params);
-			} else if (key.startsWith("startclock+")) {
-				parseStartClock(key.substring(11), params);
-			} else if (key.startsWith("playclock+")) {
-				parsePlayClock(key.substring(10), params);
-			} else if (key.startsWith("playerInfos+")) {
-				parsePlayerInfos(key.substring(12), params);
+			} else if (key.startsWith(PREFIX_GAME_NAME)) {
+				parseGameName(key.substring(PREFIX_GAME_NAME.length()), params);
+			} else if (key.startsWith(PREFIX_START_CLOCK)) {
+				parseStartClock(key.substring(PREFIX_START_CLOCK.length()), params);
+			} else if (key.startsWith(PREFIX_PLAY_CLOCK)) {
+				parsePlayClock(key.substring(PREFIX_PLAY_CLOCK.length()), params);
+			} else if (key.startsWith(PREFIX_PLAYER_INFOS)) {
+				parsePlayerInfos(key.substring(PREFIX_PLAYER_INFOS.length()), params);
 			} else {
-				System.err.print("Unknown parameter: " + key + " (values ");
+				logger.warning("Map<String,String[]> - Unknown parameter: " + key + " (values ");
 				for (String value : params) {
-					System.out.print(value + " ");
+					logger.warning(value + " ");
 				}
-				System.out.println(")");
+				logger.warning(")");
 			}
 		}
 		commit();
 	}
-	
+
 	private void commit() throws SQLException {
 		for (EditableMatch match : editableMatches.values()) {
 			match.commit();
 		}
 	}
-	
+
 	private void parseTournamentID(String[] params) {
 		if (params.length == 1) {
 			setTournamentID(params[0]);
@@ -80,7 +99,7 @@ public class SaveTournament {
 	private void parseGameName(String matchID, String[] params) throws SQLException {
 		if (params.length == 1) {
 			getEditableMatch(matchID).setGame(params[0]);
-			System.out.println("match(" + matchID + ").setGame(" + params[0] + ")");
+			logger.config("String, String[] - match(" + matchID + ").setGame(" + params[0] + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 	}
 
@@ -89,7 +108,7 @@ public class SaveTournament {
 			try {
 				Integer startclock = Integer.parseInt(params[0]);
 				getEditableMatch(matchID).setStartclock(startclock);
-				System.out.println("match(" + matchID + ").setStartClock(" + startclock + ")");
+				logger.config("String, String[] - match(" + matchID + ").setStartClock(" + startclock + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			} catch (NumberFormatException e) {
 				// ignore
 			}
@@ -102,7 +121,7 @@ public class SaveTournament {
 				Integer playclock = Integer.parseInt(params[0]);
 				if (playclock != null) {
 					getEditableMatch(matchID).setPlayclock(playclock);
-					System.out.println("match(" + matchID + ").setPlayClock(" + playclock + ")");
+					logger.config("String, String[] - match(" + matchID + ").setPlayClock(" + playclock + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				}
 			} catch (NumberFormatException e) {
 				// ignore
@@ -114,12 +133,12 @@ public class SaveTournament {
 		int roleNumber = 0;
 		for (String playerName : params) {
 			getEditableMatch(matchID).setPlayerInfo(roleNumber, playerName);
-			System.out.println("match(" + matchID + ").setPlayerInfo(" + roleNumber + ", " + playerName + ")"); 
-			
+			logger.config("String, String[] - match(" + matchID + ").setPlayerInfo(" + roleNumber + ", " + playerName + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+
 			roleNumber++;
 		}
 	}
-	
+
 	private EditableMatch getEditableMatch(String matchID) throws SQLException {
 		EditableMatch result = editableMatches.get(matchID);
 		if (result == null) {
