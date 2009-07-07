@@ -39,6 +39,12 @@ public class EditableMatch {
 	private int playclock;
 	private List<PlayerInfo> playerInfos;
 	
+	private boolean scrambled = false;  
+		// this is false by default (and not shadowedMatch.isScrambled), because
+		// SaveTournament only sets every scrambled match to true, but doesn't
+		// set non-scrambled matches to false (because of the behaviour of HTML
+		// checkboxes: the parameter is only sent when the box is checked).
+	
 
 	@SuppressWarnings("unchecked")
 	public EditableMatch(String matchID) throws SQLException {
@@ -72,6 +78,10 @@ public class EditableMatch {
 		playerInfos.set(roleIndex, db.getPlayerInfo(playerName));
 	}
 
+	public void setScrambled(boolean scrambled) {
+		this.scrambled = scrambled;
+	}
+
 	@SuppressWarnings("unchecked")
 	public void commit() throws SQLException {
 		if (shadowedMatch.getStartclock() != startclock) {
@@ -95,6 +105,10 @@ public class EditableMatch {
 			if (!playerInfo.equals(shadowedPlayerInfo)) {
 				db.setMatchPlayerInfo(shadowedMatch.getMatchID(), i, playerInfo);
 			}
+		}
+		
+		if (shadowedMatch.isScrambled() != scrambled) {
+			db.setMatchScrambled(shadowedMatch.getMatchID(), scrambled);
 		}
 		
 		// set the game last, because this will change the match id

@@ -278,6 +278,7 @@ CREATE TABLE IF NOT EXISTS `matches` (
   `start_time` timestamp NOT NULL default CURRENT_TIMESTAMP,
   `status` varchar(20) NOT NULL default 'new',
   `tournament_id` VARCHAR(40) NOT NULL,
+  `scrambled` tinyint(1) NOT NULL default '0',
   PRIMARY KEY  (`match_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 

@@ -82,6 +82,7 @@
             <src path="src"/>
             <classpath refid="ggpserver.classpath"/>
         </javac>
+		<copy file="${gamecontroller.location}/resources/wordlist.txt" todir="build/classes"/>		
     </target>
     <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
     <target name="Test">

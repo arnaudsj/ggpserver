@@ -63,6 +63,8 @@ import tud.ggpserver.scheduler.PlayerStatusListener;
 import tud.ggpserver.util.Digester;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
+import java.io.InputStream;
+import tud.gamecontroller.scrambling.GameScrambler;
 
 
 /**
@@ -80,7 +82,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	public static final int MATCHID_MAXLENGTH = 40;
 
 	private static final Logger logger = Logger.getLogger(AbstractDBConnector.class.getName());
-	private static final GameScramblerInterface gamescrambler = new IdentityGameScrambler();    // we don't do any scrambling (yet)
+	private static final GameScramblerInterface identityGameScrambler = new IdentityGameScrambler();
 
 	private static final String NEXT_PLAYED_GAME = "next_played_game";
 	private static final Collection<String> defaultRoleNames = Collections.<String>singleton("member");
@@ -320,7 +322,8 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			int playclock,
 			Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayerInfos,
 			Tournament<TermType, ReasonerStateInfoType> tournament,
-			Date startTime) throws DuplicateInstanceException, SQLException {
+			Date startTime, 
+			boolean scrambled) throws DuplicateInstanceException, SQLException {
 
 		if (matchID == null ||  game == null || startclock <= 0 || playclock <=0 || rolesToPlayerInfos == null || tournament == null || startTime == null || game.getNumberOfRoles() != rolesToPlayerInfos.size()) {
 			throw new IllegalArgumentException();
@@ -330,13 +333,14 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		PreparedStatement ps = null;
 		try {
 
-			ps = con.prepareStatement("INSERT INTO `matches` (`match_id` , `game` , `start_clock` , `play_clock` , `start_time`, `tournament_id`) VALUES (?, ?, ?, ?, ?, ?);");
+			ps = con.prepareStatement("INSERT INTO `matches` (`match_id` , `game` , `start_clock` , `play_clock` , `start_time`, `tournament_id`, `scrambled`) VALUES (?, ?, ?, ?, ?, ?, ?);");
 			ps.setString(1, matchID);
 			ps.setString(2, game.getName());
 			ps.setInt(3, startclock);
 			ps.setInt(4, playclock);
 			ps.setTimestamp(5, new Timestamp(startTime.getTime()));
 			ps.setString(6, tournament.getTournamentID());
+			ps.setBoolean(7, scrambled);
 			
 			ps.executeUpdate();
 			ps.close();
@@ -367,7 +371,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 
 		logger.info("String, Game<TermType,ReasonerStateInfoType>, int, int, Map<? extends RoleInterface<TermType>,? extends PlayerInfo>, Date - Creating new match: " + matchID); //$NON-NLS-1$
 		return new NewMatch<TermType, ReasonerStateInfoType>(matchID, game, startclock, playclock,
-				rolesToPlayerInfos, startTime, this);
+				rolesToPlayerInfos, startTime, scrambled, this);
 	}
 	
 	/**
@@ -375,7 +379,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	 */
 	public NewMatch<TermType, ReasonerStateInfoType> createMatch(GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game,
 			int startclock, int playclock, Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayerInfos,
-			Tournament<TermType, ReasonerStateInfoType> tournament, Date startTime) throws SQLException {
+			Tournament<TermType, ReasonerStateInfoType> tournament, Date startTime, boolean scrambled) throws SQLException {
 		
 		long number = System.currentTimeMillis();
 		NewMatch<TermType, ReasonerStateInfoType> match = null;
@@ -383,7 +387,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		while (match == null) {
 			String matchID = generateMatchID(game, Long.toString(number));
 			try {
-				match = createMatch(matchID, game, startclock, playclock, rolesToPlayerInfos, tournament, startTime);
+				match = createMatch(matchID, game, startclock, playclock, rolesToPlayerInfos, tournament, startTime, scrambled);
 			} catch (DuplicateInstanceException e) {
 				number++;
 			}
@@ -392,10 +396,22 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return match;
 	}
 
+	/**
+	 * Creates a match with some default values: a generated match ID and start time "now".
+	 */
+	public NewMatch<TermType, ReasonerStateInfoType> createMatch(GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game,
+			int startclock, int playclock, Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayerInfos, 
+			Tournament<TermType, ReasonerStateInfoType> tournament, boolean scrambled) throws SQLException {
+		return createMatch(game, startclock, playclock, rolesToPlayerInfos, tournament, new Date(), scrambled);
+	}
+
+	/**
+	 * Creates a match with some default values: a generated match ID, start time "now" and no scrambling.
+	 */
 	public NewMatch<TermType, ReasonerStateInfoType> createMatch(GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game,
 			int startclock, int playclock, Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayerInfos, 
 			Tournament<TermType, ReasonerStateInfoType> tournament) throws SQLException {
-		return createMatch(game, startclock, playclock, rolesToPlayerInfos, tournament, new Date());
+		return createMatch(game, startclock, playclock, rolesToPlayerInfos, tournament, new Date(), false);
 	}
 	
 	public ServerMatch<TermType, ReasonerStateInfoType> getMatch(String matchID)
@@ -408,7 +424,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		ServerMatch<TermType, ReasonerStateInfoType> result = null;
 
 		try {
-			ps = con.prepareStatement("SELECT `game` , `start_clock` , `play_clock` , `start_time` , `status` FROM `matches` WHERE `match_id` = ? ;");
+			ps = con.prepareStatement("SELECT `game` , `start_clock` , `play_clock` , `start_time` , `status`, `scrambled` FROM `matches` WHERE `match_id` = ? ;");
 			ps.setString(1, matchID);
 			rs = ps.executeQuery();
 			
@@ -418,7 +434,8 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				int playclock = rs.getInt("play_clock");
 				Timestamp startTime = rs.getTimestamp("start_time");
 				String status = rs.getString("status");
-				
+				boolean scrambled = rs.getBoolean("scrambled");
+
 				ps_roles = con.prepareStatement("SELECT `player` , `roleindex` , `goal_value` FROM `match_players` WHERE `match_id` = ? ;");
 				ps_roles.setString(1, matchID);
 
@@ -443,24 +460,31 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				if (status.equals(ServerMatch.STATUS_NEW)) {
 					result = new NewMatch<TermType, ReasonerStateInfoType>(
 							matchID, game, startclock, playclock,
-							rolesToPlayerInfos, startTime, this);
+							rolesToPlayerInfos, startTime, scrambled, this);
 				} else if (status.equals(ServerMatch.STATUS_RUNNING)) {
+					GameScramblerInterface gameScrambler;
+					
+					if (scrambled) {
+						gameScrambler = new GameScrambler(getWordlistStream());
+					} else {
+						gameScrambler = identityGameScrambler;
+					}
 					result = new RunningMatch<TermType, ReasonerStateInfoType>(
 							matchID, game, startclock, playclock,
-							rolesToPlayerInfos, startTime, this,
-							getMoveFactory(), gamescrambler);
+							rolesToPlayerInfos, startTime, scrambled, this,
+							getMoveFactory(), gameScrambler);
 				} else if (status.equals(ServerMatch.STATUS_ABORTED)) {
 					result = new AbortedMatch<TermType, ReasonerStateInfoType>(
 							matchID, game, startclock, playclock,
-							rolesToPlayerInfos, startTime, this);
+							rolesToPlayerInfos, startTime, scrambled, this);
 				} else if (status.equals(ServerMatch.STATUS_FINISHED)) {
 					result = new FinishedMatch<TermType, ReasonerStateInfoType>(
 							matchID, game, startclock, playclock,
-							rolesToPlayerInfos, startTime, this, goalValues);
+							rolesToPlayerInfos, startTime, scrambled, this, goalValues);
 				}
 				
 				if (result == null) {
-					throw new SQLException("Field \"status\" in database entry for match " + matchID + " has an illegal value!");
+					throw new SQLException("Field \"status\" in database entry for match " + matchID + " has an illegal value: " + status);
 				}
 			}
 		} finally { 
@@ -838,6 +862,14 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	}
 
 	/**
+	 * 
+	 * @return a word list stream to use for scrambling
+	 */
+	private InputStream getWordlistStream() {
+		return AbstractDBConnector.class.getResourceAsStream("/wordlist.txt");
+	}
+
+	/**
 	 * @param onlyRowCount
 	 *            If <code>true</code>, prepare a statement to count the
 	 *            number of rows
@@ -905,7 +937,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		try {
 			
 			String setStartTime = "";
-			if(status == ServerMatch.STATUS_RUNNING) {
+			if(status.equals(ServerMatch.STATUS_RUNNING)) {
 				setStartTime = ", `start_time` = CURRENT_TIMESTAMP";				
 			}
 			ps = con.prepareStatement("UPDATE `ggpserver`.`matches` SET `status` = ? " + setStartTime + " WHERE `matches`.`match_id` = ? LIMIT 1 ;");
@@ -1047,6 +1079,24 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				try {ps.close();} catch (SQLException e) {}
 		}
 		
+	}
+
+	public void setMatchScrambled(String matchID, boolean scrambled) throws SQLException {
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+
+		try {
+			ps = con.prepareStatement("UPDATE `matches` SET `scrambled` = ? WHERE `matches`.`match_id` = ? LIMIT 1 ;");
+			ps.setBoolean(1, scrambled);
+			ps.setString(2, matchID);
+			
+			ps.executeUpdate();
+		} finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+		}
 	}
 
 	/**

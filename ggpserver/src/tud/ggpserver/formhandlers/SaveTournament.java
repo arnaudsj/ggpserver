@@ -43,6 +43,7 @@ public class SaveTournament {
 	public static final String PREFIX_PLAYER_INFOS = "playerInfos+";
 	public static final String PREFIX_PLAY_CLOCK = "playclock+";
 	public static final String PREFIX_START_CLOCK = "startclock+";
+	public static final String PREFIX_SCRAMBLED = "scrambled+";
 
 	private String tournamentID;
 	private int page;
@@ -72,6 +73,8 @@ public class SaveTournament {
 				parsePlayClock(key.substring(PREFIX_PLAY_CLOCK.length()), params);
 			} else if (key.startsWith(PREFIX_PLAYER_INFOS)) {
 				parsePlayerInfos(key.substring(PREFIX_PLAYER_INFOS.length()), params);
+			} else if (key.startsWith(PREFIX_SCRAMBLED)) {
+				parseScrambled(key.substring(PREFIX_SCRAMBLED.length()), params);
 			} else {
 				logger.warning("Map<String,String[]> - Unknown parameter: " + key + " (values ");
 				for (String value : params) {
@@ -136,6 +139,13 @@ public class SaveTournament {
 			logger.config("String, String[] - match(" + matchID + ").setPlayerInfo(" + roleNumber + ", " + playerName + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 			roleNumber++;
+		}
+	}
+
+	private void parseScrambled(String matchID, String[] params) throws SQLException {
+		if (params.length == 1 && params[0].equals("checked")) {
+			getEditableMatch(matchID).setScrambled(true);
+			logger.config("String, String[] - match(" + matchID + ").setScrambled(" + true + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 	}
 

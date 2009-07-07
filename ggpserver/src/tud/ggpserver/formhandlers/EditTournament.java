@@ -177,7 +177,8 @@ public class EditTournament extends ShowMatches {
 
 	@SuppressWarnings("unchecked")
 	private void cloneMatch(ServerMatch match) throws SQLException {
-		db.createMatch(match.getGame(), match.getStartclock(), match.getPlayclock(), match.getRolesToPlayerInfos(), tournament);
+		db.createMatch(match.getGame(), match.getStartclock(), match.getPlayclock(), 
+				match.getRolesToPlayerInfos(), tournament, match.isScrambled());
 		correctlyPerformed = true;
 	}
 

@@ -194,10 +194,12 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 			int playclock,
 			Map<? extends RoleInterface<Term>, ? extends PlayerInfo> rolesToPlayerInfos,
 			Tournament<Term, GameState> tournament,
-			Date startTime) throws DuplicateInstanceException,
+			Date startTime, boolean scrambled) throws DuplicateInstanceException,
 			SQLException {
 		synchronized (matches) {
-			NewMatch<Term, GameState> result = super.createMatch(matchID, game, startclock, playclock, rolesToPlayerInfos, tournament, startTime);
+			NewMatch<Term, GameState> result = super.createMatch(matchID, game, 
+					startclock, playclock, rolesToPlayerInfos, tournament, 
+					startTime, scrambled);
 			matches.put(matchID, result);
 			return result;
 		}
@@ -268,6 +270,14 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 		synchronized (matches) {
 			clearCacheForMatch(match.getMatchID());
 			super.setMatchGame(match, newGame);
+		}
+	}
+
+	@Override
+	public void setMatchScrambled(String matchID, boolean scrambled) throws SQLException {
+		synchronized (matches) {
+			clearCacheForMatch(matchID);
+			super.setMatchScrambled(matchID, scrambled);
 		}
 	}
 

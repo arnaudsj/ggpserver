@@ -45,8 +45,9 @@ public class AbortedMatch<TermType extends TermInterface, ReasonerStateInfoType>
 			int playclock,
 			Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayerInfos,
 			Date startTime,
+			boolean scrambled,
 			AbstractDBConnector<TermType, ReasonerStateInfoType> db) {
-		super(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, db);
+		super(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, scrambled, db);
 	}
 
 

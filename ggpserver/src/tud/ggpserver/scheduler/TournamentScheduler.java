@@ -55,7 +55,7 @@ public class TournamentScheduler<TermType extends TermInterface, ReasonerStateIn
 				logger.info("Thread for match " + matchID + " - START");
 				try {
 					RunningMatch<TermType, ReasonerStateInfoType> match = newMatch.toRunning();
-
+			
 					try {
 						GameController<TermType, ReasonerStateInfoType> gameController 
 								= new GameController<TermType, ReasonerStateInfoType>(match);

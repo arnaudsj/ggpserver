@@ -103,12 +103,13 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 			int playclock,
 			Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayerInfos,
 			Date startTime,
+			boolean scrambled,
 			AbstractDBConnector<TermType, ReasonerStateInfoType> db,
 			MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory,
-			GameScramblerInterface gamescrambler) {
-		super(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, db);
+			GameScramblerInterface gameScrambler) {
+		super(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, scrambled, db);
 		this.moveFactory = movefactory;
-		setGameScrambler(gameScrambler);
+		this.gameScrambler = gameScrambler;
 	}
 	
 	/**
@@ -276,10 +277,6 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 		} catch (SQLException e) {
 			logger.severe("GameControllerErrorMessage - exception: " + e); //$NON-NLS-1$
 		}
-	}
-	
-	public void setGameScrambler(GameScramblerInterface gameScrambler) {
-		this.gameScrambler = gameScrambler;
 	}
 
 	private void updateGoalValues(Map<? extends RoleInterface<?>, Integer> goalValues) {
