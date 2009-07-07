@@ -24,6 +24,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -46,6 +49,14 @@ public class GameScrambler implements GameScramblerInterface {
 
 	public GameScrambler(File wordlistfile){
 		this(GameScrambler.wordlistFromFile(wordlistfile));
+	}
+
+	public GameScrambler(InputStream stream){
+		this(GameScrambler.wordlistFromStream(stream));
+	}
+
+	public GameScrambler(Reader reader){
+		this(GameScrambler.wordlistFromReader(reader));
 	}
 
 	public GameScrambler(Set<String> wordset){
@@ -148,26 +159,50 @@ public class GameScrambler implements GameScramblerInterface {
 		return word;
 	}
 
-	public static Set<String> wordlistFromFile(File wordlistfile) {
-		Set<String> wordset=new HashSet<String>();
-		BufferedReader reader;
+	private static Set<String> wordlistFromFile(File wordlistfile) {
 		try {
-			reader = new BufferedReader(new FileReader(wordlistfile));
-			Pattern p=Pattern.compile("[A-Za-z][A-Za-z]*");
+			return wordlistFromReader(new FileReader(wordlistfile));
+		} catch (FileNotFoundException e) {
+			Logger.getLogger("tud.gamecontroller").severe(
+					"error reading file: " + wordlistfile + "\n"
+					+ "GameScrambler will use generic identifiers to scramble the game!\n" 
+					+ e.getMessage());
+			return new HashSet<String>();
+		}
+	}
+
+	private static Set<String> wordlistFromStream(InputStream stream) {
+		return wordlistFromReader(new InputStreamReader(stream));
+	}
+	
+	private static Set<String> wordlistFromReader(Reader reader) {
+		Set<String> wordset = new HashSet<String>();
+		BufferedReader bufferedReader = null;
+		try {
+			bufferedReader = new BufferedReader(reader);
+			Pattern p = Pattern.compile("[A-Za-z][A-Za-z]*");
 			Matcher m;
-			String line=reader.readLine();
-			while(line!=null){
-				m=p.matcher(line);
-				if(m.find()){
+			String line = bufferedReader.readLine();
+			while (line != null) {
+				m = p.matcher(line);
+				if (m.find()) {
 					wordset.add(m.group().toLowerCase());
 				}
-				line=reader.readLine();
+				line = bufferedReader.readLine();
 			}
-			reader.close();
-		} catch (FileNotFoundException e) {
-			System.err.println("error reading file: "+wordlistfile+"\nGameScrambler will use generic identifiers to scramble the game!\n"+e.getMessage());
 		} catch (IOException e) {
-			System.err.println("error reading file: "+wordlistfile+"\nGameScrambler may use generic identifiers to scramble the game!\n"+e.getMessage());
+			Logger.getLogger("tud.gamecontroller").severe(
+					"error reading from input reader!\n"
+					+ "GameScrambler will use generic identifiers to scramble the game!\n" 
+					+ e.getMessage());
+		} finally {
+			if (bufferedReader != null) {
+				try {
+					bufferedReader.close();
+				} catch (IOException e) {
+					// ignore
+				}
+			}
 		}
 		return wordset;
 	}
