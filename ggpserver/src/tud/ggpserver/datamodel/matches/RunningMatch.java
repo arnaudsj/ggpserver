@@ -62,7 +62,7 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 	private static final Logger logger = Logger.getLogger(RunningMatch.class.getName());
 
 	private final MoveFactoryInterface<? extends MoveInterface<TermType>> moveFactory;
-	private final GameScramblerInterface gameScrambler;
+	private GameScramblerInterface gameScrambler;
 
 	/**
 	 * JointMove 0 = joint move leading from initial state to State 1.
@@ -108,7 +108,7 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 			GameScramblerInterface gamescrambler) {
 		super(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, db);
 		this.moveFactory = movefactory;
-		this.gameScrambler = gamescrambler;
+		setGameScrambler(gameScrambler);
 	}
 	
 	/**
@@ -232,6 +232,7 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 	 * 
 	 * Like above, errorMessages and xmlStates will have size n+1 [== 1], while jointMoves and jointMovesStrings will have size (n) [== 0].
 	 */
+	@Override
 	public void gameStarted(RunnableMatchInterface<? extends TermInterface, ?> match, StateInterface<? extends TermInterface, ?> currentState) {
 		stepNumber++;
 		
@@ -242,6 +243,7 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 		}
 	}
 
+	@Override
 	public void gameStep(JointMoveInterface<? extends TermInterface> jointMove, StateInterface<? extends TermInterface, ?> currentState) {
 		updateJointMove(jointMove); // this has to be done BEFORE storing the state (because updateXmlState reads jointMoves)
 
@@ -253,6 +255,7 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 		}		
 	}
 
+	@Override
 	public void gameStopped(StateInterface<? extends TermInterface, ?> currentState, Map<? extends RoleInterface<?>, Integer> goalValues) {
 		assert(currentState.isTerminal());
 		
@@ -266,12 +269,17 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 	/* (non-Javadoc)
 	 * @see tud.ggpserver.datamodel.matches.ErrorMessageListener#addErrorMessage(tud.gamecontroller.logging.GameControllerErrorMessage)
 	 */
+	@Override
 	public void notifyErrorMessage(GameControllerErrorMessage errorMessage) {
 		try {
 			getDB().addErrorMessage(getMatchID(), stepNumber, errorMessage);
 		} catch (SQLException e) {
 			logger.severe("GameControllerErrorMessage - exception: " + e); //$NON-NLS-1$
 		}
+	}
+	
+	public void setGameScrambler(GameScramblerInterface gameScrambler) {
+		this.gameScrambler = gameScrambler;
 	}
 
 	private void updateGoalValues(Map<? extends RoleInterface<?>, Integer> goalValues) {
