@@ -189,7 +189,7 @@
 					    </c:when>
 					    <c:otherwise>
 						<c:forEach var="roleindex" begin="0" end="${match.game.numberOfRoles - 1}">
-						    <c:out value="${match.orderedGoalValues[roleindex]}" />
+						    <input type="text" name="goalvalue+${match.matchID}" size="3" value="${match.orderedGoalValues[roleindex]}" maxlength="4" style="text-align: right;" onchange="document.theForm.submitButton.style.color = '#ff0000';">
 						    <br>
 						</c:forEach>
 					    </c:otherwise>
@@ -316,7 +316,7 @@
 		<ul>
 		    <li>Before viewing, starting, deleting, cloning or adding 
 		    a match, you have to save your changes.</li>
-		    <li>When clicking "save changes", all changes will be stored
+		    <li>When clicking "save", all changes will be stored
 			persistently, including any new matches. They can still be 
 		    edited.</li>
 		    <li>New matches won't show up on the publicly visible 

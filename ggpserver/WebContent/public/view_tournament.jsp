@@ -20,9 +20,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%> 
-<jsp:useBean id="pager" class="tud.ggpserver.formhandlers.ShowTournaments" scope="page">
+<jsp:useBean id="viewTournament" class="tud.ggpserver.formhandlers.ViewTournament" scope="page">
 	<c:catch>
-		<jsp:setProperty name="pager" property="page"/>
+		<jsp:setProperty name="viewTournament" property="tournamentID"/>
 	</c:catch>
 </jsp:useBean>
 
@@ -38,21 +38,19 @@
 
 <!-- Content -->
 <div id="content">
-    <div id="ctitle">Show tournaments</div>
-
-	<!-- pager -->
-	<jsp:directive.include file="/inc/pager_title.jsp" />
-	<jsp:directive.include file="/inc/pager.jsp" />
-
+    <div id="ctitle">View Tournament</div>
+    <h1 class="notopborder">Information on tournament ${viewTournament.tournamentID}</h1>
 	<table>
 		<thead>
 			<tr>
-				<th>tournament</th>
-				<th>actions</th>
+				<th>player</th>
+				<th>number of matches</th>
+				<th>total reward</th>
+				<th>average reward</th>
 			</tr>
 		</thead>
 		<tbody>
-	      <c:forEach var="tournament" items="${pager.tournaments}" varStatus="lineInfo">
+	      <c:forEach var="player" items="${viewTournament.tournament.orderedPlayers}" varStatus="lineInfo">
 	      	 <c:choose>
 			   <c:when test="${lineInfo.count % 2 == 0}">
 			     <c:set var="rowClass" value="even" />
@@ -62,20 +60,10 @@
 			   </c:otherwise>
 			 </c:choose> 
 		     <tr class="${rowClass}">
-				<td>
-				    <c:out value="${tournament.tournamentID}" />
-				</td>
-				<td>
-					<c:url value="show_matches.jsp" var="showMatchesURL">
-						<c:param name="tournamentID" value="${tournament.tournamentID}" />
-					</c:url>
-					<a href='<c:out value="${showMatchesURL}" />'>show matches</a>
-					/ 
-					<c:url value="view_tournament.jsp" var="viewTournamentURL">
-						<c:param name="tournamentID" value="${tournament.tournamentID}" />
-					</c:url>
-					<a href='<c:out value="${viewTournamentURL}" />'>leader board</a>
-			</td>
+				<td>${player.name}</td>
+				<td>${viewTournament.tournament.numberOfMatches[player]}</td>
+				<td>${viewTournament.tournament.totalReward[player]}</td>
+				<td>${viewTournament.tournament.averageReward[player]}</td>
 			</tr>
 	      </c:forEach>
 		</tbody>
