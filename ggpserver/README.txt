@@ -47,6 +47,7 @@ sudo apache2ctl restart
 # First execute 01_create_database.sql, then 02_add_db_user.sql .
 mysql -u root -p < 01_create_database.sql
 mysql -u root -p < 02_add_db_user.sql
+mysql -u root -p < 03_add_games.sql
 # enter the matching sql root password
 
 # ========================================================================================
