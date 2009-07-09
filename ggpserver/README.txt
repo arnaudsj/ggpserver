@@ -37,7 +37,7 @@ sudo ln -s /usr/share/tomcat5.5-webapps/jsp-examples/WEB-INF/lib/jstl.jar /usr/s
 
 # ========================================================================================
 
-# install phpmyadmin to admin database
+# install phpmyadmin to admin database (can usually be reached at: http://127.0.0.1/phpmyadmin/)
 sudo apt-get install phpmyadmin
 
 # not necessary for ubuntu intrepid or better
