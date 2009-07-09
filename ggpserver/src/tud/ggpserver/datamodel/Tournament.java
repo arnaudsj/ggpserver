@@ -20,8 +20,17 @@
 package tud.ggpserver.datamodel;
 
 import java.sql.SQLException;
+import java.util.AbstractMap;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.matches.ServerMatch;
 
@@ -31,7 +40,12 @@ public class Tournament<TermType extends TermInterface, ReasonerStateInfoType> {
 	
 	private final String tournamentID;
 	private final User owner;
-	
+	private Map<PlayerInfo, Integer> numberOfMatches = new HashMap<PlayerInfo, Integer>();
+	private Map<PlayerInfo, Integer> totalReward = new HashMap<PlayerInfo, Integer>();
+//	private List<Integer> orderedNumberOfMatches;
+//	private List<Integer> orderedTotalRewards;
+	private List<PlayerInfo> orderedPlayers;
+
 	private final AbstractDBConnector<TermType, ReasonerStateInfoType> db;
 
 	public Tournament(final String tournamentID, final User owner, AbstractDBConnector<TermType, ReasonerStateInfoType> db) {
@@ -52,6 +66,77 @@ public class Tournament<TermType extends TermInterface, ReasonerStateInfoType> {
 		return owner;
 	}
 
+	public Map<PlayerInfo, Integer> getNumberOfMatches() {
+		return new HashMap<PlayerInfo, Integer>(numberOfMatches);
+	}
+
+	public void setNumberOfMatches(Map<PlayerInfo, Integer> numberOfMatches) {
+		this.numberOfMatches = new HashMap<PlayerInfo, Integer>(numberOfMatches);
+	}
+
+	public int getNumberOfMatches(PlayerInfo player) {
+		return numberOfMatches.get(player);
+	}
+
+	public void setNumberOfMatches(PlayerInfo player, int newNumberOfMatches) {
+		this.numberOfMatches.put(player, newNumberOfMatches);
+	}
+	
+	public Map<PlayerInfo, Integer> getTotalReward() {
+		return new HashMap<PlayerInfo, Integer>(totalReward);
+	}
+
+	public void setTotalReward(Map<PlayerInfo, Integer> totalReward) {
+		this.totalReward = new HashMap<PlayerInfo, Integer>(totalReward);
+	}
+
+	public int getTotalReward(PlayerInfo player) {
+		return totalReward.get(player);
+	}
+
+	public void setTotalReward(PlayerInfo player, int newTotalReward) {
+		this.totalReward.put(player, newTotalReward);
+	}
+	
+	public Map<PlayerInfo, Double> getAverageReward() {
+		Map<PlayerInfo, Double> averageReward = new HashMap<PlayerInfo, Double>();
+		for (PlayerInfo playerInfo : getOrderedPlayers()) {
+			int count = getNumberOfMatches(playerInfo);
+			if (count > 0) {
+				averageReward.put(playerInfo, ((double) getTotalReward(playerInfo)) / count);
+			} else {
+				averageReward.put(playerInfo, 0.0);
+			}
+		}
+		return averageReward;
+	}
+
+	public List<PlayerInfo> getOrderedPlayers() {
+		if (orderedPlayers == null) {
+			orderedPlayers = initOrderedPlayers();
+		}
+		return orderedPlayers;
+	}
+	
+	private List<PlayerInfo> initOrderedPlayers() {
+		List<PlayerInfo> result = new LinkedList<PlayerInfo>();
+		
+		List<Entry<PlayerInfo, Integer>> entryList = new LinkedList<Entry<PlayerInfo, Integer>>(totalReward.entrySet());
+		Collections.sort(entryList
+				, new Comparator<Entry<PlayerInfo, Integer>>() {
+			@Override
+			public int compare(Entry<PlayerInfo, Integer> firstEntry,
+					Entry<PlayerInfo, Integer> secondEntry) {
+				return secondEntry.getValue() - firstEntry.getValue();
+			}
+		});
+		
+		for (Entry<PlayerInfo, Integer> entry : entryList) {
+			result.add(entry.getKey());
+		}
+		return result;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int PRIME = 31;
@@ -76,4 +161,5 @@ public class Tournament<TermType extends TermInterface, ReasonerStateInfoType> {
 			return false;
 		return true;
 	}
+	
 }

@@ -35,15 +35,17 @@ public class SaveTournament {
 	 * Full parameter names
 	 */
 	public static final String PARAM_TOURNAMENT_ID = "tournamentID";
+	public static final String PARAM_SUBMIT_BUTTON = "submitButton";
 
 	/**
-	 * Parameter prefixes.
+	 * Parameter prefixes (the full parameter name consists of a prefix + match id).
 	 */
 	public static final String PREFIX_GAME_NAME = "gameName+";
 	public static final String PREFIX_PLAYER_INFOS = "playerInfos+";
 	public static final String PREFIX_PLAY_CLOCK = "playclock+";
 	public static final String PREFIX_START_CLOCK = "startclock+";
 	public static final String PREFIX_SCRAMBLED = "scrambled+";
+	public static final String PREFIX_GOALVALUE = "goalvalue+";
 
 	private String tournamentID;
 	private int page;
@@ -65,6 +67,8 @@ public class SaveTournament {
 			String[] params = entry.getValue();
 			if (key.equals(PARAM_TOURNAMENT_ID)) {
 				parseTournamentID(params);
+			} else if (key.equals(PARAM_SUBMIT_BUTTON)) {
+				// ignore
 			} else if (key.startsWith(PREFIX_GAME_NAME)) {
 				parseGameName(key.substring(PREFIX_GAME_NAME.length()), params);
 			} else if (key.startsWith(PREFIX_START_CLOCK)) {
@@ -75,12 +79,15 @@ public class SaveTournament {
 				parsePlayerInfos(key.substring(PREFIX_PLAYER_INFOS.length()), params);
 			} else if (key.startsWith(PREFIX_SCRAMBLED)) {
 				parseScrambled(key.substring(PREFIX_SCRAMBLED.length()), params);
+			} else if (key.startsWith(PREFIX_GOALVALUE)) {
+				parseGoalValue(key.substring(PREFIX_GOALVALUE.length()), params);
 			} else {
-				logger.warning("Map<String,String[]> - Unknown parameter: " + key + " (values ");
+				String message = "Map<String,String[]> - Unknown parameter: " + key + " (values ";
 				for (String value : params) {
-					logger.warning(value + " ");
+					message += value + " ";
 				}
-				logger.warning(")");
+				message += ")";
+				logger.warning(message);
 			}
 		}
 		commit();
@@ -146,6 +153,16 @@ public class SaveTournament {
 		if (params.length == 1 && params[0].equals("checked")) {
 			getEditableMatch(matchID).setScrambled(true);
 			logger.config("String, String[] - match(" + matchID + ").setScrambled(" + true + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		}
+	}
+
+	private void parseGoalValue(String matchID, String[] params) throws SQLException {
+		int roleNumber = 0;
+		for (String param : params) {
+			int goalValue = Integer.parseInt(param);
+			getEditableMatch(matchID).setGoalValue(roleNumber, goalValue);
+			logger.config("String, String[] - match(" + matchID + ").setGoalValue(" + roleNumber + ", " + goalValue + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			roleNumber++;
 		}
 	}
 

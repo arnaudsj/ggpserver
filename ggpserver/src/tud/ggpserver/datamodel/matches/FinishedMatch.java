@@ -20,6 +20,7 @@
 package tud.ggpserver.datamodel.matches;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -62,7 +63,8 @@ public class FinishedMatch<TermType extends TermInterface, ReasonerStateInfoType
 
 	@Override
 	public Map<? extends RoleInterface<?>, Integer> getGoalValues() {
-		return goalValues;
+		// defensive copy needed here, otherwise EditableMatch will fail
+		return new HashMap<RoleInterface<?>, Integer>(goalValues);
 	}
 	
 	@Override

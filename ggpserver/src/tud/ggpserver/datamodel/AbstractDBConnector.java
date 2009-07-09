@@ -1752,6 +1752,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			
 			if (rs.next()) {
 				result = new Tournament<TermType, ReasonerStateInfoType>(rs.getString("tournament_id"), getUser(rs.getString("owner")), this);
+				fillTournamentStatistics(result);
 			}
 		} finally { 
 			if (con != null)
@@ -1764,7 +1765,37 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 
 		return result;
 	}
+	
+	private void fillTournamentStatistics(Tournament<TermType, ReasonerStateInfoType> tournament) throws SQLException {
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
 
+		try {
+			ps = con.prepareStatement(
+					"SELECT `match_players`.`player`, SUM(`match_players`.`goal_value`) AS the_sum, COUNT(`match_players`.`goal_value`) AS the_count " +
+					"FROM `matches`, `match_players` " +
+					"WHERE `matches`.`match_id` = `match_players`.`match_id` AND `matches`.`tournament_id` = ? AND `match_players`.`goal_value` IS NOT NULL AND `player` != 'Random' AND `player` != 'Legal' " +
+					"GROUP BY `match_players`.`player` " +
+					"ORDER BY the_sum DESC");
+			ps.setString(1, tournament.getTournamentID());
+			rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				PlayerInfo player = getPlayerInfo(rs.getString("player"));
+				tournament.setTotalReward(player, rs.getInt("the_sum"));
+				tournament.setNumberOfMatches(player, rs.getInt("the_count"));
+			}
+		} finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+			if (rs != null)
+				try {rs.close();} catch (SQLException e) {}
+		} 
+	}
+	
 	public Tournament<TermType , ReasonerStateInfoType> createTournament(String tournamentID, User owner) throws DuplicateInstanceException,
 			SQLException {
 		

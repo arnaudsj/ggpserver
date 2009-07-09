@@ -21,23 +21,28 @@ package tud.ggpserver.formhandlers;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import java.util.Map;
 import tud.gamecontroller.game.GameInterface;
+import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
 import tud.ggpserver.datamodel.matches.NewMatch;
+import tud.ggpserver.datamodel.matches.ServerMatch;
 
 
 public class EditableMatch {
 	private final AbstractDBConnector db = DBConnectorFactory.getDBConnector();
-	private final NewMatch shadowedMatch;
+	private final ServerMatch shadowedMatch;
 	private GameInterface game;
 	private int startclock;
 	private int playclock;
 	private List<PlayerInfo> playerInfos;
+	private Map<RoleInterface, Integer> goalValues;
 	
 	private boolean scrambled = false;  
 		// this is false by default (and not shadowedMatch.isScrambled), because
@@ -48,11 +53,12 @@ public class EditableMatch {
 
 	@SuppressWarnings("unchecked")
 	public EditableMatch(String matchID) throws SQLException {
-		shadowedMatch = db.getNewMatch(matchID);
+		shadowedMatch = db.getMatch(matchID);
 		game = shadowedMatch.getGame();
 		startclock = shadowedMatch.getStartclock();
 		playclock = shadowedMatch.getPlayclock();
 		playerInfos = shadowedMatch.getOrderedPlayerInfos();
+		goalValues = shadowedMatch.getGoalValues();
 	}
 
 
@@ -82,6 +88,15 @@ public class EditableMatch {
 		this.scrambled = scrambled;
 	}
 
+
+	void setGoalValue(int roleNumber, int goalValue) {
+		if (goalValues == null) {
+			throw new IllegalStateException("Goal values can only be changed for FinishedMatches, and match is not finished: " + shadowedMatch);
+		}
+		List<RoleInterface> roles = game.getOrderedRoles();
+		goalValues.put(roles.get(roleNumber), goalValue);
+	}
+	
 	@SuppressWarnings("unchecked")
 	public void commit() throws SQLException {
 		if (shadowedMatch.getStartclock() != startclock) {
@@ -111,12 +126,19 @@ public class EditableMatch {
 			db.setMatchScrambled(shadowedMatch.getMatchID(), scrambled);
 		}
 		
+		if (goalValues != null && !(goalValues.equals(shadowedMatch.getGoalValues()))) {
+			db.setMatchGoalValues(shadowedMatch, goalValues);
+		}
+		
 		// set the game last, because this will change the match id
 		if (!shadowedMatch.getGame().equals(game)) {
-			db.setMatchGame(shadowedMatch, game);
+			if (shadowedMatch instanceof NewMatch) {
+				db.setMatchGame(((NewMatch) shadowedMatch), game);
+			} else {
+				throw new IllegalStateException("Game can only be changed for NewMatches, but match is not new: " + shadowedMatch);
+			}
 		}
 	}
-
 
 	private RemotePlayerInfo duplicateRemotePlayer(List<PlayerInfo> shadowedPlayerInfos) {
 		List<RemotePlayerInfo> seenPlayers = new ArrayList<RemotePlayerInfo>();
