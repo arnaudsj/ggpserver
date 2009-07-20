@@ -38,7 +38,7 @@ import tud.ggpserver.datamodel.matches.ServerMatch;
 public class EditableMatch {
 	private final AbstractDBConnector db = DBConnectorFactory.getDBConnector();
 	private final ServerMatch shadowedMatch;
-	private GameInterface game;
+	private GameInterface<?, ?> game;
 	private int startclock;
 	private int playclock;
 	private List<PlayerInfo> playerInfos;
@@ -93,7 +93,7 @@ public class EditableMatch {
 		if (goalValues == null) {
 			throw new IllegalStateException("Goal values can only be changed for FinishedMatches, and match is not finished: " + shadowedMatch);
 		}
-		List<RoleInterface> roles = game.getOrderedRoles();
+		List<? extends RoleInterface> roles = game.getOrderedRoles();
 		goalValues.put(roles.get(roleNumber), goalValue);
 	}
 	
