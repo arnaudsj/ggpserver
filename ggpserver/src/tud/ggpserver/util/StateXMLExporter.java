@@ -90,6 +90,8 @@ public class StateXMLExporter {
 	public static void exportStepXML(String xml, String step, ZipOutputStream zip, String directory) throws IOException {
 		ZipEntry zipEntry=new ZipEntry(directory+step+".xml");
 		zip.putNextEntry(zipEntry);
+		// this is a hack to make the xml files work with the gamecontroller stylesheets (different paths)
+		xml=xml.replace("<?xml-stylesheet type=\"text/xsl\" href=\"../stylesheets/", "<?xml-stylesheet type=\"text/xsl\" href=\"../../stylesheets/");
 		zip.write(xml.getBytes(Charset.forName("UTF-8")));
 	}
 
