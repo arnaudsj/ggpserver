@@ -64,9 +64,9 @@ public class StateXMLExporter {
 		zip.putNextEntry(zipEntry);
 		String xmlState=null;
 		List<String> xmlStates=match.getXmlStates();
-		for(int step=0;step<xmlStates.size();step++) {
+		for(int step=0; step<xmlStates.size(); step++) {
 			xmlState=xmlStates.get(step);
-			exportStepXML(xmlState, "step_"+step, zip, matchDir);
+			exportStepXML(xmlState, "step_"+(step+1), zip, matchDir);
 			
 		}
 		exportStepXML(xmlState, "finalstate", zip, matchDir);
@@ -160,8 +160,13 @@ public class StateXMLExporter {
 					sb.append("</td>\n")
 						.append("\t\t\t\t\t<td>");
 					// goal values
-					for(int gv:match.getOrderedGoalValues()){
-						sb.append(gv).append("<br/>");
+					List<Integer> goalValues=match.getOrderedGoalValues();
+					if(goalValues!=null) {
+						for(int gv:goalValues){
+							sb.append(gv).append("<br/>");
+						}
+					}else{
+						sb.append("status: ").append(match.getStatus());
 					}
 					sb.append("</td>\n")
 						.append("\t\t\t\t</tr>\n");
