@@ -68,6 +68,7 @@ public class EditPlayer {
 		
 		try {
 			InetAddress hostAddress = InetAddress.getByName(host);
+			// TODO: make this check an option (incase one wants to run the server in a local network)
 			if (hostAddress.isSiteLocalAddress()) {
 				// 10.0.0.0    - 10.255.255.255  (10/8 prefix)
 				// 172.16.0.0  - 172.31.255.255  (172.16/12 prefix)

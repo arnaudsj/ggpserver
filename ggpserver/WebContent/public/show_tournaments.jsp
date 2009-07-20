@@ -48,7 +48,7 @@
 		<thead>
 			<tr>
 				<th>tournament</th>
-				<th>actions</th>
+				<th colspan="3">actions</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -70,11 +70,19 @@
 						<c:param name="tournamentID" value="${tournament.tournamentID}" />
 					</c:url>
 					<a href='<c:out value="${showMatchesURL}" />'>show matches</a>
-					/ 
+				</td>
+				<td>
 					<c:url value="view_tournament.jsp" var="viewTournamentURL">
 						<c:param name="tournamentID" value="${tournament.tournamentID}" />
 					</c:url>
 					<a href='<c:out value="${viewTournamentURL}" />'>leader board</a>
+				</td>
+				<td>
+					<c:url value="export_xml.jsp" var="exportXMLURL">
+						<c:param name="tournamentID" value="${tournament.tournamentID}" />
+					</c:url>
+					<a href='<c:out value="${exportXMLURL}" />'>export xml</a>
+				</td>
 			</td>
 			</tr>
 	      </c:forEach>
