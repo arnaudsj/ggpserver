@@ -45,14 +45,14 @@ import java.sql.SQLException;
  */
 public class StateXMLExporter {
 
-	public static void exportTournament(String tournamentID, ZipOutputStream zip, String directory) throws SQLException, IOException {
+	public static void exportTournament(String tournamentID, ZipOutputStream zip) throws SQLException, IOException {
 		AbstractDBConnector<?, ?> dbconnector=DBConnectorFactory.getDBConnector();
-		exportXML(dbconnector.getTournament(tournamentID), zip, directory);
+		exportXML(dbconnector.getTournament(tournamentID), zip, "");
 	}
 
-	public static void exportMatch(String matchID, ZipOutputStream zip, String directory) throws SQLException, IOException {
+	public static void exportMatch(String matchID, ZipOutputStream zip) throws SQLException, IOException {
 		AbstractDBConnector<?, ?> dbconnector=DBConnectorFactory.getDBConnector();
-		exportXML(dbconnector.getMatch(matchID), zip, directory);
+		exportXML(dbconnector.getMatch(matchID), zip, "");
 	}
 	
 	/**
@@ -66,10 +66,12 @@ public class StateXMLExporter {
 		List<String> xmlStates=match.getXmlStates();
 		for(int step=0; step<xmlStates.size(); step++) {
 			xmlState=xmlStates.get(step);
-			exportStepXML(xmlState, "step_"+(step+1), zip, matchDir);
+			if(xmlState != null)
+				exportStepXML(xmlState, "step_"+(step+1), zip, matchDir);
 			
 		}
-		exportStepXML(xmlState, "finalstate", zip, matchDir);
+		if(xmlState != null)
+			exportStepXML(xmlState, "finalstate", zip, matchDir);
 	}
 
 	/**
