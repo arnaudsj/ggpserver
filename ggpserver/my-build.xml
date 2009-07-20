@@ -81,6 +81,7 @@
         <javac debug="true" debuglevel="${debuglevel}" destdir="build/classes" source="${source}" target="${target}">
             <src path="src"/>
             <classpath refid="ggpserver.classpath"/>
+			<compilerarg value="-Xlint:unchecked"/>
         </javac>
 		<copy file="${gamecontroller.location}/resources/wordlist.txt" todir="build/classes"/>		
     </target>
