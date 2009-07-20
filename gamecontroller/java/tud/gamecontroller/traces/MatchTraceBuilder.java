@@ -110,7 +110,7 @@ public class MatchTraceBuilder implements GameControllerListener {
 		Map<String, String> moves = new HashMap<String, String>();
 		
 		if (jointmove != null) {
-			List<MoveInterface<? extends TermInterface>> stateMoves = ((JointMoveInterface) jointmove).getOrderedMoves();
+			List<? extends MoveInterface<? extends TermInterface>> stateMoves = jointmove.getOrderedMoves();
 
 			for (int i = 0; i < stateMoves.size(); i++) {
 				moves.put(roles.get(i).getKIFForm().toLowerCase(), stateMoves.get(i).getKIFForm().toLowerCase());
