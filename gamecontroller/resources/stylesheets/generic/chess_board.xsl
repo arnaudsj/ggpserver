@@ -272,8 +272,8 @@
 						<xsl:when test="$mirrorY='yes'"><xsl:value-of select="$CellHeight * ($y - 1) + $BorderWidth"/></xsl:when>
 						<xsl:otherwise><xsl:value-of select="$CellHeight * ($internalHeight - $y) + $BorderWidth"/></xsl:otherwise>
 					</xsl:choose>
-				 
 				</xsl:variable>
+				
 				<!-- select the right background color for the cell based on the coordinates -->
 				<xsl:variable name="CellColor">
 					<xsl:choose>
@@ -319,7 +319,7 @@
 							<xsl:when test="$content='CYAN' or $content='TEAL'">O5</xsl:when>
 							<xsl:when test="$content='YELLOW'">O6</xsl:when>
 							<xsl:when test="$content='PINK'">O7</xsl:when>
-							<xsl:when test="$content='BROWN'">O8</xsl:when>
+							<xsl:when test="$content='BROWN' or $content='ORANGE'">O8</xsl:when>
 							<xsl:when test="$content='MAGENTA'">O9</xsl:when>
 							<xsl:when test="$content='1'">x1</xsl:when>
 							<xsl:when test="$content='2'">x2</xsl:when>
