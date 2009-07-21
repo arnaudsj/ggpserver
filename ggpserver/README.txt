@@ -56,11 +56,13 @@ mysql -u root -p < 03_add_games.sql
 
 permission java.net.SocketPermission "*", "connect,resolve";  // required for database access to 127.0.0.1:3306 and for connecting to the players
 permission java.util.PropertyPermission "file.encoding", "read";
+permission java.util.PropertyPermission "java.io.tmpdir", "read";
 permission java.util.PropertyPermission "org.apache.jasper.runtime.BodyContentImpl.LIMIT_BUFFER", "read";
 permission java.util.logging.LoggingPermission "control";
 permission java.io.FilePermission "${catalina.base}${file.separator}webapps${file.separator}ggpserver${file.separator}WEB-INF${file.separator}classes${file.separator}logging.properties", "read";
 permission java.io.FilePermission "${catalina.base}${file.separator}logs", "read, write";
 permission java.io.FilePermission "${catalina.base}${file.separator}logs${file.separator}*", "read, write";
+permission java.io.FilePermission "${java.io.tmpdir}${file.separator}*", "read, write, delete"; // required for exporting tournaments/matches
 
 # ========================================================================================
 
