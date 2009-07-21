@@ -46,8 +46,9 @@
 	
 	<h1 class="notopborder">Recent changes</h1>
 		<ul>
-			<li>The server now supports manual creation of tournaments. For now, this functionality is limited to admins in order to avoid the permission complexities of who may schedule what player for which tournament.</li>
-			<li>The show_matches.jsp overview page now goes automatically to the last page.</li>
+			<li>XML files for the matches of a tournament can now be exported on the <a href="<%= request.getContextPath() + response.encodeURL("/public/show_tournaments.jsp") %>">tournaments page</a></li>
+			<li>A leaderboard is generated for each tournament.</li>
+			<li>Messages to players can be scrambled. (Scrambling is not enabled for round robin mode.)</li>
 		</ul>
 
 	<h1 class="notopborder">Sourceforge project</h1>
