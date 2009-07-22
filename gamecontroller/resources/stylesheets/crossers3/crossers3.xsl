@@ -313,9 +313,7 @@
 			<xsl:attribute name="class">wall_<xsl:value-of select="$type"/></xsl:attribute>
 			<xsl:if test="fact[prop-f='WALL' and arg[1]=$col1 and arg[2]=$row1 and arg[3]=$col2 and arg[4]=$row2]">
 				<img>
-					<xsl:attribute name="src">
-						<xsl:value-of select="$stylesheetURL"/>/crossers3/crosserswall_<xsl:value-of select="$type"/>.gif
-					</xsl:attribute>
+					<xsl:attribute name="src"><xsl:value-of select="$stylesheetURL"/>/crossers3/crosserswall_<xsl:value-of select="$type"/>.gif</xsl:attribute>
 				</img>
 			</xsl:if>
 		</div>
@@ -327,17 +325,13 @@
 		<div>
 			<xsl:attribute name="class">cell<xsl:for-each select="fact[prop-f='POS' and arg[2]=$col and arg[3]=$row]"><xsl:sort select="arg[1]"/>_<xsl:value-of select="arg[1]"/></xsl:for-each></xsl:attribute>
 			<img>
-				<xsl:attribute name="src">
-					<xsl:value-of select="$stylesheetURL"/>/crossers3/
+				<xsl:variable name="pitimage">
 					<xsl:choose>
-						<xsl:when test="fact[prop-f='POS' and arg[2]=$col and arg[3]=$row]">
-							crossersboardpit.gif
-						</xsl:when>
-						<xsl:otherwise>
-							crossersboardpitb.gif
-						</xsl:otherwise>
+						<xsl:when test="fact[prop-f='POS' and arg[2]=$col and arg[3]=$row]">crossersboardpit.gif</xsl:when>
+						<xsl:otherwise>crossersboardpitb.gif</xsl:otherwise>
 					</xsl:choose>
-				</xsl:attribute>
+				</xsl:variable>
+				<xsl:attribute name="src"><xsl:value-of select="$stylesheetURL"/>crossers3/<xsl:value-of select="$pitimage"/></xsl:attribute>
 			</img>
 		</div>
 	</xsl:template>
