@@ -71,6 +71,10 @@
 	<zip destfile="stylesheets.zip">
 		<zipfileset dir="resources/stylesheets" prefix="stylesheets">
 			<exclude name="**/.svn/"/>
+			<exclude name="generic/sitespecific.xsl"/>
+		</zipfileset>
+		<zipfileset dir="resources/stylesheets-export" prefix="stylesheets">
+			<exclude name="**/.svn/"/>
 		</zipfileset>
 		<zipfileset dir="." prefix="stylesheets">
 			<include name="LICENSE"/>

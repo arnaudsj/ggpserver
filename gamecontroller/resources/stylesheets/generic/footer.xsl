@@ -17,7 +17,9 @@
 				<xsl:call-template name="webmaster"/>
 			</span>
 			<br/>
-			Visualization and design partially provided by the <a href="http://logic.stanford.edu/">Stanford Logic Group</a>.
+			This visualization is part of <a href="http://ggpserver.sourceforge.net/">GGP Server</a>.
+			<br/>
+			Design partially provided by the <a href="http://logic.stanford.edu/">Stanford Logic Group</a>.
 			<br/>
 			
 		</div>
