@@ -182,7 +182,8 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 				else reply += line;
 			}
 		} catch (InterruptedIOException e) {
-			e.printStackTrace();
+			String message = "error: io error for "+ this+" : "+e.getMessage();
+			logErrorMessage(GameControllerErrorMessage.IO_ERROR, message);
 			Thread.currentThread().interrupt();
 		} catch (UnknownHostException e) {
 			String message = "error: unknown host \""+ host+ "\"";
