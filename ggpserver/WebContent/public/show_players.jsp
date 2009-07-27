@@ -50,6 +50,12 @@
 				<th>player name</th>
 				<th>owner</th>
 				<th>status</th>
+				<c:if test='${navigationUserBean.user != null}'>
+					<c:if test='<%= navigationUserBean.getUser().hasRole("admin") %>'>
+						<th>host</th>
+						<th>port</th>
+					</c:if>
+				</c:if>
 			</tr>
 		</thead>
 		<tbody>
@@ -71,6 +77,12 @@
 				</td>
 				<td>${player.owner.userName}</td>
 				<td><div class="playerstatus-${player.status}"><span>${player.status}</span></div></td>
+				<c:if test='${navigationUserBean.user != null}'>
+					<c:if test='<%= navigationUserBean.getUser().hasRole("admin") %>'>
+						<td>${player.host}</td>
+						<td>${player.port}</td>
+					</c:if>
+				</c:if>
 			</tr>
 	      </c:forEach>
 		</tbody>
