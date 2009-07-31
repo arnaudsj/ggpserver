@@ -58,7 +58,7 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 	 * the maximum time (milliseconds) to wait until the connection to the player is established
 	 * (the start/playclock only start after that)
 	 */
-	private static final int CONNECTION_TIMEOUT = 2000;
+	private static final int CONNECTION_TIMEOUT = 5000;
 	
 	public RemotePlayer(String name, String host, int port, MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory, GameScramblerInterface gamescrambler) {
 		super(name);
@@ -85,7 +85,7 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 				" ("+gameScrambler.scramble(match.getGame().getKIFGameDescription()).toUpperCase()+") "+
 				match.getStartclock()+" "+match.getPlayclock()+")";
 		notifyStartRunning();
-		String reply=sendMsg(msg, match.getStartclock(), notifier);
+		String reply=sendMsg(msg, notifier);
 		notifyStopRunning();
 		logger.info("reply from "+this.getName()+": "+reply+ " after "+getLastMessageRuntime()+"ms");
 			
@@ -102,7 +102,7 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 		msg+=")";
 		String reply, descrambledReply;
 		notifyStartRunning();
-		reply=sendMsg(msg, match.getPlayclock(), notifier);
+		reply=sendMsg(msg, notifier);
 		notifyStopRunning();
 		logger.info("reply from "+this.getName()+": "+reply+ " after "+getLastMessageRuntime()+"ms");
 		if(reply!=null){
@@ -132,12 +132,12 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 		}
 		msg+=")";
 		//notifyStartRunning(); // don't count time for the stop message
-		/*String reply=*/ sendMsg(msg, match.getPlayclock(), notifier);
+		/*String reply=*/ sendMsg(msg, notifier);
 		//notifyStopRunning();
 		//logger.info("reply from "+this.getName()+": "+reply+ " after "+getLastMessageRuntime()+"ms");
 	}
 
-	private String sendMsg(String msg, int timeout, MessageSentNotifier notifier) {
+	private String sendMsg(String msg, MessageSentNotifier notifier) {
 		String reply=null;
 		Socket s=null;
 		OutputStream out=null;
