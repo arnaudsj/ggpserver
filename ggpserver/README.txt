@@ -25,7 +25,7 @@ sudo apt-get install mysql-server
 
 # Steps to install under Ubuntu:
 
-sudo apt-get install libmysql-java
+sudo apt-get install libmysql-java libcommons-lang-java
 sudo ln -s /usr/share/java/mysql-connector-java.jar /usr/share/tomcat5.5/common/lib/
 sudo ln -s /usr/share/java/commons-lang.jar /usr/share/tomcat5.5/common/lib/
 
