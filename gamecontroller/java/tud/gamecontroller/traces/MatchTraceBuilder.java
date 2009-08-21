@@ -70,6 +70,7 @@ public class MatchTraceBuilder implements GameControllerListener {
 	/**
 	 * @param jointmove may be null
 	 */
+	@SuppressWarnings("unchecked")
 	public void addTracedStep(JointMoveInterface<? extends TermInterface> jointmove, 
 			StateInterface<? extends TermInterface, ?> state) {
 		
