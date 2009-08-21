@@ -9,7 +9,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 	<xsl:template name="header">
-		<div class="header">
+		<div class="header" id="header">
 			<xsl:variable name="currentStep" select="count(/match/history/step)+1"/>
 			
 			<span class="heading">Match:</span><span class="content"><xsl:value-of select="/match/match-id"/></span>
@@ -33,6 +33,20 @@
 			</xsl:call-template>
 			<div class="underline" style="clear:left;"/>
 		</div>
+		<script language="JavaScript" type="text/javascript">
+			// &lt;!--
+			<![CDATA[
+					// replace links by javascript
+					var link_ids = new Array("navigation_initial", "navigation_previous", "navigation_next", "navigation_final");
+					for(i=0; i<link_ids.length; i++) {
+						if(document.links[link_ids[i]] != null) {
+							document.links[link_ids[i]].href = 'javascript:location.replace("' + document.links[link_ids[i]].href + '")';
+						}
+					}
+			]]>
+			// --&gt;
+		</script>
+		
 	</xsl:template>
 
 	<xsl:template name="make_tab">
@@ -41,6 +55,8 @@
 
 		<div class="bartab">
 			<a>
+				
+				<xsl:attribute name="id">navigation_<xsl:value-of select="$which"/></xsl:attribute>
 				
 				<xsl:variable name="linkStep">
 					<xsl:choose>
