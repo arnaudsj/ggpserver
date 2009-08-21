@@ -22,6 +22,7 @@ package tud.ggpserver.formhandlers;
 import java.sql.SQLException;
 import java.util.List;
 
+import tud.gamecontroller.players.PlayerInfo;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.Tournament;
@@ -29,18 +30,96 @@ import tud.ggpserver.datamodel.Tournament;
 public class ViewTournament {
 	
 	private String tournamentID;
+	
+	@SuppressWarnings("unchecked")
+	private Tournament tournament;
+
+	private String sortBy;
+	
+	private int sortByInt = Tournament.FIELD_TOTAL_REWARD;
+
+	private String sortOrder;
+
+	private int sortOrderInt = Tournament.SORT_ORDER_DESCENDING;
+	
+	public final static String[] fieldNames = {"player", "numberOfMatches", "totalReward", "averageReward"};
+
+	public final static String[] fieldDescriptions = {"player", "number of matches", "total reward", "average reward"};
+	
+	public String[] getFieldNames() {
+		return fieldNames;
+	}
+
+	public String[] getFieldDescriptions() {
+		return fieldDescriptions;
+	}
 
 	public String getTournamentID() {
 		return tournamentID;
 	}
 
-	public void setTournamentID(String tournamentID) {
+	public void setTournamentID(String tournamentID) throws SQLException {
 		this.tournamentID = tournamentID;
+		AbstractDBConnector<?, ?> db = DBConnectorFactory.getDBConnector();
+		tournament = db.getTournament(tournamentID);
 	}
 
+	public Object getValue(PlayerInfo player, int field) {
+		switch(field){
+			case Tournament.FIELD_PLAYER: return player.getName();
+			case Tournament.FIELD_NUMBER_OF_MATCHES: return tournament.getNumberOfMatches(player);
+			case Tournament.FIELD_TOTAL_REWARD: return tournament.getTotalReward(player);
+			case Tournament.FIELD_AVERAGE_REWARD: return tournament.getAverageReward(player);
+			default: return null;
+		}
+	}
+	
+	/**
+	 * 
+	 * @param sortBy one of "player", "numberOfMatches", "totalReward", or "averageReward"
+	 */
+	public void setSortBy(String sortBy) {
+		if(sortBy.equals(fieldNames[Tournament.FIELD_PLAYER]))
+			this.sortByInt = Tournament.FIELD_PLAYER;
+		else if(sortBy.equals(fieldNames[Tournament.FIELD_NUMBER_OF_MATCHES]))
+			this.sortByInt = Tournament.FIELD_NUMBER_OF_MATCHES;
+		else if(sortBy.equals(fieldNames[Tournament.FIELD_TOTAL_REWARD]))
+			this.sortByInt = Tournament.FIELD_TOTAL_REWARD;
+		else if(sortBy.equals(fieldNames[Tournament.FIELD_AVERAGE_REWARD]))
+			this.sortByInt = Tournament.FIELD_AVERAGE_REWARD;
+		else
+			throw new IllegalArgumentException("unknown sort field:"+sortBy);
+		this.sortBy = sortBy;
+	}
 
-	public Tournament getTournament() throws SQLException {
-		AbstractDBConnector db = DBConnectorFactory.getDBConnector();
+	public String getSortBy() {
+		return sortBy;
+	}
+	
+	/**
+	 * 
+	 * @param sortOrder one of "asc", "desc"
+	 */
+	public void setSortOrder(String sortOrder) {
+		if(sortOrder.equals("asc"))
+			this.sortOrderInt = Tournament.SORT_ORDER_ASCENDING;
+		else if(sortOrder.equals("desc"))
+			this.sortOrderInt = Tournament.SORT_ORDER_DESCENDING;
+		else
+			throw new IllegalArgumentException("unknown sort order:"+sortOrder);
+		this.sortOrder = sortOrder;
+	}
+
+	public String getSortOrder() {
+		return sortOrder;
+	}
+
+	public List<PlayerInfo> getOrderedPlayers() throws SQLException {
+		return getTournament().getOrderedPlayers(sortByInt, sortOrderInt);
+	}
+
+	public Tournament<?, ?> getTournament() throws SQLException {
+		AbstractDBConnector<?, ?> db = DBConnectorFactory.getDBConnector();
 		return db.getTournament(tournamentID);
 	}
 }

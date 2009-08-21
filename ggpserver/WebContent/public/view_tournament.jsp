@@ -23,6 +23,8 @@
 <jsp:useBean id="viewTournament" class="tud.ggpserver.formhandlers.ViewTournament" scope="page">
 	<c:catch>
 		<jsp:setProperty name="viewTournament" property="tournamentID"/>
+		<jsp:setProperty name="viewTournament" property="sortBy"/>
+		<jsp:setProperty name="viewTournament" property="sortOrder"/>
 	</c:catch>
 </jsp:useBean>
 
@@ -43,14 +45,43 @@
 	<table>
 		<thead>
 			<tr>
-				<th>player</th>
-				<th>number of matches</th>
-				<th>total reward</th>
-				<th>average reward</th>
+				<c:forEach var="field" items="${viewTournament.fieldNames}" varStatus="fieldInfo">
+
+					<c:url value="view_tournament.jsp" var="sortURL">
+					    <c:param name="tournamentID" value="${viewTournament.tournamentID}"/>
+					    <c:param name="sortBy" value="${field}"/>
+					    <c:choose>
+					    	<c:when test="${field != viewTournament.sortBy}">
+					    		<c:param name="sortOrder" value="desc" />
+					    	</c:when>
+					    	<c:when test="${viewTournament.sortOrder != 'desc'}">
+					    		<c:param name="sortOrder" value="desc" />
+					    	</c:when>
+					    	<c:otherwise>
+					    		<c:param name="sortOrder" value="asc" />
+					    	</c:otherwise>
+						</c:choose>
+					</c:url>
+					<th style="vertical-align: middle;">
+						<a href="${sortURL}">
+							${viewTournament.fieldDescriptions[fieldInfo.count - 1]}
+							<c:if test="${field == viewTournament.sortBy}">
+							    <c:choose>
+							    	<c:when test="${viewTournament.sortOrder == 'desc'}">
+							    		<img src='<%= request.getContextPath() + "/icons/other/16_downarrow.png" %>' />
+							    	</c:when>
+							    	<c:otherwise>
+							    		<img src='<%= request.getContextPath() + "/icons/other/16_uparrow.png" %>' />
+							    	</c:otherwise>
+								</c:choose>
+							</c:if>
+						</a>
+					</th>
+				</c:forEach>
 			</tr>
 		</thead>
 		<tbody>
-	      <c:forEach var="player" items="${viewTournament.tournament.orderedPlayers}" varStatus="lineInfo">
+	      <c:forEach var="player" items="${viewTournament.orderedPlayers}" varStatus="lineInfo">
 	      	 <c:choose>
 			   <c:when test="${lineInfo.count % 2 == 0}">
 			     <c:set var="rowClass" value="even" />

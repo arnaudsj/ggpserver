@@ -19,24 +19,19 @@
 
 package tud.ggpserver.util;
 
-import tud.ggpserver.datamodel.DBConnectorFactory;
-import tud.ggpserver.datamodel.AbstractDBConnector;
-import tud.ggpserver.datamodel.matches.ServerMatch;
-import tud.ggpserver.datamodel.Tournament;
-import tud.ggpserver.datamodel.Game;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import tud.gamecontroller.players.PlayerInfo;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.LinkedList;
-import java.util.logging.Logger;
-import java.util.zip.ZipOutputStream;
-import java.util.zip.ZipEntry;
-
-import java.nio.charset.Charset;
-
-import java.sql.SQLException;
+import tud.ggpserver.datamodel.AbstractDBConnector;
+import tud.ggpserver.datamodel.DBConnectorFactory;
+import tud.ggpserver.datamodel.Tournament;
+import tud.ggpserver.datamodel.matches.ServerMatch;
 
 
 /**

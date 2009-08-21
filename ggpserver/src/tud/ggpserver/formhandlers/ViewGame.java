@@ -26,7 +26,7 @@ import tud.ggpserver.datamodel.Game;
 
 public class ViewGame {
 	private String name = "";
-	private Game game = null;
+	private Game<?, ?> game = null;
 
 	public String getName() {
 		return name;
@@ -36,7 +36,7 @@ public class ViewGame {
 		this.name = name;
 	}
 
-	public Game getGame() throws SQLException {
+	public Game<?, ?> getGame() throws SQLException {
 		if(game == null){
 			game = DBConnectorFactory.getDBConnector().getGame(name);
 		}

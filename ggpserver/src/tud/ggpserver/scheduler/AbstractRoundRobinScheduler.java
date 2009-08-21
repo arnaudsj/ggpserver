@@ -188,7 +188,6 @@ public class AbstractRoundRobinScheduler<TermType extends TermInterface, Reasone
 		setRunning(false);
 	}
 
-	@SuppressWarnings("unchecked")
 	private List<NewMatch<TermType, ReasonerStateInfoType>> createMatches() throws SQLException, InterruptedException {
 		int playclock;
 		int startclock;

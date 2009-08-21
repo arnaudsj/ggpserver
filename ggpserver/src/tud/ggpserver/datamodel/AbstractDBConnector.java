@@ -1584,7 +1584,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return getGame(nextGameName);
 	}
 	
-	public void setNextPlayedGame(Game nextPlayedGame) throws SQLException {
+	public void setNextPlayedGame(Game<?, ?> nextPlayedGame) throws SQLException {
 		storeConfigEntry(NEXT_PLAYED_GAME, nextPlayedGame.getName());
 	}
 
@@ -1691,7 +1691,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return datasource.getConnection();
 	}
 	
-	public static String generateMatchID(GameInterface game, String appendix) {
+	public static String generateMatchID(GameInterface<?, ?> game, String appendix) {
 		String firstPart;
 		if (game == null) {
 			firstPart = "null";

@@ -20,16 +20,14 @@
 package tud.ggpserver.datamodel;
 
 import java.sql.SQLException;
-import java.util.AbstractMap;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.matches.ServerMatch;
@@ -42,11 +40,22 @@ public class Tournament<TermType extends TermInterface, ReasonerStateInfoType> {
 	private final User owner;
 	private Map<PlayerInfo, Integer> numberOfMatches = new HashMap<PlayerInfo, Integer>();
 	private Map<PlayerInfo, Integer> totalReward = new HashMap<PlayerInfo, Integer>();
-//	private List<Integer> orderedNumberOfMatches;
-//	private List<Integer> orderedTotalRewards;
-	private List<PlayerInfo> orderedPlayers;
+	private Map<PlayerInfo, Double> averageReward = null;
+	private List<PlayerInfo> orderedPlayers = null;
 
 	private final AbstractDBConnector<TermType, ReasonerStateInfoType> db;
+	
+	private int sortBy;
+	
+	public static final int FIELD_PLAYER = 0;
+	public static final int FIELD_NUMBER_OF_MATCHES = 1;
+	public static final int FIELD_TOTAL_REWARD = 2;
+	public static final int FIELD_AVERAGE_REWARD = 3;
+	
+	private int sortOrder;
+	
+	public static final int SORT_ORDER_ASCENDING = 0;
+	public static final int SORT_ORDER_DESCENDING = 1;
 
 	public Tournament(final String tournamentID, final User owner, AbstractDBConnector<TermType, ReasonerStateInfoType> db) {
 		this.tournamentID = tournamentID;
@@ -86,10 +95,6 @@ public class Tournament<TermType extends TermInterface, ReasonerStateInfoType> {
 		return new HashMap<PlayerInfo, Integer>(totalReward);
 	}
 
-	public void setTotalReward(Map<PlayerInfo, Integer> totalReward) {
-		this.totalReward = new HashMap<PlayerInfo, Integer>(totalReward);
-	}
-
 	public int getTotalReward(PlayerInfo player) {
 		return totalReward.get(player);
 	}
@@ -99,41 +104,64 @@ public class Tournament<TermType extends TermInterface, ReasonerStateInfoType> {
 	}
 	
 	public Map<PlayerInfo, Double> getAverageReward() {
-		Map<PlayerInfo, Double> averageReward = new HashMap<PlayerInfo, Double>();
-		for (PlayerInfo playerInfo : getOrderedPlayers()) {
-			int count = getNumberOfMatches(playerInfo);
-			if (count > 0) {
-				averageReward.put(playerInfo, ((double) getTotalReward(playerInfo)) / count);
-			} else {
-				averageReward.put(playerInfo, 0.0);
+		if(averageReward == null) {
+			averageReward = new HashMap<PlayerInfo, Double>();
+			for (PlayerInfo playerInfo : getPlayers()) {
+				int count = getNumberOfMatches(playerInfo);
+				if (count > 0) {
+					averageReward.put(playerInfo, ((double) getTotalReward(playerInfo)) / count);
+				} else {
+					averageReward.put(playerInfo, 0.0);
+				}
 			}
 		}
 		return averageReward;
 	}
 
+	public double getAverageReward(PlayerInfo player) {
+		return getAverageReward().get(player).doubleValue();
+	}
+
+	public Collection<PlayerInfo> getPlayers() {
+		return totalReward.keySet();
+	}
+
 	public List<PlayerInfo> getOrderedPlayers() {
-		if (orderedPlayers == null) {
-			orderedPlayers = initOrderedPlayers();
+		return getOrderedPlayers(FIELD_TOTAL_REWARD, SORT_ORDER_DESCENDING);
+	}
+
+	public List<PlayerInfo> getOrderedPlayers(int sortBy, int sortOrder) {
+		if (orderedPlayers == null || sortBy != this.sortBy || sortOrder != this.sortOrder) {
+			orderedPlayers = initOrderedPlayers(sortBy, sortOrder);
 		}
 		return orderedPlayers;
 	}
-	
-	private List<PlayerInfo> initOrderedPlayers() {
-		List<PlayerInfo> result = new LinkedList<PlayerInfo>();
-		
-		List<Entry<PlayerInfo, Integer>> entryList = new LinkedList<Entry<PlayerInfo, Integer>>(totalReward.entrySet());
-		Collections.sort(entryList
-				, new Comparator<Entry<PlayerInfo, Integer>>() {
-			@Override
-			public int compare(Entry<PlayerInfo, Integer> firstEntry,
-					Entry<PlayerInfo, Integer> secondEntry) {
-				return secondEntry.getValue() - firstEntry.getValue();
-			}
-		});
-		
-		for (Entry<PlayerInfo, Integer> entry : entryList) {
-			result.add(entry.getKey());
-		}
+
+	private List<PlayerInfo> initOrderedPlayers(final int sortBy, final int sortOrder) {
+		List<PlayerInfo> result = new LinkedList<PlayerInfo>(getPlayers());
+		Collections.sort(result
+			, new Comparator<PlayerInfo>() {
+				@Override
+				public int compare(PlayerInfo firstEntry,
+						PlayerInfo secondEntry) {
+					int compare;
+					switch(sortBy){
+						case FIELD_PLAYER:
+							compare = firstEntry.getName().compareToIgnoreCase(secondEntry.getName());
+							break;
+						case FIELD_NUMBER_OF_MATCHES:
+							compare = getNumberOfMatches(firstEntry) - getNumberOfMatches(secondEntry);
+							break;
+						case FIELD_AVERAGE_REWARD:
+							compare = Double.compare(getAverageReward(firstEntry), getAverageReward(secondEntry));
+							break;
+						default: // case SORT_FIELD_TOTAL_REWARD:
+							compare = getTotalReward(firstEntry) - getTotalReward(secondEntry);
+							break;
+					}
+					return sortOrder == SORT_ORDER_ASCENDING ? compare : -compare;
+				}
+			});
 		return result;
 	}
 	
@@ -153,7 +181,7 @@ public class Tournament<TermType extends TermInterface, ReasonerStateInfoType> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		final Tournament other = (Tournament) obj;
+		Tournament<?, ?> other = (Tournament<?, ?>) obj;
 		if (tournamentID == null) {
 			if (other.tournamentID != null)
 				return false;

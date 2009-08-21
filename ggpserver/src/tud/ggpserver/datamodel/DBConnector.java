@@ -166,7 +166,7 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 
 	private void clearCacheForGame(String gameName) throws SQLException {
 		// this has to be done first, or otherwise this call to getGame() will be cached
-		Game game = getGame(gameName);
+		Game<?, ?> game = getGame(gameName);
 		
 		synchronized (games) {
 			// delete cached result, so it will be read again on next request
@@ -175,7 +175,7 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 		
 		// also remove all cached matches of this game (to prevent the stale-stylesheet-bug).
 		synchronized (matches) {
-			for (ServerMatch match : new LinkedList<ServerMatch>(matches.values())) {
+			for (ServerMatch<?, ?> match : new LinkedList<ServerMatch<?, ?>>(matches.values())) {
 					// new LinkedList(...) necessary to avoid concurrent iteration and modification
 				if (match.getGame().equals(game)) {
 					matches.remove(match.getMatchID());
@@ -354,7 +354,7 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 		
 		// remove all cached matches of this player. 
 		synchronized (matches) {
-			for (ServerMatch match : new LinkedList<ServerMatch<Term, GameState>>(matches.values())) {
+			for (ServerMatch<?, ?> match : new LinkedList<ServerMatch<Term, GameState>>(matches.values())) {
 					// new LinkedList(...) necessary to avoid concurrent iteration and modification
 				if (match.getPlayerInfos().contains(player)) {
 					clearCacheForMatch(match.getMatchID());

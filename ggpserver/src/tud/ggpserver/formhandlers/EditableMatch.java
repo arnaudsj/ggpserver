@@ -21,7 +21,6 @@ package tud.ggpserver.formhandlers;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import java.util.Map;
@@ -42,7 +41,7 @@ public class EditableMatch {
 	private int startclock;
 	private int playclock;
 	private List<PlayerInfo> playerInfos;
-	private Map<RoleInterface, Integer> goalValues;
+	private Map<RoleInterface<?>, Integer> goalValues;
 	
 	private boolean scrambled = false;  
 		// this is false by default (and not shadowedMatch.isScrambled), because
@@ -93,7 +92,7 @@ public class EditableMatch {
 		if (goalValues == null) {
 			throw new IllegalStateException("Goal values can only be changed for FinishedMatches, and match is not finished: " + shadowedMatch);
 		}
-		List<? extends RoleInterface> roles = game.getOrderedRoles();
+		List<? extends RoleInterface<?>> roles = game.getOrderedRoles();
 		goalValues.put(roles.get(roleNumber), goalValue);
 	}
 	

@@ -105,7 +105,6 @@ public class SaveTournament {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private void parseGameName(String matchID, String[] params) throws SQLException {
 		if (params.length == 1) {
 			getEditableMatch(matchID).setGame(params[0]);

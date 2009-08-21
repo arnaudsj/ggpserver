@@ -42,7 +42,7 @@ public class EditGame extends AbstractGameValidator {
 	public void setGameName(String gameName) {
 		super.setGameName(gameName);
 		try {
-			Game game = getDBConnector().getGame(gameName);
+			Game<?, ?> game = getDBConnector().getGame(gameName);
 			if (game == null) {
 				getErrorsGameName().add("there is no game with name '" + gameName + "'");
 			} else {

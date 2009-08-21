@@ -430,6 +430,28 @@ span.highlight {
 	padding-top:       16px;
 }
 
+/* sort order indication (up or down arrow after column heading) */
+div.sorted_asc {
+  background: url(icons/other/16_uparrow.png) no-repeat;
+  display:             inline-block;
+  height:              16px;
+  width:               16px;
+  float:               left;
+}
+div.sorted_asc span {
+  visibility:          hidden;
+}
+
+div.sorted_desc {
+  background: url(icons/other/16_downarrow.png) no-repeat;
+  display:             inline-block;
+  height:              16px;
+  width:               16px;
+  float:               left;
+}
+div.sorted_desc span {
+  visibility:          hidden;
+}
 
 /* 
 .playerstatus-active {
