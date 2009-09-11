@@ -1,4 +1,14 @@
-<%@ page language="java" contentType="application/x-zip" pageEncoding="UTF-8"%><%@ page import="tud.ggpserver.util.StateXMLExporter" %><%@ page import="java.util.zip.ZipOutputStream" %><%@ page import="java.io.File" %><%@ page import="java.io.FileOutputStream" %><%@ page import="java.io.FileInputStream" %><%@ page import="java.io.BufferedInputStream" %><%@ page import="java.io.OutputStream" %><%
+<%@ page language="java" contentType="application/x-zip" pageEncoding="UTF-8"%>
+
+<%@ page import="tud.ggpserver.util.StateXMLExporter" %>
+<%@ page import="java.util.zip.ZipOutputStream" %>
+<%@ page import="java.io.File" %>
+<%@ page import="java.io.FileOutputStream" %>
+<%@ page import="java.io.FileInputStream" %>
+<%@ page import="java.io.BufferedInputStream" %>
+<%@ page import="java.io.OutputStream" %>
+<%
+	out.clearBuffer(); // to remove newline characters up to here 
 	String tournamentID = request.getParameter("tournamentID");
 	String matchID = request.getParameter("matchID");
 	String zipName = null;
