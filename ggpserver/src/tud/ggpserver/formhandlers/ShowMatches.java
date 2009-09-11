@@ -26,15 +26,14 @@ import java.util.List;
 
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
-import tud.ggpserver.datamodel.matches.RunningMatch;
+import tud.ggpserver.datamodel.matches.ServerMatch;
 
 public class ShowMatches extends AbstractPager {
 	private String playerName = null;
 	private String gameName = null;
 	private String tournamentID = null;
 
-	@SuppressWarnings("unchecked")
-	private List<RunningMatch> matches = null;
+	private List<? extends ServerMatch<?,?>> matches = null;
 
 	@SuppressWarnings("unchecked")
 	protected final AbstractDBConnector db = DBConnectorFactory.getDBConnector();
@@ -62,7 +61,7 @@ public class ShowMatches extends AbstractPager {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<RunningMatch> getMatches() throws SQLException {
+	public List<? extends ServerMatch<?, ?>> getMatches() throws SQLException {
 		if (matches == null) {
 			matches = db.getMatches(getStartRow(), getNumDisplayedRows(), playerName, gameName, tournamentID, excludeNewMatches());
 		}

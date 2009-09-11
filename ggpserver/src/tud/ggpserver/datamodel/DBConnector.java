@@ -101,7 +101,6 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void clearCache() {
 		synchronized (games) {
 			games.clear();

@@ -38,6 +38,7 @@ import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.players.RandomPlayerInfo;
 import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
+import tud.ggpserver.datamodel.ConfigOption;
 import tud.ggpserver.datamodel.Game;
 import tud.ggpserver.datamodel.matches.NewMatch;
 import tud.ggpserver.datamodel.matches.RunningMatch;
@@ -118,10 +119,10 @@ public class AbstractRoundRobinScheduler<TermType extends TermInterface, Reasone
 		return gamePicker.getNextPlayedGame();
 	}
 
-	public synchronized void setNextPlayedGame(Game<TermType, ReasonerStateInfoType> nextPlayedGame) throws SQLException {
-		gamePicker.setNextPlayedGame(nextPlayedGame);
+	public synchronized void setNextPlayedGame(String name) throws SQLException {
+		gamePicker.setNextPlayedGame(name);
 	}
-	
+
 	public boolean isRunning() {
 		return running;
 	}
@@ -202,9 +203,18 @@ public class AbstractRoundRobinScheduler<TermType extends TermInterface, Reasone
 			playclock = 5;
 			startclock = 5;
 		} else {
-			// pick playclock (5, 10, ..., 60 seconds)
-			playclock = ((int) (random.nextDouble() * 12 + 1)) * 5;
-			startclock = 6 * playclock;
+			int playclockMin = getPlayClockMin();
+			int playclockMax = getPlayClockMax();
+			int startclockMin = getStartClockMin();
+			int startclockMax = getStartClockMax();
+			
+			// pick playclock as a multiple of 5 somewhere between playclockMin and playclockMax
+			playclock =  playclockMin + 5 * random.nextInt( ( playclockMax - playclockMin) / 5 + 1 );
+			// ((int) (random.nextDouble() * 12 + 1)) * 5;
+			
+			// the same for startclock
+			startclock =  startclockMin + 5 * random.nextInt( ( startclockMax - startclockMin) / 5 + 1 );
+			// startclock = 6 * playclock;
 		}
 		
 		List<NewMatch<TermType, ReasonerStateInfoType>> result = new LinkedList<NewMatch<TermType,ReasonerStateInfoType>>();
@@ -223,6 +233,32 @@ public class AbstractRoundRobinScheduler<TermType extends TermInterface, Reasone
 			result.add(db.createMatch(nextGame, startclock, playclock, rolesToPlayerInfos, db.getTournament(ROUND_ROBIN_TOURNAMENT_ID)));
 		}
 		return result;
+	}
+
+	private int getIntOption(ConfigOption option) throws SQLException {
+		String s = db.getConfigOption(option);
+		try {
+			return Integer.parseInt(s);
+		} catch (NumberFormatException e) {
+			logger.severe("NumberFormatException while parsing config option " + option + ":" + e.getMessage());
+			return 42;
+		}
+	}
+	
+	private int getStartClockMax() throws SQLException {
+		return getIntOption(ConfigOption.START_CLOCK_MAX);
+	}
+
+	private int getStartClockMin() throws SQLException {
+		return getIntOption(ConfigOption.START_CLOCK_MIN);
+	}
+
+	private int getPlayClockMax() throws SQLException {
+		return getIntOption(ConfigOption.PLAY_CLOCK_MAX);
+	}
+
+	private int getPlayClockMin() throws SQLException {
+		return getIntOption(ConfigOption.PLAY_CLOCK_MIN);
 	}
 
 	private List<Map<RoleInterface<TermType>, PlayerInfo>> createPlayerInfos(Game<TermType, ReasonerStateInfoType> game, Collection<? extends PlayerInfo> activePlayers) {

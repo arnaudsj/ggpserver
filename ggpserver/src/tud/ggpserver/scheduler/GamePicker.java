@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 
 import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
+import tud.ggpserver.datamodel.ConfigOption;
 import tud.ggpserver.datamodel.Game;
 
 public class GamePicker<TermType extends TermInterface, ReasonerStateInfoType> {
@@ -57,7 +58,7 @@ public class GamePicker<TermType extends TermInterface, ReasonerStateInfoType> {
 		} 
 
 		int newNextPlayedGameIndex = (allGames.indexOf(oldNextPlayedGame) + 1) % allGames.size(); 
-		setNextPlayedGame(allGames.get(newNextPlayedGameIndex));
+		setNextPlayedGame(allGames.get(newNextPlayedGameIndex).getName());
 		
 		return oldNextPlayedGame;
 	}
@@ -81,8 +82,8 @@ public class GamePicker<TermType extends TermInterface, ReasonerStateInfoType> {
 		return nextPlayedGame;
 	}
 
-	public void setNextPlayedGame(Game<TermType, ReasonerStateInfoType> nextPlayedGame) throws SQLException {
-		getDBConnector().setNextPlayedGame(nextPlayedGame);
+	public void setNextPlayedGame(String nextPlayedGameName) throws SQLException {
+		getDBConnector().setConfigOption(ConfigOption.NEXT_PLAYED_GAME, nextPlayedGameName);
 	}
 
 	

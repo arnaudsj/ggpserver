@@ -4,10 +4,15 @@
     <property name="ECLIPSE_HOME" value="/usr/lib/eclipse"/>
     <property name="junit.output.dir" value="junit"/>
     <property name="gamecontroller.location" value="../gamecontroller"/>
+    <property name="ggpratingsystem.location" value="../GgpRatingSystem"/>
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.6"/>
     <property name="source" value="1.6"/>
     <import file="ant_create_war.xml"/>
+    <path id="ggpratingsystem.classpath">
+	    <pathelement location="${ggpratingsystem.location}/build/jar/GgpRatingSystem.jar"/>
+	    <!-- <pathelement location="${ggpratingsystem.location}/lib/GgpRatingSystem.jar"/> -->
+    </path>
     <path id="gamecontroller.classpath">
         <pathelement location="${gamecontroller.location}/bin"/>
         <pathelement location="${gamecontroller.location}/lib/BenderNG/lib/antlr.jar"/>
@@ -54,6 +59,7 @@
     </path>
     <path id="ggpserver.classpath">
         <pathelement location="build/classes"/>
+        <path refid="ggpratingsystem.classpath"/>
         <path refid="gamecontroller.classpath"/>
         <path refid="Apache Tomcat v5.5 [Apache Tomcat v5.5].libraryclasspath"/>
         <path refid="JUnit 4.libraryclasspath"/>
@@ -73,6 +79,7 @@
     </target>
     <target depends="build-subprojects,build-project" name="build"/>
     <target name="build-subprojects">
+        <ant antfile="${ggpratingsystem.location}/build.xml" inheritAll="false" target="jar"/>
         <ant antfile="${gamecontroller.location}/my-build.xml" inheritAll="false" target="build-project"/>
         <ant antfile="${gamecontroller.location}/my-build.xml" inheritAll="false" target="jar"/>
     </target>

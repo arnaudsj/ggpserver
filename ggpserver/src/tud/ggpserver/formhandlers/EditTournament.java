@@ -53,7 +53,7 @@ public class EditTournament extends ShowMatches {
 	private boolean correctlyPerformed = false;
 
 	@SuppressWarnings("unchecked")
-	public List<Game<?, ?>> getGames() throws SQLException {
+	public List<? extends Game<?, ?>> getGames() throws SQLException {
 		return db.getAllEnabledGames();
 	}
 
@@ -132,8 +132,8 @@ public class EditTournament extends ShowMatches {
 	
 	@SuppressWarnings("unchecked")
 	private void addMatch() throws SQLException {
-		List<Game<?, ?>> allEnabledGames = db.getAllEnabledGames();
-		Game<?, ?> game = allEnabledGames.get(0);
+		List<? extends Game<?, ?>> allEnabledGames = db.getAllEnabledGames();
+		Game<?,?> game = allEnabledGames.get(0);
 		Map<RoleInterface, PlayerInfo> rolesToPlayerInfos = new HashMap<RoleInterface, PlayerInfo>();
 		
 		int roleIndex = 0;

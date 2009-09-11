@@ -23,8 +23,10 @@ import static tud.ggpserver.datamodel.DBConnectorFactory.getDBConnector;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Logger;
 
 import tud.ggpserver.datamodel.AbstractDBConnector;
+import tud.ggpserver.datamodel.ConfigOption;
 import tud.ggpserver.datamodel.Game;
 import tud.ggpserver.datamodel.Tournament;
 import tud.ggpserver.scheduler.AbstractRoundRobinScheduler;
@@ -32,6 +34,8 @@ import tud.ggpserver.scheduler.RoundRobinScheduler;
 
 public class AdminPage {
 	private boolean cacheCleared = false;
+
+	private static final Logger logger = Logger.getLogger(AdminPage.class.getName());
 
 	public boolean isRunning() {
 		return RoundRobinScheduler.getInstance().isRunning();
@@ -63,20 +67,61 @@ public class AdminPage {
 		return RoundRobinScheduler.getInstance().getNextPlayedGame().getName();
 	}
 
-	@SuppressWarnings("unchecked")
 	public void setNextPlayedGameName(String nextPlayedGame) throws SQLException {
-		Game<?, ?> game = getDBConnector().getGame(nextPlayedGame);
-		RoundRobinScheduler.getInstance().setNextPlayedGame(game);
+		RoundRobinScheduler.getInstance().setNextPlayedGame(nextPlayedGame);
 	}
 	
-	@SuppressWarnings("unchecked")
-	public List<Game<?, ?>> getAllGames() throws SQLException {
-		return ((AbstractDBConnector) getDBConnector()).getAllEnabledGames();
+	public String getStartclockMin() throws SQLException {
+		return getDBConnector().getConfigOption(ConfigOption.START_CLOCK_MIN);
+	}
+
+	public String getStartclockMax() throws SQLException {
+		return getDBConnector().getConfigOption(ConfigOption.START_CLOCK_MAX);
+	}
+
+	public String getPlayclockMin() throws SQLException {
+		return getDBConnector().getConfigOption(ConfigOption.PLAY_CLOCK_MIN);
+	}
+
+	public String getPlayclockMax() throws SQLException {
+		return getDBConnector().getConfigOption(ConfigOption.PLAY_CLOCK_MAX);
+	}
+
+	public void setStartclockMin(String s) throws SQLException {
+		setClockOption(ConfigOption.START_CLOCK_MIN, s);
+	}
+
+	public void setStartclockMax(String s) throws SQLException {
+		setClockOption(ConfigOption.START_CLOCK_MAX, s);
+	}
+
+	public void setPlayclockMin(String s) throws SQLException {
+		setClockOption(ConfigOption.PLAY_CLOCK_MIN, s);
+	}
+
+	public void setPlayclockMax(String s) throws SQLException {
+		setClockOption(ConfigOption.PLAY_CLOCK_MAX, s);
+	}
+
+	private void setClockOption(ConfigOption option, String s) throws SQLException {
+		try {
+			int i=Integer.parseInt(s);
+			if( i > 0 && (i % 5 == 0) ) {
+				getDBConnector().setConfigOption(option, Integer.toString(i));
+			}else{
+				logger.warning("wrong value for "+option+": " + i + " is out of range or not a multiple of 5");
+			}
+		} catch (NumberFormatException e) {
+			logger.warning("NumberFormatException while parsing config option " + option + ":" + e.getMessage());
+		}
+	}
+
+	public List<? extends Game<?, ?>> getAllGames() throws SQLException {
+		return ((AbstractDBConnector<?,?>) getDBConnector()).getAllEnabledGames();
 	}
 	
-	@SuppressWarnings("unchecked")
-	public List<Tournament<?, ?>> getTournaments() throws SQLException {
-		List tournaments = getDBConnector().getTournaments();
+	public List<? extends Tournament<?, ?>> getTournaments() throws SQLException {
+		List<? extends Tournament<?, ?>> tournaments = getDBConnector().getTournaments();
 		tournaments.remove(getDBConnector().getTournament(AbstractRoundRobinScheduler.ROUND_ROBIN_TOURNAMENT_ID));
 		return tournaments;
 	}

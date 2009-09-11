@@ -4,13 +4,16 @@
 <project basedir="." default="war" name="ant_create_war">
 	<target depends="build" name="war">
 		<war destfile="ggpserver.war" webxml="WebContent/WEB-INF/web.xml">
-		<classes dir="build/classes"/>
-		<lib file="${gamecontroller.location}/gamecontroller.jar"/>
-		<fileset dir="WebContent"/>
-		<fileset dir="${gamecontroller.location}/resources/">
+			<classes dir="build/classes"/>
+			<lib file="${ggpratingsystem.location}/build/jar/GgpRatingSystem.jar"/>
+			<lib file="${ggpratingsystem.location}/lib/flanagan.jar"/>
+			<!-- <lib dir="${ggpratingsystem.location}/lib" includes="**/*.jar"/> -->
+			<lib file="${gamecontroller.location}/gamecontroller.jar"/>
+			<fileset dir="WebContent"/>
+			<fileset dir="${gamecontroller.location}/resources/">
 				<include name="stylesheets/**"/>
 				<exclude name="stylesheets/generic/sitespecific.xsl"/>
-		</fileset>
+			</fileset>
 		</war>
 	</target>
 </project>

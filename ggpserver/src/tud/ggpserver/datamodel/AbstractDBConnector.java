@@ -84,7 +84,6 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	private static final Logger logger = Logger.getLogger(AbstractDBConnector.class.getName());
 	private static final GameScramblerInterface identityGameScrambler = new IdentityGameScrambler();
 
-	private static final String NEXT_PLAYED_GAME = "next_played_game";
 	private static final Collection<String> defaultRoleNames = Collections.<String>singleton("member");
 	
 	private static DataSource datasource;
@@ -502,38 +501,34 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return result;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public NewMatch<TermType, ReasonerStateInfoType> getNewMatch(String matchID) throws SQLException {
 		ServerMatch<TermType, ReasonerStateInfoType> match = getMatch(matchID);
 		if (match instanceof NewMatch) {
-			return (NewMatch) match;
+			return (NewMatch<TermType, ReasonerStateInfoType>) match;
 		}
 		throw new IllegalArgumentException("Not a new match: " + matchID);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public RunningMatch<TermType, ReasonerStateInfoType> getRunningMatch(String matchID) throws SQLException {
 		ServerMatch<TermType, ReasonerStateInfoType> match = getMatch(matchID);
 		if (match instanceof RunningMatch) {
-			return (RunningMatch) match;
+			return (RunningMatch<TermType, ReasonerStateInfoType>) match;
 		}
 		throw new IllegalArgumentException("Not a running match: " + matchID);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public FinishedMatch<TermType, ReasonerStateInfoType> getFinishedMatch(String matchID) throws SQLException {
 		ServerMatch<TermType, ReasonerStateInfoType> match = getMatch(matchID);
 		if (match instanceof FinishedMatch) {
-			return (FinishedMatch) match;
+			return (FinishedMatch<TermType, ReasonerStateInfoType>) match;
 		}
 		throw new IllegalArgumentException("Not a finished match: " + matchID);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public AbortedMatch<TermType, ReasonerStateInfoType> getAbortedMatch(String matchID) throws SQLException {
 		ServerMatch<TermType, ReasonerStateInfoType> match = getMatch(matchID);
 		if (match instanceof AbortedMatch) {
-			return (AbortedMatch) match;
+			return (AbortedMatch<TermType, ReasonerStateInfoType>) match;
 		}
 		throw new IllegalArgumentException("Not an aborted match: " + matchID);
 	}
@@ -1577,7 +1572,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	}
 
 	public Game<TermType, ReasonerStateInfoType> getNextPlayedGame() throws SQLException {
-		String nextGameName = getConfigEntry(NEXT_PLAYED_GAME);
+		String nextGameName = getConfigEntry(ConfigOption.NEXT_PLAYED_GAME.getDBKey());
 		if (nextGameName == null) {
 			return null;
 		}
@@ -1585,7 +1580,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	}
 	
 	public void setNextPlayedGame(Game<?, ?> nextPlayedGame) throws SQLException {
-		storeConfigEntry(NEXT_PLAYED_GAME, nextPlayedGame.getName());
+		storeConfigEntry(ConfigOption.NEXT_PLAYED_GAME.getDBKey(), nextPlayedGame.getName());
 	}
 
 
@@ -1617,6 +1612,19 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				try {rs.close();} catch (SQLException e) {}
 		} 
 		return result;
+	}
+
+	public void setConfigOption(ConfigOption option, String value) throws SQLException {
+		storeConfigEntry(option.getDBKey(), value);
+	}
+
+	public String getConfigOption(ConfigOption option) throws SQLException {
+		String value = getConfigEntry(option.getDBKey());
+		if(value == null){
+			value = option.getDefaultValue();
+			setConfigOption(option, value);
+		}
+		return value;
 	}
 
 	private synchronized void storeConfigEntry(String key, String value) throws SQLException {

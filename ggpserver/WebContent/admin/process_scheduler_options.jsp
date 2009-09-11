@@ -1,5 +1,6 @@
 <%--
-    Copyright (C) 2009 Martin Günther (mintar@gmx.de)
+    Copyright (C) 2009 Martin GÃ¼nther <mintar@gmx.de>,
+                  2009 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GGP Server.
 
@@ -23,6 +24,10 @@
 <jsp:useBean id="adminPage" class="tud.ggpserver.formhandlers.AdminPage" scope="request">
 	<c:catch>
 		<jsp:setProperty name="adminPage" property="nextPlayedGameName"/>
+		<jsp:setProperty name="adminPage" property="startclockMin"/>
+		<jsp:setProperty name="adminPage" property="startclockMax"/>
+		<jsp:setProperty name="adminPage" property="playclockMin"/>
+		<jsp:setProperty name="adminPage" property="playclockMax"/>
 	</c:catch>
 </jsp:useBean>
 

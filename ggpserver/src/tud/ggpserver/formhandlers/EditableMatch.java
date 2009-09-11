@@ -35,7 +35,9 @@ import tud.ggpserver.datamodel.matches.ServerMatch;
 
 
 public class EditableMatch {
+	@SuppressWarnings("unchecked")
 	private final AbstractDBConnector db = DBConnectorFactory.getDBConnector();
+	@SuppressWarnings("unchecked")
 	private final ServerMatch shadowedMatch;
 	private GameInterface<?, ?> game;
 	private int startclock;

@@ -1,5 +1,6 @@
 <%--
-    Copyright (C) 2009 Martin Günther (mintar@gmx.de)
+    Copyright (C) 2009 Martin Günther <mintar@gmx.de>,
+                  2009 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GGP Server.
 
@@ -93,6 +94,24 @@
 						</c:choose>
 					</c:forEach>
 				</select>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" align="right">
+				start clock range
+			</td>
+			<td>
+				[ <input type="text" name="startclockMin" size="3" value="${adminPage.startclockMin}" maxlength="3"> s,  
+				<input type="text" name="startclockMax" size="3" value="${adminPage.startclockMax}" maxlength="3"> s ]
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" align="right">
+				play clock range
+			</td>
+			<td>
+				[ <input type="text" name="playclockMin" size="3" value="${adminPage.playclockMin}" maxlength="3"> s,  
+				<input type="text" name="playclockMax" size="3" value="${adminPage.playclockMax}" maxlength="3"> s ]
 			</td>
 		</tr>
 		<tr>

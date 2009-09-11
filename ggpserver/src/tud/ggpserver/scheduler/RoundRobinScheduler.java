@@ -25,14 +25,14 @@ import tud.ggpserver.datamodel.DBConnectorFactory;
 import cs227b.teamIago.util.GameState;
 
 public class RoundRobinScheduler extends AbstractRoundRobinScheduler<Term, GameState> {
-	private static AbstractRoundRobinScheduler instance = null;
+	private static RoundRobinScheduler instance = null;
 	
 	@SuppressWarnings("unchecked")
 	private RoundRobinScheduler(AbstractDBConnector dbConnector) {
 		super(dbConnector);
 	}
 
-	public static synchronized AbstractRoundRobinScheduler getInstance() {
+	public static synchronized AbstractRoundRobinScheduler<?,?> getInstance() {
 		if (instance == null) {
 			instance = new RoundRobinScheduler(DBConnectorFactory.getDBConnector());
 		}
