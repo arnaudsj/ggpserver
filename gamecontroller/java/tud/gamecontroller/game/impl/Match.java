@@ -73,7 +73,7 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType> implem
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		final Match other = (Match) obj;
+		final Match<?, ?> other = (Match<?, ?>) obj;
 		if (matchID == null) {
 			if (other.matchID != null)
 				return false;

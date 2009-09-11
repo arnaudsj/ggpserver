@@ -163,7 +163,7 @@ public class Game<
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		final Game other = (Game) obj;
+		final Game<?, ?> other = (Game<?, ?>) obj;
 		if (name == null) {
 			if (other.name != null)
 				return false;

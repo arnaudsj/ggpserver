@@ -151,7 +151,7 @@ public class GameController<
 				String message = "player "+t.getPlayer()+" timed out!";
 				GameControllerErrorMessage errorMessage = new GameControllerErrorMessage(GameControllerErrorMessage.TIMEOUT, message, t.getPlayer().getName());
 				if (match instanceof ErrorMessageListener) {
-					((ErrorMessageListener) match).notifyErrorMessage(errorMessage);
+					((ErrorMessageListener<?, ?>) match).notifyErrorMessage(errorMessage);
 				}
 				logger.log(loglevel, message, errorMessage);
 			}
