@@ -116,6 +116,15 @@
 				</c:otherwise>
 			</c:choose></td>
 		</tr>
+		<tr>
+			<th>export</th>
+			<td>
+				<c:url value="export_xml.jsp" var="exportXMLURL">
+					<c:param name="matchID" value="${match.matchID}" />
+				</c:url>
+				<a href='<c:out value="${exportXMLURL}" />'>export xml</a>
+			</td>
+		</tr>
 	</tbody>
 </table>
 
