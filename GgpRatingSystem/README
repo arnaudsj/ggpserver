@@ -94,5 +94,5 @@ data/competition2029/output/constant_linear_regression_1.0.html .
 You can also use the script make_ratings.sh to regenerate all ratings.
 
 -- 3.4 Troubleshooting --
-If the XML format has suddenly changed (again), you have to adjust the file Match.java 
+If the XML format has suddenly changed (again), you have to adjust the file FileMatchReader.java 
 (which does the XML parsing).

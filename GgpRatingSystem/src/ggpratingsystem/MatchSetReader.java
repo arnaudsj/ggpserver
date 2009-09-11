@@ -19,21 +19,14 @@
 
 package ggpratingsystem;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+public interface MatchSetReader {
+	/**
+	 * Reads and returns the next MatchSet.
+	 */
+	public abstract MatchSet readMatchSet();
 
-public class AllTests {
-
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for ggpratingsystem");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(FileMatchReaderTest.class);
-		suite.addTestSuite(MatchSetTest.class);
-		suite.addTestSuite(FileMatchSetReaderTest.class);
-		suite.addTestSuite(CommandLineInterfaceTest.class);
-		//$JUnit-END$
-		suite.addTest(ggpratingsystem.ratingsystems.AllTests.suite());
-		return suite;
-	}
-
+	/**
+	 * Indicates whether this MatchReader has a next MatchSet to read.
+	 */
+	public abstract boolean hasNext();
 }

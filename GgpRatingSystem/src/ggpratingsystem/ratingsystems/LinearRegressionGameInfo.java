@@ -395,4 +395,8 @@ public class LinearRegressionGameInfo extends AbstractGameInfo {
 		}
 		return coefficients;
 	}
+	
+	public double[][] getCoefficients() {
+		return coeffs.clone();
+	}
 }

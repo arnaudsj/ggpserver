@@ -19,21 +19,26 @@
 
 package ggpratingsystem;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import ggpratingsystem.util.Util;
 
-public class AllTests {
+import java.io.File;
+import java.io.IOException;
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for ggpratingsystem");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(FileMatchReaderTest.class);
-		suite.addTestSuite(MatchSetTest.class);
-		suite.addTestSuite(FileMatchSetReaderTest.class);
-		suite.addTestSuite(CommandLineInterfaceTest.class);
-		//$JUnit-END$
-		suite.addTest(ggpratingsystem.ratingsystems.AllTests.suite());
-		return suite;
+import junit.framework.TestCase;
+
+public class FileMatchSetReaderTest extends TestCase {
+
+	/*
+	 * Test method for 'ggpratingsystem.MatchReader.readMatches(String)'
+	 */
+	public void testReadMatches() throws IOException {
+		MatchSetReader matchSetReader = new FileMatchSetReader(new File(Util.getDataDir(), "competition2007" + File.separator + "xml"), new Configuration());
+		
+		int numMatchSets = 0;
+		while (matchSetReader.hasNext()) {
+			numMatchSets++;
+			matchSetReader.readMatchSet();
+		}
+		assertEquals(47, numMatchSets);
 	}
-
 }

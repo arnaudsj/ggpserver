@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2008,2009 Martin Günther <mintar@gmx.de>
-
+                  2009 Stephan Schiffel <stephan.schiffel@gmx.de>
+                       
     This file is part of GgpRatingSystem.
 
     GgpRatingSystem is free software: you can redistribute it and/or modify
@@ -19,25 +20,8 @@
 
 package ggpratingsystem;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.xpath.domapi.XPathEvaluatorImpl;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.xpath.XPathEvaluator;
-import org.w3c.dom.xpath.XPathNSResolver;
-import org.w3c.dom.xpath.XPathResult;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * Match.java
@@ -57,130 +41,15 @@ public class Match {
 	
 	private final MatchSet matchSet;
 	
-	// Data available in the XML source
 	private final String matchId;
 	private final List<Player> players;
 	private final List<Integer> scores;
 	
-	public Match(MatchSet matchSet, File xmlFile) throws MatchParsingException {
-		super();
-
+	public Match(MatchSet matchSet, String matchId, List<Player> players, List<Integer> scores) {
 		this.matchSet = matchSet;
-
-		log.fine("processing XML file: " + xmlFile);
-		
-		try {
-			/* parse matchId */
-			XPathResult result = queryXPath(xmlFile, "/match/match-id");
-
-			Node firstResult = result.iterateNext();
-			if (firstResult != null) {
-				// competition 2007 XML format: there is a node called "match-id"
-				
-				this.matchId = firstResult.getTextContent();
-			} else {
-				// competition 2008 XML format: "id" is an attribute of node "match"
-				result = queryXPath(xmlFile, "/match");
-
-				firstResult = result.iterateNext();
-				
-				if (firstResult == null) {
-					throw new MatchParsingException("XPath query for match id returned no results!");				
-				}
-				this.matchId = firstResult.getAttributes().getNamedItem("id").getTextContent();
-			}
-
-			if (result.iterateNext() != null) {
-				throw new MatchParsingException("XPath query for match id returned more than one result!");
-			}
-			
-			log.finest("matchId: " + matchId);
-
-			/* parse roles */
-			result = queryXPath(xmlFile, "/match/role");
-			
-			List<String> roles = new LinkedList<String>();
-
-			for (Node n = result.iterateNext(); n != null; n = result.iterateNext()) {
-				
-				// n = <role>White</role>
-				Node firstChild = n.getFirstChild(); // firstChild = White
-				
-				log.finest("Role:    " + firstChild.getTextContent());
-				roles.add(firstChild.getTextContent());
-
-				if (n.getChildNodes().getLength() > 1) {
-					throw new MatchParsingException("XPath query for roles returned a node with several children!");
-				}
-			}
-			
-			matchSet.getGame().setRoles(roles);	// TODO What an ugly hack. Fix this in the future when roles of a game are available directly and not only via the matches.  
-			
-			/* parse players */
-			result = queryXPath(xmlFile, "/match/player");
-			
-			this.players = new LinkedList<Player>();
-
-			for (Node n = result.iterateNext(); n != null; n = result.iterateNext()) {
-				// n = <player>FLUXPLAYER</player>
-				Node firstChild = n.getFirstChild(); // firstChild = FLUXPLAYER
-				
-				log.finest("Player:    " + firstChild.getTextContent());
-				players.add(Player.getInstance(firstChild.getTextContent()));
-
-				if (n.getChildNodes().getLength() > 1) {
-					throw new MatchParsingException("XPath query for players returned a node with several children!");
-				}
-			}
-			
-			/* parse scores */
-			this.scores = new LinkedList<Integer>();
-
-			result = queryXPath(xmlFile, "/match/scores/reward");   // 2007 XML format
-			
-			List<Node> results = new LinkedList<Node>();
-			
-			for (Node n = result.iterateNext(); n != null; n = result.iterateNext()) {
-				results.add(n);
-			}
-			
-			if (results.size() == 0) {
-				result = queryXPath(xmlFile, "/match/rewards/reward");   // 2008 XML format
-				
-				for (Node n = result.iterateNext(); n != null; n = result.iterateNext()) {
-					results.add(n);
-				}				
-			}
-			
-			for (Node n : results) {
-				// n = <reward>100</reward>
-				Node firstChild = n.getFirstChild(); // firstChild = 100
-				
-				log.finest("Score:    " + firstChild.getTextContent());
-				scores.add(Integer.valueOf(firstChild.getTextContent()));
-
-				if (n.getChildNodes().getLength() > 1) {
-					throw new MatchParsingException("XPath query for players returned a node with several children!");
-				}
-			}
-
-			// sanity check 
-			if (roles.size() != players.size() || players.size() != scores.size() || roles.isEmpty()) {
-				throw new MatchParsingException("All 3 lists (roles, players, scores) must have the same number of elements and must not be empty!"); 
-			}
-		} catch (FileNotFoundException e) {
-			MatchParsingException thrown = new MatchParsingException("XML file was not found: " + xmlFile, e);
-			throw thrown;
-		} catch (SAXException e) {
-			MatchParsingException thrown = new MatchParsingException("SAXException while parsing XML file: " + xmlFile, e);
-			throw thrown;
-		} catch (IOException e) {
-			MatchParsingException thrown = new MatchParsingException("IOException while parsing XML file: " + xmlFile, e);
-			throw thrown;
-		} catch (ParserConfigurationException e) {
-			MatchParsingException thrown = new MatchParsingException("ParserConfigurationException while parsing XML file: " + xmlFile, e);
-			throw thrown;
-		}
+		this.matchId = matchId;
+		this.players = players;
+		this.scores = scores;
 	}
 
 	public String getMatchId() {
@@ -202,38 +71,6 @@ public class Match {
 	@Override
 	public String toString() {
 		return getMatchId();
-	}
-	
-	private static XPathResult queryXPath(File xmlFile, String xpath) throws SAXException, IOException, ParserConfigurationException, MatchParsingException  {
-		if (xmlFile == null || xpath == null || xpath.length() == 0) {
-			throw new MatchParsingException("Bad input arguments: " + xmlFile + ", " + xpath);
-		}
-
-		// Set up a DOM tree to query.
-		InputSource in = new InputSource(new FileInputStream(xmlFile));
-		DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
-		dfactory.setNamespaceAware(true);
-		
-		// Disable loading of external DTDs. This has to be done in case that
-		// games.stanford.edu is down (again). Otherwise we'll get connection
-		// timeouts.
-		try {
-			dfactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-		} catch (ParserConfigurationException e) {
-			// Parser does not support this feature. We'll try to do without.
-			log.warning("XML Parser does not support disabling of feature load-external-dtd!");
-		}
-
-		Document doc = dfactory.newDocumentBuilder().parse(in);
-
-		// Create an XPath evaluator and pass in the document.
-		XPathEvaluator evaluator = new XPathEvaluatorImpl(doc);
-		XPathNSResolver resolver = evaluator.createNSResolver(doc);
-
-		// Evaluate the xpath expression
-		XPathResult result = (XPathResult) evaluator.evaluate(xpath, doc,
-				resolver, XPathResult.UNORDERED_NODE_ITERATOR_TYPE, null);
-		return result;
 	}
 	
 	/**

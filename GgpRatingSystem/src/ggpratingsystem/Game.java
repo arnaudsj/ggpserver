@@ -23,6 +23,8 @@ import ggpratingsystem.ratingsystems.AbstractGameInfo;
 import ggpratingsystem.ratingsystems.GameInfoFactory;
 import ggpratingsystem.ratingsystems.RatingSystemType;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +32,6 @@ import java.util.logging.Logger;
 
 public final class Game {
 	private static final Logger log = Logger.getLogger(Game.class.getName());
-	private static Map<String, Game> instances = new HashMap<String, Game>();
 
 	private final String name;
 	private List<String> roles;
@@ -43,22 +44,11 @@ public final class Game {
 		log.setLevel(null);
 	}
 	
-	private Game(String name) {
+	protected Game(String name) {
 		super();
 		this.name = name;
 	}
 	
-	public static Game getInstance(String name) {
-		Game result = instances.get(name);
-		
-		if (result == null) {
-			result = new Game(name);
-			instances.put(name, result);
-		}
-		
-		return result;
-	}
-
 	public String getName() {
 		return name;
 	}
@@ -77,6 +67,10 @@ public final class Game {
 
 	public void setRoles(List<String> roles) {	// TODO What an ugly hack. Fix this in the future when roles of a game are available directly and not only via the matches.  
 		this.roles = roles;
+	}
+	
+	public boolean hasRoles() {
+		return roles != null;
 	}
 	
 

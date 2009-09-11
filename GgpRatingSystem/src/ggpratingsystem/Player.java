@@ -37,31 +37,15 @@ public final class Player implements Comparable<Player> {
 		log.setLevel(null);
 	}
 	
-	private static Map<String, Player> instances = new HashMap<String, Player>();
-
 	private final String name;
 	private Map<RatingSystemType, Rating> ratings = new HashMap<RatingSystemType, Rating>();
 	
-	private Player(String name) {
+	/**
+	 * use PlayerSet.getPlayer(name) instead
+	 */
+	protected Player(String name) {
 		super();
 		this.name = name;
-		
-		if (instances.get(name) != null)
-			throw new IllegalStateException("Player already exists!");
-	}
-
-	public static Player getInstance(String playerName) {
-		// convert to lower case and remove all non-alphanumeric characters 
-		// before querying
-		String queryName = playerName.toLowerCase().replaceAll("[^\\p{Alnum}]", "");
-
-		Player result = instances.get(queryName);		
-		if (result == null) {
-			result = new Player(playerName);
-			instances.put(queryName, result);
-		}
-		
-		return result;
 	}
 
 	public String getName() {
@@ -113,8 +97,4 @@ public final class Player implements Comparable<Player> {
 		return name.compareTo(other.getName());
 	}
 
-	
-	public static List<Player> getAllPlayers() {
-		return new LinkedList<Player>(instances.values());
-	}
 }

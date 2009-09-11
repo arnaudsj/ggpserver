@@ -271,8 +271,8 @@ public class CommandLineInterface extends SimpleJSAP {
 		configuration.setDebugLevel(level);
         
 		/* configure input dir */
-		MatchReader matchReader = new FileMatchReader(jsap.getFile(OPTION_INPUT_DIR));
-		configuration.setMatchReader(matchReader);
+		MatchSetReader matchSetReader = new FileMatchSetReader(jsap.getFile(OPTION_INPUT_DIR), configuration);
+		configuration.setMatchReader(matchSetReader);
 		
 		/* configure output dir */
 		Configuration.setOutputDir(jsap.getFile(OPTION_OUTPUT_DIR));
@@ -296,7 +296,7 @@ public class CommandLineInterface extends SimpleJSAP {
 		
 
 		/* make ignore list */
-		Set<Player> ignorePlayers = new IgnorePlayerSet(jsap.getFile(OPTION_INPUT_DIR));
+		Set<Player> ignorePlayers = new IgnorePlayerSet(jsap.getFile(OPTION_INPUT_DIR), configuration.getPlayerSet());
 		
 		/* configure output methods */
 		for (RatingSystemType type : configuration.getEnabledRatingSystems()) {

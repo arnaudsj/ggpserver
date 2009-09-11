@@ -20,6 +20,7 @@
 package ggpratingsystem.ratingsystems;
 
 import ggpratingsystem.Player;
+import ggpratingsystem.PlayerSet;
 
 import java.io.File;
 import java.io.FileReader;
@@ -89,7 +90,7 @@ public class RatingFactory {
 		return result;
 	}
 
-	public static void initializeRatings(RatingSystemType type, File previousRatings) throws IOException, RatingException {
+	public static void initializeRatings(RatingSystemType type, File previousRatings, PlayerSet playerSet) throws IOException, RatingException {
 		CSVReader reader;
 		reader = new CSVReader(new FileReader(previousRatings));
 
@@ -110,7 +111,7 @@ public class RatingFactory {
 		for (int i = 0; i < playerNames.length; i++) {
 			String playerName = playerNames[i];
 	    	double curRating = Double.parseDouble(ratings[i]);
-			Rating rating = Player.getInstance(playerName).getRating(type);
+			Rating rating = playerSet.getPlayer(playerName).getRating(type);
 			rating.setCurRating(curRating);
 			try {
 				initialRatings(type).add((Rating) rating.clone());

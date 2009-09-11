@@ -21,6 +21,7 @@ package ggpratingsystem.ratingsystems;
 
 import static ggpratingsystem.ratingsystems.RatingSystemType.DIRECT_SCORES;
 import ggpratingsystem.Game;
+import ggpratingsystem.GameSet;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -34,7 +35,8 @@ public class GameInfoFactoryTest extends TestCase {
 		roles.add("role1");
 		roles.add("role2");
 		
-		Game game = Game.getInstance("GameInfoFactoryTest_TESTGAME");
+		GameSet gameSet = new GameSet();
+		Game game = gameSet.getGame("GameInfoFactoryTest_TESTGAME");
 		game.setRoles(roles);
 		
 		RatingSystemType[] types = RatingSystemType.values();

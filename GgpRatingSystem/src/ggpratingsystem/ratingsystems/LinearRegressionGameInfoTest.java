@@ -21,11 +21,13 @@ package ggpratingsystem.ratingsystems;
 
 import static ggpratingsystem.ratingsystems.RatingSystemType.DYNAMIC_LINEAR_REGRESSION;
 
+import ggpratingsystem.Configuration;
 import ggpratingsystem.Game;
-import ggpratingsystem.FileMatchReader;
-import ggpratingsystem.MatchReader;
+import ggpratingsystem.FileMatchSetReader;
+import ggpratingsystem.MatchSetReader;
 import ggpratingsystem.MatchSet;
 import ggpratingsystem.Player;
+import ggpratingsystem.PlayerSet;
 import ggpratingsystem.util.Util;
 
 import java.io.File;
@@ -41,6 +43,7 @@ import junit.framework.TestCase;
 public class LinearRegressionGameInfoTest extends TestCase {
 	private LinearRegressionGameInfo testGameInfo;
 	private Game testgame;
+	private Configuration configuration;
 	
 	private final List<MatchSet> matchSets;
 //	private MatchSet blocksworld;
@@ -49,11 +52,12 @@ public class LinearRegressionGameInfoTest extends TestCase {
 	
 	public LinearRegressionGameInfoTest() throws IOException {
 		super();
-		MatchReader matchReader = new FileMatchReader(new File(Util.getDataDir(), "competition2007" + File.separator + "xml"));
+		configuration = new Configuration();
+		MatchSetReader matchSetReader = new FileMatchSetReader(new File(Util.getDataDir(), "competition2007" + File.separator + "xml"), configuration);
 		
 		matchSets = new LinkedList<MatchSet>();
-		while (matchReader.hasNext()) {
-			matchSets.add(matchReader.readMatchSet());
+		while (matchSetReader.hasNext()) {
+			matchSets.add(matchSetReader.readMatchSet());
 		}
 	}
 
@@ -69,7 +73,7 @@ public class LinearRegressionGameInfoTest extends TestCase {
 		roles.add("Testrole1");
 		roles.add("Testrole2");
 		
-		testgame = Game.getInstance("TESTGAME");
+		testgame = configuration.getGameSet().getGame("TESTGAME");
 		testgame.setRoles(roles);
 		testGameInfo = (LinearRegressionGameInfo) GameInfoFactory.makeGameInfo(
 				DYNAMIC_LINEAR_REGRESSION, testgame);
@@ -83,18 +87,18 @@ public class LinearRegressionGameInfoTest extends TestCase {
 			matchSet.getGame().getGameInfo(DYNAMIC_LINEAR_REGRESSION).reset();		
 		}
 		
-		Player.getInstance("FLUXPLAYER").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
-		Player.getInstance("U-TEXAS-LARG").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
-		Player.getInstance("CLUNEPLAYER").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
-		Player.getInstance("JIGSAWBOT").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
-		Player.getInstance("W-WOLFE").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
-		Player.getInstance("ARY").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
-		Player.getInstance("CADIA-PLAYER").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
-		Player.getInstance("LUCKY-LEMMING").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
-		Player.getInstance("THE-PIRATE").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
-		Player.getInstance("RANDOM").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
-		Player.getInstance("RANDOM2").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
-		Player.getInstance("RANDOM3").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
+		configuration.getPlayerSet().getPlayer("FLUXPLAYER").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
+		configuration.getPlayerSet().getPlayer("U-TEXAS-LARG").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
+		configuration.getPlayerSet().getPlayer("CLUNEPLAYER").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
+		configuration.getPlayerSet().getPlayer("JIGSAWBOT").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
+		configuration.getPlayerSet().getPlayer("W-WOLFE").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
+		configuration.getPlayerSet().getPlayer("ARY").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
+		configuration.getPlayerSet().getPlayer("CADIA-PLAYER").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
+		configuration.getPlayerSet().getPlayer("LUCKY-LEMMING").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
+		configuration.getPlayerSet().getPlayer("THE-PIRATE").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
+		configuration.getPlayerSet().getPlayer("RANDOM").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
+		configuration.getPlayerSet().getPlayer("RANDOM2").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
+		configuration.getPlayerSet().getPlayer("RANDOM3").getRating(DYNAMIC_LINEAR_REGRESSION).reset();
 	}
 		
 	public void testGetType() {
@@ -122,7 +126,7 @@ public class LinearRegressionGameInfoTest extends TestCase {
 	}
 
 	public void testGetGame() {
-		assertEquals(Game.getInstance("TESTGAME"), testGameInfo.getGame());
+		assertEquals(configuration.getGameSet().getGame("TESTGAME"), testGameInfo.getGame());
 	}
 	
 	/*  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  
@@ -134,7 +138,7 @@ public class LinearRegressionGameInfoTest extends TestCase {
 	 * LinearRegressionGameInfo.DEFAULT_EXPECTED_SCORE to all players
 	 */
 	public void testExpectedScoresUntrained() {
-		for (Player player : Player.getAllPlayers()) {
+		for (Player player : configuration.getPlayerSet().getAllPlayers()) {
 			player.getRating(DYNAMIC_LINEAR_REGRESSION).reset();
 		}
 		
@@ -165,7 +169,7 @@ public class LinearRegressionGameInfoTest extends TestCase {
 	 * scores to all players
 	 */
 	public void testExpectedScoresTrainedOnce() {
-		for (Player player : Player.getAllPlayers()) {
+		for (Player player : configuration.getPlayerSet().getAllPlayers()) {
 			player.getRating(DYNAMIC_LINEAR_REGRESSION).reset();
 		}
 		
@@ -229,18 +233,18 @@ public class LinearRegressionGameInfoTest extends TestCase {
 		LinearRegressionGameInfo gameInfo = (LinearRegressionGameInfo) matchSet
 				.getGame().getGameInfo(DYNAMIC_LINEAR_REGRESSION);
 
-		Player.getInstance("CADIA-PLAYER").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(1400.0);
-		Player.getInstance("FLUXPLAYER").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(1400.0);
-		Player.getInstance("CLUNEPLAYER").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(1350.0);
-		Player.getInstance("U-TEXAS-LARG").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(1300.0);
-		Player.getInstance("ARY").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(900.0);
-		Player.getInstance("JIGSAWBOT").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(700.0);
-		Player.getInstance("LUCKY-LEMMING").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(600.0);
-		Player.getInstance("W-WOLFE").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(400.0);
-		Player.getInstance("THE-PIRATE").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(300.0);
-		Player.getInstance("RANDOM").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(200.0);
-		Player.getInstance("RANDOM2").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(200.0);
-		Player.getInstance("RANDOM3").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(200.0);
+		configuration.getPlayerSet().getPlayer("CADIA-PLAYER").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(1400.0);
+		configuration.getPlayerSet().getPlayer("FLUXPLAYER").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(1400.0);
+		configuration.getPlayerSet().getPlayer("CLUNEPLAYER").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(1350.0);
+		configuration.getPlayerSet().getPlayer("U-TEXAS-LARG").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(1300.0);
+		configuration.getPlayerSet().getPlayer("ARY").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(900.0);
+		configuration.getPlayerSet().getPlayer("JIGSAWBOT").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(700.0);
+		configuration.getPlayerSet().getPlayer("LUCKY-LEMMING").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(600.0);
+		configuration.getPlayerSet().getPlayer("W-WOLFE").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(400.0);
+		configuration.getPlayerSet().getPlayer("THE-PIRATE").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(300.0);
+		configuration.getPlayerSet().getPlayer("RANDOM").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(200.0);
+		configuration.getPlayerSet().getPlayer("RANDOM2").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(200.0);
+		configuration.getPlayerSet().getPlayer("RANDOM3").getRating(DYNAMIC_LINEAR_REGRESSION).setCurRating(200.0);
 		
 		gameInfo.updateGameInfo(matchSet);
 

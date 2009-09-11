@@ -20,13 +20,15 @@
 package ggpratingsystem.ratingsystems;
 
 import ggpratingsystem.Player;
+import ggpratingsystem.PlayerSet;
 
 import junit.framework.TestCase;
 
 public class RatingFactoryTest extends TestCase {
 
 	public void testMakeRating() {
-		Player player = Player.getInstance("TESTPLAYER");
+		PlayerSet playerSet = new PlayerSet();
+		Player player = playerSet.getPlayer("TESTPLAYER");
 		RatingSystemType[] types = RatingSystemType.values();
 		
 		for (RatingSystemType type : types) {

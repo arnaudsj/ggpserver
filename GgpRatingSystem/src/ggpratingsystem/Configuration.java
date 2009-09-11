@@ -66,10 +66,19 @@ public class Configuration {
 	
 	private Map<RatingSystemType, List<OutputBuilder>> outputBuilders = new HashMap<RatingSystemType, List<OutputBuilder>>();	
 	private Map<RatingSystemType, RatingStrategy> ratingSystems = new HashMap<RatingSystemType, RatingStrategy>();
-	private MatchReader matchReader;
+	private MatchSetReader matchSetReader;
 
 	private File previousRatings;
 
+	private PlayerSet playerSet;
+
+	private GameSet gameSet;
+
+	public Configuration() {
+		super();
+		this.playerSet = new PlayerSet();
+		this.gameSet = new GameSet();
+	}
 	public void addRatingSystem(RatingStrategy ratingSystem) {
 		ratingSystems.put(ratingSystem.getType(), ratingSystem);
 	}
@@ -155,16 +164,16 @@ public class Configuration {
 		if (previousRatings != null) {
 			for (RatingStrategy ratingSystem : ratingSystems.values()) {
 				RatingSystemType type = ratingSystem.getType();
-				RatingFactory.initializeRatings(type, previousRatings);
+				RatingFactory.initializeRatings(type, previousRatings, playerSet);
 			}
 		}
 		
-		if (matchReader == null) {
+		if (matchSetReader == null) {
 			throw new IllegalStateException("setMatchReader() must be called before calling run()!");
 		}
 		
-		while (matchReader.hasNext()) {
-			MatchSet matchSet = matchReader.readMatchSet();
+		while (matchSetReader.hasNext()) {
+			MatchSet matchSet = matchSetReader.readMatchSet();
 			for (RatingStrategy ratingSystem : ratingSystems.values()) {
 				ratingSystem.update(matchSet);
 				RatingSystemType type = ratingSystem.getType(); 
@@ -207,8 +216,8 @@ public class Configuration {
 	}
 	
 
-	public void setMatchReader(MatchReader matchReader) {
-		this.matchReader = matchReader;
+	public void setMatchReader(MatchSetReader matchSetReader) {
+		this.matchSetReader = matchSetReader;
 	}
 
 	public void setPreviousRatings(File previousRatings) {
@@ -237,6 +246,13 @@ public class Configuration {
 
 	public void setDebugLevel(Level level) {
 		Logger.getLogger("ggpratingsystem").setLevel(level);
+	}
+
+	public PlayerSet getPlayerSet() {
+		return playerSet;
+	}
+	public GameSet getGameSet() {
+		return gameSet;
 	}
 
 }

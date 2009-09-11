@@ -34,16 +34,18 @@ public class MatchSetTest extends TestCase {
 	private final MatchSet blocksworld;
 	private final MatchSet tictactoe;
 	private final MatchSet chinesecheckers4p;
+	private final Configuration configuration;
 	
 	
 	public MatchSetTest() throws IOException {
 		super();
-		MatchReader matchReader = new FileMatchReader(new File(Util.getDataDir(), "competition2007" + File.separator + "xml"));
+		configuration = new Configuration();
+		MatchSetReader matchSetReader = new FileMatchSetReader(new File(Util.getDataDir(), "competition2007" + File.separator + "xml"), configuration);
 
 		matchSets = new LinkedList<MatchSet>();
 		for (int i = 0; i < 9; i++) {	// intentionally not reading all MatchSets here, are not needed
-			assert(matchReader.hasNext());
-			matchSets.add(matchReader.readMatchSet());
+			assert(matchSetReader.hasNext());
+			matchSets.add(matchSetReader.readMatchSet());
 		}
 
 		blocksworld = matchSets.get(0);	
@@ -101,42 +103,42 @@ public class MatchSetTest extends TestCase {
 	public void testOverallScores() {
 		Map<Player, Double> overallScores = blocksworld.overallScores();
 		assertEquals(9, overallScores.size());
-		assertEquals(100.0, overallScores.get(Player.getInstance("FLUXPLAYER")));
-		assertEquals(100.0, overallScores.get(Player.getInstance("U-TEXAS-LARG")));
-		assertEquals(100.0, overallScores.get(Player.getInstance("CLUNEPLAYER")));
-		assertEquals(100.0, overallScores.get(Player.getInstance("JIGSAWBOT")));
-		assertEquals(100.0, overallScores.get(Player.getInstance("W-WOLFE")));
-		assertEquals(100.0, overallScores.get(Player.getInstance("ARY")));
-		assertEquals(100.0, overallScores.get(Player.getInstance("CADIA-PLAYER")));
-		assertEquals(100.0, overallScores.get(Player.getInstance("LUCKY-LEMMING")));
-		assertEquals(  0.0, overallScores.get(Player.getInstance("THE-PIRATE")));
+		assertEquals(100.0, overallScores.get(configuration.getPlayerSet().getPlayer("FLUXPLAYER")));
+		assertEquals(100.0, overallScores.get(configuration.getPlayerSet().getPlayer("U-TEXAS-LARG")));
+		assertEquals(100.0, overallScores.get(configuration.getPlayerSet().getPlayer("CLUNEPLAYER")));
+		assertEquals(100.0, overallScores.get(configuration.getPlayerSet().getPlayer("JIGSAWBOT")));
+		assertEquals(100.0, overallScores.get(configuration.getPlayerSet().getPlayer("W-WOLFE")));
+		assertEquals(100.0, overallScores.get(configuration.getPlayerSet().getPlayer("ARY")));
+		assertEquals(100.0, overallScores.get(configuration.getPlayerSet().getPlayer("CADIA-PLAYER")));
+		assertEquals(100.0, overallScores.get(configuration.getPlayerSet().getPlayer("LUCKY-LEMMING")));
+		assertEquals(  0.0, overallScores.get(configuration.getPlayerSet().getPlayer("THE-PIRATE")));
 		
 		overallScores = tictactoe.overallScores();
 		assertEquals(8, overallScores.size());
-		assertEquals(100.0, overallScores.get(Player.getInstance("FLUXPLAYER")));
-		assertEquals(200.0, overallScores.get(Player.getInstance("U-TEXAS-LARG")));
-		assertEquals(100.0, overallScores.get(Player.getInstance("CLUNEPLAYER")));
-		assertEquals(  0.0, overallScores.get(Player.getInstance("JIGSAWBOT")));
-		assertEquals(  0.0, overallScores.get(Player.getInstance("W-WOLFE")));
-		assertEquals(100.0, overallScores.get(Player.getInstance("ARY")));
-		assertEquals(200.0, overallScores.get(Player.getInstance("CADIA-PLAYER")));
-		assertEquals(100.0, overallScores.get(Player.getInstance("LUCKY-LEMMING")));
-		assertEquals( null, overallScores.get(Player.getInstance("THE-PIRATE")));
+		assertEquals(100.0, overallScores.get(configuration.getPlayerSet().getPlayer("FLUXPLAYER")));
+		assertEquals(200.0, overallScores.get(configuration.getPlayerSet().getPlayer("U-TEXAS-LARG")));
+		assertEquals(100.0, overallScores.get(configuration.getPlayerSet().getPlayer("CLUNEPLAYER")));
+		assertEquals(  0.0, overallScores.get(configuration.getPlayerSet().getPlayer("JIGSAWBOT")));
+		assertEquals(  0.0, overallScores.get(configuration.getPlayerSet().getPlayer("W-WOLFE")));
+		assertEquals(100.0, overallScores.get(configuration.getPlayerSet().getPlayer("ARY")));
+		assertEquals(200.0, overallScores.get(configuration.getPlayerSet().getPlayer("CADIA-PLAYER")));
+		assertEquals(100.0, overallScores.get(configuration.getPlayerSet().getPlayer("LUCKY-LEMMING")));
+		assertEquals( null, overallScores.get(configuration.getPlayerSet().getPlayer("THE-PIRATE")));
 		
 		overallScores = chinesecheckers4p.overallScores();
 		assertEquals(8, overallScores.size());
-		assertEquals(100.0, overallScores.get(Player.getInstance("FLUXPLAYER")));
-		assertEquals( 50.0, overallScores.get(Player.getInstance("U-TEXAS-LARG")));
-		assertEquals( 75.0, overallScores.get(Player.getInstance("CLUNEPLAYER")));
-		assertEquals(100.0, overallScores.get(Player.getInstance("JIGSAWBOT")));
-		assertEquals( null, overallScores.get(Player.getInstance("W-WOLFE")));
-		assertEquals( 75.0, overallScores.get(Player.getInstance("ARY")));
-		assertEquals( null, overallScores.get(Player.getInstance("CADIA-PLAYER")));
-		assertEquals( null, overallScores.get(Player.getInstance("LUCKY-LEMMING")));
-		assertEquals( null, overallScores.get(Player.getInstance("THE-PIRATE")));
-		assertEquals( 25.0, overallScores.get(Player.getInstance("RANDOM")));
-		assertEquals( 25.0, overallScores.get(Player.getInstance("RANDOM2")));
-		assertEquals( 50.0, overallScores.get(Player.getInstance("RANDOM3")));
+		assertEquals(100.0, overallScores.get(configuration.getPlayerSet().getPlayer("FLUXPLAYER")));
+		assertEquals( 50.0, overallScores.get(configuration.getPlayerSet().getPlayer("U-TEXAS-LARG")));
+		assertEquals( 75.0, overallScores.get(configuration.getPlayerSet().getPlayer("CLUNEPLAYER")));
+		assertEquals(100.0, overallScores.get(configuration.getPlayerSet().getPlayer("JIGSAWBOT")));
+		assertEquals( null, overallScores.get(configuration.getPlayerSet().getPlayer("W-WOLFE")));
+		assertEquals( 75.0, overallScores.get(configuration.getPlayerSet().getPlayer("ARY")));
+		assertEquals( null, overallScores.get(configuration.getPlayerSet().getPlayer("CADIA-PLAYER")));
+		assertEquals( null, overallScores.get(configuration.getPlayerSet().getPlayer("LUCKY-LEMMING")));
+		assertEquals( null, overallScores.get(configuration.getPlayerSet().getPlayer("THE-PIRATE")));
+		assertEquals( 25.0, overallScores.get(configuration.getPlayerSet().getPlayer("RANDOM")));
+		assertEquals( 25.0, overallScores.get(configuration.getPlayerSet().getPlayer("RANDOM2")));
+		assertEquals( 50.0, overallScores.get(configuration.getPlayerSet().getPlayer("RANDOM3")));
 	}
 	
 //	public void testCountRoles() {

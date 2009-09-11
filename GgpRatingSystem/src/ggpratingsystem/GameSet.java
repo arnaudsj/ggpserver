@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008,2009 Martin Günther <mintar@gmx.de>
+    Copyright (C) 2008,2009 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GgpRatingSystem.
 
@@ -19,21 +19,26 @@
 
 package ggpratingsystem;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
-public class AllTests {
+public final class GameSet {
+	private Map<String, Game> games = new HashMap<String, Game>();
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for ggpratingsystem");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(FileMatchReaderTest.class);
-		suite.addTestSuite(MatchSetTest.class);
-		suite.addTestSuite(FileMatchSetReaderTest.class);
-		suite.addTestSuite(CommandLineInterfaceTest.class);
-		//$JUnit-END$
-		suite.addTest(ggpratingsystem.ratingsystems.AllTests.suite());
-		return suite;
+	public Game getGame(String name) {
+		Game result = games.get(name);
+		
+		if (result == null) {
+			result = new Game(name);
+			games.put(name, result);
+		}
+		
+		return result;
 	}
 
+	public Collection<? extends Game> getAllGames() {
+		return Collections.unmodifiableCollection(games.values());
+	}
 }

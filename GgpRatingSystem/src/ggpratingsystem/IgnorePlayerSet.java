@@ -32,7 +32,7 @@ import au.com.bytecode.opencsv.CSVReader;
 public class IgnorePlayerSet extends HashSet<Player> {
 	private static final long serialVersionUID = -9015780749809835266L;
 
-	public IgnorePlayerSet(File directory) throws IOException {
+	public IgnorePlayerSet(File directory, PlayerSet playerSet) throws IOException {
 		CSVReader reader;
 		File ignoreFile = new File(directory, "ignore_players.csv");
 		
@@ -51,7 +51,7 @@ public class IgnorePlayerSet extends HashSet<Player> {
 		    	}
 		    	
 		    	String playerName = line[0];	    	
-		    	add(Player.getInstance(playerName));
+		    	add(playerSet.getPlayer(playerName));
 			}
 	    }
 	}
