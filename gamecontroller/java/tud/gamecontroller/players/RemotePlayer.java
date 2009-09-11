@@ -55,10 +55,21 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 	private Logger logger;
 
 	/**
+	 * the idea to handle connection timeouts by Sam Schreiber <schreib@cs.stanford.edu>:
+	 * "[...] one way to deal with unresponsive 
+	 * players might be to give each player a total of (for example) 10 extra
+	 * seconds total over the course of the match to spend establishing the
+	 * connection, and then only cut them off with a connection timeout if they
+	 * spend all of that time [...]"
+	 */
+	private int connectionTimeoutBonus;
+
+	/**
 	 * the maximum time (milliseconds) to wait until the connection to the player is established
 	 * (the start/playclock only start after that)
 	 */
-	private static final int CONNECTION_TIMEOUT = 5000;
+	private static final int CONNECTION_TIMEOUT = 2000;
+	private static final int CONNECTION_TIMEOUT_BONUS = 30000;
 	
 	public RemotePlayer(String name, String host, int port, MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory, GameScramblerInterface gamescrambler) {
 		super(name);
@@ -79,6 +90,7 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 	@Override
 	public void gameStart(MatchInterface<TermType, ?> match, RoleInterface<TermType> role, MessageSentNotifier notifier) {
 		super.gameStart(match, role, notifier);
+		connectionTimeoutBonus = CONNECTION_TIMEOUT_BONUS;
 		String msg="(START "+
 				match.getMatchID()+" "+
 				gameScrambler.scramble(role.getKIFForm()).toUpperCase()+
@@ -144,8 +156,11 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 		InputStream is=null;
 		try {
 			logger.info("Begin creating Socket for " + host + ":" + port);
+			long t0 = System.currentTimeMillis();
 			s = new Socket();
-			s.connect(new InetSocketAddress(getHostAddress(), port), CONNECTION_TIMEOUT);
+			s.connect(new InetSocketAddress(getHostAddress(), port), CONNECTION_TIMEOUT + connectionTimeoutBonus);
+			long t1 = System.currentTimeMillis();
+			connectionTimeoutBonus -= Math.max(0, t1 - t0 - CONNECTION_TIMEOUT); // subtract the excess connection time from the bonus if greater than CONNECTION_TIMEOUT 
 			notifier.messageWasSent();
 			// TODO: rename this to notifier.connectionEstablished() or similar
 			//       the actual sending of the message is already counted towards the startclock/playclock
@@ -209,7 +224,7 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 	private void logErrorMessage(String type, String message) {
 		GameControllerErrorMessage errorMessage = new GameControllerErrorMessage(type, message, this.getName());
 		if (match instanceof ErrorMessageListener) {
-			((ErrorMessageListener) match).notifyErrorMessage(errorMessage);
+			((ErrorMessageListener<?, ?>) match).notifyErrorMessage(errorMessage);
 		}
 		logger.log(Level.SEVERE, message, errorMessage);
 	}
