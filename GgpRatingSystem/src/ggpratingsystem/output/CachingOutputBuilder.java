@@ -29,6 +29,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import tud.ggpserver.formhandlers.ViewRatings.HtmlOutputBuilder;
+
 /**
  * This class caches all calls in memory and then, on finish(), passes them
  * all at once to an OutputBuilder. The advantage is that the list of players 
@@ -48,11 +50,17 @@ public class CachingOutputBuilder implements OutputBuilder {
 	private List<MatchSet> matchSets = new LinkedList<MatchSet>();
 	private List<List<Rating>> ratingLists = new LinkedList<List<Rating>>();
 
+	public CachingOutputBuilder(final OutputBuilder decorated) {
+		this(decorated, new HashSet<Player>());
+	}
+
 	public CachingOutputBuilder(final OutputBuilder decorated, 
 			final Set<Player> ignorePlayers) {
 		this.decorated = decorated;
 		this.ignorePlayers = ignorePlayers;
 	}
+
+
 
 
 	/**
