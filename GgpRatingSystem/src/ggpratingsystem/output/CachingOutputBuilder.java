@@ -29,8 +29,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import tud.ggpserver.formhandlers.ViewRatings.HtmlOutputBuilder;
-
 /**
  * This class caches all calls in memory and then, on finish(), passes them
  * all at once to an OutputBuilder. The advantage is that the list of players 
