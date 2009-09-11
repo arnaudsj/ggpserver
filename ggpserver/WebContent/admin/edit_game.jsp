@@ -47,7 +47,9 @@
 <div id="content">
     <div id="ctitle">Edit Game</div>
 
-	<form action="<%= request.getContextPath() + response.encodeURL("/admin/process_edit_game.jsp") %>" method="post">
+	<c:url value="process_edit_game.jsp" var="saveChangesURL"/>
+		
+	<form action="${saveChangesURL}" method="post">
 	<table cellpadding="4" cellspacing="2" border="0">
 		<tr>
 			<td valign="top" align="right">
