@@ -22,14 +22,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="viewRatings"
 	class="tud.ggpserver.formhandlers.ViewRatings" scope="page">
-	<c:catch>
-		<%
-		// this is for catching NumberFormatExceptions and the like
-		%>
-		<%--
-			<jsp:setProperty name="viewPlayer" property="name" />
-		--%>
-	</c:catch>
 </jsp:useBean>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -43,7 +35,11 @@
 <div id="content">
 <div id="ctitle">View player ratings</div>
 <h1 class="notopborder">Player ratings</h1>
+	<% viewRatings.computeRatings(request.getSession()); %>
 	${viewRatings.ratingsHtmlTable}
+	<c:url value="/servlet/ChartViewer" var="chartURL"/>
+	<img src="${chartURL}" usemap="#chartImageMap">
+	${viewRatings.chartImageMap}
 </div>
 <!--end div "content"--> <jsp:directive.include file="/inc/footer.jsp" />
 </div>

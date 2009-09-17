@@ -12,6 +12,19 @@
 		<welcome-file>default.jsp</welcome-file>
 	</welcome-file-list>
 
+	<!--
+		Define servlet for serving chart files
+		(see http://www.jfree.org/phpBB2/viewtopic.php?p=28493#p28493)
+	-->
+	<servlet>
+	    <servlet-name>ChartViewer</servlet-name>
+	    <servlet-class>tud.ggpserver.ratingsystem.ChartViewer</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ChartViewer</servlet-name>
+		<url-pattern>/servlet/ChartViewer</url-pattern>
+	</servlet-mapping>
+  
 	<!-- Define the roles we want to use in the application -->
 	<security-role> 
 	    <role-name>admin</role-name> 

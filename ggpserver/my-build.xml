@@ -57,6 +57,10 @@
     <path id="Web App Libraries.libraryclasspath">
         <pathelement location="WebContent/WEB-INF/lib/catalina.jar"/>
     </path>
+    <path id="JFreeChart.libraryclasspath">
+        <pathelement location="WebContent/WEB-INF/lib/jcommon-1.0.16.jar"/>
+        <pathelement location="WebContent/WEB-INF/lib/jfreechart-1.0.13.jar"/>
+    </path>
     <path id="ggpserver.classpath">
         <pathelement location="build/classes"/>
         <path refid="ggpratingsystem.classpath"/>
@@ -64,6 +68,7 @@
         <path refid="Apache Tomcat v5.5 [Apache Tomcat v5.5].libraryclasspath"/>
         <path refid="JUnit 4.libraryclasspath"/>
         <path refid="Web App Libraries.libraryclasspath"/>
+        <path refid="JFreeChart.libraryclasspath"/>
     </path>
     <target name="init">
         <mkdir dir="build/classes"/>

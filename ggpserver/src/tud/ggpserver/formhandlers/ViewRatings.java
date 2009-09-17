@@ -20,49 +20,39 @@
 package tud.ggpserver.formhandlers;
 
 import ggpratingsystem.Configuration;
-import ggpratingsystem.Game;
-import ggpratingsystem.Match;
-import ggpratingsystem.MatchSet;
-import ggpratingsystem.MatchSetReader;
-import ggpratingsystem.Player;
 import ggpratingsystem.output.CachingOutputBuilder;
-import ggpratingsystem.output.OutputBuilder;
 import ggpratingsystem.ratingsystems.ConstantLinearRegressionStrategy;
-import ggpratingsystem.ratingsystems.LinearRegressionGameInfo;
-import ggpratingsystem.ratingsystems.Rating;
 import ggpratingsystem.ratingsystems.RatingException;
 import ggpratingsystem.ratingsystems.RatingSystemType;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.sql.SQLException;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.logging.Logger;
 
-import tud.gamecontroller.game.RoleInterface;
-import tud.gamecontroller.players.PlayerInfo;
-import tud.ggpserver.datamodel.AbstractDBConnector;
-import tud.ggpserver.datamodel.DBConnector;
-import tud.ggpserver.datamodel.matches.ServerMatch;
+import javax.servlet.http.HttpSession;
+
+import org.jfree.chart.ChartRenderingInfo;
+import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.JFreeChart;
+
+import tud.ggpserver.ratingsystem.ChartOutputBuilder;
+import tud.ggpserver.ratingsystem.DBMatchSetReader;
+import tud.ggpserver.ratingsystem.HtmlOutputBuilder;
 
 public class ViewRatings {
 	
-	private static final Logger logger = Logger.getLogger(AdminPage.class.getName());
+	private final Logger logger = Logger.getLogger(AdminPage.class.getName());
 
-	private static final AbstractDBConnector<?, ?> db = DBConnector.getInstance();
-	
-	private Configuration configuration;
+	private Configuration configuration = null;
 
-	public String getRatingsHtmlTable() throws IOException, RatingException, SQLException{
+	private String ratingsHtmlTable = null;
 	
-		StringBuilder result = new StringBuilder();
-		
+	private String chartImageMap;
+	
+	public void computeRatings(HttpSession session) throws SQLException, IOException, RatingException {
 		logger.info("create configuration");
 		configuration = new Configuration();
 		
@@ -75,12 +65,15 @@ public class ViewRatings {
 	
 		// set match reader 
 		logger.info("set match reader");
-		configuration.setMatchReader(new DBMatchReader());
+		configuration.setMatchReader(new DBMatchSetReader(configuration));
 	
-		// add outputBuilder
-		logger.info("add output builder");
+		// add output builders
+		logger.info("add output builders");
 		StringWriter writer = new StringWriter();
-		configuration.addOutputBuilder(RatingSystemType.CONSTANT_LINEAR_REGRESSION, new CachingOutputBuilder(new HtmlOutputBuilder(writer)));
+		configuration.addOutputBuilder(RatingSystemType.CONSTANT_LINEAR_REGRESSION, new CachingOutputBuilder(new HtmlOutputBuilder(configuration, writer)));
+
+		ChartOutputBuilder chartOutputBuilder = new ChartOutputBuilder();
+		configuration.addOutputBuilder(RatingSystemType.CONSTANT_LINEAR_REGRESSION, chartOutputBuilder);
 		
 		// compute
 		logger.info("compute");
@@ -89,216 +82,30 @@ public class ViewRatings {
 		// write results
 		logger.info("close output builders");
 		configuration.closeOutputBuilders();
-		
+
 		logger.info("write table");
-		result.append(writer.getBuffer());
+		ratingsHtmlTable = writer.toString();
+
+		JFreeChart chart = chartOutputBuilder.getChart();
 		
-		return result.toString();
+		ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo();  
+		BufferedImage chartImage = chart.createBufferedImage(640, 400, chartRenderingInfo);
+
+		// putting chart as BufferedImage in session, 
+		// thus making it available for the image reading action Action.
+		session.setAttribute("chartImage", chartImage);
+
+		writer = new StringWriter();
+		ChartUtilities.writeImageMap(new PrintWriter(writer), "chartImageMap", chartRenderingInfo, false);
+		chartImageMap = writer.toString();
 	}
 	
-
-	private class DBMatchReader implements MatchSetReader {
-
-		List<? extends ServerMatch<?,?>> matches;
-		int matchSetId = 0;
-		
-		private final long MATCHSET_TIME = 24*60*60*1000; // maximal difference in start time of two matches such that they still belong to the same match set 
-		
-		public DBMatchReader() throws SQLException {
-			matches = db.getMatches(0, Integer.MAX_VALUE, null, null, "round_robin_tournament", true);
-
-			// filter matches, such that only finished matches are in the list
-			Iterator<? extends ServerMatch<?, ?>> it = matches.iterator();
-			while(it.hasNext()){
-				if ( it.next().getStatus() != ServerMatch.STATUS_FINISHED ) {
-					it.remove();
-				}
-			}
-		}
-		
-		@Override
-		public boolean hasNext() {
-			return !matches.isEmpty();
-		}
-		
-		@Override
-		public MatchSet readMatchSet() {
-			if(matches.isEmpty())
-				return null;
-			
-			Iterator<? extends ServerMatch<?, ?>> it = matches.iterator();
-			if ( !it.hasNext() ) {
-				return null;
-			}
-			ServerMatch<?, ?> nextMatch = it.next();
-			
-			matchSetId++;
-			Calendar calendar = Calendar.getInstance();
-			calendar.setTime(nextMatch.getStartTime());
-			long startTimeInMillis = nextMatch.getStartTime().getTime();
-			
-			String gameName = nextMatch.getGame().getName();
-			Game game = configuration.getGameSet().getGame(gameName);
-			
-			if(!game.hasRoles()) {
-				List<String> roleNames = new LinkedList<String>();
-				for(RoleInterface<?> role:nextMatch.getGame().getOrderedRoles()){
-					roleNames.add(role.getPrefixForm());
-				}
-				game.setRoles(roleNames);
-			}
-			
-			logger.info("creating MatchSet " + matchSetId + " of game " + gameName + " (start time: " + startTimeInMillis + ")");
-			MatchSet matchSet = new MatchSet(""+matchSetId, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), matchSetId, game);
-			
-			boolean continueSearch = true;
-			do {
-				if ( nextMatch.getGame().getName().equals(gameName) ) {
-					logger.info("add match " + nextMatch.getMatchID() + " to matchset");
-					matchSet.addMatch(getRatingSystemMatch(matchSet, nextMatch));
-					it.remove();
-				}
-				if ( it.hasNext() ) {
-					nextMatch = it.next();
-					if ( nextMatch.getStartTime().getTime() > startTimeInMillis + MATCHSET_TIME ) {
-						continueSearch = false;
-					}
-				} else {
-					continueSearch = false;
-				}
-			} while ( continueSearch );
-			return matchSet;
-		}
-		
-		private Match getRatingSystemMatch(MatchSet matchSet, ServerMatch<?, ?> match){
-			List<Player> players = new LinkedList<Player>();
-			for(PlayerInfo playerInfo:match.getOrderedPlayerInfos()) {
-				players.add(configuration.getPlayerSet().getPlayer(playerInfo.getName()));
-			}
-			List<Integer> scores = match.getOrderedGoalValues();
-			return new Match(matchSet, match.getMatchID(), players, scores); 
-		}
-
+	public String getRatingsHtmlTable() {
+		return ratingsHtmlTable;
 	}
-	
-    class HtmlOutputBuilder implements OutputBuilder {
-    	private List<Player> players;
-    	private PrintWriter writer;
-    	private HashMap<Player, Double> playerRatings;
-    	
-    	public HtmlOutputBuilder(Writer rawwriter) {
-    		this.writer = new PrintWriter(rawwriter);
-    		playerRatings = new HashMap<Player, Double>();
-    	}
 
-    	public void initialize(List<Player> players) throws IOException {
-    		this.players = players;
-    		writer.println("<dl>");
-    	}
-
-    	public void beginMatchSet(MatchSet matchSet) {
-    	}
-
-    	public void endMatchSet(MatchSet matchSet) {
-    		
-    		Game game = matchSet.getGame();
-
-    		writer.println("<dt>match set " + matchSet.getId() + "(game: " + game.getName() + ", #matches: " + matchSet.getMatches().size() + ") </dt>");
-    		
-    		writer.println("<dd>");
-
-    		// print scores of single matches
-    		writer.println("<table>");
-    		writer.println("  <tr>");
-    		for(Player player : players){
-   				writer.println("    <th>" + player.getName() + "</th>");
-    		}
-    		writer.println("  </tr>");
-    		for (Match m : matchSet.getMatches()) {
-        		writer.println("  <tr>");
-        		for(Player player : players){
-        			int i = m.getPlayers().indexOf(player);
-        			if (i != -1) {
-            			writer.println("    <td>" + m.getScores().get(i) + "(" + matchSet.getGame().getRoles().get(i) + ")</td>");
-        			} else {
-        				writer.println("    <td></td>");
-        			}
-        		}
-        		writer.println("  </tr>");
-    		}
-    		writer.println("</table>");
-
-    		writeRatingTable();
-    		
-			writer.println("</dd>");
-    	}
-
-    	public void ratingUpdate(Rating rating) {
-    		playerRatings.put(rating.getPlayer(), rating.getCurRating());
-    	}
-
-    	public void finish() {
-    		writer.println("</dl>");
-
-    		// add some more information
-    		writer.println("game coefficients:<br/>");
-    		writer.println("<dl>");
-    		for(Game game : configuration.getGameSet().getAllGames()) {
-    			writer.print("<dt>");
-    			writer.print(game.getName());
-    			writer.println("</dt>");
-    			writer.println("<dd>");
-    			writeGameCoefficientsTable(game);
-    			writer.println("</dd>");
-    		}
-    		writer.println("</dl>");
-
-    		// close output file
-    		writer.close();
-    	}
-    	
-    	private void writeRatingTable() {
-    		// write current ratings table
-    		writer.println("<table>");
-    		writer.println("  <tr>");
-    		for(Player player : players){
-   				writer.println("    <th>" + player.getName() + "</th>");
-    		}
-    		writer.println("  </tr>");
-    		writer.println("  <tr>");
-    		for(Player player : players){
-    			Double rating = playerRatings.get(player);
-    			writer.println("    <td>" + rating + "</td>");
-    		}
-    		writer.println("  </tr>");
-    		writer.println("</table>");
-    	}
-
-    	private void writeGameCoefficientsTable(Game game) {
-    		LinearRegressionGameInfo gameInfo = (LinearRegressionGameInfo)game.getGameInfo(RatingSystemType.CONSTANT_LINEAR_REGRESSION);
-			double[][] coeffs = gameInfo.getCoefficients();
-			writer.println("<table> <tr> <td></td> <th>const</th>");
-			for(String roleName : game.getRoles()) {
-				writer.print("<th>");
-				writer.print(roleName);
-				writer.println("</th>");
-			}
-			writer.println("</tr>");
-			for(int i = 0 ; i < coeffs.length; i++){
-				writer.println("<tr>");
-				writer.print("<th>");
-				writer.print(game.getRoles().get(i));
-				writer.println("</th>");
-				for(int j = 0 ; j < coeffs[i].length; j++){
-					writer.print("<td>");
-					writer.print(coeffs[i][j]);
-					writer.println("</td>");
-				}
-				writer.println("</tr>");
-			}
-			writer.println("</table>");
-    	}
-}
-
+	public String getChartImageMap() {
+		return chartImageMap;
+	}
 
 }
