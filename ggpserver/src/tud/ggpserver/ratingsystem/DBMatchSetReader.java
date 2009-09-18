@@ -56,8 +56,8 @@ public class DBMatchSetReader implements MatchSetReader {
 	
 	private int matchSetId = 0;
 
-	private static final long matchSetMinTime = 24*60*60*1000; // one day
-	private static final long matchSetMaxTime = 4*7*24*60*60*1000; // four weeks
+	private static final long matchSetMinTime = 24*60*60*1000L; // one day
+	private static final long matchSetMaxTime = 4*7*24*60*60*1000L; // four weeks
 	
 	public DBMatchSetReader(Configuration configuration) throws SQLException {
 		this.configuration = configuration;
