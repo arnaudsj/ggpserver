@@ -25,10 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import cs227b.teamIago.util.GameState;
-
 import tud.gamecontroller.game.RoleInterface;
-import tud.gamecontroller.game.javaprover.Term;
 import tud.gamecontroller.players.LegalPlayerInfo;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.players.RandomPlayerInfo;
@@ -38,7 +35,7 @@ import tud.ggpserver.datamodel.Tournament;
 import tud.ggpserver.datamodel.matches.NewMatch;
 import tud.ggpserver.datamodel.matches.RunningMatch;
 import tud.ggpserver.datamodel.matches.ServerMatch;
-import tud.ggpserver.scheduler.JavaProverTournamentScheduler;
+import tud.ggpserver.scheduler.MatchRunner;
 
 public class EditTournament extends ShowMatches {
 	public static final String ADD_MATCH = "add_match";
@@ -149,28 +146,20 @@ public class EditTournament extends ShowMatches {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void startMatch(NewMatch match) {
-		JavaProverTournamentScheduler.getInstance(tournament).start(match);
+	private void startMatch(NewMatch match) throws SQLException {
+		MatchRunner.getInstance().scheduleMatch(match);
 		correctlyPerformed = true;
 	}
 
 	@SuppressWarnings("unchecked")
 	private void abortMatch(RunningMatch match) {
-		JavaProverTournamentScheduler.getInstance(tournament).abort(match);
+		MatchRunner.getInstance().abort(match);
 		correctlyPerformed = true;
 	}
 
 	@SuppressWarnings("unchecked")
 	private void deleteMatch(ServerMatch match) throws SQLException {
-		JavaProverTournamentScheduler scheduler = JavaProverTournamentScheduler.getInstance(tournament);
-		if (scheduler.isRunning(match)) {
-			assert (match instanceof RunningMatch);
-			try {
-				scheduler.abort((RunningMatch<Term, GameState>) match);
-			} catch (IllegalStateException e) {
-				// Match wasn't running any more, ignore
-			}
-		}
+		MatchRunner.getInstance().delete(match); // abort the match, if it is scheduled or running
 		db.deleteMatch(match.getMatchID());
 		correctlyPerformed = true;
 	}

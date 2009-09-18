@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
+import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.DuplicateInstanceException;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
@@ -40,11 +41,11 @@ public class CreatePlayer {
 		if (playerName.equals("")) {
 			errors.add("player name must not be empty");
 		}
-		if (playerName.equalsIgnoreCase("Legal")) {
-			errors.add("player name can not be \"Legal\"");
+		if (playerName.equalsIgnoreCase(AbstractDBConnector.PLAYER_LEGAL)) {
+			errors.add("player name can not be \"" + AbstractDBConnector.PLAYER_LEGAL + "\"");
 		}
-		if (playerName.equalsIgnoreCase("Random")) {
-			errors.add("player name can not be \"Random\"");
+		if (playerName.equalsIgnoreCase(AbstractDBConnector.PLAYER_RANDOM)) {
+			errors.add("player name can not be \"" + AbstractDBConnector.PLAYER_RANDOM + "\"");
 		}
 		if (playerName.length() > 20) {
 			errors.add("player name must not be longer than 20 characters");

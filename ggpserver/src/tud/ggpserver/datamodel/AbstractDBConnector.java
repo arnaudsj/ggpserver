@@ -58,6 +58,7 @@ import tud.ggpserver.datamodel.matches.AbortedMatch;
 import tud.ggpserver.datamodel.matches.FinishedMatch;
 import tud.ggpserver.datamodel.matches.NewMatch;
 import tud.ggpserver.datamodel.matches.RunningMatch;
+import tud.ggpserver.datamodel.matches.ScheduledMatch;
 import tud.ggpserver.datamodel.matches.ServerMatch;
 import tud.ggpserver.scheduler.PlayerStatusListener;
 import tud.ggpserver.util.Digester;
@@ -79,6 +80,10 @@ import tud.gamecontroller.scrambling.GameScrambler;
  * 
  */
 public abstract class AbstractDBConnector<TermType extends TermInterface, ReasonerStateInfoType> {
+	public static final String PLAYER_LEGAL = "Legal";
+
+	public static final String PLAYER_RANDOM = "Random";
+
 	public static final int MATCHID_MAXLENGTH = 40;
 
 	private static final Logger logger = Logger.getLogger(AbstractDBConnector.class.getName());
@@ -182,8 +187,8 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			int port, User owner, String status)
 			throws DuplicateInstanceException, SQLException {
 		
-		assert(!name.equals("Legal"));
-		assert(!name.equals("Random"));
+		assert(!name.equals(PLAYER_LEGAL));
+		assert(!name.equals(PLAYER_RANDOM));
 
 		Connection con = getConnection();
 		PreparedStatement ps = null;
@@ -217,10 +222,10 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	}
 	
 	public PlayerInfo getPlayerInfo(String name) throws SQLException {
-		if (name.equals("Legal")) {
+		if (name.equals(PLAYER_LEGAL)) {
 			logger.info("String - Returning new LegalPlayerInfo"); //$NON-NLS-1$
 			return new LegalPlayerInfo(-1);
-		} else if (name.equals("Random")) {
+		} else if (name.equals(PLAYER_RANDOM)) {
 			logger.info("String - Returning new RandomPlayerInfo"); //$NON-NLS-1$
 			return new RandomPlayerInfo(-1);
 		}
@@ -460,6 +465,10 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 					result = new NewMatch<TermType, ReasonerStateInfoType>(
 							matchID, game, startclock, playclock,
 							rolesToPlayerInfos, startTime, scrambled, this);
+				} else if (status.equals(ServerMatch.STATUS_SCHEDULED)) {
+					result = new ScheduledMatch<TermType, ReasonerStateInfoType>(
+							matchID, game, startclock, playclock,
+							rolesToPlayerInfos, startTime, scrambled, this);
 				} else if (status.equals(ServerMatch.STATUS_RUNNING)) {
 					GameScramblerInterface gameScrambler;
 					
@@ -507,6 +516,14 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			return (NewMatch<TermType, ReasonerStateInfoType>) match;
 		}
 		throw new IllegalArgumentException("Not a new match: " + matchID);
+	}
+
+	public ScheduledMatch<TermType, ReasonerStateInfoType> getScheduledMatch(String matchID) throws SQLException {
+		ServerMatch<TermType, ReasonerStateInfoType> match = getMatch(matchID);
+		if (match instanceof ScheduledMatch) {
+			return (ScheduledMatch<TermType, ReasonerStateInfoType>) match;
+		}
+		throw new IllegalArgumentException("Not a scheduled match: " + matchID);
 	}
 	
 	public RunningMatch<TermType, ReasonerStateInfoType> getRunningMatch(String matchID) throws SQLException {
@@ -902,9 +919,12 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		}
 		if (excludeNew) {
 			where += " AND `m`.`status` != '" + ServerMatch.STATUS_NEW + "'";
+			where += " AND `m`.`status` != '" + ServerMatch.STATUS_SCHEDULED + "'";
 		}else{
 			// show the new matches last
-			orderBy = "ORDER BY CASE WHEN `m`.`status`!='" + ServerMatch.STATUS_NEW + "' THEN 1 ELSE 2 END, `m`.`start_time`";
+			orderBy = "ORDER BY CASE"
+						+ " WHEN `m`.`status`!='" + ServerMatch.STATUS_NEW + "' AND `m`.`status`!='" + ServerMatch.STATUS_SCHEDULED + "'"
+						+ " THEN 1 ELSE 2 END, `m`.`start_time`";
 		}
 		parameters.add(startRow);
 		parameters.add(numDisplayedRows);
@@ -1783,7 +1803,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			ps = con.prepareStatement(
 					"SELECT `match_players`.`player`, SUM(`match_players`.`goal_value`) AS the_sum, COUNT(`match_players`.`goal_value`) AS the_count " +
 					"FROM `matches`, `match_players` " +
-					"WHERE `matches`.`match_id` = `match_players`.`match_id` AND `matches`.`tournament_id` = ? AND `match_players`.`goal_value` IS NOT NULL AND `player` != 'Random' AND `player` != 'Legal' " +
+					"WHERE `matches`.`match_id` = `match_players`.`match_id` AND `matches`.`tournament_id` = ? AND `match_players`.`goal_value` IS NOT NULL AND `player` != '" + PLAYER_RANDOM + "' AND `player` != '" + PLAYER_LEGAL + "' " +
 					"GROUP BY `match_players`.`player` " +
 					"ORDER BY the_sum DESC");
 			ps.setString(1, tournament.getTournamentID());

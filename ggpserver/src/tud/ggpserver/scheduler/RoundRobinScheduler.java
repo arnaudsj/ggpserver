@@ -19,9 +19,13 @@
 
 package tud.ggpserver.scheduler;
 
+import java.sql.SQLException;
+import java.util.Collection;
+
 import tud.gamecontroller.game.javaprover.Term;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
+import tud.ggpserver.datamodel.matches.NewMatch;
 import cs227b.teamIago.util.GameState;
 
 public class RoundRobinScheduler extends AbstractRoundRobinScheduler<Term, GameState> {
@@ -37,5 +41,11 @@ public class RoundRobinScheduler extends AbstractRoundRobinScheduler<Term, GameS
 			instance = new RoundRobinScheduler(DBConnectorFactory.getDBConnector());
 		}
 		return instance;
+	}
+
+	@Override
+	protected void runMatches(Collection<NewMatch<Term, GameState>> matches) throws SQLException {
+		MatchRunner<Term, GameState> matchRunner = MatchRunner.getInstance();
+		matchRunner.runMatches(matches);
 	}
 }

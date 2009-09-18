@@ -25,6 +25,7 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
+import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
 import tud.ggpserver.datamodel.User;
@@ -156,8 +157,8 @@ public class EditPlayer {
 	}
 
 	public void setPlayerName(String playerName) throws SQLException {
-		if (playerName.equals("Legal") || playerName.equals("Random")) {
-			throw new IllegalArgumentException("player cannot be Legal or Random!");
+		if (playerName.equals(AbstractDBConnector.PLAYER_RANDOM) || playerName.equals(AbstractDBConnector.PLAYER_RANDOM)) {
+			throw new IllegalArgumentException("player cannot be " + AbstractDBConnector.PLAYER_RANDOM + " or " + AbstractDBConnector.PLAYER_LEGAL + "!");
 		}
 
 		// this cast is safe because of the check above

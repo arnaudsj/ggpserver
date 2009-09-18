@@ -31,9 +31,7 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import tud.gamecontroller.GameController;
 import tud.gamecontroller.game.RoleInterface;
-import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.players.RandomPlayerInfo;
 import tud.gamecontroller.term.TermInterface;
@@ -41,9 +39,8 @@ import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.ConfigOption;
 import tud.ggpserver.datamodel.Game;
 import tud.ggpserver.datamodel.matches.NewMatch;
-import tud.ggpserver.datamodel.matches.RunningMatch;
 
-public class AbstractRoundRobinScheduler<TermType extends TermInterface, ReasonerStateInfoType> {
+public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface, ReasonerStateInfoType> {
 	public static final String ROUND_ROBIN_TOURNAMENT_ID = "round_robin_tournament";
 	private static final Logger logger = Logger.getLogger(AbstractRoundRobinScheduler.class.getName());
 	private static final Random random = new Random();
@@ -54,11 +51,12 @@ public class AbstractRoundRobinScheduler<TermType extends TermInterface, Reasone
 	private final AbstractDBConnector<TermType, ReasonerStateInfoType> db;
 
 	private Thread gameThread;
-	private List<Thread> matchThreads;
+//	private List<Thread> matchThreads;
 
 	private final GamePicker<TermType, ReasonerStateInfoType> gamePicker;
 	private final PlayerStatusTracker<TermType, ReasonerStateInfoType> playerStatusTracker;
-
+	private String lastPlayedGame = null;
+	private int nbMatchesToPlayForGame;
 	
 	public AbstractRoundRobinScheduler(AbstractDBConnector<TermType, ReasonerStateInfoType> db) {
 		this.db = db;
@@ -76,20 +74,10 @@ public class AbstractRoundRobinScheduler<TermType extends TermInterface, Reasone
 				public void run() {
 					try {
 						runMatches();
-					} catch (InterruptedException e) {
-						// abort all current matches
-						if (matchThreads != null) {
-							try {
-								for (Thread matchThread : matchThreads) {
-									matchThread.interrupt();
-									matchThread.join();
-								}
-							} catch (InterruptedException e1) {
-								logger.severe("exception: " + e1); //$NON-NLS-1$
-							}
-						}
 					} catch (SQLException e) {
 						logger.severe("exception: " + e); //$NON-NLS-1$
+					} catch (InterruptedException e) {
+						logger.info("round robin scheduler interrupted");
 					}
 					setRunning(false);
 				}
@@ -102,6 +90,7 @@ public class AbstractRoundRobinScheduler<TermType extends TermInterface, Reasone
 	
 	public synchronized void stop() {
 		if (running) {
+			stopAfterCurrentMatches = true;
 			gameThread.interrupt();
 			try {
 				gameThread.join();
@@ -139,55 +128,16 @@ public class AbstractRoundRobinScheduler<TermType extends TermInterface, Reasone
 
 	// this method has default visibility so it can be accessed from within the
 	// anonymous inner Thread classes without overhead
-	void runMatches() throws InterruptedException, SQLException {
+	void runMatches() throws SQLException, InterruptedException {
 		while (!stopAfterCurrentMatches) {
 			List<NewMatch<TermType, ReasonerStateInfoType>> currentMatches = createMatches();
-			
-			matchThreads = new LinkedList<Thread>();
-			
-			for (final NewMatch<TermType, ReasonerStateInfoType> currentMatch : currentMatches) {
-				Thread thread = new Thread(){
-					@Override
-					public void run() {
-						String matchID = currentMatch.getMatchID();
-						logger.info("Thread for match " + matchID + " - START");
-						try {
-							RunningMatch<TermType, ReasonerStateInfoType> match = currentMatch.toRunning();
-
-							try {
-								GameController<TermType, ReasonerStateInfoType> gameController 
-										= new GameController<TermType, ReasonerStateInfoType>(match);
-								gameController.addListener(match);
-								gameController.runGame();
-								match.toFinished();
-								playerStatusTracker.updateDeadPlayers(match);
-							} catch (InterruptedException e1) {
-								logger.info("Thread for match " + matchID + " - INTERRUPT");
-								match.notifyErrorMessage(new GameControllerErrorMessage(GameControllerErrorMessage.ABORTED, "The match was aborted."));
-								match.toAborted();
-							}
-						} catch (SQLException e2) {
-							logger.severe("exception: " + e2);
-						}
-						logger.info("Thread for match " + matchID + " - END");
-					}
-				};
-				thread.start();
-				matchThreads.add(thread);
-			}
-			
-			// wait for all matches to complete
-			for (Thread thread : matchThreads) {
-				thread.join();
-			}
-			
-			matchThreads = null;
-			
+			runMatches(currentMatches);
 			Thread.sleep(DELAY_BETWEEN_GAMES);
 		}
-
 		setRunning(false);
 	}
+
+	protected abstract void runMatches(Collection<NewMatch<TermType, ReasonerStateInfoType>> currentMatches) throws SQLException;
 
 	private List<NewMatch<TermType, ReasonerStateInfoType>> createMatches() throws SQLException, InterruptedException {
 		int playclock;
@@ -219,7 +169,17 @@ public class AbstractRoundRobinScheduler<TermType extends TermInterface, Reasone
 		
 		List<NewMatch<TermType, ReasonerStateInfoType>> result = new LinkedList<NewMatch<TermType,ReasonerStateInfoType>>();
 		
-		Game<TermType, ReasonerStateInfoType> nextGame = gamePicker.pickNextGame();
+		Game<TermType, ReasonerStateInfoType> nextGame = gamePicker.getNextPlayedGame();
+		if( nextGame.getName().equals(lastPlayedGame) ) {
+			nbMatchesToPlayForGame--;
+		}else{
+			nbMatchesToPlayForGame = nextGame.getNumberOfRoles() - 1;
+		}
+		
+		if (nbMatchesToPlayForGame < 1) {
+			// change next game to play
+			gamePicker.pickNextGame();
+		}
 		Collection<? extends PlayerInfo> activePlayers = playerStatusTracker.waitForActivePlayers();
 		// If there are no enabled games, gamePicker.pickNextGame() will return null.
 		// In order to handle this case correctly, one would have to replace gamePicker.pickNextGame()

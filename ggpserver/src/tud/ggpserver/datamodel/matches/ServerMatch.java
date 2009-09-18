@@ -43,6 +43,7 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 	public static final String STATUS_RUNNING = "running";
 	public static final String STATUS_FINISHED = "finished";
 	public static final String STATUS_ABORTED = "aborted";
+	public static final String STATUS_SCHEDULED = "scheduled";
 	
 	private final Date startTime;
 	private final Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayerInfos;

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+    Copyright (C) 2009 Stephan Schiffel <stephan.schiffel@gmx.de> 
 
     This file is part of GGP Server.
 
@@ -19,24 +19,19 @@
 
 package tud.ggpserver.datamodel.matches;
 
-import java.sql.SQLException;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.impl.State;
-import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 
-public class NewMatch<TermType extends TermInterface, ReasonerStateInfoType>
-		extends ServerMatch<TermType, ReasonerStateInfoType> {
+public class ScheduledMatch<TermType extends TermInterface, ReasonerStateInfoType> extends NewMatch<TermType, ReasonerStateInfoType> {
 
-	public NewMatch(
+	public ScheduledMatch(
 			String matchID,
 			GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game,
 			int startclock,
@@ -48,40 +43,9 @@ public class NewMatch<TermType extends TermInterface, ReasonerStateInfoType>
 		super(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, scrambled, db);
 	}
 
-	/**
-	 * Sets this matches status to "running", and returns the new running match.
-	 * This object must not be used any more after calling this method.
-	 */
-	public RunningMatch<TermType, ReasonerStateInfoType> toRunning() throws SQLException {
-		getDB().setMatchStatus(getMatchID(), ServerMatch.STATUS_RUNNING);
-		return getDB().getRunningMatch(getMatchID());
-	}
-	
-	public ScheduledMatch<TermType, ReasonerStateInfoType> toScheduled() throws SQLException {
-		getDB().setMatchStatus(getMatchID(), ServerMatch.STATUS_SCHEDULED);
-		return getDB().getScheduledMatch(getMatchID());
-	}
-	
 	@Override
 	public String getStatus() {
-		return ServerMatch.STATUS_NEW;
+		return ServerMatch.STATUS_SCHEDULED;
 	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<List<GameControllerErrorMessage>> getErrorMessages() {
-		return Collections.EMPTY_LIST;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<List<String>> getJointMovesStrings() {
-		return Collections.EMPTY_LIST;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<String> getXmlStates() {
-		return Collections.EMPTY_LIST;
-	}
+	
 }
