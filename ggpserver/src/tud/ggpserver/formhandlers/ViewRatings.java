@@ -38,6 +38,7 @@ import org.jfree.chart.ChartRenderingInfo;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 
+import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.ratingsystem.ChartOutputBuilder;
 import tud.ggpserver.ratingsystem.DBMatchSetReader;
 import tud.ggpserver.ratingsystem.HtmlOutputBuilder;
@@ -59,9 +60,13 @@ public class ViewRatings {
 		// TODO: get previous ratings from database
 		// configuration.setPreviousRatings(previousRatings);
 		
+		// don't change the ratings of random and legal players
+		configuration.getPlayerSet().setPlayerConstantRating(AbstractDBConnector.PLAYER_RANDOM);
+		configuration.getPlayerSet().setPlayerConstantRating(AbstractDBConnector.PLAYER_LEGAL);
+		
 		// add rating system 
 		logger.info("add rating system");
-		configuration.addRatingSystem(new ConstantLinearRegressionStrategy(1.0));
+		configuration.addRatingSystem(new ConstantLinearRegressionStrategy(0.01));
 	
 		// set match reader 
 		logger.info("set match reader");

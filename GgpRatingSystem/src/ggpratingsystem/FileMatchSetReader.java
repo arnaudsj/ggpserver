@@ -107,7 +107,7 @@ public class FileMatchSetReader implements MatchSetReader {
 		reader = new CSVReader(new FileReader(matchIndexFile));
 
 		List<String[]> lines = new LinkedList<String[]>();
-		for (Iterator iter = reader.readAll().iterator(); iter.hasNext();) {
+		for (Iterator<?> iter = reader.readAll().iterator(); iter.hasNext();) {
 			String[] line = (String[]) iter.next();
 			lines.add(line);
 		}		

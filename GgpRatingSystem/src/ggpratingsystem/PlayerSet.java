@@ -48,5 +48,14 @@ public final class PlayerSet {
 	public Collection<? extends Player> getAllPlayers() {
 		return Collections.unmodifiableCollection(players.values());
 	}
+	
+	public void setPlayerConstantRating(String playerName) {
+		Player player = players.get(playerName);
+		if(player != null) {
+			throw new IllegalStateException("player already exists");
+		}
+		player = new ConstantRatingPlayer(playerName);
+		players.put(playerName, player);
+	}
 }
 

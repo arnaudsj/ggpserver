@@ -58,7 +58,7 @@ public class Converter {
 		CSVReader reader = new CSVReader(new FileReader(matchesFile));
 
 		List<String[]> lines = new LinkedList<String[]>();
-		for (Iterator iter = reader.readAll().iterator(); iter.hasNext();) {
+		for (Iterator<?> iter = reader.readAll().iterator(); iter.hasNext();) {
 			String[] line = (String[]) iter.next();
 			lines.add(line);
 		}

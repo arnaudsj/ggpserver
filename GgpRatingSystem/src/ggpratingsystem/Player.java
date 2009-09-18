@@ -24,12 +24,10 @@ import ggpratingsystem.ratingsystems.RatingFactory;
 import ggpratingsystem.ratingsystems.RatingSystemType;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-public final class Player implements Comparable<Player> {
+public class Player implements Comparable<Player> {
 	private static final Logger log = Logger.getLogger(Player.class.getName());
     
 	static {

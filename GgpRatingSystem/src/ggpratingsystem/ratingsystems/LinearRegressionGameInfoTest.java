@@ -27,7 +27,6 @@ import ggpratingsystem.FileMatchSetReader;
 import ggpratingsystem.MatchSetReader;
 import ggpratingsystem.MatchSet;
 import ggpratingsystem.Player;
-import ggpratingsystem.PlayerSet;
 import ggpratingsystem.util.Util;
 
 import java.io.File;

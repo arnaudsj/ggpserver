@@ -29,9 +29,10 @@ import java.util.List;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 public class ChartOutputBuilder implements OutputBuilder {
@@ -47,7 +48,10 @@ public class ChartOutputBuilder implements OutputBuilder {
 		chart = ChartFactory.createLineChart("Player Ratings", "Match Sets",
 	            "Rating", dataset, PlotOrientation.VERTICAL, true, true, false);
 		CategoryPlot plot = (CategoryPlot)chart.getPlot();
-		((LineAndShapeRenderer)plot.getRenderer()).setBaseShapesVisible(true);
+		// ((LineAndShapeRenderer)plot.getRenderer()).setBaseShapesVisible(true);
+		plot.getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.DOWN_45);
+		// plot.getDomainAxis().setMaximumCategoryLabelLines(3);
+		((NumberAxis)plot.getRangeAxis()).setAutoRangeIncludesZero(false);
 	}
 	
 	/* (non-Javadoc)

@@ -23,8 +23,6 @@ import ggpratingsystem.ratingsystems.AbstractGameInfo;
 import ggpratingsystem.ratingsystems.GameInfoFactory;
 import ggpratingsystem.ratingsystems.RatingSystemType;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
