@@ -222,58 +222,58 @@
 				    <%-- action "start" [only NEW] --%>
 				    <td class="nopadding"><c:choose>
 					    <c:when test="${ match.status == 'new' }">
-						<c:url value="process_edit_tournament.jsp" var="startURL">
-						    <c:param name="tournamentID" value="${pager.tournamentID}"/>
-						    <c:param name="action" value="<%= EditTournament.START_MATCH %>"/>
-						    <c:param name="matchID" value="${match.matchID}" />
-						    <c:param name="page" value="${pager.page}" />
-						</c:url>
-						<a href='<c:out value="${startURL}" />'><div class="start" title="start match"><span>start</span></div></a>
+							<c:url value="process_edit_tournament.jsp" var="startURL">
+							    <c:param name="tournamentID" value="${pager.tournamentID}"/>
+							    <c:param name="action" value="<%= EditTournament.START_MATCH %>"/>
+							    <c:param name="matchID" value="${match.matchID}" />
+							    <c:param name="page" value="${pager.page}" />
+							</c:url>
+							<a href='<c:out value="${startURL}" />'><div class="start" title="start match"><span>start</span></div></a>
 					    </c:when>
-					    <c:when test="${ match.status == 'running' }">
-						<c:url value="process_edit_tournament.jsp" var="abortURL">
-						    <c:param name="tournamentID" value="${pager.tournamentID}"/>
-						    <c:param name="action" value="<%= EditTournament.ABORT_MATCH %>"/>
-						    <c:param name="matchID" value="${match.matchID}" />
-						    <c:param name="page" value="${pager.page}" />
-						</c:url>
-						<a href='<c:out value="${abortURL}" />'><div class="abort" title="abort match"><span>abort</span></div></a>
+					    <c:when test="${ match.status == 'running' || match.status == 'scheduled' }">
+							<c:url value="process_edit_tournament.jsp" var="abortURL">
+							    <c:param name="tournamentID" value="${pager.tournamentID}"/>
+							    <c:param name="action" value="<%= EditTournament.ABORT_MATCH %>"/>
+							    <c:param name="matchID" value="${match.matchID}" />
+							    <c:param name="page" value="${pager.page}" />
+							</c:url>
+							<a href='<c:out value="${abortURL}" />'><div class="abort" title="abort match"><span>abort</span></div></a>
 					    </c:when>
 					    <c:otherwise>
-						<div class="start-bw"></div>
+							<div class="start-bw"></div>
 					    </c:otherwise>
 				    </c:choose></td>
 				    
 				    <%-- action "delete" [all, but warn on finished/running] --%>
 				    <td class="nopadding">
-					<c:url value="process_edit_tournament.jsp" var="deleteURL">
-					    <c:param name="tournamentID" value="${pager.tournamentID}"/>
-					    <c:param name="action" value="<%= EditTournament.DELETE_MATCH %>"/>
-					    <c:param name="matchID" value="${match.matchID}" />
-					    <c:param name="page" value="${pager.page}" />
-					</c:url>
-					
-					<c:choose>
-					    <c:when test="${ match.status == 'finished' || match.status == 'running' }">
-						<c:set var="realDeleteURL" value="javascript:confirm_delete('${match.matchID}', '${deleteURL}')"></c:set>							
-					    </c:when>
-					    <c:otherwise>
-						<c:set var="realDeleteURL" value="${deleteURL}"></c:set>
-					    </c:otherwise>
-					</c:choose>
-					
-					<a href='<c:out value="${realDeleteURL}" />'><div class="delete" title="delete match"><span>delete</span></div></a>
+						<c:url value="process_edit_tournament.jsp" var="deleteURL">
+						    <c:param name="tournamentID" value="${pager.tournamentID}"/>
+						    <c:param name="action" value="<%= EditTournament.DELETE_MATCH %>"/>
+						    <c:param name="matchID" value="${match.matchID}" />
+						    <c:param name="page" value="${pager.page}" />
+						</c:url>
+						
+						<c:choose>
+						    <c:when test="${ match.status == 'finished' || match.status == 'running' }">
+								<c:set var="realDeleteURL" value="javascript:confirm_delete('${match.matchID}', '${deleteURL}')"></c:set>							
+						    </c:when>
+						    <c:otherwise>
+								<c:set var="realDeleteURL" value="${deleteURL}"></c:set>
+						    </c:otherwise>
+						</c:choose>
+						
+						<a href='<c:out value="${realDeleteURL}" />'><div class="delete" title="delete match"><span>delete</span></div></a>
 				    </td>
 				    
 				    <%-- action "clone" [all] --%>
 				    <td class="nopadding">
-					<c:url value="process_edit_tournament.jsp" var="cloneURL">
-					    <c:param name="tournamentID" value="${pager.tournamentID}"/>
-					    <c:param name="action" value="<%= EditTournament.CLONE_MATCH %>"/>
-					    <c:param name="matchID" value="${match.matchID}" />
-					    <c:param name="page" value="${pager.page}" />
-					</c:url>
-					<a href='<c:out value="${cloneURL}" />'><div class="clone" title="clone match"><span>clone</span></div></a>
+						<c:url value="process_edit_tournament.jsp" var="cloneURL">
+						    <c:param name="tournamentID" value="${pager.tournamentID}"/>
+						    <c:param name="action" value="<%= EditTournament.CLONE_MATCH %>"/>
+						    <c:param name="matchID" value="${match.matchID}" />
+						    <c:param name="page" value="${pager.page}" />
+						</c:url>
+						<a href='<c:out value="${cloneURL}" />'><div class="clone" title="clone match"><span>clone</span></div></a>
 				    </td>
 				</tr>
 			    </c:forEach>

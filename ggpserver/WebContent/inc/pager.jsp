@@ -22,6 +22,12 @@
 	<c:if test="${pager.numberOfPages != 1}">
 		<div class="pager">
 			<c:set var="previousI" value="-1"/> 
+			<c:if test="${pager.page != 1}">
+				<c:url value="${pager.targetJsp}" var="pageURL">
+					<c:param name="page" value="${pager.page - 1}" />
+				</c:url>
+				<a href='<c:out value="${pageURL}" />'>Previous</a>
+			</c:if>
 			<c:forEach var="i" items="${pager.linkedPages}">
 				<c:if test="${(i != previousI + 1) && (previousI != -1)}">
 					...
@@ -39,5 +45,11 @@
 				</c:choose>
 				<c:set var="previousI" value="${i}"/> 
 			</c:forEach>
+			<c:if test="${pager.page != pager.numberOfPages}">
+				<c:url value="${pager.targetJsp}" var="pageURL">
+					<c:param name="page" value="${pager.page + 1}" />
+				</c:url>
+				<a href='<c:out value="${pageURL}" />'>Next</a>
+			</c:if>
 		</div>
 	</c:if>

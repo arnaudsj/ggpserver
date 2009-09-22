@@ -60,6 +60,7 @@ import tud.ggpserver.datamodel.matches.NewMatch;
 import tud.ggpserver.datamodel.matches.RunningMatch;
 import tud.ggpserver.datamodel.matches.ScheduledMatch;
 import tud.ggpserver.datamodel.matches.ServerMatch;
+import tud.ggpserver.scheduler.AbstractRoundRobinScheduler;
 import tud.ggpserver.scheduler.PlayerStatusListener;
 import tud.ggpserver.util.Digester;
 
@@ -93,7 +94,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	
 	private static DataSource datasource;
 	
-	private Collection<PlayerStatusListener<TermType, ReasonerStateInfoType>> playerStatusListeners = new ArrayList<PlayerStatusListener<TermType, ReasonerStateInfoType>>();
+	private Collection<PlayerStatusListener> playerStatusListeners = new ArrayList<PlayerStatusListener>();
 
 	private final ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory;
 
@@ -215,10 +216,14 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		logger.info("String, String, int, User, String - Creating new RemotePlayerInfo: " + name); //$NON-NLS-1$
 		RemotePlayerInfo result = new RemotePlayerInfo(name, host, port, owner, status);
 		
-		for (PlayerStatusListener<TermType, ReasonerStateInfoType> listener : playerStatusListeners) {
+		notifyPlayerStatusListeners(result);
+		return result;
+	}
+
+	private void notifyPlayerStatusListeners(RemotePlayerInfo result) {
+		for (PlayerStatusListener listener : playerStatusListeners) {
 			listener.notifyStatusChange(result);
 		}
-		return result;
 	}
 	
 	public PlayerInfo getPlayerInfo(String name) throws SQLException {
@@ -1559,9 +1564,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			ps.executeUpdate();
 			
 			RemotePlayerInfo playerInfo = (RemotePlayerInfo) getPlayerInfo(playerName);
-			for (PlayerStatusListener<TermType, ReasonerStateInfoType> listener : playerStatusListeners) {
-				listener.notifyStatusChange(playerInfo);
-			}			
+			notifyPlayerStatusListeners(playerInfo);			
 		} finally { 
 			if (con != null)
 				try {con.close();} catch (SQLException e) {}
@@ -1703,7 +1706,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		}
 	}
 	
-	public void addPlayerStatusListener(PlayerStatusListener<TermType, ReasonerStateInfoType> listener) {
+	public void addPlayerStatusListener(PlayerStatusListener listener) {
 		playerStatusListeners.add(listener);
 	}
 	
@@ -1853,6 +1856,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	
 	/**
 	 * Cleans up all matches marked as "running" in the database (sets their status to "aborted").
+	 * Also changes "scheduled" matches back to "new" (or aborts them if they belong to the "round_robin_tournament").
 	 * @throws SQLException 
 	 */
 	public void cleanup() throws SQLException {
@@ -1863,6 +1867,16 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			ps = con.prepareStatement("UPDATE `matches` SET `status` = ? WHERE `status` = ? ;");
 			ps.setString(1, ServerMatch.STATUS_ABORTED);
 			ps.setString(2, ServerMatch.STATUS_RUNNING);
+			ps.executeUpdate(); 
+
+			ps = con.prepareStatement("UPDATE `matches` SET `status` = ? WHERE `status` = ? AND tournament_id != '" + AbstractRoundRobinScheduler.ROUND_ROBIN_TOURNAMENT_ID + "' ;");
+			ps.setString(1, ServerMatch.STATUS_NEW);
+			ps.setString(2, ServerMatch.STATUS_SCHEDULED);
+			ps.executeUpdate(); 
+
+			ps = con.prepareStatement("UPDATE `matches` SET `status` = ? WHERE `status` = ? AND tournament_id = '" + AbstractRoundRobinScheduler.ROUND_ROBIN_TOURNAMENT_ID + "' ;");
+			ps.setString(1, ServerMatch.STATUS_ABORTED);
+			ps.setString(2, ServerMatch.STATUS_SCHEDULED);
 			ps.executeUpdate(); 
 		} finally { 
 			if (con != null)

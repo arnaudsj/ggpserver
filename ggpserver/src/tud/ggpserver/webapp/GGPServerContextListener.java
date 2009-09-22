@@ -26,6 +26,9 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import tud.ggpserver.datamodel.DBConnectorFactory;
+import tud.ggpserver.scheduler.AbstractRoundRobinScheduler;
+import tud.ggpserver.scheduler.MatchRunner;
+import tud.ggpserver.scheduler.RoundRobinScheduler;
 
 /**
  * On application startup, this class starts the database cleanup function.
@@ -33,14 +36,20 @@ import tud.ggpserver.datamodel.DBConnectorFactory;
  * @author Martin Günther <mintar@gmx.de>
  *
  */
-public class DatabaseCleaner implements ServletContextListener {
+public class GGPServerContextListener implements ServletContextListener {
 	/**
 	 * Logger for this class
 	 */
-	private static final Logger logger = Logger.getLogger(DatabaseCleaner.class.getName());
+	private static final Logger logger = Logger.getLogger(GGPServerContextListener.class.getName());
 
 	public void contextDestroyed(ServletContextEvent event) {
-		// nothing to do
+		// TODO: this doesn't work, find out why
+//		AbstractRoundRobinScheduler<?,?> roundRobinScheduler = RoundRobinScheduler.getInstance();
+//		roundRobinScheduler.stop();
+//		logger.info("roundRobinScheduler stopped");
+//		MatchRunner<?,?> matchRunner = MatchRunner.getInstance();
+//		matchRunner.abort();
+//		logger.info("matchRunner stopped");
 	}
 
 	public void contextInitialized(ServletContextEvent event) {

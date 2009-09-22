@@ -19,10 +19,9 @@
 
 package tud.ggpserver.scheduler;
 
-import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
 
-public interface PlayerStatusListener<TermType extends TermInterface, ReasonerStateInfoType> {
+public interface PlayerStatusListener {
 
 	public abstract void notifyStatusChange(RemotePlayerInfo player);
 

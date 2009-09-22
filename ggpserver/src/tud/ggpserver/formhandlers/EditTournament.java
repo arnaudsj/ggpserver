@@ -34,6 +34,7 @@ import tud.ggpserver.datamodel.RemotePlayerInfo;
 import tud.ggpserver.datamodel.Tournament;
 import tud.ggpserver.datamodel.matches.NewMatch;
 import tud.ggpserver.datamodel.matches.RunningMatch;
+import tud.ggpserver.datamodel.matches.ScheduledMatch;
 import tud.ggpserver.datamodel.matches.ServerMatch;
 import tud.ggpserver.scheduler.MatchRunner;
 
@@ -95,7 +96,7 @@ public class EditTournament extends ShowMatches {
 		} else if (action.equals(START_MATCH) && match != null && match instanceof NewMatch) {
 			// TODO: should we check that all players are active ?
 			return true;
-		} else if (action.equals(ABORT_MATCH) && match != null && match instanceof RunningMatch) {
+		} else if (action.equals(ABORT_MATCH) && match != null && (match instanceof ScheduledMatch || match instanceof RunningMatch)) {
 			return true;
 		} else if (action.equals(DELETE_MATCH) && match != null) {
 			return true;
@@ -117,8 +118,8 @@ public class EditTournament extends ShowMatches {
 			assert (match instanceof NewMatch);       // checked in isValid()
 			startMatch((NewMatch) match);
 		} else if (action.equals(ABORT_MATCH)) {
-			assert (match instanceof RunningMatch);   // checked in isValid()
-			abortMatch((RunningMatch) match);
+			assert (match instanceof RunningMatch || match instanceof ScheduledMatch);   // checked in isValid()
+			abortMatch(match);
 		} else if (action.equals(DELETE_MATCH)) {
 			deleteMatch(match);
 		} else {
@@ -152,8 +153,8 @@ public class EditTournament extends ShowMatches {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void abortMatch(RunningMatch match) {
-		MatchRunner.getInstance().abort(match);
+	private void abortMatch(ServerMatch match) throws SQLException {
+		MatchRunner.getInstance().delete(match); // abort the match, if it is scheduled or running
 		correctlyPerformed = true;
 	}
 

@@ -24,8 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -36,6 +35,8 @@ import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.players.RemotePlayerInfo;
 import tud.gamecontroller.term.TermInterface;
+import tud.ggpserver.datamodel.AbstractDBConnector;
+import tud.ggpserver.datamodel.DBConnector;
 import tud.ggpserver.datamodel.matches.NewMatch;
 import tud.ggpserver.datamodel.matches.RunningMatch;
 import tud.ggpserver.datamodel.matches.ScheduledMatch;
@@ -47,6 +48,7 @@ import cs227b.teamIago.util.GameState;
  *
  */
 public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> {
+	private static final long DELAY_BETWEEN_MATCHES = 2000;   // time between two matches with the same players
 	
 	private static final Logger logger = Logger.getLogger(MatchRunner.class.getName());
 
@@ -54,28 +56,45 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 	private static MatchRunner<Term, GameState> instance = null;
 	public static MatchRunner<Term, GameState> getInstance() {
 		if(instance == null)
-			instance = new MatchRunner<Term, GameState>();
+			instance = new MatchRunner<Term, GameState>(DBConnector.getInstance());
 		return instance;
 	}
 
+	/**
+	 * status flag
+	 */
 	private boolean running;
+	
+	/**
+	 * is set to true to stop the main loop
+	 */
 	private boolean stop;
+	
+	/**
+	 * the thread running the main loop
+	 */
+	private Thread matchRunnerThread;
 
-	private final List<String> scheduledMatchIDs;
-	private final Set<String> playingPlayers;
-	private final Map<String, Thread> matchThreads;
+	/**
+	 * the list of scheduled matches (matches waiting to be run)
+	 */
 	private final Map<String, ScheduledMatch<TermType, ReasonerStateInfoType>> scheduledMatches;
+
+	/**
+	 * the threads of the currently running matches 
+	 */
+	private final Map<String, Thread> matchThreads;
+
+	private AvailablePlayersTracker<TermType, ReasonerStateInfoType> availablePlayersTracker;
 
 	/**
 	 *  private constructor
 	 */
-	private MatchRunner() {
-		running = false;
+	private MatchRunner(AbstractDBConnector<TermType, ReasonerStateInfoType> db) {
+		availablePlayersTracker = new AvailablePlayersTracker<TermType, ReasonerStateInfoType>(db);
+		matchRunnerThread = null;
 		// scheduledMatches must be synchronized because it is also accessed from the runMatches thread
-		scheduledMatchIDs = Collections.synchronizedList(new LinkedList<String>());
-		scheduledMatches = Collections.synchronizedMap(new HashMap<String, ScheduledMatch<TermType, ReasonerStateInfoType>>());
-		// the same holds for playingPlayers
-		playingPlayers = Collections.synchronizedSet(new HashSet<String>());
+		scheduledMatches = Collections.synchronizedMap(new LinkedHashMap<String, ScheduledMatch<TermType, ReasonerStateInfoType>>());
 		// and matchThreads map
 		matchThreads = Collections.synchronizedMap(new HashMap<String, Thread>());
 	}
@@ -83,11 +102,11 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 	/**
 	 * starts MatchRunner's main loop
 	 */
-	public void start() {
+	public synchronized void start() {
 		stop = false;
 		if( !running ) {
 			running = true;
-			new Thread() {
+			matchRunnerThread = new Thread() {
 				@Override
 				public void run() {
 					try {
@@ -98,51 +117,82 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 					}
 					running = false;
 				}
-			}.start();
+			};
+			matchRunnerThread.start();
 		}
 	}
 	
 	/**
-	 * stops MatchRunner's main loop after currently running matches are finished
+	 * stops MatchRunner's main loop, currently running matches are finished
 	 */
 	public void stop() {
+		logger.info("stopping MatchRunner");
 		stop = true;
-		scheduledMatches.notifyAll();
+		if(matchRunnerThread != null){
+			matchRunnerThread.interrupt();
+			try {
+				matchRunnerThread.join(3000);
+			} catch (InterruptedException e) {
+				logger.severe("interrupted while stopping matchRunner: " + e);
+			}
+			matchRunnerThread = null;
+		}
 	}
 
 	/**
 	 * stops MatchRunner's main loop; currently running matches are aborted
 	 */
-	public synchronized void abort() {
-		stop = true;
+	public void abort() {
+		logger.info("aborting MatchRunner");
+		stop();
+		logger.info("stopping all running matches");
 		for(Thread t:matchThreads.values()) {
+			t.interrupt();
 			try {
-				t.interrupt();
-				t.join();
-			} catch (InterruptedException e1) {
-				logger.severe("interrupted while aborting match: " + e1); //$NON-NLS-1$
+				t.join(3000);
+			} catch (InterruptedException e) {
+				logger.severe("interrupted while aborting match: " + e);
 			}
 		}
-		scheduledMatches.notifyAll();
 	}
 
+	/**
+	 * the main loop
+	 * @throws SQLException
+	 */
 	private void runMatches() throws SQLException {
+		logger.info("matchRunner started");
 		while( !stop ) {
-			// find a runnable match (all players available)
-			ScheduledMatch<TermType, ReasonerStateInfoType> scheduledMatch = getRunnableMatch();
-			if(scheduledMatch != null){
+			try {
+				// find a runnable match (all players available)
+				ScheduledMatch<TermType, ReasonerStateInfoType> scheduledMatch = waitForRunnableMatch();
 				// run the match
 				startMatch(scheduledMatch.toRunning());
-			}else{
-				// wait for a new match or a player to become available 
-				try {
-					scheduledMatches.wait();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+			} catch (InterruptedException e) {
+				logger.info("matchRunner interrupted");
 			}
 		}
+		logger.info("matchRunner stopped");
+	}
+
+	private synchronized ScheduledMatch<TermType, ReasonerStateInfoType> waitForRunnableMatch() throws InterruptedException {
+		ScheduledMatch<TermType, ReasonerStateInfoType> runnableMatch = null;
+
+		while (runnableMatch == null) {
+			runnableMatch = getRunnableMatch();
+			if(runnableMatch != null){
+				logger.info("found runnable match: " + runnableMatch.getMatchID());
+			}else if(scheduledMatches.isEmpty()) {
+				logger.info("no scheduled match -> stop MatchRunner");
+				stop = true;
+				throw new InterruptedException();
+			}else{
+				logger.info("no runnable match found (but " + scheduledMatches.size() + " scheduled) -> wait");
+				// wait for a new match or a player to become available 
+				waitForChanges();
+			}
+		}
+		return runnableMatch;
 	}
 
 	/**
@@ -150,17 +200,15 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 	 */
 	private synchronized ScheduledMatch<TermType, ReasonerStateInfoType> getRunnableMatch() {
 		ScheduledMatch<TermType, ReasonerStateInfoType> runnableMatch = null;
-		for(String matchID:scheduledMatchIDs){
-			ScheduledMatch<TermType, ReasonerStateInfoType> match = scheduledMatches.get(matchID);
+		for(ScheduledMatch<TermType, ReasonerStateInfoType> match : scheduledMatches.values()){
 			runnableMatch = match;
 			for(PlayerInfo player:match.getPlayerInfos()) {
-				if(playingPlayers.contains(player.getName())) {
+				if(availablePlayersTracker.isPlaying(player.getName())) {
 					runnableMatch = null;
 					break;
 				}
 			}
 			if(runnableMatch != null) {
-				scheduledMatchIDs.remove(runnableMatch.getMatchID());
 				scheduledMatches.remove(runnableMatch.getMatchID());
 				break;
 			}
@@ -172,53 +220,69 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 		// remember that the players in the match are currently unavailable for other matches
 		for(PlayerInfo p:match.getPlayerInfos()) {
 			if(p instanceof RemotePlayerInfo) {
-				playingPlayers.add(p.getName());
+				availablePlayersTracker.notifyStartPlaying(p.getName());
 			}
 		}
-		final String matchID = match.getMatchID();
-		Thread thread = new Thread(){
+		Thread thread = new Thread() {
 			@Override
-			public void run() {
-				
-				logger.info("Thread for match " + matchID + " - START");
-				try {
-					try {
-						GameController<TermType, ReasonerStateInfoType> gameController 
-								= new GameController<TermType, ReasonerStateInfoType>(match);
-						gameController.addListener(match);
-						gameController.runGame();
-						match.toFinished();
-					} catch (InterruptedException e1) {
-						logger.info("Thread for match " + matchID + " - INTERRUPT");
-						match.notifyErrorMessage(new GameControllerErrorMessage(GameControllerErrorMessage.ABORTED, "The match was aborted."));
-						match.toAborted();
-						// when aborting, don't remove this from matchThreads to prevent deadlock. abort() must do that. 
-					}
-				} catch (SQLException e2) {
-					logger.severe("exception: " + e2);
-				}
-				// players are free again
-				for(PlayerInfo p:match.getPlayerInfos()) {
-					if(p instanceof RemotePlayerInfo) {
-						playingPlayers.remove(p.getName());
-					}
-				}
-				matchThreads.remove(match.getMatchID());
-				// notify MatchRunner about changed player state
-				scheduledMatches.notifyAll();
-				logger.info("Thread for match " + matchID + " - END");
+			public void run(){
+				runSingleMatch(match);
 			}
 		};
-		matchThreads.put(matchID, thread);
+		matchThreads.put(match.getMatchID(), thread);
 		thread.start();
 	}
+
+	private void runSingleMatch(RunningMatch<TermType, ReasonerStateInfoType> runningMatch) {
+		String matchID = runningMatch.getMatchID();
+		logger.info("Thread for match " + matchID + " - START");
+		try {
+			try {
+				GameController<TermType, ReasonerStateInfoType> gameController 
+						= new GameController<TermType, ReasonerStateInfoType>(runningMatch);
+				gameController.addListener(runningMatch);
+				gameController.runGame();
+				runningMatch.toFinished();
+				// wait for some time to give players a chance to cleanup
+				//   we wait in the MatchThread, such that the RoundRobinScheduler
+				//   (who waits for the thread to finish) doesn't start the next round before the players are available again
+				try {
+					Thread.sleep(DELAY_BETWEEN_MATCHES);
+				} catch (InterruptedException e) {
+				}
+			} catch (InterruptedException e1) {
+				logger.info("Thread for match " + matchID + " - INTERRUPT");
+				runningMatch.notifyErrorMessage(new GameControllerErrorMessage(GameControllerErrorMessage.ABORTED, "The match was aborted."));
+				runningMatch.toAborted();
+			}
+		} catch (SQLException e2) {
+			logger.severe("exception: " + e2);
+		}
+		// players are free again
+		for(PlayerInfo p:runningMatch.getPlayerInfos()) {
+			if(p instanceof RemotePlayerInfo) {
+				availablePlayersTracker.notifyStopPlaying(p.getName());
+			}
+		}
+		matchThreads.remove(runningMatch.getMatchID());
+		// notify MatchRunner about changed player state
+		notifyAboutChanges();
+		logger.info("Thread for match " + matchID + " - END");
+	}
 	
+	/**
+	 * schedules the match for running as soon as all players in the match are finished playing any other matches
+	 * (active status of the players is not checked)
+	 * @param match
+	 * @throws SQLException
+	 */
 	public synchronized void scheduleMatch(NewMatch<TermType, ReasonerStateInfoType> match) throws SQLException{
 		// TODO: check match status to make sure that the match is not scheduled twice (or was already run)
 		String matchID = match.getMatchID();
-		scheduledMatchIDs.add(matchID);
 		scheduledMatches.put(matchID, match.toScheduled());
-		scheduledMatches.notifyAll();
+		logger.info("match " + matchID + " scheduled");
+		start();
+		notifyAboutChanges();
 	}
 
 	/**
@@ -235,7 +299,7 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 		try {
 			// wait for matches to finish
 			for(String matchID:matchIDs){
-					waitForMatch(matchID);
+				waitForMatch(matchID);
 			}
 		} catch (InterruptedException e) {
 			for(String matchID:matchIDs){
@@ -244,9 +308,15 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 		}
 	}
 
+	/**
+	 * waits until the match with the given matchID is finished or aborted<br/>
+	 * returns immediately if there is no such match
+	 * @param matchID
+	 * @throws InterruptedException
+	 */
 	private void waitForMatch(String matchID) throws InterruptedException {
 		while(scheduledMatches.containsKey(matchID)) {
-			scheduledMatches.wait();
+			waitForChanges();
 		}
 		Thread matchThread = matchThreads.get(matchID);
 		if(matchThread != null){
@@ -254,10 +324,18 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 		}
 	}
 
+	/**
+	 * @see abort(String matchID)
+	 * @param match
+	 */
 	public void abort(RunningMatch<TermType, ReasonerStateInfoType> match) {
 		abort(match.getMatchID());
 	}
 
+	/**
+	 * aborts the match with the given matchID if it is currently running
+	 * @param match
+	 */
 	public synchronized void abort(String matchID) {
 		Thread matchThread = matchThreads.get(matchID);
 		if (matchThread != null) {
@@ -270,18 +348,57 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 		}
 	}
 
-	public void delete(ServerMatch<TermType, ReasonerStateInfoType> match) {
+	/**
+	 * deletes the match from the list of scheduled matches if it is not running yet or aborts the match if it is currently running
+	 * @param match
+	 * @throws SQLException 
+	 */
+	public void delete(ServerMatch<TermType, ReasonerStateInfoType> match) throws SQLException {
 		delete(match.getMatchID());
 	}
 
-	public synchronized void delete(String matchID) {
-		scheduledMatchIDs.remove(matchID);
-		scheduledMatches.remove(matchID);
-		abort(matchID);
+	/**
+	 * deletes the match with the given matchID from the list of scheduled matches if it is not running yet or aborts the match if it is currently running
+	 * @param matchID
+	 * @throws SQLException 
+	 */
+	public synchronized void delete(String matchID) throws SQLException {
+		if(scheduledMatches.containsKey(matchID)){
+			scheduledMatches.remove(matchID).toNew(); // if the match was not running yet, set its status to new
+		}else{
+			abort(matchID);
+		}
+		notifyAboutChanges();
 	}
 
+	/**
+	 * 
+	 * @param match
+	 * @return true if match is currently running
+	 */
 	public boolean isRunning(ServerMatch<TermType, ReasonerStateInfoType> match) {
 		return matchThreads.containsKey(match.getMatchID());
 	}
 	
+	private synchronized void notifyAboutChanges() {
+		this.notifyAll();
+	}
+
+	/**
+	 * waits until there is a change in the scheduled matches or players currently playing a match
+	 * @throws InterruptedException (if interrupt() was called on the waiting Thread)
+	 */
+	private synchronized void waitForChanges() throws InterruptedException {
+		this.wait();
+	}
+	
+	/**
+	 * waits until there is at least one player available (active and not currently playing a match)
+	 * @return a collection of all currently available players
+	 * @throws InterruptedException (if interrupt() was called on the waiting Thread)
+	 */
+	public Collection<tud.ggpserver.datamodel.RemotePlayerInfo> waitForAvailablePlayers() throws InterruptedException {
+		return availablePlayersTracker.waitForAvailablePlayers();
+	}
+
 }

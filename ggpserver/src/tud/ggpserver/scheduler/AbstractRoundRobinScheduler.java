@@ -38,30 +38,29 @@ import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.ConfigOption;
 import tud.ggpserver.datamodel.Game;
+import tud.ggpserver.datamodel.matches.FinishedMatch;
 import tud.ggpserver.datamodel.matches.NewMatch;
 
 public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface, ReasonerStateInfoType> {
 	public static final String ROUND_ROBIN_TOURNAMENT_ID = "round_robin_tournament";
 	private static final Logger logger = Logger.getLogger(AbstractRoundRobinScheduler.class.getName());
 	private static final Random random = new Random();
-	private static final long DELAY_BETWEEN_GAMES = 2000;   // wait two seconds
 
 	private boolean running = false;
 	private boolean stopAfterCurrentMatches = false;
 	private final AbstractDBConnector<TermType, ReasonerStateInfoType> db;
 
 	private Thread gameThread;
-//	private List<Thread> matchThreads;
+	private final PlayerErrorTracker<TermType, ReasonerStateInfoType> playerErrorTracker;
 
 	private final GamePicker<TermType, ReasonerStateInfoType> gamePicker;
-	private final PlayerStatusTracker<TermType, ReasonerStateInfoType> playerStatusTracker;
 	private String lastPlayedGame = null;
 	private int nbMatchesToPlayForGame;
 	
 	public AbstractRoundRobinScheduler(AbstractDBConnector<TermType, ReasonerStateInfoType> db) {
 		this.db = db;
 		this.gamePicker = new GamePicker<TermType, ReasonerStateInfoType>(db);
-		this.playerStatusTracker = new PlayerStatusTracker<TermType, ReasonerStateInfoType>(db);
+		this.playerErrorTracker = new PlayerErrorTracker<TermType, ReasonerStateInfoType>(db);
 	}
 
 	public synchronized void start() {
@@ -122,22 +121,29 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 
 	// this method has default visibility so it can be accessed from within the
 	// anonymous inner Thread classes without overhead
-	void setRunning(boolean running) {
+	private void setRunning(boolean running) {
 		this.running = running;
 	}
 
 	// this method has default visibility so it can be accessed from within the
 	// anonymous inner Thread classes without overhead
-	void runMatches() throws SQLException, InterruptedException {
+	private void runMatches() throws SQLException, InterruptedException {
 		while (!stopAfterCurrentMatches) {
 			List<NewMatch<TermType, ReasonerStateInfoType>> currentMatches = createMatches();
-			runMatches(currentMatches);
-			Thread.sleep(DELAY_BETWEEN_GAMES);
+			getMatchRunner().runMatches(currentMatches);
+			for(NewMatch<TermType, ReasonerStateInfoType> match:currentMatches) {
+				try {
+					FinishedMatch<TermType, ReasonerStateInfoType> finishedMatch = db.getFinishedMatch(match.getMatchID());
+					playerErrorTracker.updateDeadPlayers(finishedMatch);
+				} catch(IllegalArgumentException e) {
+					// in case it is not a finished match (e.g., aborted)
+				}
+			}
 		}
 		setRunning(false);
 	}
 
-	protected abstract void runMatches(Collection<NewMatch<TermType, ReasonerStateInfoType>> currentMatches) throws SQLException;
+	protected abstract MatchRunner<TermType, ReasonerStateInfoType> getMatchRunner();
 
 	private List<NewMatch<TermType, ReasonerStateInfoType>> createMatches() throws SQLException, InterruptedException {
 		int playclock;
@@ -174,20 +180,21 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 			nbMatchesToPlayForGame--;
 		}else{
 			nbMatchesToPlayForGame = nextGame.getNumberOfRoles() - 1;
+			lastPlayedGame = nextGame.getName();
 		}
 		
 		if (nbMatchesToPlayForGame < 1) {
 			// change next game to play
 			gamePicker.pickNextGame();
 		}
-		Collection<? extends PlayerInfo> activePlayers = playerStatusTracker.waitForActivePlayers();
+		Collection<? extends PlayerInfo> availablePlayers = MatchRunner.getInstance().waitForAvailablePlayers();
 		// If there are no enabled games, gamePicker.pickNextGame() will return null.
 		// In order to handle this case correctly, one would have to replace gamePicker.pickNextGame()
 		// by some function waitForEnabledGames(), similar to playerStatusTracker.waitForActivePlayers().
 		// ATM, we will just run into a NullPointerException somewhere down the line, so let's hope that
 		// there is always at least one enabled game! :-)
 		
-		List<Map<RoleInterface<TermType>, PlayerInfo>> matchesToRolesToPlayerInfos = createPlayerInfos(nextGame, activePlayers);
+		List<Map<RoleInterface<TermType>, PlayerInfo>> matchesToRolesToPlayerInfos = createPlayerInfos(nextGame, availablePlayers);
 		
 		for (Map<RoleInterface<TermType>, PlayerInfo> rolesToPlayerInfos : matchesToRolesToPlayerInfos) {
 			result.add(db.createMatch(nextGame, startclock, playclock, rolesToPlayerInfos, db.getTournament(ROUND_ROBIN_TOURNAMENT_ID)));
@@ -221,8 +228,8 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		return getIntOption(ConfigOption.PLAY_CLOCK_MIN);
 	}
 
-	private List<Map<RoleInterface<TermType>, PlayerInfo>> createPlayerInfos(Game<TermType, ReasonerStateInfoType> game, Collection<? extends PlayerInfo> activePlayers) {
-		List<PlayerInfo> allPlayerInfos = new LinkedList<PlayerInfo>(activePlayers);
+	private List<Map<RoleInterface<TermType>, PlayerInfo>> createPlayerInfos(Game<TermType, ReasonerStateInfoType> game, Collection<? extends PlayerInfo> players) {
+		List<PlayerInfo> allPlayerInfos = new LinkedList<PlayerInfo>(players);
 		int numberOfRoles = game.getNumberOfRoles();
 		
 		// add enough random players so that the players are divisible among the matches without remainder 

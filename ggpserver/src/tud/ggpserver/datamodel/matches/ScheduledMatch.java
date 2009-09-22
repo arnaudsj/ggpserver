@@ -19,6 +19,7 @@
 
 package tud.ggpserver.datamodel.matches;
 
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.Map;
 
@@ -46,6 +47,11 @@ public class ScheduledMatch<TermType extends TermInterface, ReasonerStateInfoTyp
 	@Override
 	public String getStatus() {
 		return ServerMatch.STATUS_SCHEDULED;
+	}
+	
+	public NewMatch<TermType, ReasonerStateInfoType> toNew() throws SQLException {
+		getDB().setMatchStatus(getMatchID(), ServerMatch.STATUS_NEW);
+		return getDB().getNewMatch(getMatchID());
 	}
 	
 }

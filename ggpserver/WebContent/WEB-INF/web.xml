@@ -100,8 +100,8 @@
 	</resource-ref>
 	
 	<listener>
-		<description>On application startup, this class starts the database cleanup function.</description>
-		<display-name>DatabaseCleaner</display-name>
-		<listener-class>tud.ggpserver.webapp.DatabaseCleaner</listener-class>
+		<description>On application startup, this class starts the database cleanup function and some schedulers.</description>
+		<display-name>GGPServerContextListener</display-name>
+		<listener-class>tud.ggpserver.webapp.GGPServerContextListener</listener-class>
 	</listener>
 </web-app>
