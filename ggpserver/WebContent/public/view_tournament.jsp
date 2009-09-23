@@ -1,6 +1,7 @@
 <%--
     Copyright (C) 2009 Martin Günther (mintar@gmx.de)
-
+                  2009 Stephan Schiffel (stephan.schiffel@gmx.de)
+                       
     This file is part of GGP Server.
 
     GGP Server is free software: you can redistribute it and/or modify
@@ -92,16 +93,14 @@
 			 </c:choose> 
 		     <tr class="${rowClass}">
 				<td>${player.name}</td>
-				<td>${viewTournament.tournament.numberOfMatches[player]}</td>
-				<td>${viewTournament.tournament.totalReward[player]}</td>
-				<td>${viewTournament.tournament.averageReward[player]}</td>
+				<td>${viewTournament.tournamentStatistics.numberOfMatches[player]}</td>
+				<td>${viewTournament.tournamentStatistics.totalReward[player]}</td>
+				<td>${viewTournament.tournamentStatistics.averageReward[player]}</td>
 			</tr>
 	      </c:forEach>
 		</tbody>
 	</table>
 	
-	<!-- pager -->
-	<jsp:directive.include file="/inc/pager.jsp" />
 </div>  <!--end div "content"-->
 
 <jsp:directive.include file="/inc/footer.jsp" />
