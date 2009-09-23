@@ -31,6 +31,7 @@ import tud.gamecontroller.players.PlayerInfo;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.Tournament;
+import tud.ggpserver.datamodel.TournamentStatistics;
 import tud.ggpserver.datamodel.matches.ServerMatch;
 
 
@@ -114,11 +115,12 @@ public class StateXMLExporter {
 			.append("\t<table>\n")
 			.append("\t\t<tr> <th>Place</th> <th>Player</th> <th>Score</th> </tr>\n");
 		int i=1;
-		for(PlayerInfo p:tournament.getOrderedPlayers()){
+		TournamentStatistics<?, ?> tournamentStatistics = DBConnectorFactory.getDBConnector().getTournamentStatistics(tournament.getTournamentID());
+		for(PlayerInfo p:tournamentStatistics.getOrderedPlayers()){
 			sb.append("\t\t<tr>\n")
 				.append("\t\t\t<td>").append(i).append("</td>\n")
 				.append("\t\t\t<td>").append(p.getName()).append("</td>\n")
-				.append("\t\t\t<td>").append(tournament.getTotalReward(p)).append("</td>\n")
+				.append("\t\t\t<td>").append(tournamentStatistics.getTotalReward(p)).append("</td>\n")
 				.append("\t\t</tr>\n");
 			++i;
 		}

@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+    Copyright (C) 2009 Martin Günther <mintar@gmx.de>
+                  2009 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GGP Server.
 
@@ -20,15 +21,8 @@
 package tud.ggpserver.datamodel;
 
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
-import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.matches.ServerMatch;
 
@@ -38,25 +32,9 @@ public class Tournament<TermType extends TermInterface, ReasonerStateInfoType> {
 	
 	private final String tournamentID;
 	private final User owner;
-	private Map<PlayerInfo, Integer> numberOfMatches = new HashMap<PlayerInfo, Integer>();
-	private Map<PlayerInfo, Integer> totalReward = new HashMap<PlayerInfo, Integer>();
-	private Map<PlayerInfo, Double> averageReward = null;
-	private List<PlayerInfo> orderedPlayers = null;
 
 	private final AbstractDBConnector<TermType, ReasonerStateInfoType> db;
 	
-	private int sortBy;
-	
-	public static final int FIELD_PLAYER = 0;
-	public static final int FIELD_NUMBER_OF_MATCHES = 1;
-	public static final int FIELD_TOTAL_REWARD = 2;
-	public static final int FIELD_AVERAGE_REWARD = 3;
-	
-	private int sortOrder;
-	
-	public static final int SORT_ORDER_ASCENDING = 0;
-	public static final int SORT_ORDER_DESCENDING = 1;
-
 	public Tournament(final String tournamentID, final User owner, AbstractDBConnector<TermType, ReasonerStateInfoType> db) {
 		this.tournamentID = tournamentID;
 		this.owner = owner;
@@ -75,96 +53,6 @@ public class Tournament<TermType extends TermInterface, ReasonerStateInfoType> {
 		return owner;
 	}
 
-	public Map<PlayerInfo, Integer> getNumberOfMatches() {
-		return new HashMap<PlayerInfo, Integer>(numberOfMatches);
-	}
-
-	public void setNumberOfMatches(Map<PlayerInfo, Integer> numberOfMatches) {
-		this.numberOfMatches = new HashMap<PlayerInfo, Integer>(numberOfMatches);
-	}
-
-	public int getNumberOfMatches(PlayerInfo player) {
-		return numberOfMatches.get(player);
-	}
-
-	public void setNumberOfMatches(PlayerInfo player, int newNumberOfMatches) {
-		this.numberOfMatches.put(player, newNumberOfMatches);
-	}
-	
-	public Map<PlayerInfo, Integer> getTotalReward() {
-		return new HashMap<PlayerInfo, Integer>(totalReward);
-	}
-
-	public int getTotalReward(PlayerInfo player) {
-		return totalReward.get(player);
-	}
-
-	public void setTotalReward(PlayerInfo player, int newTotalReward) {
-		this.totalReward.put(player, newTotalReward);
-	}
-	
-	public Map<PlayerInfo, Double> getAverageReward() {
-		if(averageReward == null) {
-			averageReward = new HashMap<PlayerInfo, Double>();
-			for (PlayerInfo playerInfo : getPlayers()) {
-				int count = getNumberOfMatches(playerInfo);
-				if (count > 0) {
-					averageReward.put(playerInfo, ((double) getTotalReward(playerInfo)) / count);
-				} else {
-					averageReward.put(playerInfo, 0.0);
-				}
-			}
-		}
-		return averageReward;
-	}
-
-	public double getAverageReward(PlayerInfo player) {
-		return getAverageReward().get(player).doubleValue();
-	}
-
-	public Collection<PlayerInfo> getPlayers() {
-		return totalReward.keySet();
-	}
-
-	public List<PlayerInfo> getOrderedPlayers() {
-		return getOrderedPlayers(FIELD_TOTAL_REWARD, SORT_ORDER_DESCENDING);
-	}
-
-	public List<PlayerInfo> getOrderedPlayers(int sortBy, int sortOrder) {
-		if (orderedPlayers == null || sortBy != this.sortBy || sortOrder != this.sortOrder) {
-			orderedPlayers = initOrderedPlayers(sortBy, sortOrder);
-		}
-		return orderedPlayers;
-	}
-
-	private List<PlayerInfo> initOrderedPlayers(final int sortBy, final int sortOrder) {
-		List<PlayerInfo> result = new LinkedList<PlayerInfo>(getPlayers());
-		Collections.sort(result
-			, new Comparator<PlayerInfo>() {
-				@Override
-				public int compare(PlayerInfo firstEntry,
-						PlayerInfo secondEntry) {
-					int compare;
-					switch(sortBy){
-						case FIELD_PLAYER:
-							compare = firstEntry.getName().compareToIgnoreCase(secondEntry.getName());
-							break;
-						case FIELD_NUMBER_OF_MATCHES:
-							compare = getNumberOfMatches(firstEntry) - getNumberOfMatches(secondEntry);
-							break;
-						case FIELD_AVERAGE_REWARD:
-							compare = Double.compare(getAverageReward(firstEntry), getAverageReward(secondEntry));
-							break;
-						default: // case SORT_FIELD_TOTAL_REWARD:
-							compare = getTotalReward(firstEntry) - getTotalReward(secondEntry);
-							break;
-					}
-					return sortOrder == SORT_ORDER_ASCENDING ? compare : -compare;
-				}
-			});
-		return result;
-	}
-	
 	@Override
 	public int hashCode() {
 		final int PRIME = 31;

@@ -52,7 +52,8 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 	private List<Integer> orderedGoalValues;
 	
 	private final boolean scrambled;
-
+	
+	private final String tournamentID;
 
 	/**
 	 * State 0 = initial state, State 1 = state after first joint move, ..., State n = final state
@@ -85,11 +86,13 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 			Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayerInfos,
 			Date startTime,
 			boolean scrambled,
+			String tournamentID,
 			AbstractDBConnector<TermType, ReasonerStateInfoType> db) {
 		super(matchID, game, startclock, playclock);
 		this.rolesToPlayerInfos = rolesToPlayerInfos;
 		this.startTime = new Date(startTime.getTime());
 		this.scrambled = scrambled;
+		this.tournamentID = tournamentID;
 		this.db = db;
 	}
 
@@ -237,6 +240,11 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 	}
 	
 	/////////////////////// everything else ///////////////////////
+
+	public String getTournamentID() {
+		return tournamentID;
+	}
+
 
 	protected AbstractDBConnector<TermType, ReasonerStateInfoType> getDB() {
 		return db;

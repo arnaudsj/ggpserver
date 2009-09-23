@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
-
+                  2009 Stephan Schiffel <stephan.schiffel@gmx.de>
+                  
     This file is part of GGP Server.
 
     GGP Server is free software: you can redistribute it and/or modify
@@ -79,6 +80,12 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	@SuppressWarnings("unchecked")
 	private Map<String, User> users = new ReferenceMap(SOFT, SOFT, false);
 
+	@SuppressWarnings("unchecked")
+	private Map<String, Tournament<Term, GameState>> tournaments = new ReferenceMap(SOFT, SOFT, false);
+
+	@SuppressWarnings("unchecked")
+	private Map<String, TournamentStatistics<Term, GameState>> tournamentStatistics = new ReferenceMap(SOFT, SOFT, false);
+
 	private DBConnector(ReasonerFactory<Term, GameState> reasonerFactory) {
 		super(reasonerFactory);
 	}
@@ -113,6 +120,12 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 		}
 		synchronized (users) {
 			users.clear();
+		}
+		synchronized (tournaments) {
+			tournaments.clear();
+		}
+		synchronized (tournamentStatistics) {
+			tournamentStatistics.clear();
 		}
 		
 		// Run the garbage collection. The reason for doing this is that we 
@@ -230,8 +243,10 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	
 	@Override
 	public void setMatchStatus(String matchID, String status) throws SQLException {
+		String tournamentID = getMatch(matchID).getTournamentID();
 		synchronized (matches) {
 			clearCacheForMatch(matchID);
+			clearCacheForTournamentStatistics(tournamentID);
 			super.setMatchStatus(matchID, status);
 		}
 	}
@@ -285,6 +300,7 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	public void setMatchGoalValues(ServerMatch<Term, GameState> match, Map<? extends RoleInterface<?>, Integer> goalValues) throws SQLException {
 		synchronized (matches) {
 			clearCacheForMatch(match.getMatchID());
+			clearCacheForTournamentStatistics(match.getTournamentID());
 			super.setMatchGoalValues(match, goalValues);
 		}
 	}
@@ -357,6 +373,7 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 					// new LinkedList(...) necessary to avoid concurrent iteration and modification
 				if (match.getPlayerInfos().contains(player)) {
 					clearCacheForMatch(match.getMatchID());
+					clearCacheForTournamentStatistics(match.getTournamentID());
 				}
 			}
 		}
@@ -387,4 +404,42 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 		}
 		return result;
 	}
+	
+	/////////////////// TOURNAMENT ///////////////////
+	@Override
+	public Tournament<Term, GameState> getTournament(String tournamentID) throws SQLException {
+		Tournament<Term, GameState> result = tournaments.get(tournamentID);
+		if (result == null) {
+			synchronized (tournaments) {
+				result = super.getTournament(tournamentID);
+				
+				if (result != null) {
+					tournaments.put(tournamentID, result);
+				}
+			}
+		}
+		return result;
+	}
+
+	@Override
+	public TournamentStatistics<Term, GameState> getTournamentStatistics(String tournamentID) throws SQLException {
+		TournamentStatistics<Term, GameState> result = tournamentStatistics.get(tournamentID);
+		if (result == null) {
+			synchronized (tournamentStatistics) {
+				result = super.getTournamentStatistics(tournamentID);
+				
+				if (result != null) {
+					tournamentStatistics.put(tournamentID, result);
+				}
+			}
+		}
+		return result;
+	}
+
+	private void clearCacheForTournamentStatistics(String tournamentID) {
+		synchronized (tournamentStatistics) {
+			tournamentStatistics.remove(tournamentID);
+		}
+	}
+
 }

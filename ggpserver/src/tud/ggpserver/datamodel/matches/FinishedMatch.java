@@ -50,9 +50,10 @@ public class FinishedMatch<TermType extends TermInterface, ReasonerStateInfoType
 			Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayerInfos,
 			Date startTime,
 			boolean scrambled,
+			String tournamentID,
 			AbstractDBConnector<TermType, ReasonerStateInfoType> db,
 			Map<? extends RoleInterface<?>, Integer> goalValues) {
-		super(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, scrambled, db);
+		super(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, scrambled, tournamentID, db);
 		this.goalValues = goalValues;
 	}
 

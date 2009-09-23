@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+                  2009 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GGP Server.
 
@@ -380,7 +381,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 
 		logger.info("String, Game<TermType,ReasonerStateInfoType>, int, int, Map<? extends RoleInterface<TermType>,? extends PlayerInfo>, Date - Creating new match: " + matchID); //$NON-NLS-1$
 		return new NewMatch<TermType, ReasonerStateInfoType>(matchID, game, startclock, playclock,
-				rolesToPlayerInfos, startTime, scrambled, this);
+				rolesToPlayerInfos, startTime, scrambled, tournament.getTournamentID(), this);
 	}
 	
 	/**
@@ -433,7 +434,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		ServerMatch<TermType, ReasonerStateInfoType> result = null;
 
 		try {
-			ps = con.prepareStatement("SELECT `game` , `start_clock` , `play_clock` , `start_time` , `status`, `scrambled` FROM `matches` WHERE `match_id` = ? ;");
+			ps = con.prepareStatement("SELECT `game`, `start_clock`, `play_clock`, `start_time`, `status`, `scrambled`, `tournament_id` FROM `matches` WHERE `match_id` = ? ;");
 			ps.setString(1, matchID);
 			rs = ps.executeQuery();
 			
@@ -444,6 +445,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				Timestamp startTime = rs.getTimestamp("start_time");
 				String status = rs.getString("status");
 				boolean scrambled = rs.getBoolean("scrambled");
+				String tournamentID = rs.getString("tournament_id");
 
 				ps_roles = con.prepareStatement("SELECT `player` , `roleindex` , `goal_value` FROM `match_players` WHERE `match_id` = ? ;");
 				ps_roles.setString(1, matchID);
@@ -469,11 +471,11 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				if (status.equals(ServerMatch.STATUS_NEW)) {
 					result = new NewMatch<TermType, ReasonerStateInfoType>(
 							matchID, game, startclock, playclock,
-							rolesToPlayerInfos, startTime, scrambled, this);
+							rolesToPlayerInfos, startTime, scrambled, tournamentID, this);
 				} else if (status.equals(ServerMatch.STATUS_SCHEDULED)) {
 					result = new ScheduledMatch<TermType, ReasonerStateInfoType>(
 							matchID, game, startclock, playclock,
-							rolesToPlayerInfos, startTime, scrambled, this);
+							rolesToPlayerInfos, startTime, scrambled, tournamentID, this);
 				} else if (status.equals(ServerMatch.STATUS_RUNNING)) {
 					GameScramblerInterface gameScrambler;
 					
@@ -484,16 +486,16 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 					}
 					result = new RunningMatch<TermType, ReasonerStateInfoType>(
 							matchID, game, startclock, playclock,
-							rolesToPlayerInfos, startTime, scrambled, this,
+							rolesToPlayerInfos, startTime, scrambled, tournamentID, this,
 							getMoveFactory(), gameScrambler);
 				} else if (status.equals(ServerMatch.STATUS_ABORTED)) {
 					result = new AbortedMatch<TermType, ReasonerStateInfoType>(
 							matchID, game, startclock, playclock,
-							rolesToPlayerInfos, startTime, scrambled, this);
+							rolesToPlayerInfos, startTime, scrambled, tournamentID, this);
 				} else if (status.equals(ServerMatch.STATUS_FINISHED)) {
 					result = new FinishedMatch<TermType, ReasonerStateInfoType>(
 							matchID, game, startclock, playclock,
-							rolesToPlayerInfos, startTime, scrambled, this, goalValues);
+							rolesToPlayerInfos, startTime, scrambled, tournamentID, this, goalValues);
 				}
 				
 				if (result == null) {
@@ -1783,7 +1785,6 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			
 			if (rs.next()) {
 				result = new Tournament<TermType, ReasonerStateInfoType>(rs.getString("tournament_id"), getUser(rs.getString("owner")), this);
-				fillTournamentStatistics(result);
 			}
 		} finally { 
 			if (con != null)
@@ -1797,7 +1798,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return result;
 	}
 	
-	private void fillTournamentStatistics(Tournament<TermType, ReasonerStateInfoType> tournament) throws SQLException {
+	public TournamentStatistics<TermType, ReasonerStateInfoType> getTournamentStatistics(String tournamentID) throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -1809,14 +1810,16 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 					"WHERE `matches`.`match_id` = `match_players`.`match_id` AND `matches`.`tournament_id` = ? AND `match_players`.`goal_value` IS NOT NULL AND `player` != '" + PLAYER_RANDOM + "' AND `player` != '" + PLAYER_LEGAL + "' " +
 					"GROUP BY `match_players`.`player` " +
 					"ORDER BY the_sum DESC");
-			ps.setString(1, tournament.getTournamentID());
+			ps.setString(1, tournamentID);
 			rs = ps.executeQuery();
-			
+			Map<PlayerInfo, Integer> totalReward = new HashMap<PlayerInfo, Integer>();
+			Map<PlayerInfo, Integer> numberOfMatches = new HashMap<PlayerInfo, Integer>();
 			while (rs.next()) {
 				PlayerInfo player = getPlayerInfo(rs.getString("player"));
-				tournament.setTotalReward(player, rs.getInt("the_sum"));
-				tournament.setNumberOfMatches(player, rs.getInt("the_count"));
+				totalReward.put(player, rs.getInt("the_sum"));
+				numberOfMatches.put(player, rs.getInt("the_count"));
 			}
+			return new TournamentStatistics<TermType, ReasonerStateInfoType>(tournamentID, numberOfMatches, totalReward);
 		} finally { 
 			if (con != null)
 				try {con.close();} catch (SQLException e) {}
