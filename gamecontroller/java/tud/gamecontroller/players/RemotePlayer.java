@@ -33,7 +33,7 @@ import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import tud.gamecontroller.MessageSentNotifier;
+import tud.gamecontroller.ConnectionEstablishedNotifier;
 import tud.gamecontroller.auxiliary.InvalidKIFException;
 import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MatchInterface;
@@ -88,7 +88,7 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 	}
 
 	@Override
-	public void gameStart(MatchInterface<TermType, ?> match, RoleInterface<TermType> role, MessageSentNotifier notifier) {
+	public void gameStart(MatchInterface<TermType, ?> match, RoleInterface<TermType> role, ConnectionEstablishedNotifier notifier) {
 		super.gameStart(match, role, notifier);
 		connectionTimeoutBonus = CONNECTION_TIMEOUT_BONUS;
 		String msg="(START "+
@@ -103,7 +103,7 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 			
 	}
 
-	public MoveInterface<TermType> gamePlay(JointMoveInterface<TermType> jointMove, MessageSentNotifier notifier) {
+	public MoveInterface<TermType> gamePlay(JointMoveInterface<TermType> jointMove, ConnectionEstablishedNotifier notifier) {
 		MoveInterface<TermType> move=null;
 		String msg="(PLAY "+match.getMatchID()+" ";
 		if(jointMove==null){
@@ -135,7 +135,7 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 	}
 
 	@Override
-	public void gameStop(JointMoveInterface<TermType> jointMove, MessageSentNotifier notifier) {
+	public void gameStop(JointMoveInterface<TermType> jointMove, ConnectionEstablishedNotifier notifier) {
 		String msg="(STOP "+match.getMatchID()+" ";
 		if(jointMove==null){
 			msg+="NIL";
@@ -149,22 +149,25 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 		//logger.info("reply from "+this.getName()+": "+reply+ " after "+getLastMessageRuntime()+"ms");
 	}
 
-	private String sendMsg(String msg, MessageSentNotifier notifier) {
+	private String sendMsg(String msg, ConnectionEstablishedNotifier notifier) {
 		String reply=null;
 		Socket s=null;
 		OutputStream out=null;
 		InputStream is=null;
+		
 		try {
-			logger.info("Begin creating Socket for " + host + ":" + port);
+			logger.info("Begin creating Socket for " + this);
 			long t0 = System.currentTimeMillis();
 			s = new Socket();
-			s.connect(new InetSocketAddress(getHostAddress(), port), CONNECTION_TIMEOUT + connectionTimeoutBonus);
-			long t1 = System.currentTimeMillis();
-			connectionTimeoutBonus -= Math.max(0, t1 - t0 - CONNECTION_TIMEOUT); // subtract the excess connection time from the bonus if greater than CONNECTION_TIMEOUT 
-			notifier.messageWasSent();
-			// TODO: rename this to notifier.connectionEstablished() or similar
-			//       the actual sending of the message is already counted towards the startclock/playclock
-			logger.info("Done creating Socket for " + host + ":" + port);
+			try {
+				s.connect(new InetSocketAddress(getHostAddress(), port), CONNECTION_TIMEOUT + connectionTimeoutBonus);
+			} catch(InterruptedIOException e) {
+				connectionTimeoutBonus -= Math.max(0, System.currentTimeMillis() - t0 - CONNECTION_TIMEOUT); // subtract the excess connection time from the bonus if greater than CONNECTION_TIMEOUT
+				throw e; // will be catch again below
+			}
+			connectionTimeoutBonus -= Math.max(0, System.currentTimeMillis() - t0 - CONNECTION_TIMEOUT); // subtract the excess connection time from the bonus if greater than CONNECTION_TIMEOUT 
+			notifier.connectionEstablished();
+			logger.info("Done creating Socket for " + this);
 			
 			out=s.getOutputStream();
 			PrintWriter pw=new PrintWriter(out);
@@ -215,7 +218,7 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 			// call the notifier in case of an exception, otherwise
 			// the GameController will wait forever if the exception occurred
 			// before the sending of the message
-			notifier.messageWasSent();
+			notifier.connectionEstablished();
 		}
 		return reply;
 	}

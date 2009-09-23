@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2008,2009 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GameController.
 
@@ -19,9 +19,9 @@
 
 package tud.gamecontroller.playerthreads;
 
-import java.util.logging.Logger;
+// import java.util.logging.Logger;
 
-import tud.gamecontroller.MessageSentNotifier;
+import tud.gamecontroller.ConnectionEstablishedNotifier;
 import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.players.Player;
@@ -29,15 +29,15 @@ import tud.gamecontroller.term.TermInterface;
 
 public abstract class AbstractPlayerThread<
 		TermType extends TermInterface
-		> extends Thread implements MessageSentNotifier {
-	private static final Logger logger = Logger.getLogger(AbstractPlayerThread.class.getName());
+		> extends Thread implements ConnectionEstablishedNotifier {
+	// private static final Logger logger = Logger.getLogger(AbstractPlayerThread.class.getName());
 	
 	protected Player<TermType> player;
 	protected RoleInterface<TermType> role;
 	protected MatchInterface<TermType, ?> match;
 	private long deadline;
 	private long timeout;
-	private ChangeableBoolean messageSent;
+	private ChangeableBoolean connectionEstablished;
 	private ChangeableBoolean deadlineSet;
 	
 	public AbstractPlayerThread(RoleInterface<TermType> role, Player<TermType> player, MatchInterface<TermType, ?> match, long timeout){
@@ -46,7 +46,7 @@ public abstract class AbstractPlayerThread<
 		this.match=match;
 		this.timeout=timeout;
 		deadline=0;
-		logger.info("Player thread initialized: " + this); // this.toString() will miss properties that are initialized in subclasses
+		// logger.info("Player thread initialized: " + this); // this.toString() will miss properties that are initialized in subclasses
 	}
 	public Player<TermType> getPlayer() {
 		return player;
@@ -59,12 +59,12 @@ public abstract class AbstractPlayerThread<
 	}
 	
 	public void start(){
-		messageSent=new ChangeableBoolean(false);
+		connectionEstablished=new ChangeableBoolean(false);
 		deadlineSet=new ChangeableBoolean(false);
 		// make another thread that waits until the message is sent and sets the deadline for this thread
 		new Thread(){
 			public void run() {
-				waitUntilMessageIsSent();
+				waitUntilConnectionIsEstablished();
 			}
 		}.start();
 		// start this thread
@@ -73,11 +73,11 @@ public abstract class AbstractPlayerThread<
 	
 	public abstract void run();
 	
-	private void waitUntilMessageIsSent() {
+	private void waitUntilConnectionIsEstablished() {
 		try {
-			synchronized (messageSent) {
-				while (!messageSent.isTrue()){
-					messageSent.wait();
+			synchronized (connectionEstablished) {
+				while (!connectionEstablished.isTrue()){
+					connectionEstablished.wait();
 				}
 			}
 		} catch (InterruptedException e) {
@@ -111,10 +111,10 @@ public abstract class AbstractPlayerThread<
 		}
 	}
 	
-	public void messageWasSent(){
-		synchronized (messageSent) {
-			messageSent.setTrue();
-			messageSent.notifyAll();
+	public void connectionEstablished(){
+		synchronized (connectionEstablished) {
+			connectionEstablished.setTrue();
+			connectionEstablished.notifyAll();
 		}
 	}
 
@@ -137,7 +137,7 @@ public abstract class AbstractPlayerThread<
 	@Override
 	protected void finalize() throws Throwable {
 		try {
-			logger.info("Player thread finalized: " + this); //$NON-NLS-1$
+			// logger.info("Player thread finalized: " + this); //$NON-NLS-1$
 		} finally {
 			super.finalize();
 		}

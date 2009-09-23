@@ -19,7 +19,7 @@
 
 package tud.gamecontroller.players;
 
-import tud.gamecontroller.MessageSentNotifier;
+import tud.gamecontroller.ConnectionEstablishedNotifier;
 import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.MoveInterface;
@@ -38,17 +38,17 @@ public abstract class LocalPlayer<
 	}
 
 	@Override
-	public void gameStart(MatchInterface<TermType, ?> match, RoleInterface<TermType> role, MessageSentNotifier notifier) {
+	public void gameStart(MatchInterface<TermType, ?> match, RoleInterface<TermType> role, ConnectionEstablishedNotifier notifier) {
 		super.gameStart(match, role, notifier);
 		notifyStartRunning();
-		notifier.messageWasSent();
+		notifier.connectionEstablished();
 		currentState=match.getGame().getInitialState();
 		notifyStopRunning();
 	}
 
-	public MoveInterface<TermType> gamePlay(JointMoveInterface<TermType> jointMove, MessageSentNotifier notifier) {
+	public MoveInterface<TermType> gamePlay(JointMoveInterface<TermType> jointMove, ConnectionEstablishedNotifier notifier) {
 		notifyStartRunning();
-		notifier.messageWasSent();
+		notifier.connectionEstablished();
 		if(jointMove!=null){
 			currentState=currentState.getSuccessor(jointMove);
 		}

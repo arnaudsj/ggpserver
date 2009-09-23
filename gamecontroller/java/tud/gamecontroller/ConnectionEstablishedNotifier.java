@@ -19,8 +19,8 @@
 
 package tud.gamecontroller;
 
-public interface MessageSentNotifier {
+public interface ConnectionEstablishedNotifier {
 
-	void messageWasSent();
+	void connectionEstablished();
 
 }

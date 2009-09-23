@@ -19,7 +19,7 @@
 
 package tud.gamecontroller.players;
 
-import tud.gamecontroller.MessageSentNotifier;
+import tud.gamecontroller.ConnectionEstablishedNotifier;
 import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.RoleInterface;
@@ -40,15 +40,15 @@ public abstract class AbstractPlayer<TermType extends TermInterface> implements 
 		this.lastMessageRuntime=0;
 	}
 	
-	public void gameStart(MatchInterface<TermType, ?> match, RoleInterface<TermType> role, MessageSentNotifier notifier) {
+	public void gameStart(MatchInterface<TermType, ?> match, RoleInterface<TermType> role, ConnectionEstablishedNotifier notifier) {
 		this.match=match;
 		this.role=role;
 		this.runtime=0;
 		this.lastMessageRuntime=0;
 	}
 
-	public void gameStop(JointMoveInterface<TermType> jointMove, MessageSentNotifier notifier) {
-		notifier.messageWasSent();
+	public void gameStop(JointMoveInterface<TermType> jointMove, ConnectionEstablishedNotifier notifier) {
+		notifier.connectionEstablished();
 	}
 
 	public long getTotalRuntime() {
