@@ -52,16 +52,11 @@
 		</thead>
 		<tbody>
 
-		private double avg, avg_of_non_error_matches, avg_of_all_matches;
-		private int nb_matches;
-		private int nb_matches_with_errors;
-		private double error_ratio;
-
 	      <c:forEach var="entry" items="${viewStats.entries}" varStatus="lineInfo">
 	      	 <c:choose>
 			   <c:when test="${lineInfo.count % 2 == 0}">
 			     <c:set var="rowClass" value="even" />
-			   </c:when> 
+			   </c:when>
 			   <c:otherwise>
 			     <c:set var="rowClass" value="odd" />
 			   </c:otherwise>
@@ -75,7 +70,7 @@
 						<c:otherwise>
 							?
 						</c:otherwise>
-					<c:choose>
+					</c:choose>
 				</td>
 				<td>
 					<c:url value="view_player.jsp" var="playerURL">

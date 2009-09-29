@@ -59,7 +59,7 @@ public class GermanComp09SeedingStats {
 		}
 
 		public int compareTo(StatEntry o2) {
-			if(nb_matches>=100 && o2.nb_matches>=100)
+			if((nb_matches>=100 && o2.nb_matches>=100) || (nb_matches<100 && o2.nb_matches<100))
 				return Double.compare(o2.avg, avg);
 			else
 				return o2.nb_matches - nb_matches;
@@ -72,7 +72,7 @@ public class GermanComp09SeedingStats {
 		statEntries.add(entry);	
 	}
 	
-	public List<StatEntry> getSortedEntries() {
+	public List<StatEntry> getEntries() {
 		Collections.sort(statEntries);
 		return Collections.unmodifiableList(statEntries);
 	}
