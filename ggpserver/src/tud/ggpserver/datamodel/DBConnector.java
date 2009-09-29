@@ -206,12 +206,12 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 			int playclock,
 			Map<? extends RoleInterface<Term>, ? extends PlayerInfo> rolesToPlayerInfos,
 			Tournament<Term, GameState> tournament,
-			Date startTime, boolean scrambled) throws DuplicateInstanceException,
+			Date startTime, boolean scrambled, double weight) throws DuplicateInstanceException,
 			SQLException {
 		synchronized (matches) {
 			NewMatch<Term, GameState> result = super.createMatch(matchID, game, 
 					startclock, playclock, rolesToPlayerInfos, tournament, 
-					startTime, scrambled);
+					startTime, scrambled, weight);
 			matches.put(matchID, result);
 			return result;
 		}
@@ -248,6 +248,20 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 			clearCacheForMatch(matchID);
 			clearCacheForTournamentStatistics(tournamentID);
 			super.setMatchStatus(matchID, status);
+		}
+	}
+
+	
+	@Override
+	public void setMatchWeight(String matchID, double weight) throws SQLException {
+		ServerMatch<Term, GameState> match = getMatch(matchID);
+		String tournamentID = match.getTournamentID();
+		synchronized (matches) {
+			clearCacheForMatch(matchID);
+			if(match.getStatus() == ServerMatch.STATUS_FINISHED){
+				clearCacheForTournamentStatistics(tournamentID);
+			}
+			super.setMatchWeight(matchID, weight);
 		}
 	}
 

@@ -71,14 +71,14 @@
 		    <table>
 			<thead>
 			    <tr>
-				<th>match name</th>
-				<th>game</th>
+				<th>match/game</th>
 				<th>status</th>
 				<th>start clock</th>
 				<th>play clock</th>
 				<th>players</th>
 				<th>scrambled</th>
 				<th>goal values</th>
+				<th>weight</th>
 				<th>errors</th>
 				<th colspan="4">actions</th>
 			    </tr>
@@ -94,28 +94,28 @@
 				    </c:otherwise>
 				</c:choose>
 				<tr class="${rowClass}">
-				    <!-- match name -->
-				    <td><c:out value="${match.matchID}" /></td>
-				    
-				    <!-- game -->
+
+				    <!-- match/game -->
 				    <td>
-					<c:choose>
-					    <c:when test="${match.status == 'new'}">
-						<select name="gameName+${match.matchID}" size="1" onChange="theForm.submit();" style="max-width:120px;">
-						    <c:forEach var="game" items="${pager.games}">
-							<c:choose>
-							    <c:when test='${game.name == match.game.name}'>
-								<option value="${game.name}" selected="selected" ><c:out value="${game.name}" /></option>
-							    </c:when>
-							    <c:otherwise>
-								<option value="${game.name}"><c:out value="${game.name}" /></option>
-							    </c:otherwise>
-							</c:choose>
-						    </c:forEach>
-						</select>							
-					    </c:when>
-					    <c:otherwise><c:out value="${match.game.name}" /></c:otherwise>
-					</c:choose>
+						<c:choose>
+						    <c:when test="${match.status == 'new'}">
+								<select name="gameName+${match.matchID}" size="1" onChange="theForm.submit();" style="max-width:120px;">
+								    <c:forEach var="game" items="${pager.games}">
+									<c:choose>
+									    <c:when test='${game.name == match.game.name}'>
+										<option value="${game.name}" selected="selected" ><c:out value="${game.name}" /></option>
+									    </c:when>
+									    <c:otherwise>
+										<option value="${game.name}"><c:out value="${game.name}" /></option>
+									    </c:otherwise>
+									</c:choose>
+								    </c:forEach>
+								</select>							
+						    </c:when>
+						    <c:otherwise>
+						    	<c:out value="${match.matchID}" />
+						    </c:otherwise>
+						</c:choose>
 				    </td>
 				    
 				    <!-- status -->
@@ -143,32 +143,32 @@
 				    
 				    <!-- players -->
 				    <td>
-					<c:forEach var="selectedplayerinfo" items="${match.orderedPlayerInfos}">
-					    <c:choose>
-						<c:when test="${match.status == 'new'}">
-						    <select name="playerInfos+${match.matchID}" size="1" onchange="document.theForm.submitButton.style.color = '#ff0000';" style="max-width:120px;">
-							<c:forEach var="playerinfo" items="${pager.playerInfos}">
-							    <c:choose>
-								<c:when test='${playerinfo.name == selectedplayerinfo.name}'>
-								    <option value="${playerinfo.name}" selected="selected" ><c:out value="${playerinfo.name}" /></option>
+						<c:forEach var="selectedplayerinfo" items="${match.orderedPlayerInfos}">
+						    <c:choose>
+								<c:when test="${match.status == 'new'}">
+								    <select name="playerInfos+${match.matchID}" size="1" onchange="document.theForm.submitButton.style.color = '#ff0000';" style="max-width:120px;">
+									<c:forEach var="playerinfo" items="${pager.playerInfos}">
+									    <c:choose>
+											<c:when test='${playerinfo.name == selectedplayerinfo.name}'>
+											    <option value="${playerinfo.name}" selected="selected" ><c:out value="${playerinfo.name}" /></option>
+											</c:when>
+											<c:otherwise>
+											    <option value="${playerinfo.name}"><c:out value="${playerinfo.name}" /></option>
+											</c:otherwise>
+									    </c:choose>
+									</c:forEach>
+								    </select>
 								</c:when>
 								<c:otherwise>
-								    <option value="${playerinfo.name}"><c:out value="${playerinfo.name}" /></option>
+								    <c:url value="../public/view_player.jsp" var="playerURL">
+									<c:param name="name" value="${selectedplayerinfo.name}" />
+								    </c:url>
+								    <a href='<c:out value="${playerURL}" />'> 
+								    <c:out value="${selectedplayerinfo.name}" /> </a>
+								    <br>
 								</c:otherwise>
-							    </c:choose>
-							</c:forEach>
-						    </select>
-						</c:when>
-						<c:otherwise>
-						    <c:url value="../public/view_player.jsp" var="playerURL">
-							<c:param name="name" value="${selectedplayerinfo.name}" />
-						    </c:url>
-						    <a href='<c:out value="${playerURL}" />'> 
-						    <c:out value="${selectedplayerinfo.name}" /> </a>
-						    <br>
-						</c:otherwise>
-					    </c:choose>
-					</c:forEach>
+						    </c:choose>
+						</c:forEach>
 				    </td>
 				    
 				    <!-- scrambled -->
@@ -194,6 +194,11 @@
 						</c:forEach>
 					    </c:otherwise>
 				    </c:choose></td>
+
+				    <!-- weight -->
+				    <td>
+						<input type="text" name="weight+${match.matchID}" size="3" value="${match.weight}" maxlength="10" style="text-align: right;" onchange="document.theForm.submitButton.style.color = '#ff0000';">
+					</td>
 				    
 				    <!-- errors -->
 				    <td>

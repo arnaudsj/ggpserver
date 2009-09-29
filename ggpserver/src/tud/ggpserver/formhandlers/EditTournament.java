@@ -168,7 +168,7 @@ public class EditTournament extends ShowMatches {
 	@SuppressWarnings("unchecked")
 	private void cloneMatch(ServerMatch match) throws SQLException {
 		db.createMatch(match.getGame(), match.getStartclock(), match.getPlayclock(), 
-				match.getRolesToPlayerInfos(), tournament, match.isScrambled());
+				match.getRolesToPlayerInfos(), tournament, match.isScrambled(), match.getWeight());
 		correctlyPerformed = true;
 	}
 
@@ -194,5 +194,14 @@ public class EditTournament extends ShowMatches {
 		result.addAll(db.getPlayerInfos());
 
 		return result;
+	}
+	
+	public String shortMatchID(ServerMatch<?, ?> match) {
+		String matchID = match.getMatchID();
+		String gameName = match.getGame().getName();
+		if(matchID.startsWith(gameName)) {
+			matchID = matchID.substring(gameName.length()+1);
+		}
+		return matchID;
 	}
 }

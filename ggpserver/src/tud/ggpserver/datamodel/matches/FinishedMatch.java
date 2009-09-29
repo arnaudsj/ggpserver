@@ -40,7 +40,7 @@ public class FinishedMatch<TermType extends TermInterface, ReasonerStateInfoType
 		extends ServerMatch<TermType, ReasonerStateInfoType> {
 
 	
-	private final Map<? extends RoleInterface<?>, Integer> goalValues;
+	private final Map<? extends RoleInterface<TermType>, Integer> goalValues;
 	
 	public FinishedMatch(
 			String matchID,
@@ -51,9 +51,10 @@ public class FinishedMatch<TermType extends TermInterface, ReasonerStateInfoType
 			Date startTime,
 			boolean scrambled,
 			String tournamentID,
+			double weight,
 			AbstractDBConnector<TermType, ReasonerStateInfoType> db,
-			Map<? extends RoleInterface<?>, Integer> goalValues) {
-		super(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, scrambled, tournamentID, db);
+			Map<? extends RoleInterface<TermType>, Integer> goalValues) {
+		super(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, scrambled, tournamentID, weight, db);
 		this.goalValues = goalValues;
 	}
 
@@ -63,9 +64,9 @@ public class FinishedMatch<TermType extends TermInterface, ReasonerStateInfoType
 	}
 
 	@Override
-	public Map<? extends RoleInterface<?>, Integer> getGoalValues() {
+	public Map<RoleInterface<TermType>, Integer> getGoalValues() {
 		// defensive copy needed here, otherwise EditableMatch will fail
-		return new HashMap<RoleInterface<?>, Integer>(goalValues);
+		return new HashMap<RoleInterface<TermType>, Integer>(goalValues);
 	}
 	
 	@Override

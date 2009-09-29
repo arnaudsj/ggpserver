@@ -105,10 +105,11 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 			Date startTime,
 			boolean scrambled,
 			String tournamentID,
+			double weight,
 			AbstractDBConnector<TermType, ReasonerStateInfoType> db,
 			MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory,
 			GameScramblerInterface gameScrambler) {
-		super(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, scrambled, tournamentID, db);
+		super(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, scrambled, tournamentID, weight, db);
 		this.moveFactory = movefactory;
 		this.gameScrambler = gameScrambler;
 	}

@@ -41,8 +41,9 @@ public class ScheduledMatch<TermType extends TermInterface, ReasonerStateInfoTyp
 			Date startTime,
 			boolean scrambled,
 			String tournamentID,
+			double weight,
 			AbstractDBConnector<TermType, ReasonerStateInfoType> db) {
-		super(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, scrambled, tournamentID, db);
+		super(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, scrambled, tournamentID, weight, db);
 	}
 
 	@Override

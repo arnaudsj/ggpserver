@@ -75,46 +75,68 @@
 			<td><c:out value="${match.startTime}" /></td>
 		</tr>
 		<tr>
-			<th>players</th>
+			<th>players
+				<c:if test="${match.orderedGoalValues != null}">
+					 &amp;<br />scores
+				</c:if>
+			</th>
 			<td>
-				<c:forEach var="playerinfo"
-					items="${match.orderedPlayerInfos}">
-					<c:url value="view_player.jsp" var="playerURL">
-						<c:param name="name" value="${playerinfo.name}" />
-					</c:url>
-	
-					<a href='<c:out value="${playerURL}" />'>
-					<c:choose>
-						<c:when test="${ playerinfo.name == viewMatch.playerName }">
-							<span class="highlight"><c:out value="${playerinfo.name}" /></span>
-						</c:when>
-						<c:otherwise>
-							<c:out value="${playerinfo.name}" />
-						</c:otherwise>
-					</c:choose>
-					</a>
-				</c:forEach>
+				<table>
+					<tbody>
+					<tr>
+						<c:forEach var="playerinfo"	items="${match.orderedPlayerInfos}">
+							<th>
+								<c:url value="view_player.jsp" var="playerURL">
+									<c:param name="name" value="${playerinfo.name}" />
+								</c:url>
+				
+								<a href='<c:out value="${playerURL}" />'>
+								<c:choose>
+									<c:when test="${ playerinfo.name == viewMatch.playerName }">
+										<span class="highlight"><c:out value="${playerinfo.name}" /></span>
+									</c:when>
+									<c:otherwise>
+										<c:out value="${playerinfo.name}" />
+									</c:otherwise>
+								</c:choose>
+								</a>
+							</th>
+						</c:forEach>
+						<c:if test="${match.weight != 1.0}">
+							<td></td>
+						</c:if> 
+					</tr>
+					<c:if test="${match.orderedGoalValues != null}">
+						<tr>
+							<c:forEach var="roleindex" begin="0" end="${match.game.numberOfRoles - 1}">
+								<td>
+									<c:choose>
+										<c:when test="${ match.orderedPlayerInfos[roleindex].name == viewMatch.playerName }">
+											<span class="highlight">${match.orderedGoalValues[roleindex]}</span>
+										</c:when>
+										<c:otherwise>
+											${match.orderedGoalValues[roleindex]}
+										</c:otherwise>
+									</c:choose>
+								</td>
+							</c:forEach>
+							<c:if test="${match.weight != 1.0}">
+								<td>*${match.weight}</td>
+							</c:if> 
+						</tr>
+					</c:if>
+					</tbody>
+				</table>
 			</td>
 		</tr>
 		<tr>
-			<th>goal values</th>
-			<td><c:choose>
-				<c:when test="${match.orderedGoalValues == null}">
-							---
-						</c:when>
-				<c:otherwise>
-					<c:forEach var="roleindex" begin="0" end="${match.game.numberOfRoles - 1}">
-						<c:choose>
-							<c:when test="${ match.orderedPlayerInfos[roleindex].name == viewMatch.playerName }">
-								<span class="highlight">${match.orderedGoalValues[roleindex]}</span>
-							</c:when>
-							<c:otherwise>
-								${match.orderedGoalValues[roleindex]}
-							</c:otherwise>
-						</c:choose>
-					</c:forEach>
-				</c:otherwise>
-			</c:choose></td>
+			<th>tournament</th>
+			<td>
+				<c:url value="view_tournament.jsp" var="viewTournamentURL">
+					<c:param name="tournamentID" value="${match.tournamentID}" />
+				</c:url>
+				<a href='<c:out value="${viewTournamentURL}" />'><c:out value="${match.tournamentID}" /></a>
+			</td>
 		</tr>
 		<tr>
 			<th>export</th>

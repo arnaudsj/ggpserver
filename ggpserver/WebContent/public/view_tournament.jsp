@@ -92,7 +92,14 @@
 			   </c:otherwise>
 			 </c:choose> 
 		     <tr class="${rowClass}">
-				<td>${player.name}</td>
+				<td>
+					<c:url value="view_player.jsp" var="playerURL">
+						<c:param name="name" value="${player.name}" />
+					</c:url>
+					<a href='<c:out value="${playerURL}" />'>
+						<c:out value="${player.name}" />
+					</a>
+				</td>
 				<td>${viewTournament.tournamentStatistics.numberOfMatches[player]}</td>
 				<td>${viewTournament.tournamentStatistics.totalReward[player]}</td>
 				<td>${viewTournament.tournamentStatistics.averageReward[player]}</td>

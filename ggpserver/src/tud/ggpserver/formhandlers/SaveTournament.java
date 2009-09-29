@@ -46,6 +46,7 @@ public class SaveTournament {
 	public static final String PREFIX_START_CLOCK = "startclock+";
 	public static final String PREFIX_SCRAMBLED = "scrambled+";
 	public static final String PREFIX_GOALVALUE = "goalvalue+";
+	public static final String PREFIX_WEIGHT = "weight+";
 
 	private String tournamentID;
 	private int page;
@@ -81,6 +82,8 @@ public class SaveTournament {
 				parseScrambled(key.substring(PREFIX_SCRAMBLED.length()), params);
 			} else if (key.startsWith(PREFIX_GOALVALUE)) {
 				parseGoalValue(key.substring(PREFIX_GOALVALUE.length()), params);
+			} else if (key.startsWith(PREFIX_WEIGHT)) {
+				parseWeight(key.substring(PREFIX_WEIGHT.length()), params);
 			} else {
 				String message = "Map<String,String[]> - Unknown parameter: " + key + " (values ";
 				for (String value : params) {
@@ -131,6 +134,20 @@ public class SaveTournament {
 				if (playclock != null) {
 					getEditableMatch(matchID).setPlayclock(playclock);
 					logger.config("String, String[] - match(" + matchID + ").setPlayClock(" + playclock + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				}
+			} catch (NumberFormatException e) {
+				// ignore
+			}
+		}
+	}
+
+	private void parseWeight(String matchID, String[] params) throws SQLException {
+		if (params.length == 1) {
+			try {
+				Double weight = Double.parseDouble(params[0]);
+				if (weight != null) {
+					getEditableMatch(matchID).setWeight(weight);
+					logger.config("String, String[] - match(" + matchID + ").setWeight(" + weight + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				}
 			} catch (NumberFormatException e) {
 				// ignore

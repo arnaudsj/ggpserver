@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.impl.Match;
@@ -34,10 +33,28 @@ import tud.gamecontroller.game.impl.State;
 import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.term.TermInterface;
+import tud.ggpserver.collectionviews.ListView;
+import tud.ggpserver.collectionviews.MapView;
+import tud.ggpserver.collectionviews.Mapping;
+import tud.ggpserver.collectionviews.Mappings;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 
 public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateInfoType>
 		extends Match<TermType, ReasonerStateInfoType> {
+
+	private final class GoalValueToWeightedMapping implements
+			Mapping<Integer, Double> {
+		@Override
+		public Double map(Integer o) {
+			return o.intValue()*weight;
+		}
+
+		@Override
+		public Integer reverseMap(Double o) {
+			return (int)Math.round(o.doubleValue()/weight);
+		}
+	}
+
 
 	public static final String STATUS_NEW = "new";
 	public static final String STATUS_RUNNING = "running";
@@ -54,6 +71,8 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 	private final boolean scrambled;
 	
 	private final String tournamentID;
+
+	private final double weight;
 
 	/**
 	 * State 0 = initial state, State 1 = state after first joint move, ..., State n = final state
@@ -78,6 +97,7 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 	/**
 	 * Don't use this constructor directly, use DBConnectorFactory.getDBConnector().getMatch() instead. 
 	 */
+	@Deprecated
 	public ServerMatch(
 			String matchID,
 			GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game,
@@ -88,14 +108,28 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 			boolean scrambled,
 			String tournamentID,
 			AbstractDBConnector<TermType, ReasonerStateInfoType> db) {
+		this(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, scrambled, tournamentID, 1.0, db);
+	}
+
+	public ServerMatch(
+			String matchID,
+			GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game,
+			int startclock,
+			int playclock,
+			Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayerInfos,
+			Date startTime,
+			boolean scrambled,
+			String tournamentID,
+			double weight,
+			AbstractDBConnector<TermType, ReasonerStateInfoType> db) {
 		super(matchID, game, startclock, playclock);
 		this.rolesToPlayerInfos = rolesToPlayerInfos;
 		this.startTime = new Date(startTime.getTime());
 		this.scrambled = scrambled;
 		this.tournamentID = tournamentID;
+		this.weight = weight;
 		this.db = db;
 	}
-
 	
 	/////////////////////// player infos ///////////////////////
 	
@@ -141,7 +175,7 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 	 * @return May return <code>null</code> if there are no goal values for
 	 *         this match yet. <br>
 	 */
-	public Map<? extends RoleInterface<?>, Integer> getGoalValues() {
+	public Map<RoleInterface<TermType>, Integer> getGoalValues() {
 		return null;
 	}
 
@@ -150,17 +184,34 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 	 *         this match yet. <br>
 	 */
 	public List<Integer> getOrderedGoalValues() {
-		Map<? extends RoleInterface<?>, Integer> goalValues = getGoalValues();
+		Map<RoleInterface<TermType>, Integer> goalValues = getGoalValues();
 		if (goalValues == null) {
 			return null;
 		}
 		if (orderedGoalValues == null) {
 			orderedGoalValues = new LinkedList<Integer>();
-			for (RoleInterface<?> role : getGame().getOrderedRoles()) {
+			for (RoleInterface<TermType> role : getGame().getOrderedRoles()) {
 				orderedGoalValues.add(goalValues.get(role));
 			}
 		}
 		return new ArrayList<Integer>(orderedGoalValues);
+	}
+	
+	public Map<? extends RoleInterface<TermType>, Double> getWeightedGoalValues() {
+		
+		return new MapView<RoleInterface<TermType>, Double, RoleInterface<TermType>, Integer>(
+				getGoalValues(),
+				Mappings.<RoleInterface<TermType>>identity(),
+				new GoalValueToWeightedMapping()
+			); 
+	}
+
+	public List<Double> getWeightedOrderedGoalValues() {
+		return new ListView<Double, Integer>(getOrderedGoalValues(), new GoalValueToWeightedMapping());
+	}
+
+	public double getWeight() {
+		return weight;
 	}
 
 	/////////////////////// joint moves strings ///////////////////////

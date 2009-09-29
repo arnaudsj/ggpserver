@@ -44,6 +44,7 @@ public class EditableMatch {
 	private int playclock;
 	private List<PlayerInfo> playerInfos;
 	private Map<RoleInterface<?>, Integer> goalValues;
+	private double weight;
 	
 	private boolean scrambled = false;  
 		// this is false by default (and not shadowedMatch.isScrambled), because
@@ -60,6 +61,7 @@ public class EditableMatch {
 		playclock = shadowedMatch.getPlayclock();
 		playerInfos = shadowedMatch.getOrderedPlayerInfos();
 		goalValues = shadowedMatch.getGoalValues();
+		weight = shadowedMatch.getWeight();
 	}
 
 
@@ -90,12 +92,16 @@ public class EditableMatch {
 	}
 
 
-	void setGoalValue(int roleNumber, int goalValue) {
+	public void setGoalValue(int roleNumber, int goalValue) {
 		if (goalValues == null) {
 			throw new IllegalStateException("Goal values can only be changed for FinishedMatches, and match is not finished: " + shadowedMatch);
 		}
 		List<? extends RoleInterface<?>> roles = game.getOrderedRoles();
 		goalValues.put(roles.get(roleNumber), goalValue);
+	}
+	
+	public void setWeight(double weight) {
+		this.weight = weight;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -127,10 +133,14 @@ public class EditableMatch {
 			db.setMatchScrambled(shadowedMatch.getMatchID(), scrambled);
 		}
 		
+		if (weight != shadowedMatch.getWeight()) {
+			db.setMatchWeight(shadowedMatch.getMatchID(), weight);
+		}
+
 		if (goalValues != null && !(goalValues.equals(shadowedMatch.getGoalValues()))) {
 			db.setMatchGoalValues(shadowedMatch, goalValues);
 		}
-		
+
 		// set the game last, because this will change the match id
 		if (!shadowedMatch.getGame().equals(game)) {
 			if (shadowedMatch instanceof NewMatch) {
