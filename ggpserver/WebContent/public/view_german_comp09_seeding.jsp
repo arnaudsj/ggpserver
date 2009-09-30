@@ -92,9 +92,9 @@
 	<h2>Legend</h2>
 	<dl>
 		<dt>Avg1</dt>
-		<dd>Average score of all matches, matches with &gt;3 errors by the player count zero for the player.</dd>
+		<dd>Average score of all matches, matches with 3 or more errors by the player count zero for the player.</dd>
 		<dt>Avg2</dt>
-		<dd>Average score of all matches in which the player had at most 3 errors.</dd>
+		<dd>Average score of all matches in which the player had less than 3 errors.</dd>
 		<dt>Avg3</dt>
 		<dd>Average score of all matches.</dd>
 	</dl>

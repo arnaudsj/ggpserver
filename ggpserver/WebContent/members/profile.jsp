@@ -117,8 +117,7 @@ A player can be in one of two states:
 
 <p>If an active player doesn't send a single legal move back for three matches in a row, it is assumed that this 
 player has crashed, and its status is automatically set to "inactive" by the 
-GGP Server. If this has happened to your player, the last error message of the 
-last match that the player played will say so.</p>
+GGP Server.</p>
 
 <p>The GGP Server will never set a player's status back to "active". You have to
 do so manually.</p>

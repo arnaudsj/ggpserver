@@ -107,7 +107,7 @@
 						</c:if> 
 					</tr>
 					<c:if test="${match.orderedGoalValues != null}">
-						<tr>
+						<tr class="even">
 							<c:forEach var="roleindex" begin="0" end="${match.game.numberOfRoles - 1}">
 								<td>
 									<c:choose>
@@ -194,7 +194,7 @@
 				<td>
 					<center>
 						<c:choose>
-							<c:when test="<%= !viewMatch.getErrorMessages().isEmpty() %>">
+							<c:when test="${!empty viewMatch.errorMessages}">
 								<c:choose>
 									<c:when test="${ viewMatch.playerName == null }">
 										<c:set var="errorclass" value="errors" />

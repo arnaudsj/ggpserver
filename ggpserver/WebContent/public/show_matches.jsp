@@ -20,6 +20,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%> 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <jsp:useBean id="pager" class="tud.ggpserver.formhandlers.ShowMatches" scope="page">
 	<c:catch> <% // this is for catching NumberFormatExceptions and the like %>
 		<jsp:setProperty name="pager" property="playerName"/>
@@ -63,108 +64,127 @@
 		<thead>
 			<tr>
 				<th>match name</th>
-				<th>status</th>
 				<th>start clock</th>
 				<th>play clock</th>
-<!--				<th>start time</th>-->
+				<th>start time</th>
 				<th>players</th>
 				<th>goal values</th>
-				<th>errors</th>
+				<%-- <th>errors</th> --%>
 			</tr>
 		</thead>
 		<tbody>
-	      <c:forEach var="match" items="${pager.matches}" varStatus="lineInfo">
-	      	 <c:choose>
-			   <c:when test="${lineInfo.count % 2 == 0}">
-			     <c:set var="rowClass" value="even" />
-			   </c:when> 
-			   <c:otherwise>
-			     <c:set var="rowClass" value="odd" />
-			   </c:otherwise>
-			 </c:choose> 
-		     <tr class="${rowClass}"> 
-				<td>
-										
-					<c:url value="view_match.jsp" var="matchURL">
-						<c:param name="matchID" value="${match.matchID}" />
-					    <c:if test="${ pager.playerName != null }">
-							<c:param name="playerName" value="${pager.playerName}" />
+			<c:forEach var="match" items="${pager.matches}" varStatus="lineInfo">
+				<c:choose>
+					<c:when test="${lineInfo.count % 2 == 0}">
+						<c:set var="rowClass" value="even" />
+					</c:when> 
+					<c:otherwise>
+						<c:set var="rowClass" value="odd" />
+					</c:otherwise>
+				</c:choose>
+				<c:set var="numberOfPlayers" value="${match.game.numberOfRoles}"/>
+				<!-- numberOfPlayers=${numberOfPlayers} -->
+				<c:forEach var="playerinfo" items="${match.orderedPlayerInfos}" varStatus="playerinfoIndex">
+					<tr class="${rowClass}">
+				    	<c:if test="${playerinfoIndex.count==1}">
+							<td rowspan="${numberOfPlayers}">  <%-- match id --%>
+								<c:url value="view_match.jsp" var="matchURL">
+									<c:param name="matchID" value="${match.matchID}" />
+								    <c:if test="${ pager.playerName != null }">
+										<c:param name="playerName" value="${pager.playerName}" />
+									</c:if>
+								</c:url>
+								<a href='<c:out value="${matchURL}" />'>${match.matchID}</a>
+							</td>
+							<%-- <td rowspan="${numberOfPlayers}">${match.status}</td> --%>  <%-- status --%>
+							<td rowspan="${numberOfPlayers}">${match.startclock}</td> <%-- start clock --%>
+							<td rowspan="${numberOfPlayers}">${match.playclock}</td>  <%-- play clock --%>
+							<td rowspan="${numberOfPlayers}"><fmt:formatDate value="${match.startTime}" pattern="dd.MM.yyyy HH:mm:ss z"/></td>  <%-- start time --%>
 						</c:if>
-					</c:url>
-					<a href='<c:out value="${matchURL}" />'>${match.matchID}</a>
-				</td>
-				<td>${match.status}</td>
-				<td>${match.startclock}</td>
-				<td>${match.playclock}</td>
-<%--				<td>${match.startTime}</td> --%>
-				<td>
-					<c:forEach var="playerinfo" items="${match.orderedPlayerInfos}">
-						<c:url value="view_player.jsp" var="playerURL">
-							<c:param name="name" value="${playerinfo.name}" />
-						</c:url>
-						<a href='<c:out value="${playerURL}" />'>
-							<c:choose>
-								<c:when test="${ playerinfo.name == pager.playerName}">
-									<span class="highlight">${playerinfo.name}</span>
-								</c:when>
-								<c:otherwise>
-									${playerinfo.name}
-								</c:otherwise>
-							</c:choose>
-						</a>
-						<br>
-					</c:forEach>
-				</td>
-				<td>
-					<c:choose>
-						<c:when test="${match.goalValues == null}">
-							---
-						</c:when>
-						<c:otherwise>
-							<c:forEach var="roleindex" begin="0" end="${match.game.numberOfRoles - 1}">
+						<td style="white-space:nowrap;">  <%-- players --%>
+							<c:url value="view_player.jsp" var="playerURL">
+								<c:param name="name" value="${playerinfo.name}" />
+							</c:url>
+							<a href='<c:out value="${playerURL}" />'>
 								<c:choose>
-									<c:when test="${ match.orderedPlayerInfos[roleindex].name == pager.playerName }">
-										<span class="highlight">${match.orderedGoalValues[roleindex]}</span>
+									<c:when test="${playerinfo.name == pager.playerName}">
+										<span class="highlight">${playerinfo.name}</span>
 									</c:when>
 									<c:otherwise>
-										${match.orderedGoalValues[roleindex]}
+										${playerinfo.name}
 									</c:otherwise>
 								</c:choose>
-								<br>
-							</c:forEach>
-						</c:otherwise>
-					</c:choose>
-				</td>
-				<td style="text-align:center;">
-					<c:choose>
-						<c:when test="${match.hasErrors}">
-							<c:choose>
-								<c:when test="${pager.playerName == null}">
-									<c:set var="errorclass" value="errors"></c:set>
-								</c:when>
-								<c:when test="${pager.playerName != null && match.hasErrorsAllPlayers[pager.playerName]}">
-									<c:set var="errorclass" value="errors"></c:set>
-								</c:when>
-								<c:otherwise>
-									<c:set var="errorclass" value="errors_bw"></c:set>
-								</c:otherwise>
-							</c:choose>
-							
-							<c:url value="view_errors.jsp" var="errorURL">
-								<c:param name="matchID" value="${match.matchID}" />
-							    <c:if test="${ pager.playerName != null }">
-									<c:param name="playerName" value="${pager.playerName}" />
-								</c:if>
-								<% // <c:param name="stepNumber" value="${stepNumber}" /> %>
-							</c:url>
-							<div class="${errorclass}"><a href='<c:out value="${errorURL}" />'><span>errors</span></a></div>
-						</c:when>
-						<c:otherwise>
-							<div class="no_errors"></div>
-						</c:otherwise>						
-					</c:choose>
-				</td>
-			</tr>
+							</a>
+							<c:if test="${match.hasErrorsAllPlayers[playerinfo.name]}">
+								<c:url value="view_errors.jsp" var="errorURL">
+									<c:param name="matchID" value="${match.matchID}" />
+									<c:param name="playerName" value="${playerinfo.name}" />
+								</c:url>
+								<c:choose>
+									<c:when test="${pager.playerName != null && pager.playerName != playerinfo.name}">
+										<c:set var="errorclass" value="errors_bw"></c:set>
+									</c:when>
+									<c:otherwise>
+										<c:set var="errorclass" value="errors"></c:set>
+									</c:otherwise>
+								</c:choose>
+								<a href='<c:out value="${errorURL}"/>'><span class="${errorclass}" title="Show Errors"/></a>
+							</c:if>
+						</td>
+						<%-- goal values / status --%>
+						<c:choose>
+							<c:when test="${match.goalValues==null}">
+						    	<c:if test="${playerinfoIndex.count==1}">
+									<td rowspan="${numberOfPlayers}">
+										${match.status}
+									</td>
+						    	</c:if>
+							</c:when>
+							<c:otherwise>
+								<td>
+									<c:choose>
+										<c:when test="${ match.orderedPlayerInfos[playerinfoIndex.count - 1].name == pager.playerName }">
+											<span class="highlight">${match.orderedGoalValues[playerinfoIndex.count - 1]}</span>
+										</c:when>
+										<c:otherwise>
+											${match.orderedGoalValues[playerinfoIndex.count - 1]}
+										</c:otherwise>
+									</c:choose>
+								</td>
+							</c:otherwise>
+						</c:choose>
+						<%-- errors --%>
+						<%--
+				    	<c:if test="${playerinfoIndex.count==1}">
+							<td style="text-align:center;" rowspan="${numberOfPlayers}">
+								<c:choose>
+									<c:when test="${match.hasErrors}">
+										<c:choose>
+											<c:when test="${pager.playerName != null && !match.hasErrorsAllPlayers[pager.playerName]}">
+												<c:set var="errorclass" value="errors_bw"></c:set>
+											</c:when>
+											<c:otherwise>
+												<c:set var="errorclass" value="errors"></c:set>
+											</c:otherwise>
+										</c:choose>
+										
+										<c:url value="view_errors.jsp" var="errorURL">
+											<c:param name="matchID" value="${match.matchID}" />
+										    <c:if test="${ pager.playerName != null }">
+												<c:param name="playerName" value="${pager.playerName}" />
+											</c:if>
+										</c:url>
+										<div class="${errorclass}"><a href='<c:out value="${errorURL}" />'><span>errors</span></a></div>
+									</c:when>
+									<c:otherwise>
+										<div class="no_errors"></div>
+									</c:otherwise>						
+								</c:choose>
+							</td>
+						</c:if>
+						--%>
+					</tr>
+				</c:forEach>
 	      </c:forEach>
 		</tbody>
 	</table>
@@ -172,11 +192,13 @@
 	<!-- pager -->
 	<jsp:directive.include file="/inc/pager.jsp" />
 	
+	<%--
 	<c:if test="${pager.playerName != null}">
 		<h1>Legend</h1>
 		<div class="errors"></div> &ndash; some players produced errors, including player ${pager.playerName} <br>
 		<div class="errors_bw"></div> &ndash; some other players produced errors
 	</c:if>
+	--%>
 </div>  <!--end div "content"-->
 
 <jsp:directive.include file="/inc/footer.jsp" />
