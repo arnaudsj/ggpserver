@@ -20,6 +20,7 @@
 package tud.ggpserver.formhandlers;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.matches.ServerMatch;
@@ -40,15 +41,18 @@ public class ViewState {
 	}
 
 	public String getXmlState() {
-		int stepNumber;
-		int numberOfStates = match.getXmlStates().size();
-		if (this.stepNumber < 1 || this.stepNumber > numberOfStates) {
-			// return the last/final state
-			stepNumber = numberOfStates;
+		int stepNumber = this.stepNumber;
+		List<String> xmlStates = match.getXmlStates();
+		int numberOfStates = xmlStates.size();
+		if(numberOfStates > 0) {
+			if (stepNumber < 1 || stepNumber > numberOfStates) {
+				// return the last/final state
+				stepNumber = numberOfStates;
+			}
+			return xmlStates.get(stepNumber - 1);
 		} else {
-			stepNumber = this.stepNumber;
+			// this can only happen if the initial state wasn't created yet
+			return "match " + match.getMatchID() + " has no state!"; 
 		}
-		
-		return match.getXmlStates().get(stepNumber - 1);
 	}
 }

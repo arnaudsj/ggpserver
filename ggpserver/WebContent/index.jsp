@@ -1,5 +1,6 @@
 <%--
     Copyright (C) 2009 Martin Günther (mintar@gmx.de)
+                  2009 Stephan Schiffel (stephan.schiffel@gmx.de)
 
     This file is part of GGP Server.
 
@@ -36,14 +37,21 @@
 	<h1 class="notopborder">Welcome to the Dresden GGP Server!</h1>
  		You can get information about 
 		<a href="<%= request.getContextPath() + response.encodeURL("/public/show_matches.jsp") %>">past or running matches</a>,
-		<a href="<%= request.getContextPath() + response.encodeURL("/public/show_games.jsp") %>">all available games</a>,
-		<a href="<%= request.getContextPath() + response.encodeURL("/public/show_players.jsp") %>">the general game playing programs</a> and the
-		<a href="<%= request.getContextPath() + response.encodeURL("/public/show_users.jsp") %>">registered users</a> 
+		<a href="<%= request.getContextPath() + response.encodeURL("/public/show_tournaments.jsp") %>">tournaments</a> and
+		<a href="<%= request.getContextPath() + response.encodeURL("/public/show_games.jsp") %>">all available games</a>
 		by clicking on the links on the left. <br>
-		
-		After <a href="<%= request.getContextPath() + response.encodeURL("/register/register.jsp") %>">registration</a>, 
-		you can add your own general game player to be pitted against the existing ones.
 	
+	<h1 class="notopborder">What is it all about?</h1>
+		The purpose of the server is to help development of <a href="http://www.general-game-playing.de/" target="_blank">General Game Playing</a> systems.
+		The server provides an easy way to test general game players on a wide range of games against other players. The idea is that you just register
+		your player and leave it online. The server will automatically pit players against each other on all games that are on the server.
+
+	<h1 class="notopborder">How to connect your player</h1>
+		We do not host your player. To participate in a match, your player has to run on a computer with a working internet connection.
+		After <a href="<%= request.getContextPath() + response.encodeURL("/register/register.jsp") %>">registration</a>/<a href="<%= request.getContextPath() + response.encodeURL("/login/login.jsp") %>">login</a>, 
+		you can add your player (you have to enter host name or IP address and the port your player is running on). Your player will automatically be pitted
+		against other players if you set its status to "active".
+
 	<h1 class="notopborder">Recent changes</h1>
 		<ul>
 			<li>XML files for the matches of a tournament can now be exported on the <a href="<%= request.getContextPath() + response.encodeURL("/public/show_tournaments.jsp") %>">tournaments page</a></li>

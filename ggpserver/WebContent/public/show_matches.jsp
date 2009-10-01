@@ -64,12 +64,11 @@
 		<thead>
 			<tr>
 				<th>match name</th>
-				<th>start clock</th>
-				<th>play clock</th>
+				<th>start &amp; play clock</th>
 				<th>start time</th>
 				<th>players</th>
 				<th>goal values</th>
-				<%-- <th>errors</th> --%>
+				<th>actions</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -97,8 +96,7 @@
 								<a href='<c:out value="${matchURL}" />'>${match.matchID}</a>
 							</td>
 							<%-- <td rowspan="${numberOfPlayers}">${match.status}</td> --%>  <%-- status --%>
-							<td rowspan="${numberOfPlayers}">${match.startclock}</td> <%-- start clock --%>
-							<td rowspan="${numberOfPlayers}">${match.playclock}</td>  <%-- play clock --%>
+							<td rowspan="${numberOfPlayers}">${match.startclock}, ${match.playclock}</td> <%-- start &amp; play clock --%>
 							<td rowspan="${numberOfPlayers}"><fmt:formatDate value="${match.startTime}" pattern="dd.MM.yyyy HH:mm:ss z"/></td>  <%-- start time --%>
 						</c:if>
 						<td style="white-space:nowrap;">  <%-- players --%>
@@ -122,13 +120,13 @@
 								</c:url>
 								<c:choose>
 									<c:when test="${pager.playerName != null && pager.playerName != playerinfo.name}">
-										<c:set var="errorclass" value="errors_bw"></c:set>
+										<c:set var="errorclass" value="errors_bw"/>
 									</c:when>
 									<c:otherwise>
-										<c:set var="errorclass" value="errors"></c:set>
+										<c:set var="errorclass" value="errors"/>
 									</c:otherwise>
 								</c:choose>
-								<a href='<c:out value="${errorURL}"/>'><span class="${errorclass}" title="Show Errors"/></a>
+								<a href='<c:out value="${errorURL}"/>'><span class="${errorclass}" title="Show Errors of ${playerinfo.name}"></span></a>
 							</c:if>
 						</td>
 						<%-- goal values / status --%>
@@ -153,36 +151,45 @@
 								</td>
 							</c:otherwise>
 						</c:choose>
-						<%-- errors --%>
-						<%--
+						<%-- actions --%>
 				    	<c:if test="${playerinfoIndex.count==1}">
-							<td style="text-align:center;" rowspan="${numberOfPlayers}">
+							<td rowspan="${numberOfPlayers}">
+							    <c:url value="view_state.jsp" var="viewStateURL">
+								    <c:param name="matchID" value="${match.matchID}" />
+								    <c:param name="stepNumber" value="final" />
+								</c:url>
+								<c:choose>
+									<c:when test="{match.goalValues==null}">
+										<c:set var="viewStateLinkTitle">View Current State</c:set>
+									</c:when>
+									<c:otherwise>
+										<c:set var="viewStateLinkTitle">View Final State</c:set>
+									</c:otherwise>
+								</c:choose>
+								<a href='<c:out value="${viewStateURL}" />'><span class="view" title="${viewStateLinkTitle}"></span></a>
+
 								<c:choose>
 									<c:when test="${match.hasErrors}">
 										<c:choose>
 											<c:when test="${pager.playerName != null && !match.hasErrorsAllPlayers[pager.playerName]}">
-												<c:set var="errorclass" value="errors_bw"></c:set>
+												<c:set var="errorclass" value="errors_bw"/>
 											</c:when>
 											<c:otherwise>
-												<c:set var="errorclass" value="errors"></c:set>
+												<c:set var="errorclass" value="errors"/>
 											</c:otherwise>
 										</c:choose>
 										
 										<c:url value="view_errors.jsp" var="errorURL">
 											<c:param name="matchID" value="${match.matchID}" />
-										    <c:if test="${ pager.playerName != null }">
-												<c:param name="playerName" value="${pager.playerName}" />
-											</c:if>
 										</c:url>
-										<div class="${errorclass}"><a href='<c:out value="${errorURL}" />'><span>errors</span></a></div>
+										<a href='<c:out value="${errorURL}" />'><span class="${errorclass}" title="Show Errors"></span></a>
 									</c:when>
 									<c:otherwise>
-										<div class="no_errors"></div>
+										<span class="no_errors"></span>
 									</c:otherwise>						
 								</c:choose>
 							</td>
 						</c:if>
-						--%>
 					</tr>
 				</c:forEach>
 	      </c:forEach>

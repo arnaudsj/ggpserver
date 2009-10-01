@@ -59,7 +59,7 @@
 				<input type="hidden" name="gameName" value="${editGame.gameName}"/>
 				<b><c:out value="${editGame.gameName}"/></b>
 				<c:if test="<%= editGame.getErrorsGameName().size() > 0 %>">
-					<br/>
+					<br>
 					<ul>
 				    	<c:forEach var="errormessage" items="${editGame.errorsGameName}">
 							<li class="validationerror">${errormessage}</li>

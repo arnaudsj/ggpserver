@@ -1792,6 +1792,33 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return result;
 	}
 
+	public List<Tournament<TermType , ReasonerStateInfoType>> getTournamentsForPlayer(String playerName) throws SQLException {
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		List<Tournament<TermType , ReasonerStateInfoType>> result = new LinkedList<Tournament<TermType , ReasonerStateInfoType>>();
+		
+		try {
+			ps = con.prepareStatement("SELECT DISTINCT `matches`.`tournament_id` AS `tournament_id` FROM `match_players` LEFT JOIN `matches` ON `match_players`.`match_id` = `matches`.`match_id` WHERE `match_players`.`player` = ? AND (`matches`.`status`='finished' OR `matches`.`status`='running');");
+			ps.setString(1, playerName);
+			rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				result.add(getTournament(rs.getString("tournament_id")));
+			}
+		} finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+			if (rs != null)
+				try {rs.close();} catch (SQLException e) {}
+		} 
+
+		return result;
+	}
+
 	public Tournament<TermType , ReasonerStateInfoType> getTournament(String tournamentID) throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;

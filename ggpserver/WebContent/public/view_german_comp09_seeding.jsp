@@ -46,7 +46,7 @@
 				<th>Avg2</th>
 				<th>Avg3</th>
 				<th>#matches played</th>
-				<th>#matches played with &gt;3 errors</th>
+				<th>#matches played with &gt;=3 errors</th>
 				<th>error ratio</th>
 			</tr>
 		</thead>

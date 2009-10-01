@@ -1,5 +1,6 @@
 <%--
     Copyright (C) 2009 Martin Günther (mintar@gmx.de)
+                  2009 Stephan Schiffel (stephan.schiffel@gmx.de)
 
     This file is part of GGP Server.
 
@@ -51,11 +52,11 @@ if (viewPlayer.getPlayer() == null) {
 <table>
 	<tbody>
 		<tr>
-			<td><b>player name</b></td>
+			<th>player name</th>
 			<td><c:out value="${viewPlayer.name}"></c:out></td>
 		</tr>
 		<tr>
-			<td><b>owner</b></td>
+			<th>owner</th>
 			<td>
 				<c:url value="view_user.jsp" var="userURL">
 					<c:param name="userName" value="${viewPlayer.owner.userName}" />
@@ -63,16 +64,27 @@ if (viewPlayer.getPlayer() == null) {
 			</td>
 		</tr>
 		<tr>
-			<td><b>status</b></td>
+			<th>status</th>
 			<td><c:out value="${viewPlayer.status}"></c:out></td>
 		</tr>
 		<tr>
-			<td><b>matches</b></td>
+			<th>matches</th>
 			<td>
-				<c:url value="show_matches.jsp" var="playerURL">
+				<c:url value="show_matches.jsp" var="URL">
 					<c:param name="playerName" value="${viewPlayer.name}" />
 				</c:url>
-				<a href='<c:out value="${playerURL}" />'>show matches</a>
+				<a href='<c:out value="${URL}" />'>show matches</a>
+			</td>
+		</tr>
+		<tr>
+			<th>tournaments</th>
+			<td>
+				<c:forEach var="tournament" items="${viewPlayer.tournaments}">
+					<c:url value="view_tournament.jsp" var="URL">
+						<c:param name="tournamentID" value="${tournament.tournamentID}" />
+					</c:url>
+					<a href='<c:out value="${URL}" />'>${tournament.tournamentID}</a><br>
+				</c:forEach>
 			</td>
 		</tr>
 	</tbody>

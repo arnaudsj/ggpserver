@@ -20,7 +20,9 @@
 package tud.ggpserver.formhandlers;
 
 import java.sql.SQLException;
+import java.util.Collection;
 
+import tud.gamecontroller.players.PlayerInfo;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.User;
 
@@ -36,4 +38,7 @@ public class ViewUser {
 		this.user = DBConnectorFactory.getDBConnector().getUser(userName);
 	}
 	
+	public Collection<? extends PlayerInfo> getPlayers() throws SQLException {
+		return DBConnectorFactory.getDBConnector().getPlayerInfosForUser(user.getUserName());
+	}
 }

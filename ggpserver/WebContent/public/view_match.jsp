@@ -1,5 +1,6 @@
 <%--
     Copyright (C) 2009 Martin Günther (mintar@gmx.de)
+                  2009 Stephan Schiffel (stephan.schiffel@gmx.de)
 
     This file is part of GGP Server.
 
@@ -178,7 +179,7 @@
 				</c:otherwise>
 			</c:choose>
 			<tr class="${rowClass}">
-				<!--			<td><c:out value="${stepNumber}" /></td>-->
+				<%--			<td><c:out value="${stepNumber}" /></td>--%>
 				<td>
 					<c:url value="view_state.jsp" var="stateURL">
 						<c:param name="matchID" value="${match.matchID}" />

@@ -83,7 +83,6 @@
 					</c:url>
 					<a href='<c:out value="${exportXMLURL}" />'>export xml</a>
 				</td>
-			</td>
 			</tr>
 	      </c:forEach>
 		</tbody>

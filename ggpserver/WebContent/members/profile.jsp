@@ -67,9 +67,6 @@
 			</c:choose>
 			<tr class="${rowClass}">
 				<td>
-<%--				<c:url value="edit_player.jsp" var="playerURL">--%>
-<%--					<c:param name="playerName" value="${player.name}" />--%>
-<%--				</c:url><a href='<c:out value="${playerURL}" />'>${player.name}</a>--%>
 					<c:out value="${player.name}" />
 				</td>
 				<td>${player.host}</td>

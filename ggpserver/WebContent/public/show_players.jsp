@@ -1,5 +1,6 @@
 <%--
     Copyright (C) 2009 Martin Günther (mintar@gmx.de)
+                  2009 Stephan Schiffel (stephan.schiffel@gmx.de)
 
     This file is part of GGP Server.
 
@@ -75,7 +76,12 @@
 					</c:url>
 					<a href='<c:out value="${playerURL}" />'>${player.name}</a>
 				</td>
-				<td>${player.owner.userName}</td>
+				<td>
+					<c:url value="view_user.jsp" var="userURL">
+						<c:param name="userName" value="${player.owner.userName}" />
+					</c:url>
+					<a href='<c:out value="${userURL}" />'>${player.owner.userName}</a>
+				</td>
 				<td><div class="playerstatus-${player.status}"><span>${player.status}</span></div></td>
 				<c:if test='${navigationUserBean.user != null}'>
 					<c:if test='<%= navigationUserBean.getUser().hasRole("admin") %>'>

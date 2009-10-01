@@ -80,7 +80,7 @@
 						<c:forEach var="playerinfo" items="${createTournament.playerInfos}">
 						    <option value="${playerinfo.name}"><c:out value="${playerinfo.name}" /></option>
 						</c:forEach>
-				    </select><br/>
+				    </select><br>
 				</c:forTokens>
 			</td>
 		</tr>

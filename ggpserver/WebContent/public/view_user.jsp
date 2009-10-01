@@ -1,5 +1,6 @@
 <%--
     Copyright (C) 2009 Martin Günther (mintar@gmx.de)
+                  2009 Stephan Schiffel (stephan.schiffel@gmx.de)
 
     This file is part of GGP Server.
 
@@ -51,8 +52,19 @@ if (viewUser.getUser() == null) {
 <table>
 	<tbody>
 		<tr>
-			<td><b>user name</b></td>
+			<th>user name</th>
 			<td><c:out value="${viewUser.user.userName}"></c:out></td>
+		</tr>
+		<tr>
+			<th>players</th>
+			<td>
+				<c:forEach var="player" items="${viewUser.players}">
+					<c:url value="view_player.jsp" var="playerURL">
+						<c:param name="name" value="${player.name}" />
+					</c:url>
+					<a href='<c:out value="${playerURL}" />'>${player.name}</a><br>
+				</c:forEach>
+			</td>
 		</tr>
 	</tbody>
 </table>

@@ -1,5 +1,6 @@
 <%--
-    Copyright (C) 2009 Martin Günther (mintar@gmx.de)
+    Copyright (C) 2009 Martin GÃ¼nther (mintar@gmx.de)
+                  2009 Stephan Schiffel (stephan.schiffel@gmx.de)
 
     This file is part of GGP Server.
 
@@ -19,9 +20,11 @@
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%> 
 <!-- Header -->
-<div id="header">
-&nbsp;
-</div>
+	<div id="header">
+		<a href="<%= request.getContextPath() + response.encodeURL("/index.jsp") %>">
+			<img src="<%= request.getContextPath() + response.encodeURL("/gfx/GGPHeaderBlau900.png") %>" width="900" height="115" alt="General Game Playing">
+		</a>
+	</div>
 
 <div id="user">
 	<c:catch var="exception">
