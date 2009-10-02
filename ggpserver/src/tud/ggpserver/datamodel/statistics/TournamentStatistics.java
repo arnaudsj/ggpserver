@@ -18,7 +18,7 @@
     along with GGP Server.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package tud.ggpserver.datamodel;
+package tud.ggpserver.datamodel.statistics;
 
 import java.sql.SQLException;
 import java.util.Collection;

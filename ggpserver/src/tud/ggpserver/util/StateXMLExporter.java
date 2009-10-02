@@ -31,8 +31,8 @@ import tud.gamecontroller.players.PlayerInfo;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.Tournament;
-import tud.ggpserver.datamodel.TournamentStatistics;
 import tud.ggpserver.datamodel.matches.ServerMatch;
+import tud.ggpserver.datamodel.statistics.TournamentStatistics;
 
 
 /**

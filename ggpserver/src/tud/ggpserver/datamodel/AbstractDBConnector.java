@@ -55,13 +55,16 @@ import tud.gamecontroller.players.RandomPlayerInfo;
 import tud.gamecontroller.scrambling.GameScramblerInterface;
 import tud.gamecontroller.scrambling.IdentityGameScrambler;
 import tud.gamecontroller.term.TermInterface;
-import tud.ggpserver.datamodel.GermanComp09SeedingStats.StatEntry;
 import tud.ggpserver.datamodel.matches.AbortedMatch;
 import tud.ggpserver.datamodel.matches.FinishedMatch;
 import tud.ggpserver.datamodel.matches.NewMatch;
 import tud.ggpserver.datamodel.matches.RunningMatch;
 import tud.ggpserver.datamodel.matches.ScheduledMatch;
 import tud.ggpserver.datamodel.matches.ServerMatch;
+import tud.ggpserver.datamodel.statistics.GameStatistics;
+import tud.ggpserver.datamodel.statistics.GermanComp09SeedingStats;
+import tud.ggpserver.datamodel.statistics.TournamentStatistics;
+import tud.ggpserver.datamodel.statistics.GermanComp09SeedingStats.StatEntry;
 import tud.ggpserver.scheduler.AbstractRoundRobinScheduler;
 import tud.ggpserver.scheduler.PlayerStatusListener;
 import tud.ggpserver.util.Digester;
@@ -1868,6 +1871,73 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				numberOfMatches.put(player, rs.getInt("the_count"));
 			}
 			return new TournamentStatistics<TermType, ReasonerStateInfoType>(tournamentID, numberOfMatches, totalReward);
+		} finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+			if (rs != null)
+				try {rs.close();} catch (SQLException e) {}
+		} 
+	}
+
+	public GameStatistics<TermType, ReasonerStateInfoType> getGameStatistics(String gameName) throws SQLException {
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			
+			Game<TermType, ReasonerStateInfoType> game = getGame(gameName);
+			
+			Map<PlayerInfo, GameStatistics.PerformanceInformation> informationPerPlayer = new HashMap<PlayerInfo, GameStatistics.PerformanceInformation>();
+			ps = con.prepareStatement(
+					"SELECT" +
+					"	`match_players`.`player`," +
+					"	AVG( `match_players`.`goal_value` ) AS `avg`," +
+					"	STDDEV_POP( `match_players`.`goal_value` ) AS `std_dev`," +
+					"	COUNT( `match_players`.`goal_value` ) AS `count`" +
+					"FROM" +
+					"		`match_players`" +
+					"	INNER JOIN" +
+					"		`matches`" +
+					"	USING ( `match_id` )" +
+					"WHERE" +
+					"	NOT ISNULL( `match_players`.`goal_value` )" +
+					"	AND `matches`.`game` = ?" +
+					"GROUP BY" +
+					"	`match_players`.`player`");
+			ps.setString(1, gameName);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				PlayerInfo player = getPlayerInfo(rs.getString("player"));
+				informationPerPlayer.put(player, new GameStatistics.PerformanceInformation(rs.getInt("count"), rs.getDouble("avg"), rs.getDouble("std_dev")));
+			}
+
+			Map<RoleInterface<TermType>, GameStatistics.PerformanceInformation> informationPerRole = new HashMap<RoleInterface<TermType>, GameStatistics.PerformanceInformation>();
+			ps = con.prepareStatement(
+					"SELECT" +
+					"	`match_players`.`roleindex`," +
+					"	AVG( `match_players`.`goal_value` ) AS `avg`," +
+					"	STDDEV_POP( `match_players`.`goal_value` ) AS `std_dev`," +
+					"	COUNT( `match_players`.`goal_value` ) AS `count`" +
+					"FROM" +
+					"		`match_players`" +
+					"	INNER JOIN" +
+					"		`matches`" +
+					"	USING ( `match_id` )" +
+					"WHERE" +
+					"	NOT ISNULL( `match_players`.`goal_value` )" +
+					"	AND `matches`.`game` = ?" +
+					"GROUP BY" +
+					"	`match_players`.`roleindex`");
+			ps.setString(1, gameName);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				informationPerRole.put(game.getRole(rs.getInt("roleindex")), new GameStatistics.PerformanceInformation(rs.getInt("count"), rs.getDouble("avg"), rs.getDouble("std_dev")));
+			}
+
+			return new GameStatistics<TermType, ReasonerStateInfoType>(game, informationPerPlayer, informationPerRole);
 		} finally { 
 			if (con != null)
 				try {con.close();} catch (SQLException e) {}

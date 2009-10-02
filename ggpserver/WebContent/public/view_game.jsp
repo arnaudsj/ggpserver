@@ -1,5 +1,6 @@
 <%--
     Copyright (C) 2009 Martin Günther (mintar@gmx.de)
+                  2009 Stephan Schiffel (stephan.schiffel@gmx.de)    
 
     This file is part of GGP Server.
 
@@ -53,26 +54,26 @@
 		<c:url value="../admin/edit_game.jsp" var="editURL">
 			<c:param name="gameName" value="${viewGame.name}" />
 		</c:url>
-		<div class="edit"><a href='<c:out value="${editURL}"/>'><span>edit</span></a></div>
+		<div class="edit" title="Edit game information"><a href='<c:out value="${editURL}"/>'><span>edit</span></a></div>
 	</c:if>
 </c:if>
 </h1>
 <table>
 	<tbody>
 		<tr>
-			<td><b>name</b></td>
+			<th>name</th>
 			<td><c:out value="${viewGame.name}"></c:out></td>
 		</tr>
 		<tr>
-			<td><b>number of roles</b></td>
+			<th>number of roles</th>
 			<td><c:out value="${viewGame.game.numberOfRoles}"></c:out></td>
 		</tr>
 		<tr>
-			<td><b>stylesheet</b></td>
+			<th>stylesheet</th>
 			<td><c:out value="${viewGame.game.stylesheet}"></c:out></td>
 		</tr>
 		<tr>
-			<td><b>enabled</b></td>
+			<th>enabled</th>
 			<td>
 				<c:choose>
 					<c:when test="${viewGame.game.enabled}">
@@ -85,7 +86,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td><b>matches</b></td>
+			<th>matches</th>
 			<td>
 				<c:url value="show_matches.jsp" var="matchesURL">
 					<c:param name="gameName" value="${viewGame.name}" />
@@ -93,10 +94,19 @@
 				<a href='<c:out value="${matchesURL}" />'>show matches</a>
 			</td>
 		</tr>
+		<tr>
+			<th>statistics</th>
+			<td>
+				<c:url value="view_game_statistics.jsp" var="URL">
+					<c:param name="gameName" value="${viewGame.name}" />
+				</c:url>
+				<a href='<c:out value="${URL}" />'>show game statistics</a>
+			</td>
+		</tr>
 	</tbody>
 </table>
 
-<h1>Game Description</h1>
+<h2>Game Description</h2>
 	<c:url value="download_gdl.jsp" var="downloadURL">
 		<c:param name="name" value="${viewGame.name}" />
 	</c:url>

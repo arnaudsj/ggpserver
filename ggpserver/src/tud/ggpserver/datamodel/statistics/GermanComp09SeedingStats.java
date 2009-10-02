@@ -1,9 +1,11 @@
-package tud.ggpserver.datamodel;
+package tud.ggpserver.datamodel.statistics;
 
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import tud.ggpserver.datamodel.DBConnectorFactory;
 
 public class GermanComp09SeedingStats {
 	

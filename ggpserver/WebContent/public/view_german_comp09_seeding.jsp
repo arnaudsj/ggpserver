@@ -20,7 +20,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%> 
-<jsp:useBean id="viewStats" class="tud.ggpserver.datamodel.GermanComp09SeedingStats" scope="page">
+<jsp:useBean id="viewStats" class="tud.ggpserver.datamodel.statistics.GermanComp09SeedingStats" scope="page">
 </jsp:useBean>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">

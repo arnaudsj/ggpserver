@@ -43,6 +43,8 @@ import tud.gamecontroller.game.javaprover.TermFactory;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.ggpserver.datamodel.matches.NewMatch;
 import tud.ggpserver.datamodel.matches.ServerMatch;
+import tud.ggpserver.datamodel.statistics.GameStatistics;
+import tud.ggpserver.datamodel.statistics.TournamentStatistics;
 import cs227b.teamIago.util.GameState;
 
 /**
@@ -70,7 +72,10 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	
 	@SuppressWarnings("unchecked")
 	private Map<String, Game<Term, GameState>> games = new ReferenceMap(SOFT, SOFT, false);
-	
+
+	@SuppressWarnings("unchecked")
+	private Map<String, GameStatistics<Term, GameState>> gameStatistics = new ReferenceMap(SOFT, SOFT, false);
+
 	@SuppressWarnings("unchecked")
 	private Map<String, ServerMatch<Term, GameState>> matches= new ReferenceMap(SOFT, SOFT, false);
 	
@@ -111,6 +116,9 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	public void clearCache() {
 		synchronized (games) {
 			games.clear();
+		}
+		synchronized (gameStatistics) {
+			gameStatistics.clear();
 		}
 		synchronized (playerInfos) {
 			playerInfos.clear();
@@ -184,6 +192,8 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 			// delete cached result, so it will be read again on next request
 			games.remove(gameName);
 		}
+
+		clearCacheForGameStatistics(gameName);
 		
 		// also remove all cached matches of this game (to prevent the stale-stylesheet-bug).
 		synchronized (matches) {
@@ -196,6 +206,26 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 		}
 	}
 
+	@Override
+	public GameStatistics<Term, GameState> getGameStatistics(String gameName) throws SQLException {
+		GameStatistics<Term, GameState> result = gameStatistics.get(gameName);
+		if (result == null) {
+			synchronized (gameStatistics) {
+				result = super.getGameStatistics(gameName);
+	
+				if (result != null) {
+					gameStatistics.put(gameName, result);
+				}
+			}
+		}
+		return result;
+	}
+
+	private void clearCacheForGameStatistics(String gameName) {
+		synchronized (gameStatistics) {
+			gameStatistics.remove(gameName);
+		}
+	}
 
 	/////////////////// MATCH ///////////////////
 	@Override
@@ -235,18 +265,28 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	
 	@Override
 	public void deleteMatch(String matchID) throws SQLException {
+		ServerMatch<Term, GameState> match = getMatch(matchID);
+		String tournamentID = match.getTournamentID();
+		String gameName = match.getGame().getName();
 		synchronized (matches) {
 			clearCacheForMatch(matchID);
+			clearCacheForTournamentStatistics(tournamentID);
+			clearCacheForGameStatistics(gameName);
 			super.deleteMatch(matchID);
 		}
 	}
 	
 	@Override
 	public void setMatchStatus(String matchID, String status) throws SQLException {
-		String tournamentID = getMatch(matchID).getTournamentID();
+		ServerMatch<Term, GameState> match = getMatch(matchID);
+		String tournamentID = match.getTournamentID();
+		String gameName = match.getGame().getName();
 		synchronized (matches) {
 			clearCacheForMatch(matchID);
-			clearCacheForTournamentStatistics(tournamentID);
+			if(status.equals(ServerMatch.STATUS_FINISHED)) {
+				clearCacheForTournamentStatistics(tournamentID);
+				clearCacheForGameStatistics(gameName);
+			}
 			super.setMatchStatus(matchID, status);
 		}
 	}
@@ -258,7 +298,7 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 		String tournamentID = match.getTournamentID();
 		synchronized (matches) {
 			clearCacheForMatch(matchID);
-			if(match.getStatus() == ServerMatch.STATUS_FINISHED){
+			if(match.getStatus().equals(ServerMatch.STATUS_FINISHED)){
 				clearCacheForTournamentStatistics(tournamentID);
 			}
 			super.setMatchWeight(matchID, weight);
@@ -315,6 +355,7 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 		synchronized (matches) {
 			clearCacheForMatch(match.getMatchID());
 			clearCacheForTournamentStatistics(match.getTournamentID());
+			clearCacheForGameStatistics(match.getGame().getName());
 			super.setMatchGoalValues(match, goalValues);
 		}
 	}

@@ -54,9 +54,7 @@
 
 	<h1 class="notopborder">Recent changes</h1>
 		<ul>
-			<li>XML files for the matches of a tournament can now be exported on the <a href="<%= request.getContextPath() + response.encodeURL("/public/show_tournaments.jsp") %>">tournaments page</a></li>
-			<li>A leaderboard is generated for each tournament.</li>
-			<li>Messages to players can be scrambled. (Scrambling is not enabled for round robin mode.)</li>
+			<li>There are now statistics for each game showing the best players and the bias of the roles. It can be reached from the View Game page of each game.</li>
 		</ul>
 
 	<h1 class="notopborder">Sourceforge project</h1>
