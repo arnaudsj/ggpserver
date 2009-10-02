@@ -13,6 +13,7 @@
 		<xsl:param name="CellWidth">40</xsl:param> <!-- the width of each cell in px -->
 		<xsl:param name="CellHeight" select="$CellWidth"/> <!-- the height of each cell in px -->
 		<xsl:param name="BorderWidth">2</xsl:param> <!-- the width of the boarder around each cell in px -->
+		<xsl:param name="BorderStyle">solid #FFC</xsl:param>
 		<xsl:param name="CellFluentName">CELL</xsl:param>
 		<xsl:param name="checkered">no</xsl:param>
 			<!-- no - all cells have light background
@@ -39,7 +40,7 @@
 				height: <xsl:value-of select="$CellHeight - 2 * $BorderWidth"/>px;
 				float:	left;
 				<xsl:if test="$BorderWidth>0">
-					border: <xsl:value-of select="$BorderWidth"/>px solid #FFC;
+					border: <xsl:value-of select="$BorderWidth"/>px <xsl:value-of select="$BorderStyle"/>;
 				</xsl:if>
 				background-color: <xsl:value-of select="$LightCellColor"/>;
 			}
@@ -49,15 +50,18 @@
 				height: <xsl:value-of select="$CellHeight - 2 * $BorderWidth"/>px;
 				float:	left;
 				<xsl:if test="$BorderWidth>0">
-					border: <xsl:value-of select="$BorderWidth"/>px solid #FFC;
+					border: <xsl:value-of select="$BorderWidth"/>px <xsl:value-of select="$BorderStyle"/>;
 				</xsl:if>
 				background-color: <xsl:value-of select="$DarkCellColor"/>;
 			}
 			div.cellInvisible
 			{
-				width:  <xsl:value-of select="$CellWidth"/>px;
-				height: <xsl:value-of select="$CellHeight"/>px;
+				width:  <xsl:value-of select="$CellWidth - 2 * $BorderWidth"/>px;
+				height: <xsl:value-of select="$CellHeight - 2 * $BorderWidth"/>px;
 				float:	left;
+				<xsl:if test="$BorderWidth>0">
+					border: <xsl:value-of select="$BorderWidth"/>px <xsl:value-of select="$BorderStyle"/>;
+				</xsl:if>
 			}
 
 		</style>
@@ -87,7 +91,6 @@
 			<xsl:with-param name="checkered" select="$checkered"/>
 			<xsl:with-param name="DefaultCell" select="$DefaultCell"/>
 		</xsl:call-template>
-		<br/>
 
 		<!-- loop -->
 		<xsl:if test="$row &gt; 1">

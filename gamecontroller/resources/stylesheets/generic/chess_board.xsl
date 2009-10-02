@@ -35,6 +35,8 @@
 		<xsl:param name="mirrorY">no</xsl:param>
 		<xsl:param name="DefaultCell">yes</xsl:param>
 		<xsl:param name="BorderWidth">2</xsl:param> <!-- the width of the boarder around each cell in px -->
+		<xsl:param name="BorderStyle">solid #FFC</xsl:param>
+
 		<xsl:param name="CellWidth" select="44 + 2 * $BorderWidth"/>
 		<xsl:param name="CellHeight" select="$CellWidth"/>
 		
@@ -61,6 +63,7 @@
 							<xsl:with-param name="CellWidth" select="$CellWidth"/>
 							<xsl:with-param name="CellHeight" select="$CellHeight"/>
 							<xsl:with-param name="BorderWidth" select="$BorderWidth"/>
+							<xsl:with-param name="BorderStyle" select="$BorderStyle"/>
 							<xsl:with-param name="BoardName">
 								<xsl:if test="$CellFluentName!='CELL'"><xsl:value-of select="substring-after($CellFluentName, 'CELL')"/></xsl:if>
 							</xsl:with-param>
@@ -88,6 +91,7 @@
 		<xsl:param name="mirrorY">no</xsl:param>
 		<xsl:param name="DefaultCell">yes</xsl:param>
 		<xsl:param name="BorderWidth">2</xsl:param> <!-- the width of the boarder around each cell in px -->
+		<xsl:param name="BorderStyle">solid #FFC</xsl:param>
 		<xsl:param name="CellWidth" select="44 + 2 * $BorderWidth"/>
 		<xsl:param name="CellHeight" select="$CellWidth"/>
 	
@@ -120,6 +124,7 @@
 			<xsl:with-param name="CellWidth" select="$CellWidth"/>
 			<xsl:with-param name="CellHeight" select="$CellHeight"/>
 			<xsl:with-param name="BorderWidth" select="$BorderWidth"/>
+			<xsl:with-param name="BorderStyle" select="$BorderStyle"/>
 		</xsl:call-template>
 		
 		<!-- show remaining fluents -->
@@ -145,6 +150,7 @@
 		<xsl:param name="mirrorY">no</xsl:param>
 		<xsl:param name="DefaultCell">yes</xsl:param>
 		<xsl:param name="BorderWidth">2</xsl:param> <!-- the width of the boarder around each cell in px -->
+		<xsl:param name="BorderStyle">solid #FFC</xsl:param>
 		<xsl:param name="CellWidth" select="44 + 2 * $BorderWidth"/>
 		<xsl:param name="CellHeight" select="$CellWidth"/>
 		<xsl:param name="BoardName"/>
@@ -239,6 +245,7 @@
 				<xsl:with-param name="CellWidth" select="$CellWidth"/>
 				<xsl:with-param name="CellHeight" select="$CellHeight"/>
 				<xsl:with-param name="BorderWidth" select="$BorderWidth"/>
+				<xsl:with-param name="BorderStyle" select="$BorderStyle"/>
 				<xsl:with-param name="checkered" select="$checkered"/>
 				<xsl:with-param name="LightCellColor">#ffce9e</xsl:with-param>
 				<xsl:with-param name="DarkCellColor">#d18b47</xsl:with-param>
