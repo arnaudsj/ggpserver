@@ -403,16 +403,38 @@
 	<!-- computes a numeric coordinate from the string representation -->
 	<xsl:template name="coord2number">
 		<xsl:param name="coord"/>
-		
-		<xsl:variable name="COORDINATES" select="'12345678ABCDEFGH'"/>
-		<xsl:variable name="NUMBERS" select="'1234567812345678'"/>
-		
 		<xsl:choose>
 			<xsl:when test="string-length($coord)>1">
 				<xsl:value-of select="number(translate($coord, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', ''))"/>
 			</xsl:when>
+			<xsl:when test="$coord='A'">1</xsl:when>
+			<xsl:when test="$coord='B'">2</xsl:when>
+			<xsl:when test="$coord='C'">3</xsl:when>
+			<xsl:when test="$coord='D'">4</xsl:when>
+			<xsl:when test="$coord='E'">5</xsl:when>
+			<xsl:when test="$coord='F'">6</xsl:when>
+			<xsl:when test="$coord='G'">7</xsl:when>
+			<xsl:when test="$coord='H'">8</xsl:when>
+			<xsl:when test="$coord='I'">9</xsl:when>
+			<xsl:when test="$coord='J'">10</xsl:when>
+			<xsl:when test="$coord='K'">11</xsl:when>
+			<xsl:when test="$coord='L'">12</xsl:when>
+			<xsl:when test="$coord='M'">13</xsl:when>
+			<xsl:when test="$coord='N'">14</xsl:when>
+			<xsl:when test="$coord='O'">15</xsl:when>
+			<xsl:when test="$coord='P'">16</xsl:when>
+			<xsl:when test="$coord='Q'">17</xsl:when>
+			<xsl:when test="$coord='R'">18</xsl:when>
+			<xsl:when test="$coord='S'">19</xsl:when>
+			<xsl:when test="$coord='T'">20</xsl:when>
+			<xsl:when test="$coord='U'">21</xsl:when>
+			<xsl:when test="$coord='V'">22</xsl:when>
+			<xsl:when test="$coord='W'">23</xsl:when>
+			<xsl:when test="$coord='X'">24</xsl:when>
+			<xsl:when test="$coord='Y'">25</xsl:when>
+			<xsl:when test="$coord='Z'">26</xsl:when>
 			<xsl:otherwise>
-				<xsl:value-of select="number(translate($coord,$COORDINATES,$NUMBERS))"/>
+				<xsl:value-of select="number($coord)"/>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
