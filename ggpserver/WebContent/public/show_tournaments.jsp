@@ -78,12 +78,11 @@
 					<a href='<c:out value="${showMatchesURL}" />'>show matches</a>
 				</td>
 				<td>
-					<c:url value="export_xml.jsp" var="exportXMLURL">
-						<c:param name="tournamentID" value="${tournament.tournamentID}" />
-					</c:url>
-					<a href='<c:out value="${exportXMLURL}" />'>export xml</a>
-					<c:if test="${viewTournament.tournament.numberOfMatches >= 1000}">
-						<span style="color:red;">Caution: This may take a long time and produce a big file!</span>
+					<c:if test="${tournament.numberOfMatches < 1000}">
+						<c:url value="export_xml.jsp" var="exportXMLURL">
+							<c:param name="tournamentID" value="${tournament.tournamentID}" />
+						</c:url>
+						<a href='<c:out value="${exportXMLURL}" />'>export xml</a>
 					</c:if>
 				</td>
 			</tr>

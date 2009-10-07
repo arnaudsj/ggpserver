@@ -91,9 +91,7 @@
 	<table>
 		<thead>
 			<tr>
-				<th style="vertical-align: middle;">
-					place
-				</th>
+				<th style="vertical-align: middle;"></th>
 				<c:forEach var="field" items="${viewTournament.fieldNames}" varStatus="fieldInfo">
 					<c:url value="view_tournament.jsp" var="sortURL">
 					    <c:param name="tournamentID" value="${viewTournament.tournamentID}"/>
