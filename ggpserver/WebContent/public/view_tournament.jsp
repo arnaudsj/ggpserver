@@ -44,10 +44,57 @@
     <div id="ctitle">View Tournament</div>
     <h1 class="notopborder">Information on tournament ${viewTournament.tournamentID}</h1>
 	<table>
+		<tbody>
+			<tr>
+				<th>tournament id</th>
+				<td><c:out value="${viewTournament.tournamentID}" /></td>
+			</tr>
+			<tr>
+				<th>owner</th>
+				<td>
+					<c:url value="view_user.jsp" var="userURL">
+						<c:param name="userName" value="${viewTournament.tournament.owner.userName}" />
+					</c:url>
+					<a href='<c:out value="${userURL}" />'>${viewTournament.tournament.owner.userName}</a>
+				</td>
+			</tr>
+			<tr>
+				<th>number of matches</th>
+				<td>
+					<c:out value="${viewTournament.tournament.numberOfMatches}" />
+				</td>
+			</tr>
+			<tr>
+				<th>matches</th>
+				<td>
+					<c:url value="show_matches.jsp" var="URL">
+						<c:param name="tournamentID" value="${viewTournament.tournamentID}" />
+					</c:url>
+					<a href='<c:out value="${URL}" />'>show matches</a>
+				</td>
+			</tr>
+			<tr>
+				<th>export</th>
+				<td>
+					<c:url value="export_xml.jsp" var="exportXMLURL">
+						<c:param name="tournamentID" value="${viewTournament.tournamentID}" />
+					</c:url>
+					<a href='<c:out value="${exportXMLURL}" />'>export xml</a>
+					<c:if test="${viewTournament.tournament.numberOfMatches >= 1000}">
+						<span style="color:red;">Caution: This may take a long time and produce a big file!</span>
+					</c:if>
+				</td>
+			</tr>
+		</tbody>
+	</table>    
+    <h2>Leader board</h2>
+	<table>
 		<thead>
 			<tr>
+				<th style="vertical-align: middle;">
+					place
+				</th>
 				<c:forEach var="field" items="${viewTournament.fieldNames}" varStatus="fieldInfo">
-
 					<c:url value="view_tournament.jsp" var="sortURL">
 					    <c:param name="tournamentID" value="${viewTournament.tournamentID}"/>
 					    <c:param name="sortBy" value="${field}"/>
@@ -92,6 +139,7 @@
 			   </c:otherwise>
 			 </c:choose> 
 		     <tr class="${rowClass}">
+				<td>${lineInfo.count}</td>
 				<td>
 					<c:url value="view_player.jsp" var="playerURL">
 						<c:param name="name" value="${player.name}" />

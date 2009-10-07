@@ -336,7 +336,7 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 	 * aborts the match with the given matchID if it is currently running
 	 * @param match
 	 */
-	public synchronized void abort(String matchID) {
+	public void abort(String matchID) {
 		Thread matchThread = matchThreads.get(matchID);
 		if (matchThread != null) {
 			try {
@@ -363,6 +363,7 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 	 * @throws SQLException 
 	 */
 	public synchronized void delete(String matchID) throws SQLException {
+		// TODO: synchronize on scheduledMatches only
 		if(scheduledMatches.containsKey(matchID)){
 			scheduledMatches.remove(matchID).toNew(); // if the match was not running yet, set its status to new
 		}else{

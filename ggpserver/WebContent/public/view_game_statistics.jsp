@@ -96,6 +96,7 @@
 						<th>average score</th>
 						<th>standard deviation</th>
 						<th>number of matches</th>
+						<th>actions</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -121,6 +122,13 @@
 						<td><c:out value="${statistics.informationPerPlayer[player].averageScore}"/></td>
 						<td><c:out value="${statistics.informationPerPlayer[player].standardDeviation}"/></td>
 						<td><c:out value="${statistics.informationPerPlayer[player].numberOfMatches}"/></td>
+						<td>
+							<c:url value="show_matches.jsp" var="matchesURL">
+								<c:param name="gameName" value="${viewGameStatistics.gameName}"/>
+								<c:param name="playerName" value="${player.name}"/>
+							</c:url>
+							<a href='<c:out value="${matchesURL}"/>'>show matches</a> 
+						</td>
 					</tr>
 			      </c:forEach>
 				</tbody>

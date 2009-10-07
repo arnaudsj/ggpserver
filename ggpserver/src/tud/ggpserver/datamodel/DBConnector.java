@@ -270,10 +270,10 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 		String gameName = match.getGame().getName();
 		synchronized (matches) {
 			clearCacheForMatch(matchID);
-			clearCacheForTournamentStatistics(tournamentID);
-			clearCacheForGameStatistics(gameName);
 			super.deleteMatch(matchID);
 		}
+		clearCacheForTournamentStatistics(tournamentID);
+		clearCacheForGameStatistics(gameName);
 	}
 	
 	@Override
@@ -283,11 +283,11 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 		String gameName = match.getGame().getName();
 		synchronized (matches) {
 			clearCacheForMatch(matchID);
-			if(status.equals(ServerMatch.STATUS_FINISHED)) {
-				clearCacheForTournamentStatistics(tournamentID);
-				clearCacheForGameStatistics(gameName);
-			}
 			super.setMatchStatus(matchID, status);
+		}
+		if(status.equals(ServerMatch.STATUS_FINISHED)) {
+			clearCacheForTournamentStatistics(tournamentID);
+			clearCacheForGameStatistics(gameName);
 		}
 	}
 
@@ -298,10 +298,10 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 		String tournamentID = match.getTournamentID();
 		synchronized (matches) {
 			clearCacheForMatch(matchID);
-			if(match.getStatus().equals(ServerMatch.STATUS_FINISHED)){
-				clearCacheForTournamentStatistics(tournamentID);
-			}
 			super.setMatchWeight(matchID, weight);
+		}
+		if(match.getStatus().equals(ServerMatch.STATUS_FINISHED)){
+			clearCacheForTournamentStatistics(tournamentID);
 		}
 	}
 
@@ -352,12 +352,14 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 
 	@Override
 	public void setMatchGoalValues(ServerMatch<Term, GameState> match, Map<? extends RoleInterface<?>, Integer> goalValues) throws SQLException {
+		String tournamentID = match.getTournamentID();
+		String gameName = match.getGame().getName();
 		synchronized (matches) {
 			clearCacheForMatch(match.getMatchID());
-			clearCacheForTournamentStatistics(match.getTournamentID());
-			clearCacheForGameStatistics(match.getGame().getName());
 			super.setMatchGoalValues(match, goalValues);
 		}
+		clearCacheForTournamentStatistics(tournamentID);
+		clearCacheForGameStatistics(gameName);
 	}
 
 
@@ -428,7 +430,6 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 					// new LinkedList(...) necessary to avoid concurrent iteration and modification
 				if (match.getPlayerInfos().contains(player)) {
 					clearCacheForMatch(match.getMatchID());
-					clearCacheForTournamentStatistics(match.getTournamentID());
 				}
 			}
 		}

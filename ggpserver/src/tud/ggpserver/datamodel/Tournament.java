@@ -34,6 +34,7 @@ public class Tournament<TermType extends TermInterface, ReasonerStateInfoType> {
 	private final User owner;
 
 	private final AbstractDBConnector<TermType, ReasonerStateInfoType> db;
+	private int nbOfMatches = -1;
 	
 	public Tournament(final String tournamentID, final User owner, AbstractDBConnector<TermType, ReasonerStateInfoType> db) {
 		this.tournamentID = tournamentID;
@@ -43,6 +44,13 @@ public class Tournament<TermType extends TermInterface, ReasonerStateInfoType> {
 
 	public List<ServerMatch<TermType,ReasonerStateInfoType>> getMatches() throws SQLException {
 		return db.getMatches(0, Integer.MAX_VALUE, null, null, tournamentID, false);
+	}
+
+	public int getNumberOfMatches() throws SQLException {
+		if(nbOfMatches == -1){
+			nbOfMatches = db.getRowCountMatches(null, null, tournamentID, false);
+		}
+		return nbOfMatches;
 	}
 
 	public String getTournamentID() {

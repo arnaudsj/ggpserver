@@ -66,22 +66,25 @@
 				    <c:out value="${tournament.tournamentID}" />
 				</td>
 				<td>
-					<c:url value="show_matches.jsp" var="showMatchesURL">
-						<c:param name="tournamentID" value="${tournament.tournamentID}" />
-					</c:url>
-					<a href='<c:out value="${showMatchesURL}" />'>show matches</a>
-				</td>
-				<td>
 					<c:url value="view_tournament.jsp" var="viewTournamentURL">
 						<c:param name="tournamentID" value="${tournament.tournamentID}" />
 					</c:url>
 					<a href='<c:out value="${viewTournamentURL}" />'>leader board</a>
 				</td>
 				<td>
+					<c:url value="show_matches.jsp" var="showMatchesURL">
+						<c:param name="tournamentID" value="${tournament.tournamentID}" />
+					</c:url>
+					<a href='<c:out value="${showMatchesURL}" />'>show matches</a>
+				</td>
+				<td>
 					<c:url value="export_xml.jsp" var="exportXMLURL">
 						<c:param name="tournamentID" value="${tournament.tournamentID}" />
 					</c:url>
 					<a href='<c:out value="${exportXMLURL}" />'>export xml</a>
+					<c:if test="${viewTournament.tournament.numberOfMatches >= 1000}">
+						<span style="color:red;">Caution: This may take a long time and produce a big file!</span>
+					</c:if>
 				</td>
 			</tr>
 	      </c:forEach>
