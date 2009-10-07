@@ -238,13 +238,15 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 			Tournament<Term, GameState> tournament,
 			Date startTime, boolean scrambled, double weight) throws DuplicateInstanceException,
 			SQLException {
+		NewMatch<Term, GameState> result;
 		synchronized (matches) {
-			NewMatch<Term, GameState> result = super.createMatch(matchID, game, 
+			result = super.createMatch(matchID, game, 
 					startclock, playclock, rolesToPlayerInfos, tournament, 
 					startTime, scrambled, weight);
 			matches.put(matchID, result);
-			return result;
 		}
+		clearCacheForTournament(tournament.getTournamentID());
+		return result;
 	}
 
 	@Override
@@ -272,6 +274,7 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 			clearCacheForMatch(matchID);
 			super.deleteMatch(matchID);
 		}
+		clearCacheForTournament(tournamentID);
 		clearCacheForTournamentStatistics(tournamentID);
 		clearCacheForGameStatistics(gameName);
 	}
@@ -475,6 +478,12 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 			}
 		}
 		return result;
+	}
+
+	private void clearCacheForTournament(String tournamentID) {
+		synchronized (tournaments) {
+			tournaments.remove(tournamentID);
+		}
 	}
 
 	@Override
