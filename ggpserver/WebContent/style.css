@@ -173,19 +173,20 @@ div#content {
 }
 
 div#ctitle {
+    background-color:	#354F9E;
     background-image:   url(gfx/VerlaufBlau3.png);
     background-repeat:  repeat-x;
     margin-top:         -1px;
     margin-left:        -11px;
     margin-right:       -11px;
     margin-bottom:      10px;
-    height:             30px;
+    min-height:         30px;
     border:             1px solid #344e9d;
     vertical-align:     middle;
     font-size:          medium;
     font-weight:        bold;
     text-transform:     capitalize;
-    text-indent:        1.5em;
+    padding-left:       11px;
     color:              #ffffff;
 }
 

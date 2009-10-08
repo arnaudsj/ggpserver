@@ -1,5 +1,6 @@
 <%--
-    Copyright (C) 2009 Martin Günther (mintar@gmx.de)
+    Copyright (C) 2009 Martin Gï¿½nther (mintar@gmx.de)
+                  2009 Stephan Schiffel (stephan.schiffel@gmx.de)
 
     This file is part of GGP Server.
 
@@ -17,10 +18,16 @@
     along with GGP Server.  If not, see <http://www.gnu.org/licenses/>.
 --%>
 
-<!-- Footer -->
-<div id="footer">
-    &nbsp;
-    <a href="http://validator.w3.org/check?uri=referer"><img
-        src="http://www.w3.org/Icons/valid-html401-blue"
-        alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
-</div>
+			</div>  <!-- end div "content" -->
+	
+			<!-- Footer -->
+			<div id="footer">
+			    &nbsp;
+			    <a href="http://validator.w3.org/check?uri=referer"><img
+			        src="http://www.w3.org/Icons/valid-html401-blue"
+			        alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+			</div>
+	
+		</div>  <!-- end div "everything" -->
+	</body>
+</html>

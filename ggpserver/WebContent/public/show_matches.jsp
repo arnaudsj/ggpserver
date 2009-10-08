@@ -30,35 +30,24 @@
 	</c:catch>
 </jsp:useBean>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-	<jsp:directive.include file="/inc/headincludes.jsp" />
-</head>
-<body>
-<div id="everything">
-<jsp:directive.include file="/inc/header.jsp" />
-<jsp:directive.include file="/inc/navigation.jsp" />
-
-<!-- Content -->
-<div id="content">
-    <div id="ctitle">
-    	Show
-	    <c:if test="${ pager.gameName != null }">
-	     ${pager.gameName}
-	    </c:if>
-	    matches
-	    <c:if test="${ pager.playerName != null }">
-	     for ${pager.playerName}
-	    </c:if>
-	    <c:if test="${ pager.tournamentID != null }">
-	     of ${pager.tournamentID}
-	    </c:if>
-     </div>
-
-	<!-- pager -->
-	<jsp:directive.include file="/inc/pager_title.jsp" />
-	<jsp:directive.include file="/inc/pager.jsp" />
+<c:set var="title">
+	<c:choose>
+		<c:when test="${ pager.gameName != null }">
+			${pager.gameName} matches
+	    </c:when>
+	    <c:otherwise>
+	    	Matches
+	    </c:otherwise>
+    </c:choose>
+    <c:if test="${ pager.tournamentID != null }">
+		of ${pager.tournamentID}
+    </c:if>
+    <c:if test="${ pager.playerName != null }">
+		for ${pager.playerName}
+    </c:if>
+</c:set>
+<jsp:directive.include file="/inc/pager_header.jsp" />
+<jsp:directive.include file="/inc/pager.jsp" />
 
 	<table>
 		<thead>
@@ -196,19 +185,14 @@
 		</tbody>
 	</table>
 	
-	<!-- pager -->
-	<jsp:directive.include file="/inc/pager.jsp" />
-	
-	<%--
-	<c:if test="${pager.playerName != null}">
-		<h1>Legend</h1>
-		<div class="errors"></div> &ndash; some players produced errors, including player ${pager.playerName} <br>
-		<div class="errors_bw"></div> &ndash; some other players produced errors
-	</c:if>
-	--%>
-</div>  <!--end div "content"-->
+<jsp:directive.include file="/inc/pager.jsp" />
+
+<%--
+<c:if test="${pager.playerName != null}">
+	<h1>Legend</h1>
+	<div class="errors"></div> &ndash; some players produced errors, including player ${pager.playerName} <br>
+	<div class="errors_bw"></div> &ndash; some other players produced errors
+</c:if>
+--%>
 
 <jsp:directive.include file="/inc/footer.jsp" />
-</div>  <!-- end div "everything" -->
-</body>
-</html>

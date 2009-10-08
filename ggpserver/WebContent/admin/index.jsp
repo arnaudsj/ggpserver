@@ -28,25 +28,14 @@
 	</c:catch>
 </jsp:useBean>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-	<title>Dresden GGP Server</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<link href="<%= request.getContextPath() %>/style.css" rel="stylesheet" type="text/css" />
-</head>
-<body>
 <%
 	response.setHeader("Cache-Control","private");
 	response.setHeader("Pragma","no-cache");
 %>
-<div id="everything">
-<jsp:directive.include file="/inc/header.jsp" />
-<jsp:directive.include file="/inc/navigation.jsp" />
 
-<!-- Content -->
-<div id="content">
-    <div id="ctitle">Admin page</div>
+<c:set var="title">Admin Page</c:set>
+<jsp:directive.include file="/inc/header.jsp" />
+
     <h1 class="notopborder">Scheduler</h1>
     
 	<c:url value="index.jsp" var="urlStopGracefully">
@@ -191,9 +180,4 @@
 		</tbody>
 	</table>
 
-</div>  <!--end div "content"-->
-
 <jsp:directive.include file="/inc/footer.jsp" />
-</div>  <!-- end div "everything" -->
-</body>
-</html>

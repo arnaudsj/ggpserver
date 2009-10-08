@@ -1,5 +1,5 @@
 <%--
-    Copyright (C) 2009 Martin Günther (mintar@gmx.de)
+    Copyright (C) 2009 Martin Gï¿½nther (mintar@gmx.de)
 
     This file is part of GGP Server.
 
@@ -25,24 +25,27 @@
 	</c:catch>
 </jsp:useBean>
 
-<!-- Navigation -->
-<div id="navigation">
+<c:if test="${omitNavigation != 'true'}">
 
-<div id="ntitle">&nbsp;</div>
-<a href="<%= request.getContextPath() + response.encodeURL("/index.jsp") %>">Start Page</a>
-<a href="<%= request.getContextPath() + response.encodeURL("/public/show_matches.jsp") %>">Matches</a>
-<a href="<%= request.getContextPath() + response.encodeURL("/public/show_games.jsp") %>">Games</a>
-<a href="<%= request.getContextPath() + response.encodeURL("/public/show_players.jsp") %>">Players</a>
-<a href="<%= request.getContextPath() + response.encodeURL("/public/show_users.jsp") %>">Users</a>
-<a href="<%= request.getContextPath() + response.encodeURL("/public/show_tournaments.jsp") %>">Tournaments</a>
+	<!-- Navigation -->
+	<div id="navigation">
 
-<c:if test='${navigationUserBean.user != null}'>
-	<c:if test='<%= navigationUserBean.getUser().hasRole("admin") %>'>
-		<a href="<%= request.getContextPath() + response.encodeURL("/admin/index.jsp") %>">Admin Page</a>
-	</c:if>
-	<a href="<%= request.getContextPath() + response.encodeURL("/members/profile.jsp") %>">My Players</a> 
-	<a href="<%= request.getContextPath() + response.encodeURL("/members/create_game.jsp") %>">Create Game</a> 
+		<div id="ntitle">&nbsp;</div>
+		<a href="<%= request.getContextPath() + response.encodeURL("/index.jsp") %>">Start Page</a>
+		<a href="<%= request.getContextPath() + response.encodeURL("/public/show_matches.jsp") %>">Matches</a>
+		<a href="<%= request.getContextPath() + response.encodeURL("/public/show_games.jsp") %>">Games</a>
+		<a href="<%= request.getContextPath() + response.encodeURL("/public/show_players.jsp") %>">Players</a>
+		<a href="<%= request.getContextPath() + response.encodeURL("/public/show_users.jsp") %>">Users</a>
+		<a href="<%= request.getContextPath() + response.encodeURL("/public/show_tournaments.jsp") %>">Tournaments</a>
+		
+		<c:if test='${navigationUserBean.user != null}'>
+			<c:if test='<%= navigationUserBean.getUser().hasRole("admin") %>'>
+				<a href="<%= request.getContextPath() + response.encodeURL("/admin/index.jsp") %>">Admin Page</a>
+			</c:if>
+			<a href="<%= request.getContextPath() + response.encodeURL("/members/profile.jsp") %>">My Players</a> 
+			<a href="<%= request.getContextPath() + response.encodeURL("/members/create_game.jsp") %>">Create Game</a> 
+		</c:if>
+		<a href="<%= request.getContextPath() + response.encodeURL("/public/contact.jsp") %>">Contact</a>
+	</div>
+
 </c:if>
-<a href="<%= request.getContextPath() + response.encodeURL("/public/contact.jsp") %>">Contact</a>
-</div>
-

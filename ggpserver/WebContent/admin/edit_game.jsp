@@ -29,23 +29,13 @@
 	</c:catch>
 </jsp:useBean>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-	<jsp:directive.include file="/inc/headincludes.jsp" />
-</head>
-<body>
 <%
 	response.setHeader("Cache-Control","private");
 	response.setHeader("Pragma","no-cache");
 %>
-<div id="everything">
-<jsp:directive.include file="/inc/header.jsp" />
-<jsp:directive.include file="/inc/navigation.jsp" />
 
-<!-- Content -->
-<div id="content">
-    <div id="ctitle">Edit Game</div>
+<c:set var="title">Edit Game</c:set>
+<jsp:directive.include file="/inc/header.jsp" />
 
 	<c:url value="process_edit_game.jsp" var="saveChangesURL"/>
 		
@@ -121,9 +111,5 @@
 		</tr>
 	</table>
 	</form>
-</div>  <!--end div "content"-->
 
 <jsp:directive.include file="/inc/footer.jsp" />
-</div>  <!-- end div "everything" -->
-</body>
-</html>

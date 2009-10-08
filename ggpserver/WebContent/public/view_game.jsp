@@ -37,32 +37,21 @@
 	</c:catch>
 </jsp:useBean>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-	<jsp:directive.include file="/inc/headincludes.jsp" />
-</head>
-<body>
-<div id="everything"><jsp:directive.include file="/inc/header.jsp" />
-<jsp:directive.include file="/inc/navigation.jsp" /> <!-- Content -->
-<div id="content">
-<div id="ctitle">View game</div>
+<c:set var="title">Game ${viewGame.name}</c:set>
+<jsp:directive.include file="/inc/header.jsp" />
 
-<h1 class="notopborder">Information on game ${viewGame.name}
-<c:if test='${viewGameUserBean.user != null}'>
-	<c:if test='<%= viewGameUserBean.getUser().hasRole("admin") %>'>
-		<c:url value="../admin/edit_game.jsp" var="editURL">
-			<c:param name="gameName" value="${viewGame.name}" />
-		</c:url>
-		<div class="edit" title="Edit game information"><a href='<c:out value="${editURL}"/>'><span>edit</span></a></div>
-	</c:if>
-</c:if>
-</h1>
 <table>
 	<tbody>
 		<tr>
 			<th>name</th>
-			<td><c:out value="${viewGame.name}"></c:out></td>
+			<td><c:out value="${viewGame.name}"></c:out>
+				<c:if test='<%= viewGameUserBean.getUser() != null && viewGameUserBean.getUser().hasRole("admin") %>'>
+					<c:url value="../admin/edit_game.jsp" var="editURL">
+						<c:param name="gameName" value="${viewGame.name}" />
+					</c:url>
+					<div class="edit" title="Edit game information"><a href='<c:out value="${editURL}"/>'><span>edit</span></a></div>
+				</c:if>
+			</td>
 		</tr>
 		<tr>
 			<th>number of roles</th>
@@ -107,14 +96,12 @@
 </table>
 
 <h2>Game Description</h2>
-	<c:url value="download_gdl.jsp" var="downloadURL">
-		<c:param name="name" value="${viewGame.name}" />
-	</c:url>
-	<div class="download"><a href='<c:out value="${downloadURL}" />'><span>Download</span></a></div>
-	<pre><code><c:out value="${viewGame.game.gameDescription}" /></code></pre>
+<c:url value="download_gdl.jsp" var="downloadURL">
+	<c:param name="name" value="${viewGame.name}" />
+</c:url>
+<div class="download">
+	<a href='<c:out value="${downloadURL}" />'><span>Download</span></a>
 </div>
-<!--end div "content"--> <jsp:directive.include file="/inc/footer.jsp" />
-</div>
-<!-- end div "everything" -->
-</body>
-</html>
+<pre><code><c:out value="${viewGame.game.gameDescription}" /></code></pre>
+
+<jsp:directive.include file="/inc/footer.jsp" />

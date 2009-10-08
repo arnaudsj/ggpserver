@@ -17,18 +17,10 @@
     along with GGP Server.  If not, see <http://www.gnu.org/licenses/>.
 --%>
 
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-<jsp:directive.include file="/inc/headincludes.jsp" />
-</head>
-<body>
-<div id="everything"><jsp:directive.include file="/inc/header.jsp" />
-<jsp:directive.include file="/inc/navigation.jsp" /> <!-- Content -->
-<div id="content">
-<div id="ctitle">Contact</div>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<c:set var="title">Contact</c:set>
+<jsp:directive.include file="/inc/header.jsp" />
 
 GGP Server was created by the <a
 	href="http://www.inf.tu-dresden.de/?node_id=1361">Computational
@@ -53,10 +45,4 @@ developers would love to hear from you. You can contact us at
 		reveal address)</li>
 </ul>
 
-
-</div>
-<!--end div "content"--> <jsp:directive.include file="/inc/footer.jsp" />
-</div>
-<!-- end div "everything" -->
-</body>
-</html>
+<jsp:directive.include file="/inc/footer.jsp" />

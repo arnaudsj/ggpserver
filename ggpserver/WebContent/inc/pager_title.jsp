@@ -19,4 +19,6 @@
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
-	<h1 class="notopborder">Page ${pager.page} of ${pager.numberOfPages} (${pager.tableName} ${pager.startRow + 1} to ${pager.endRow + 1})</h1>
+	<h1 class="notopborder">
+		page ${pager.page} of ${pager.numberOfPages} (${pager.tableName} ${pager.startRow + 1} to ${pager.endRow + 1})
+	</h1>

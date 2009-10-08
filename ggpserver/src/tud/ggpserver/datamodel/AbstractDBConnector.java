@@ -20,6 +20,7 @@
 
 package tud.ggpserver.datamodel;
 
+import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -52,6 +53,7 @@ import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.LegalPlayerInfo;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.players.RandomPlayerInfo;
+import tud.gamecontroller.scrambling.GameScrambler;
 import tud.gamecontroller.scrambling.GameScramblerInterface;
 import tud.gamecontroller.scrambling.IdentityGameScrambler;
 import tud.gamecontroller.term.TermInterface;
@@ -62,16 +64,12 @@ import tud.ggpserver.datamodel.matches.RunningMatch;
 import tud.ggpserver.datamodel.matches.ScheduledMatch;
 import tud.ggpserver.datamodel.matches.ServerMatch;
 import tud.ggpserver.datamodel.statistics.GameStatistics;
-import tud.ggpserver.datamodel.statistics.GermanComp09SeedingStats;
 import tud.ggpserver.datamodel.statistics.TournamentStatistics;
-import tud.ggpserver.datamodel.statistics.GermanComp09SeedingStats.StatEntry;
 import tud.ggpserver.scheduler.AbstractRoundRobinScheduler;
 import tud.ggpserver.scheduler.PlayerStatusListener;
 import tud.ggpserver.util.Digester;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
-import java.io.InputStream;
-import tud.gamecontroller.scrambling.GameScrambler;
 
 
 /**
@@ -1946,113 +1944,6 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			if (rs != null)
 				try {rs.close();} catch (SQLException e) {}
 		} 
-	}
-
-	public void fillGermanComp09SeedingStats(GermanComp09SeedingStats stats) throws SQLException {
-		Connection con = getConnection();
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
-		try {
-			ps = con.prepareStatement(
-					"SELECT"
-					+"	`g1`.`player`,"
-					+"	IFNULL(`sum_all`-`sum_g3`, `sum_all`)/`count_all` AS `avg`,"
-					+"	IFNULL(`sum_all`-`sum_g3`, `sum_all`)/IFNULL(`count_all`-`count_g3`, `count_all`) AS `avg_of_non_error_matches`,"
-					+"	`sum_all`/`count_all` AS `avg_of_all_matches`,"
-					+"	`count_all` AS `nb_matches`,"
-					+"	IFNULL(`count_g3`,0) AS `nb_matches_with_errors`,"
-					+"	IFNULL(`count_g3`/`count_all`,0) AS `error_ratio`"
-					+"FROM"
-					+"		(SELECT"
-					+"			`match_players`.`player`,"
-					+"			SUM(`match_players`.`goal_value`) AS `sum_all`,"
-					+"			COUNT(`match_players`.`goal_value`) AS `count_all`"
-					+"		FROM"
-					+"				(`match_players` INNER JOIN `german_comp09_players` ON `match_players`.`player` = `german_comp09_players`.`player`)"
-					+"			INNER JOIN"
-					+"				("
-					+"					`matches`"
-					+"				INNER JOIN"
-					+"					`games`"
-					+"				ON"
-					+"					`matches`.`game`=`games`.`name`"
-					+"				)"
-					+"			USING (`match_id`)"
-					+"		WHERE"
-					+"			NOT ISNULL(`match_players`.`goal_value`)"
-					+"			AND `games`.`enabled`=TRUE"
-					+"			AND `matches`.`start_time`>='2009.09.28'"
-					+"			AND `matches`.`start_time`<'2009.10.05'"
-					+"			AND `matches`.`tournament_id`='round_robin_tournament'"
-					+"		GROUP BY"
-					+"			`match_players`.`player`"
-					+"		) AS `g1`"
-					+"	LEFT JOIN"
-					+"		(SELECT"
-					+"			g2.`player`,"
-					+"			SUM(`goal_value`) AS `sum_g3`,"
-					+"			COUNT(`goal_value`) AS `count_g3`"
-					+"		FROM"
-					+"			(SELECT"
-					+"				`match_players`.`player`,"
-					+"				`match_players`.`match_id`,"
-					+"				`match_players`.`goal_value`"
-					+"			FROM"
-					+"					("
-					+"						`match_players`"
-					+"					INNER JOIN"
-					+"						`errormessages`"
-					+"					USING (`player`, `match_id`)"
-					+"					)"
-					+"				INNER JOIN"
-					+"					("
-					+"						`matches`"
-					+"					INNER JOIN"
-					+"						`games`"
-					+"					ON"
-					+"						`matches`.`game`=`games`.`name`"
-					+"					)"
-					+"				USING (`match_id`)"
-					+"			WHERE"
-					+"				NOT ISNULL(`match_players`.`goal_value`)"
-					+"				AND `games`.`enabled`=TRUE"
-					+"				AND `matches`.`start_time`>='2009.09.28'"
-					+"				AND `matches`.`start_time`<'2009.10.05'"
-					+"				AND `matches`.`tournament_id`='round_robin_tournament'"
-					+"			GROUP BY"
-					+"				`match_players`.`player`,"
-					+"				`match_players`.`match_id`"
-					+"			HAVING"
-					+"				COUNT(DISTINCT `errormessages`.`step_number`)>=3"
-					+"			) AS g2"
-					+"		GROUP BY g2.`player`"
-					+"		) AS `g3`"
-					+"	ON `g1`.`player`=`g3`.`player`"
-					+"ORDER BY `avg` DESC"
-					);
-			rs = ps.executeQuery();
-			while (rs.next()) {
-				stats.addRow(
-					new StatEntry(
-							rs.getString("player"),
-							rs.getDouble("avg"),
-							rs.getDouble("avg_of_non_error_matches"),
-							rs.getDouble("avg_of_all_matches"),
-							rs.getInt("nb_matches"),
-							rs.getInt("nb_matches_with_errors"),
-							rs.getDouble("error_ratio")
-						)
-					);
-			}
-		} finally { 
-			if (con != null)
-				try {con.close();} catch (SQLException e) {}
-			if (ps != null)
-				try {ps.close();} catch (SQLException e) {}
-			if (rs != null)
-				try {rs.close();} catch (SQLException e) {}
-		}
 	}
 
 	public Tournament<TermType , ReasonerStateInfoType> createTournament(String tournamentID, User owner) throws DuplicateInstanceException,

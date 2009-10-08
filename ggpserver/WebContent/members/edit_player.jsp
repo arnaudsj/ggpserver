@@ -17,9 +17,9 @@
     along with GGP Server.  If not, see <http://www.gnu.org/licenses/>.
 --%>
 
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%> 
+
 <jsp:useBean id="editPlayer" class="tud.ggpserver.formhandlers.EditPlayer" scope="request">
 	<c:catch>
 		<jsp:setProperty name="editPlayer" property="playerName"/>
@@ -30,23 +30,14 @@
 	</c:catch>
 </jsp:useBean>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-	<jsp:directive.include file="/inc/headincludes.jsp" />
-</head>
-<body>
-	<%
-		response.setHeader("Cache-Control","private");
-		response.setHeader("Pragma","no-cache");
-	%>
+<%
+	response.setHeader("Cache-Control","private");
+	response.setHeader("Pragma","no-cache");
+%>
 	
-<div id="everything">
+<c:set var="title">Edit Player</c:set>
 <jsp:directive.include file="/inc/header.jsp" />
-<jsp:directive.include file="/inc/navigation.jsp" />
 
-<!-- Content -->
-<div id="content">
 	<% 
 		// this has to be a java "if" instead of a "<c:if>", because 
 		// otherwise the compiler believes that the rest of the page 
@@ -56,8 +47,6 @@
 			return;
 		}
 	%>
-
-    <div id="ctitle">Edit Player</div>
 
 	<form action="<%= request.getContextPath() + response.encodeURL("/members/process_edit_player.jsp") %>" method="post">
 	<table cellpadding="4" cellspacing="2" border="0">
@@ -128,9 +117,5 @@
 		</tr>
 	</table>
 	</form>
-</div>  <!--end div "content"-->
 
 <jsp:directive.include file="/inc/footer.jsp" />
-</div>  <!-- end div "everything" -->
-</body>
-</html>

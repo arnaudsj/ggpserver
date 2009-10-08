@@ -17,9 +17,9 @@
     along with GGP Server.  If not, see <http://www.gnu.org/licenses/>.
 --%>
 
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%> 
+
 <jsp:useBean id="profile"
 	class="tud.ggpserver.formhandlers.Profile" scope="request">
 	<c:catch>
@@ -28,21 +28,14 @@
 	</c:catch>
 </jsp:useBean>
 
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-	<jsp:directive.include file="/inc/headincludes.jsp" />
-</head>
-<body>
 <%
 	response.setHeader("Cache-Control","private");
 	response.setHeader("Pragma","no-cache");
 %>
-<div id="everything"><jsp:directive.include file="/inc/header.jsp" />
-<jsp:directive.include file="/inc/navigation.jsp" /> <!-- Content -->
-<div id="content">
-<div id="ctitle">Member Profile</div>
+
+<c:set var="title">User Profile</c:set>
+<jsp:directive.include file="/inc/header.jsp" />
+
 <h1 class="notopborder">My Players</h1>
 
 <table>
@@ -103,7 +96,7 @@
 	</tbody>
 </table>
 
-<h1>Tips</h1>
+<h1>Hints</h1>
 A player can be in one of two states:
 <ul>
 	<li><b>active</b> - the player will take part in the round-robin tournament, 
@@ -119,10 +112,4 @@ GGP Server.</p>
 <p>The GGP Server will never set a player's status back to "active". You have to
 do so manually.</p>
 
-
-</div>
-<!--end div "content"--> <jsp:directive.include file="/inc/footer.jsp" />
-</div>
-<!-- end div "everything" -->
-</body>
-</html>
+<jsp:directive.include file="/inc/footer.jsp" />

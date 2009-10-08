@@ -32,19 +32,11 @@
 	</c:catch>
 </jsp:useBean>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-<jsp:directive.include file="/inc/headincludes.jsp" />
-</head>
-<body>
-<div id="everything"><jsp:directive.include file="/inc/header.jsp" />
-<jsp:directive.include file="/inc/navigation.jsp" /> <!-- Content -->
-<div id="content">
-<div id="ctitle">View match</div>
 <c:set var="match" value="${viewMatch.match}" />
 
-<h1 class="notopborder">Information on match ${match.matchID}</h1>
+<c:set var="title">Match ${match.matchID}</c:set>
+<jsp:directive.include file="/inc/header.jsp" />
+
 <table>
 	<tbody>
 		<tr>
@@ -230,9 +222,4 @@
 	</tbody>
 </table>
 
-</div>
-<!--end div "content"--> <jsp:directive.include file="/inc/footer.jsp" />
-</div>
-<!-- end div "everything" -->
-</body>
-</html>
+<jsp:directive.include file="/inc/footer.jsp" />

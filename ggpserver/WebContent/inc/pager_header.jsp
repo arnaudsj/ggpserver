@@ -1,6 +1,5 @@
 <%--
-    Copyright (C) 2009 Martin Günther (mintar@gmx.de)
-                  2009 Stephan Schiffel (stephan.schiffel@gmx.de)
+    Copyright (C) 2009 Stephan Schiffel (stephan.schiffel@gmx.de)
 
     This file is part of GGP Server.
 
@@ -17,14 +16,15 @@
     You should have received a copy of the GNU General Public License
     along with GGP Server.  If not, see <http://www.gnu.org/licenses/>.
 --%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
-<title>
-	<c:if test="${title != null && title != ''}">
-		<c:out value="${title}"/> - 
-	</c:if>
-	Dresden GGP Server
-</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link href="<%= request.getContextPath() %>/style.css" rel="stylesheet" type="text/css">
-<link rel="shortcut icon" href="<%= request.getContextPath() + "/icons/favicon.ico" %>" type="image/x-icon">
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%> 
+
+<c:if test="${pager.numberOfPages > 1}">
+	<c:set var="title">
+		${title} (${pager.page}/${pager.numberOfPages})
+	</c:set>
+</c:if>
+<jsp:directive.include file="/inc/header.jsp" />
+
+<!-- pager -->
+<jsp:directive.include file="/inc/pager_title.jsp" />
