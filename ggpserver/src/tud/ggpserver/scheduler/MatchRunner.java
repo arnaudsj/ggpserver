@@ -105,6 +105,7 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 	public synchronized void start() {
 		stop = false;
 		if( !running ) {
+			logger.info("starting MatchRunner");
 			running = true;
 			matchRunnerThread = new Thread() {
 				@Override
@@ -243,28 +244,36 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 				gameController.addListener(runningMatch);
 				gameController.runGame();
 				runningMatch.toFinished();
-				// wait for some time to give players a chance to cleanup
-				//   we wait in the MatchThread, such that the RoundRobinScheduler
-				//   (who waits for the thread to finish) doesn't start the next round before the players are available again
-				try {
-					Thread.sleep(DELAY_BETWEEN_MATCHES);
-				} catch (InterruptedException e) {
-				}
 			} catch (InterruptedException e1) {
 				logger.info("Thread for match " + matchID + " - INTERRUPT");
 				runningMatch.notifyErrorMessage(new GameControllerErrorMessage(GameControllerErrorMessage.ABORTED, "The match was aborted."));
+				logger.info("Thread for match " + matchID + " - set match to aborted");
 				runningMatch.toAborted();
 			}
 		} catch (SQLException e2) {
 			logger.severe("exception: " + e2);
 		}
+
+		// wait for some time to give players a chance to cleanup
+		//   we wait in the MatchThread, such that the RoundRobinScheduler
+		//   (who waits for the thread to finish) doesn't start the next round before the players are available again
+		logger.info("Thread for match " + matchID + " - delay");
+		try {
+			Thread.sleep(DELAY_BETWEEN_MATCHES);
+		} catch (InterruptedException e) {
+		}
+		
 		// players are free again
+		logger.info("Thread for match " + matchID + " - set players to available");
 		for(PlayerInfo p:runningMatch.getPlayerInfos()) {
 			if(p instanceof RemotePlayerInfo) {
 				availablePlayersTracker.notifyStopPlaying(p.getName());
 			}
 		}
+
+		logger.info("Thread for match " + matchID + " - remove thread");
 		matchThreads.remove(runningMatch.getMatchID());
+
 		// notify MatchRunner about changed player state
 		notifyAboutChanges();
 		logger.info("Thread for match " + matchID + " - END");
@@ -382,6 +391,7 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 	}
 	
 	private synchronized void notifyAboutChanges() {
+		logger.info("notify about changed state");
 		this.notifyAll();
 	}
 

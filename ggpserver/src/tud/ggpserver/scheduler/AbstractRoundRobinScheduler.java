@@ -65,6 +65,7 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 
 	public synchronized void start() {
 		if (!running) {
+			logger.info("starting RoundRobinScheduler");
 			setRunning(true);
 			stopAfterCurrentMatches=false;
 			
@@ -83,12 +84,14 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 			};
 			gameThread.start();
 		}else if(stopAfterCurrentMatches){ // stop the stop
+			logger.info("RoundRobinScheduler is still running -> stop the stopping");
 			stopAfterCurrentMatches = false;
 		}
 	}
 	
 	public synchronized void stop() {
 		if (running) {
+			logger.info("stopping RoundRobinScheduler");
 			stopAfterCurrentMatches = true;
 			gameThread.interrupt();
 			try {
@@ -96,10 +99,13 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 			} catch (InterruptedException e) {
 			}
 			setRunning(false);
+		}else{
+			logger.info("RoundRobinScheduler is not running");
 		}
 	}
 
 	public void stopGracefully() {
+		logger.info("stopping RoundRobinScheduler after the currently running atches");
 		stopAfterCurrentMatches = true;
 	}
 	
@@ -130,7 +136,9 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 	private void runMatches() throws SQLException, InterruptedException {
 		while (!stopAfterCurrentMatches) {
 			List<NewMatch<TermType, ReasonerStateInfoType>> currentMatches = createMatches();
+			logger.info("running matches");
 			getMatchRunner().runMatches(currentMatches);
+			logger.info("matches of this round finished.");
 			for(NewMatch<TermType, ReasonerStateInfoType> match:currentMatches) {
 				try {
 					FinishedMatch<TermType, ReasonerStateInfoType> finishedMatch = db.getFinishedMatch(match.getMatchID());
@@ -187,6 +195,7 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 			// change next game to play
 			gamePicker.pickNextGame();
 		}
+		logger.info("waiting for some players to become available");
 		Collection<? extends PlayerInfo> availablePlayers = MatchRunner.getInstance().waitForAvailablePlayers();
 		// If there are no enabled games, gamePicker.pickNextGame() will return null.
 		// In order to handle this case correctly, one would have to replace gamePicker.pickNextGame()
@@ -194,8 +203,10 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		// ATM, we will just run into a NullPointerException somewhere down the line, so let's hope that
 		// there is always at least one enabled game! :-)
 		
+		logger.info("associating players to roles");
 		List<Map<RoleInterface<TermType>, PlayerInfo>> matchesToRolesToPlayerInfos = createPlayerInfos(nextGame, availablePlayers);
 		
+		logger.info("creating matches");
 		for (Map<RoleInterface<TermType>, PlayerInfo> rolesToPlayerInfos : matchesToRolesToPlayerInfos) {
 			result.add(db.createMatch(nextGame, startclock, playclock, rolesToPlayerInfos, db.getTournament(ROUND_ROBIN_TOURNAMENT_ID)));
 		}
