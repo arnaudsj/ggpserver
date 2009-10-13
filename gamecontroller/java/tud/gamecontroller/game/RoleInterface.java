@@ -21,6 +21,9 @@ package tud.gamecontroller.game;
 
 import tud.gamecontroller.term.GameObjectInterface;
 
+/**
+ * two roles should be equal if they have the same name 
+ */
 public interface RoleInterface<TermType> extends GameObjectInterface{
 	TermType getTerm();
 }
