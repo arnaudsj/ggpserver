@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2009 Stephan Schiffel <stephan.schiffel@gmx.de> 
 
     This file is part of GGP Server.
 
@@ -19,89 +19,35 @@
 
 package tud.ggpserver.datamodel.statistics;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 
 import tud.gamecontroller.game.RoleInterface;
-import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.term.TermInterface;
-import tud.ggpserver.datamodel.Game;
 
 public class GameStatistics<TermType extends TermInterface, ReasonerStateInfoType> {
-	
-	public static class PerformanceInformation {
-		private int numberOfMatches;
-		private double averageScore;
-		private double standardDeviation;
+	private GameRoleStatistics<TermType, ReasonerStateInfoType> gameRoleStatistics = null;
+	private GamePlayerStatistics<TermType, ReasonerStateInfoType> gamePlayerStatistics = null;
+	private Map<RoleInterface<TermType>, GamePlayerStatistics<TermType, ReasonerStateInfoType>> gamePlayerStatisticsPerRole = null;
 
-		public PerformanceInformation(int numberOfMatches, double averageScore, double standardDeviation) {
-			this.numberOfMatches = numberOfMatches;
-			this.averageScore = averageScore;
-			this.standardDeviation = standardDeviation;
-		}
-
-		public int getNumberOfMatches() {
-			return numberOfMatches;
-		}
-
-		public double getAverageScore() {
-			return averageScore;
-		}
-
-		public double getStandardDeviation() {
-			return standardDeviation;
-		}
-}
-
-	private Game<TermType, ReasonerStateInfoType> game;
-	private Map<? extends PlayerInfo, PerformanceInformation> informationPerPlayer;
-	private Map<? extends RoleInterface<TermType>, PerformanceInformation> informationPerRole;
-	private List<? extends PlayerInfo> sortedPlayers;
-	
-
-	public GameStatistics(Game<TermType, ReasonerStateInfoType> game,
-			Map<? extends PlayerInfo, PerformanceInformation> informationPerPlayer,
-			Map<? extends RoleInterface<TermType>, PerformanceInformation> informationPerRole) {
-		this.game = game;
-		this.informationPerPlayer = informationPerPlayer;
-		this.informationPerRole = informationPerRole;
+	public GameStatistics(
+			GameRoleStatistics<TermType, ReasonerStateInfoType> gameRoleStatistics,
+			GamePlayerStatistics<TermType, ReasonerStateInfoType> gamePlayerStatistics,
+			Map<RoleInterface<TermType>, GamePlayerStatistics<TermType, ReasonerStateInfoType>> gamePlayerStatisticsPerRole) {
+		this.gameRoleStatistics = gameRoleStatistics;
+		this.gamePlayerStatistics = gamePlayerStatistics;
+		this.gamePlayerStatisticsPerRole = gamePlayerStatisticsPerRole;
 	}
 
-	public Game<TermType, ReasonerStateInfoType> getGame() {
-		return game;
+	public GameRoleStatistics<TermType, ReasonerStateInfoType> getGameRoleStatistics() {
+		return gameRoleStatistics;
 	}
 
-	public Map<? extends RoleInterface<TermType>, PerformanceInformation> getInformationPerRole() {
-		return informationPerRole;
-	}
-	
-	public List<? extends RoleInterface<TermType>> getOrderedRoles() {
-		return game.getOrderedRoles();
+	public GamePlayerStatistics<TermType, ReasonerStateInfoType> getGamePlayerStatistics() {
+		return gamePlayerStatistics;
 	}
 
-	public Map<? extends PlayerInfo, PerformanceInformation> getInformationPerPlayer() {
-		return informationPerPlayer;
-	}
-
-	public Collection<? extends PlayerInfo> getPlayers() {
-		return informationPerPlayer.keySet();
-	}
-
-	public List<? extends PlayerInfo> getSortedPlayers() {
-		if (sortedPlayers == null) {
-			sortedPlayers = new ArrayList<PlayerInfo>(informationPerPlayer.keySet());
-			Collections.sort(sortedPlayers, new Comparator<PlayerInfo>() {
-				@Override
-				public int compare(PlayerInfo o1, PlayerInfo o2) {
-					return Double.compare(informationPerPlayer.get(o2).getAverageScore(), informationPerPlayer.get(o1).getAverageScore());
-				}
-			});
-		}
-		return sortedPlayers;
+	public Map<RoleInterface<TermType>, GamePlayerStatistics<TermType, ReasonerStateInfoType>> getGamePlayerStatisticsPerRole() {
+		return gamePlayerStatisticsPerRole;
 	}
 
 }

@@ -24,6 +24,15 @@
 		<servlet-name>ChartViewer</servlet-name>
 		<url-pattern>/servlet/ChartViewer</url-pattern>
 	</servlet-mapping>
+
+	<servlet>
+	    <servlet-name>GameStatisticsChartViewer</servlet-name>
+	    <servlet-class>tud.ggpserver.webapp.GameStatisticsChartViewer</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>GameStatisticsChartViewer</servlet-name>
+		<url-pattern>/servlet/GameStatisticsChartViewer</url-pattern>
+	</servlet-mapping>
   
 	<!-- Define the roles we want to use in the application -->
 	<security-role> 

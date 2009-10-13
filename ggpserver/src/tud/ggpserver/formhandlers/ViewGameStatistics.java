@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009 Martin Günther <mintar@gmx.de>
+    Copyright (C) 2009 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GGP Server.
 
@@ -19,17 +19,30 @@
 
 package tud.ggpserver.formhandlers;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
+import javax.servlet.http.HttpSession;
+
+import tud.gamecontroller.game.RoleInterface;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.Game;
+import tud.ggpserver.datamodel.statistics.GamePlayerStatistics;
+import tud.ggpserver.datamodel.statistics.GameRoleStatistics;
 import tud.ggpserver.datamodel.statistics.GameStatistics;
+import tud.ggpserver.datamodel.statistics.GameStatisticsChartCreator;
 
 public class ViewGameStatistics {
 	private String gameName = "";
 	private Game<?, ?> game = null;
+	private LinkedList<ImageInfo> charts;
+	private HttpSession session;
 	private GameStatistics<?, ?> gameStatistics = null;
-
+	
 	public String getGameName() {
 		return gameName;
 	}
@@ -45,10 +58,75 @@ public class ViewGameStatistics {
 		return game;
 	}
 
-	public GameStatistics<?, ?> getStatistics() throws SQLException {
+	@SuppressWarnings("unchecked")
+	public GameStatistics getStatistics() throws SQLException {
 		if(gameStatistics == null){
 			gameStatistics = DBConnectorFactory.getDBConnector().getGameStatistics(gameName);
 		}
 		return gameStatistics;
 	}
+
+	public GameRoleStatistics<?, ?> getRoleStatistics() throws SQLException {
+		return getStatistics().getGameRoleStatistics();
+	}
+
+	public GamePlayerStatistics<?, ?> getPlayerStatistics() throws SQLException {
+		return getStatistics().getGamePlayerStatistics();
+	}
+
+	@SuppressWarnings("unchecked")
+	public Map<RoleInterface<?>, GamePlayerStatistics<?, ?>> getPlayerStatisticsPerRole() throws SQLException {
+		return getStatistics().getGamePlayerStatisticsPerRole();
+	}
+
+	public List<ImageInfo> getChartsForRoles() throws SQLException, UnsupportedEncodingException, IOException{
+		if(charts == null) {
+			charts = new LinkedList<ImageInfo>();
+			int roleIndex = 0;
+			for(RoleInterface<?> role:getGame().getOrderedRoles()) {
+				charts.add(getChart(roleIndex, role));
+				roleIndex++;
+			}
+		}
+		return charts;
+	}
+	
+	public void setSession(HttpSession session) {
+		this.session = session;
+	}
+	
+	private ImageInfo getChart(int roleIndex, RoleInterface<?> role) throws SQLException, UnsupportedEncodingException, IOException {
+		GameStatisticsChartCreator chartCreator = new GameStatisticsChartCreator(session, getGame(), role);
+		return new ImageInfo(chartCreator.getImageID(), chartCreator.getImageMap(), chartCreator.getImageMapID(), roleIndex);
+	}
+
+	public class ImageInfo {
+		private String imageID;
+		private String imageMap;
+		private String imageMapID;
+		private int roleIndex;
+		
+		public ImageInfo(String imageID, String imageMap, String imageMapID, int roleIndex) {
+			this.imageID = imageID;
+			this.imageMap = imageMap;
+			this.imageMapID = imageMapID; 
+		}
+
+		public String getImageID() {
+			return imageID;
+		}
+
+		public String getImageMap() {
+			return imageMap;
+		}
+		
+		public String getImageMapID() {
+			return imageMapID;
+		}
+
+		public int getRoleIndex() {
+			return roleIndex;
+		}
+	}
+
 }

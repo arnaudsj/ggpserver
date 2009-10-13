@@ -63,7 +63,7 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 	public static final String STATUS_SCHEDULED = "scheduled";
 	
 	private final Date startTime;
-	private final Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayerInfos;
+	private final Map<? extends RoleInterface<?>, ? extends PlayerInfo> rolesToPlayerInfos;
 	private List<PlayerInfo> orderedPlayerInfos = null;
 	
 	private List<Integer> orderedGoalValues;
@@ -145,7 +145,7 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 		return new ArrayList<PlayerInfo>(orderedPlayerInfos);   // defensive copy, needed e.g. in EditableMatch
 	}
 
-	public PlayerInfo getPlayerInfo(RoleInterface<TermType> role) {
+	public PlayerInfo getPlayerInfo(RoleInterface<?> role) {
 		return rolesToPlayerInfos.get(role);
 	}
 
@@ -153,8 +153,8 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 		return new ArrayList<PlayerInfo>(rolesToPlayerInfos.values());
 	}
 
-	public Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> getRolesToPlayerInfos() {
-		return new HashMap<RoleInterface<TermType>, PlayerInfo>(rolesToPlayerInfos);
+	public Map<? extends RoleInterface<?>, ? extends PlayerInfo> getRolesToPlayerInfos() {
+		return new HashMap<RoleInterface<?>, PlayerInfo>(rolesToPlayerInfos);
 	}
 
 	/////////////////////// start time ///////////////////////

@@ -63,7 +63,10 @@ import tud.ggpserver.datamodel.matches.NewMatch;
 import tud.ggpserver.datamodel.matches.RunningMatch;
 import tud.ggpserver.datamodel.matches.ScheduledMatch;
 import tud.ggpserver.datamodel.matches.ServerMatch;
+import tud.ggpserver.datamodel.statistics.GamePlayerStatistics;
+import tud.ggpserver.datamodel.statistics.GameRoleStatistics;
 import tud.ggpserver.datamodel.statistics.GameStatistics;
+import tud.ggpserver.datamodel.statistics.PerformanceInformation;
 import tud.ggpserver.datamodel.statistics.TournamentStatistics;
 import tud.ggpserver.scheduler.AbstractRoundRobinScheduler;
 import tud.ggpserver.scheduler.PlayerStatusListener;
@@ -143,7 +146,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				try {ps.close();} catch (SQLException e) {}
 		} 
 
-		logger.info("String, String - Creating new user: " + userName); //$NON-NLS-1$
+		logger.info("Creating new user: " + userName); //$NON-NLS-1$
 		return new User(userName, defaultRoleNames);
 	}
 
@@ -174,7 +177,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				return null;
 			}
 			
-			logger.info("String - Returning new User: " + userName); //$NON-NLS-1$
+			// logger.info("Returning new User: " + userName); //$NON-NLS-1$
 			result = new User(userName, roleNames);
 		} finally { 
 			if (con != null)
@@ -216,7 +219,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				try {ps.close();} catch (SQLException e) {}
 		} 
 
-		logger.info("String, String, int, User, String - Creating new RemotePlayerInfo: " + name); //$NON-NLS-1$
+		logger.info("Creating new RemotePlayerInfo: " + name); //$NON-NLS-1$
 		RemotePlayerInfo result = new RemotePlayerInfo(name, host, port, owner, status);
 		
 		notifyPlayerStatusListeners(result);
@@ -231,10 +234,10 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	
 	public PlayerInfo getPlayerInfo(String name) throws SQLException {
 		if (name.equals(PLAYER_LEGAL)) {
-			logger.info("String - Returning new LegalPlayerInfo"); //$NON-NLS-1$
+			// logger.info("Returning new LegalPlayerInfo"); //$NON-NLS-1$
 			return new LegalPlayerInfo(-1);
 		} else if (name.equals(PLAYER_RANDOM)) {
-			logger.info("String - Returning new RandomPlayerInfo"); //$NON-NLS-1$
+			// logger.info("Returning new RandomPlayerInfo"); //$NON-NLS-1$
 			return new RandomPlayerInfo(-1);
 		}
 		
@@ -251,7 +254,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			rs = ps.executeQuery();
 			
 			if (rs.next()) {
-				logger.info("String - Returning new RemotePlayerInfo: " + name); //$NON-NLS-1$
+				// logger.info("Returning new RemotePlayerInfo: " + name); //$NON-NLS-1$
 				result = new RemotePlayerInfo(name, rs.getString("host"), rs.getInt("port"), getUser(rs.getString("owner")), rs.getString("status"));
 			}
 		} finally { 
@@ -290,7 +293,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				try {ps.close();} catch (SQLException e) {}
 		} 
 
-		logger.info("String, String - Creating new game: " + name); //$NON-NLS-1$
+		logger.info("Creating new game: " + name); //$NON-NLS-1$
 		return new Game<TermType, ReasonerStateInfoType>(gameDescription, name, reasonerFactory, stylesheet, enabled);
 	}
 
@@ -311,7 +314,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				String stylesheet = rs.getString("stylesheet");
 				boolean enabled = rs.getBoolean("enabled");
 				
-				logger.info("String - Returning new game: " + name); //$NON-NLS-1$
+				// logger.info("Returning new game: " + name); //$NON-NLS-1$
 				result = new Game<TermType, ReasonerStateInfoType>(gameDescription, name, reasonerFactory, stylesheet, enabled);
 				
 			}
@@ -382,7 +385,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				try {ps.close();} catch (SQLException e) {}
 		}
 
-		logger.info("String, Game<TermType,ReasonerStateInfoType>, int, int, Map<? extends RoleInterface<TermType>,? extends PlayerInfo>, Date - Creating new match: " + matchID); //$NON-NLS-1$
+		logger.info("Creating new match: " + matchID); //$NON-NLS-1$
 		return new NewMatch<TermType, ReasonerStateInfoType>(matchID, game, startclock, playclock,
 				rolesToPlayerInfos, startTime, scrambled, tournament.getTournamentID(), weight, this);
 	}
@@ -517,7 +520,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				try {rs.close();} catch (SQLException e) {}
 		} 
 
-		logger.info("String - Returning new match: " + matchID); //$NON-NLS-1$
+		// logger.info("String - Returning new match: " + matchID); //$NON-NLS-1$
 		return result;
 	}
 	
@@ -1880,39 +1883,24 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	}
 
 	public GameStatistics<TermType, ReasonerStateInfoType> getGameStatistics(String gameName) throws SQLException {
+		Game<TermType, ReasonerStateInfoType> game = getGame(gameName);
+		HashMap<RoleInterface<TermType>, GamePlayerStatistics<TermType,ReasonerStateInfoType>> gamePlayerStatisticsPerRole = new HashMap<RoleInterface<TermType>, GamePlayerStatistics<TermType,ReasonerStateInfoType>>();
+		int roleIndex = 0;
+		for(RoleInterface<TermType> role:game.getOrderedRoles()){
+			gamePlayerStatisticsPerRole.put(role, getGamePlayerStatistics(game, roleIndex));
+			roleIndex++;
+		}
+		return new GameStatistics<TermType, ReasonerStateInfoType>(getGameRoleStatistics(game), getGamePlayerStatistics(game), gamePlayerStatisticsPerRole);
+	}
+
+	public GameRoleStatistics<TermType, ReasonerStateInfoType> getGameRoleStatistics(Game<TermType, ReasonerStateInfoType> game) throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
 		try {
 			
-			Game<TermType, ReasonerStateInfoType> game = getGame(gameName);
-			
-			Map<PlayerInfo, GameStatistics.PerformanceInformation> informationPerPlayer = new HashMap<PlayerInfo, GameStatistics.PerformanceInformation>();
-			ps = con.prepareStatement(
-					"SELECT" +
-					"	`match_players`.`player`," +
-					"	AVG( `match_players`.`goal_value` ) AS `avg`," +
-					"	STDDEV_POP( `match_players`.`goal_value` ) AS `std_dev`," +
-					"	COUNT( `match_players`.`goal_value` ) AS `count`" +
-					"FROM" +
-					"		`match_players`" +
-					"	INNER JOIN" +
-					"		`matches`" +
-					"	USING ( `match_id` )" +
-					"WHERE" +
-					"	NOT ISNULL( `match_players`.`goal_value` )" +
-					"	AND `matches`.`game` = ?" +
-					"GROUP BY" +
-					"	`match_players`.`player`");
-			ps.setString(1, gameName);
-			rs = ps.executeQuery();
-			while (rs.next()) {
-				PlayerInfo player = getPlayerInfo(rs.getString("player"));
-				informationPerPlayer.put(player, new GameStatistics.PerformanceInformation(rs.getInt("count"), rs.getDouble("avg"), rs.getDouble("std_dev")));
-			}
-
-			Map<RoleInterface<TermType>, GameStatistics.PerformanceInformation> informationPerRole = new HashMap<RoleInterface<TermType>, GameStatistics.PerformanceInformation>();
+			Map<RoleInterface<TermType>, PerformanceInformation> informationPerRole = new HashMap<RoleInterface<TermType>, PerformanceInformation>();
 			ps = con.prepareStatement(
 					"SELECT" +
 					"	`match_players`.`roleindex`," +
@@ -1929,13 +1917,70 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 					"	AND `matches`.`game` = ?" +
 					"GROUP BY" +
 					"	`match_players`.`roleindex`");
-			ps.setString(1, gameName);
+			ps.setString(1, game.getName());
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				informationPerRole.put(game.getRole(rs.getInt("roleindex")), new GameStatistics.PerformanceInformation(rs.getInt("count"), rs.getDouble("avg"), rs.getDouble("std_dev")));
+				informationPerRole.put(game.getRole(rs.getInt("roleindex")), new PerformanceInformation(rs.getInt("count"), rs.getDouble("avg"), rs.getDouble("std_dev")));
 			}
 
-			return new GameStatistics<TermType, ReasonerStateInfoType>(game, informationPerPlayer, informationPerRole);
+			return new GameRoleStatistics<TermType, ReasonerStateInfoType>(game, informationPerRole);
+		} finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+			if (rs != null)
+				try {rs.close();} catch (SQLException e) {}
+		} 
+	}
+
+	public GamePlayerStatistics<TermType, ReasonerStateInfoType> getGamePlayerStatistics(Game<TermType, ReasonerStateInfoType> game) throws SQLException {
+		return getGamePlayerStatistics(game, -1);
+	}
+
+	public GamePlayerStatistics<TermType, ReasonerStateInfoType> getGamePlayerStatistics(Game<TermType, ReasonerStateInfoType> game, int roleIndex) throws SQLException  {
+
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			
+			Map<PlayerInfo, PerformanceInformation> informationPerPlayer = new HashMap<PlayerInfo, PerformanceInformation>();
+			String roleSelector = "";
+			if (roleIndex>=0) {
+				roleSelector = " AND `match_players`.`roleindex` = ? ";
+			}
+			ps = con.prepareStatement(
+					"SELECT" +
+					"	`match_players`.`player`," +
+					"	AVG( `match_players`.`goal_value` ) AS `avg`," +
+					"	STDDEV_POP( `match_players`.`goal_value` ) AS `std_dev`," +
+					"	COUNT( `match_players`.`goal_value` ) AS `count`" +
+					"FROM" +
+					"		`match_players`" +
+					"	INNER JOIN" +
+					"		`matches`" +
+					"	USING ( `match_id` )" +
+					"WHERE" +
+					"	NOT ISNULL( `match_players`.`goal_value` )" +
+					"	AND `matches`.`game` = ?" +
+						roleSelector +
+					"GROUP BY" +
+					"	`match_players`.`player`");
+			ps.setString(1, game.getName());
+			if (roleIndex>=0) {
+				ps.setInt(2, roleIndex);
+			}
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				PlayerInfo player = getPlayerInfo(rs.getString("player"));
+				informationPerPlayer.put(player, new PerformanceInformation(rs.getInt("count"), rs.getDouble("avg"), rs.getDouble("std_dev")));
+			}
+			RoleInterface<TermType> role = null;
+			if(roleIndex>=0)
+				role = game.getRole(roleIndex);
+			return new GamePlayerStatistics<TermType, ReasonerStateInfoType>(game, role, informationPerPlayer);
 		} finally { 
 			if (con != null)
 				try {con.close();} catch (SQLException e) {}
@@ -2004,4 +2049,5 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				try {ps.close();} catch (SQLException e) {}
 		}
 	}
+
 }

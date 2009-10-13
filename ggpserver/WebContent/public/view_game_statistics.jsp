@@ -30,6 +30,8 @@
 	</c:catch>
 </jsp:useBean>
 
+<% viewGameStatistics.setSession(request.getSession()); %>
+
 <c:set var="title">Statistics for ${viewGameStatistics.gameName}</c:set>
 <jsp:directive.include file="/inc/header.jsp" />
 
@@ -42,7 +44,7 @@
 	</a>
 </h1>
 
-<c:set var="statistics" value="${viewGameStatistics.statistics}"/>
+<c:set var="roleStatistics" value="${viewGameStatistics.roleStatistics}"/>
 
 <h2>Statistics per role</h2>
 <table>
@@ -56,7 +58,7 @@
 		</tr>
 	</thead>
 	<tbody>
-      <c:forEach var="role" items="${statistics.orderedRoles}" varStatus="lineInfo">
+      <c:forEach var="role" items="${roleStatistics.orderedRoles}" varStatus="lineInfo">
       	 <c:choose>
 		   <c:when test="${lineInfo.count % 2 == 0}">
 		     <c:set var="rowClass" value="even" />
@@ -68,61 +70,75 @@
 	     <tr class="${rowClass}">
 			<td><c:out value="${lineInfo.count}"/></td>
 			<td><c:out value="${role}"/></td>
-			<td><c:out value="${statistics.informationPerRole[role].averageScore}"/></td>
-			<td><c:out value="${statistics.informationPerRole[role].standardDeviation}"/></td>
+			<td><c:out value="${roleStatistics.informationPerRole[role].averageScore}"/></td>
+			<td><c:out value="${roleStatistics.informationPerRole[role].standardDeviation}"/></td>
 			<c:if test="${lineInfo.count == 1}">
-				<td rowspan="${statistics.game.numberOfRoles}"><c:out value="${statistics.informationPerRole[role].numberOfMatches}"/></td>
+				<td rowspan="${roleStatistics.game.numberOfRoles}"><c:out value="${roleStatistics.informationPerRole[role].numberOfMatches}"/></td>
 			</c:if>
 		</tr>
       </c:forEach>
 	</tbody>
 </table>
 
-<h2>Statistics per player</h2>
-<table>
-	<thead>
-		<tr>
-			<th></th>
-			<th>player</th>
-			<th>average score</th>
-			<th>standard deviation</th>
-			<th>number of matches</th>
-			<th>actions</th>
-		</tr>
-	</thead>
-	<tbody>
-      <c:forEach var="player" items="${statistics.sortedPlayers}" varStatus="lineInfo">
-      	 <c:choose>
-		   <c:when test="${lineInfo.count % 2 == 0}">
-		     <c:set var="rowClass" value="even" />
-		   </c:when> 
-		   <c:otherwise>
-		     <c:set var="rowClass" value="odd" />
-		   </c:otherwise>
-		 </c:choose> 
-	     <tr class="${rowClass}">
-			<td><c:out value="${lineInfo.count}"/></td>
-			<td>
-				<c:url value="view_player.jsp" var="playerURL">
-					<c:param name="name" value="${player.name}"/>
-				</c:url>
-				<a href='<c:out value="${playerURL}"/>'>
-					<c:out value="${player.name}"/>
-				</a>
-			</td>
-			<td><c:out value="${statistics.informationPerPlayer[player].averageScore}"/></td>
-			<td><c:out value="${statistics.informationPerPlayer[player].standardDeviation}"/></td>
-			<td><c:out value="${statistics.informationPerPlayer[player].numberOfMatches}"/></td>
-			<td>
-				<c:url value="show_matches.jsp" var="matchesURL">
-					<c:param name="gameName" value="${viewGameStatistics.gameName}"/>
-					<c:param name="playerName" value="${player.name}"/>
-				</c:url>
-				<a href='<c:out value="${matchesURL}"/>'>show matches</a> 
-			</td>
-		</tr>
-      </c:forEach>
-	</tbody>
-</table>
+<c:forEach var="role" items="${viewGameStatistics.game.orderedRoles}" varStatus="roleInfo">
+	<h2>Player performance for role ${role}</h2>
+	<c:set var="playerStatistics" value="${viewGameStatistics.playerStatisticsPerRole[role]}"/>
+	<table>
+		<thead>
+			<tr>
+				<th></th>
+				<th>player</th>
+				<th>average score</th>
+				<th>standard deviation</th>
+				<th>number of matches</th>
+				<th>actions</th>
+			</tr>
+		</thead>
+		<tbody>
+	      <c:forEach var="player" items="${playerStatistics.sortedPlayers}" varStatus="lineInfo">
+	      	 <c:choose>
+			   <c:when test="${lineInfo.count % 2 == 0}">
+			     <c:set var="rowClass" value="even" />
+			   </c:when> 
+			   <c:otherwise>
+			     <c:set var="rowClass" value="odd" />
+			   </c:otherwise>
+			 </c:choose> 
+		     <tr class="${rowClass}">
+				<td><c:out value="${lineInfo.count}"/></td>
+				<td>
+					<c:url value="view_player.jsp" var="playerURL">
+						<c:param name="name" value="${player.name}"/>
+					</c:url>
+					<a href='<c:out value="${playerURL}"/>'>
+						<c:out value="${player.name}"/>
+					</a>
+				</td>
+				<td><c:out value="${playerStatistics.informationPerPlayer[player].averageScore}"/></td>
+				<td><c:out value="${playerStatistics.informationPerPlayer[player].standardDeviation}"/></td>
+				<td><c:out value="${playerStatistics.informationPerPlayer[player].numberOfMatches}"/></td>
+				<td>
+					<c:url value="show_matches.jsp" var="matchesURL">
+						<c:param name="gameName" value="${viewGameStatistics.gameName}"/>
+						<c:param name="playerName" value="${player.name}"/>
+					</c:url>
+					<a href='<c:out value="${matchesURL}"/>'>show matches</a> 
+				</td>
+			</tr>
+	      </c:forEach>
+		</tbody>
+	</table>
+	<!-- chart --> 
+	<c:set var="chartInfo" value="${viewGameStatistics.chartsForRoles[roleInfo.count - 1]}"/>
+	<c:url value="/servlet/GameStatisticsChartViewer" var="URL">
+		<c:param name="imageID" value="${chartInfo.imageID}"/>
+		<c:param name="gameName" value="${viewGameStatistics.gameName}"/>
+		<c:param name="roleIndex" value="${chartInfo.roleIndex}"/>
+	</c:url>
+	<img src="${URL}" usemap="#${chartInfo.imageMapID}">
+	${chartInfo.imageMap}
+	<br>
+	The chart shows the <a href="http://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average" target="_blank">exponential moving average</a> of the scores of each player with a smoothing factor of 0.1.
+</c:forEach>
 
 <jsp:directive.include file="/inc/footer.jsp" />
