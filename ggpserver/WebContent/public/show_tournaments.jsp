@@ -75,9 +75,7 @@
 	      </c:forEach>
 		</tbody>
 	</table>
-	<p>
-		Download the stylesheets for the exported xmls at our <a href="http://sourceforge.net/projects/ggpserver/files/">SourceForge project web page</a>.
-	</p>
+	<jsp:directive.include file="/inc/download_stylesheets_text.jsp" />
 
 <jsp:directive.include file="/inc/pager.jsp" />
 <jsp:directive.include file="/inc/footer.jsp" />

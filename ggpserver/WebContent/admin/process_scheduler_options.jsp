@@ -26,8 +26,12 @@
 		<jsp:setProperty name="adminPage" property="nextPlayedGameName"/>
 		<jsp:setProperty name="adminPage" property="startclockMin"/>
 		<jsp:setProperty name="adminPage" property="startclockMax"/>
+		<jsp:setProperty name="adminPage" property="startclockMean"/>
+		<jsp:setProperty name="adminPage" property="startclockStdDeviation"/>
 		<jsp:setProperty name="adminPage" property="playclockMin"/>
 		<jsp:setProperty name="adminPage" property="playclockMax"/>
+		<jsp:setProperty name="adminPage" property="playclockMean"/>
+		<jsp:setProperty name="adminPage" property="playclockStdDeviation"/>
 	</c:catch>
 </jsp:useBean>
 

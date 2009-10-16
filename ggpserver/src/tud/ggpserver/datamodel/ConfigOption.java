@@ -24,8 +24,12 @@ public enum ConfigOption {
 	NEXT_PLAYED_GAME ("next_played_game", null),
 	PLAY_CLOCK_MIN ("playclock_min", "5"),
 	PLAY_CLOCK_MAX ("playclock_max", "60"),
+	PLAY_CLOCK_MEAN ("playclock_mean", "30"),
+	PLAY_CLOCK_STD_DEVIATION ("playclock_std_dev", "15"),
 	START_CLOCK_MIN ("startclock_min", "30"),
-	START_CLOCK_MAX ("startclock_max", "600");
+	START_CLOCK_MAX ("startclock_max", "600"),
+	START_CLOCK_MEAN ("startclock_mean", "120"),
+	START_CLOCK_STD_DEVIATION ("startclock_std_dev", "60");
 
     private final String dBKey;
     private final String defaultValue;

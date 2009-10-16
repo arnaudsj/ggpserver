@@ -48,7 +48,7 @@ import cs227b.teamIago.util.GameState;
  *
  */
 public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> {
-	private static final long DELAY_BETWEEN_MATCHES = 2000;   // time between two matches with the same players
+	private static final long DELAY_BETWEEN_MATCHES = 5000;   // time between two matches with the same players
 	
 	private static final Logger logger = Logger.getLogger(MatchRunner.class.getName());
 

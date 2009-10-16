@@ -72,6 +72,7 @@
 					<c:if test="${viewTournament.tournament.numberOfMatches >= 1000}">
 						<span style="color:red;">Caution: This may take a long time and produce a big file!</span>
 					</c:if>
+					<jsp:directive.include file="/inc/download_stylesheets_text.jsp" />
 				</td>
 			</tr>
 		</tbody>

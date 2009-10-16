@@ -168,17 +168,25 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 			startclock = 5;
 		} else {
 			int playclockMin = getPlayClockMin();
-			int playclockMax = getPlayClockMax();
 			int startclockMin = getStartClockMin();
-			int startclockMax = getStartClockMax();
 			
-			// pick playclock as a multiple of 5 somewhere between playclockMin and playclockMax
-			playclock =  playclockMin + 5 * random.nextInt( ( playclockMax - playclockMin) / 5 + 1 );
-			// ((int) (random.nextDouble() * 12 + 1)) * 5;
+			// pick playclock as a multiple of 5 somewhere between playclockMin and playclockMax distributed according to a logistic distribution
+			playclock = 
+						Math.min(
+							playclockMin + 5 * (int)Math.round(
+								logisticDistributionQuantile(random.nextDouble(), (getPlayClockMean() - playclockMin) / 5.0, getPlayClockStdDeviation() / 5.0)),
+							getPlayClockMax()
+							);
+			// playclock =  playclockMin + 5 * random.nextInt( ( playclockMax - playclockMin) / 5 + 1 );
 			
 			// the same for startclock
-			startclock =  startclockMin + 5 * random.nextInt( ( startclockMax - startclockMin) / 5 + 1 );
-			// startclock = 6 * playclock;
+			startclock = 
+				Math.min(
+					startclockMin + 5 * (int)Math.round(
+						logisticDistributionQuantile(random.nextDouble(), (getStartClockMean() - startclockMin) / 5.0, getStartClockStdDeviation() / 5.0)),
+					getStartClockMax()
+					);
+			// startclock =  startclockMin + 5 * random.nextInt( ( startclockMax - startclockMin) / 5 + 1 );
 		}
 		
 		List<NewMatch<TermType, ReasonerStateInfoType>> result = new LinkedList<NewMatch<TermType,ReasonerStateInfoType>>();
@@ -213,6 +221,10 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		return result;
 	}
 
+	private double logisticDistributionQuantile(double probability, double mean, double stdDeviation) {
+		return mean + Math.sqrt(3) * stdDeviation / Math.PI * Math.log(probability / (1 - probability));
+	}
+
 	private int getIntOption(ConfigOption option) throws SQLException {
 		String s = db.getConfigOption(option);
 		try {
@@ -231,6 +243,14 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		return getIntOption(ConfigOption.START_CLOCK_MIN);
 	}
 
+	private int getStartClockMean() throws SQLException {
+		return getIntOption(ConfigOption.START_CLOCK_MEAN);
+	}
+
+	private int getStartClockStdDeviation() throws SQLException {
+		return getIntOption(ConfigOption.START_CLOCK_STD_DEVIATION);
+	}
+
 	private int getPlayClockMax() throws SQLException {
 		return getIntOption(ConfigOption.PLAY_CLOCK_MAX);
 	}
@@ -239,6 +259,15 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		return getIntOption(ConfigOption.PLAY_CLOCK_MIN);
 	}
 
+	private int getPlayClockMean() throws SQLException {
+		return getIntOption(ConfigOption.PLAY_CLOCK_MEAN);
+	}
+
+	private int getPlayClockStdDeviation() throws SQLException {
+		return getIntOption(ConfigOption.PLAY_CLOCK_STD_DEVIATION);
+	}
+
+	
 	private List<Map<RoleInterface<TermType>, PlayerInfo>> createPlayerInfos(Game<TermType, ReasonerStateInfoType> game, Collection<? extends PlayerInfo> players) {
 		List<PlayerInfo> allPlayerInfos = new LinkedList<PlayerInfo>(players);
 		int numberOfRoles = game.getNumberOfRoles();

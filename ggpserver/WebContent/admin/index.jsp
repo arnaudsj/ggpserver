@@ -91,7 +91,9 @@
 			</td>
 			<td>
 				[ <input type="text" name="startclockMin" size="3" value="${adminPage.startclockMin}" maxlength="3"> s,  
-				<input type="text" name="startclockMax" size="3" value="${adminPage.startclockMax}" maxlength="3"> s ]
+				<input type="text" name="startclockMax" size="3" value="${adminPage.startclockMax}" maxlength="3"> s ],
+				mean: <input type="text" name="startclockMean" size="3" value="${adminPage.startclockMean}" maxlength="3">
+				std. deviation: <input type="text" name="startclockStdDeviation" size="3" value="${adminPage.startclockStdDeviation}" maxlength="3">
 			</td>
 		</tr>
 		<tr>
@@ -100,7 +102,9 @@
 			</td>
 			<td>
 				[ <input type="text" name="playclockMin" size="3" value="${adminPage.playclockMin}" maxlength="3"> s,  
-				<input type="text" name="playclockMax" size="3" value="${adminPage.playclockMax}" maxlength="3"> s ]
+				<input type="text" name="playclockMax" size="3" value="${adminPage.playclockMax}" maxlength="3"> s ],
+				mean: <input type="text" name="playclockMean" size="3" value="${adminPage.playclockMean}" maxlength="3">
+				std. deviation: <input type="text" name="playclockStdDeviation" size="3" value="${adminPage.playclockStdDeviation}" maxlength="3">
 			</td>
 		</tr>
 		<tr>

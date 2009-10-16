@@ -79,6 +79,14 @@ public class AdminPage {
 		return getDBConnector().getConfigOption(ConfigOption.START_CLOCK_MAX);
 	}
 
+	public String getStartclockMean() throws SQLException {
+		return getDBConnector().getConfigOption(ConfigOption.START_CLOCK_MEAN);
+	}
+
+	public String getStartclockStdDeviation() throws SQLException {
+		return getDBConnector().getConfigOption(ConfigOption.START_CLOCK_STD_DEVIATION);
+	}
+
 	public String getPlayclockMin() throws SQLException {
 		return getDBConnector().getConfigOption(ConfigOption.PLAY_CLOCK_MIN);
 	}
@@ -87,29 +95,53 @@ public class AdminPage {
 		return getDBConnector().getConfigOption(ConfigOption.PLAY_CLOCK_MAX);
 	}
 
+	public String getPlayclockMean() throws SQLException {
+		return getDBConnector().getConfigOption(ConfigOption.PLAY_CLOCK_MEAN);
+	}
+
+	public String getPlayclockStdDeviation() throws SQLException {
+		return getDBConnector().getConfigOption(ConfigOption.PLAY_CLOCK_STD_DEVIATION);
+	}
+
 	public void setStartclockMin(String s) throws SQLException {
-		setClockOption(ConfigOption.START_CLOCK_MIN, s);
+		setClockOption(ConfigOption.START_CLOCK_MIN, s, 5);
 	}
 
 	public void setStartclockMax(String s) throws SQLException {
-		setClockOption(ConfigOption.START_CLOCK_MAX, s);
+		setClockOption(ConfigOption.START_CLOCK_MAX, s, 5);
+	}
+
+	public void setStartclockMean(String s) throws SQLException {
+		setClockOption(ConfigOption.START_CLOCK_MEAN, s, 1);
+	}
+
+	public void setStartclockStdDeviation(String s) throws SQLException {
+		setClockOption(ConfigOption.START_CLOCK_STD_DEVIATION, s, 1);
 	}
 
 	public void setPlayclockMin(String s) throws SQLException {
-		setClockOption(ConfigOption.PLAY_CLOCK_MIN, s);
+		setClockOption(ConfigOption.PLAY_CLOCK_MIN, s, 5);
 	}
 
 	public void setPlayclockMax(String s) throws SQLException {
-		setClockOption(ConfigOption.PLAY_CLOCK_MAX, s);
+		setClockOption(ConfigOption.PLAY_CLOCK_MAX, s, 5);
 	}
 
-	private void setClockOption(ConfigOption option, String s) throws SQLException {
+	public void setPlayclockMean(String s) throws SQLException {
+		setClockOption(ConfigOption.PLAY_CLOCK_MEAN, s, 1);
+	}
+
+	public void setPlayclockStdDeviation(String s) throws SQLException {
+		setClockOption(ConfigOption.PLAY_CLOCK_STD_DEVIATION, s, 1);
+	}
+
+	private void setClockOption(ConfigOption option, String s, long multipleOf) throws SQLException {
 		try {
 			int i=Integer.parseInt(s);
-			if( i > 0 && (i % 5 == 0) ) {
+			if( i > 0 && (i % multipleOf == 0) ) {
 				getDBConnector().setConfigOption(option, Integer.toString(i));
 			}else{
-				logger.warning("wrong value for "+option+": " + i + " is out of range or not a multiple of 5");
+				logger.warning("wrong value for "+option+": " + i + " is out of range or not a multiple of " + multipleOf);
 			}
 		} catch (NumberFormatException e) {
 			logger.warning("NumberFormatException while parsing config option " + option + ":" + e.getMessage());

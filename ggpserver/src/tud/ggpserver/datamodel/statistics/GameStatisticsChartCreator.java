@@ -27,12 +27,12 @@ import java.io.UnsupportedEncodingException;
 import java.lang.ref.SoftReference;
 import java.net.URLEncoder;
 import java.sql.SQLException;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
@@ -47,8 +47,16 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.time.Day;
+import org.jfree.data.time.Hour;
+import org.jfree.data.time.Minute;
+import org.jfree.data.time.Month;
+import org.jfree.data.time.Quarter;
+import org.jfree.data.time.RegularTimePeriod;
+import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
+import org.jfree.data.time.Week;
+import org.jfree.data.time.Year;
 
 import tud.gamecontroller.game.RoleInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
@@ -60,15 +68,35 @@ import com.keypoint.PngEncoder;
 
 public class GameStatisticsChartCreator {
 
-	private class RunningAverage {
+	public static class Pair<T1, T2> {
+		private T1 left;
+		private T2 right;
+
+		public Pair(T1 a, T2 b) {
+			this.left = a;
+			this.right = b;
+		}
+		
+		public T1 getLeft() {
+			return left;
+		}
+
+		public T2 getRight() {
+			return right;
+		}
+	}
+
+	private static class RunningAverage {
 				
 		private static final double MIN_LEARNING_RATE = 0.1;
 		private double average;
 		private long count;
+		private long countSinceLastReset;
 		
 		public RunningAverage() {
 			this.average = 0;
 			this.count = 0;
+			this.countSinceLastReset = 0;
 		}
 
 		public RunningAverage(double initialValue) {
@@ -80,6 +108,7 @@ public class GameStatisticsChartCreator {
 			double learningRate = getLearningRate();
 			average = average  * (1 - learningRate) + value * learningRate;
 			count++;
+			countSinceLastReset++;
 		}
 		
 		private double getLearningRate() {
@@ -88,6 +117,22 @@ public class GameStatisticsChartCreator {
 
 		public double getAverage() {
 			return average;
+		}
+
+		public long getCountSinceLastReset() {
+			return countSinceLastReset;
+		}
+
+		public void resetCount() {
+			countSinceLastReset = 0;
+		}
+
+		public long getCount() {
+			return count;
+		}
+
+		public void ageing() {
+			countSinceLastReset*=2;
 		}
 
 	}
@@ -151,7 +196,9 @@ public class GameStatisticsChartCreator {
 //				chartTitle += " in " + tournamentID;
 
 			// make the chart
-			List<? extends ServerMatch<?, ?>> matches = db.getMatches(0, Integer.MAX_VALUE, null, game.getName(), tournamentID, true);
+			String gameName = ( game!=null ? game.getName() : null);
+			
+			List<? extends ServerMatch<?, ?>> matches = db.getMatches(0, Integer.MAX_VALUE, null, gameName, tournamentID, true);
 			
 			Collection<? extends RoleInterface<?>> roles = null;
 			if (role != null) {
@@ -159,7 +206,7 @@ public class GameStatisticsChartCreator {
 			}else if (game!=null) {
 				roles = game.getOrderedRoles();
 			}
-			chart = makeChart(db, matches, chartTitle, roles);
+			chart = makeChart(matches, chartTitle, roles);
 			
 			// save chart
 			session.setAttribute("gameStatisticsChart_"+imageID, new SoftReference<JFreeChart>(chart));
@@ -209,45 +256,35 @@ public class GameStatisticsChartCreator {
 		return chart;
 	}
 
-	private JFreeChart makeChart(AbstractDBConnector<?, ?> db, List<? extends ServerMatch<?, ?>> matches, String title, Collection<? extends RoleInterface<?>> roles) throws SQLException {
+	private JFreeChart makeChart(List<? extends ServerMatch<?, ?>> matches, String title, Collection<? extends RoleInterface<?>> roles) throws SQLException {
+		// decide which time period to use
+		Class<? extends RegularTimePeriod> timePeriodClass = getTimePeriodClass(matches);
+
 		// setup chart
 		TimeSeriesCollection dataset = new TimeSeriesCollection();
-		JFreeChart chart = ChartFactory.createTimeSeriesChart(title, "Date", "Score", dataset, true, true, false);
+		JFreeChart chart = ChartFactory.createTimeSeriesChart(title, timePeriodClass.getSimpleName(), "Score", dataset, true, true, false);
 		XYPlot plot = (XYPlot)chart.getPlot();
 		((XYLineAndShapeRenderer)plot.getRenderer()).setBaseShapesVisible(true);
 		// plot.getDomainAxis().setLabelAngle(45/360*Math.PI); //.setCategoryLabelPositions(CategoryLabelPositions.DOWN_45);
 		// plot.getDomainAxis().setMaximumCategoryLabelLines(3);
 		// ((NumberAxis)plot.getRangeAxis()).setAutoRangeIncludesZero(false);
 
-		Calendar startOfNextPeriod = null, startOfPeriod = null;
+		
+		RegularTimePeriod currentPeriod = null;
 		playerScores = new HashMap<String, RunningAverage>();
-		Map<String, RunningAverage> oldPlayerScores = new HashMap<String, RunningAverage>();
 		
 		// fill in data
-		
 		for(ServerMatch<?, ?> match:matches){
-			Calendar matchDate=Calendar.getInstance();
-			matchDate.setTime(match.getStartTime());
-			if(startOfPeriod == null || matchDate.compareTo(startOfNextPeriod) >= 0) {
-				logger.info("new period:" + matchDate);
-				if (startOfPeriod != null) {
-					addData(dataset, startOfPeriod);
-					for(Entry<String, RunningAverage> entry:playerScores.entrySet()) {
-						oldPlayerScores.put(entry.getKey(), entry.getValue());
+			if(isGoodMatch(match)) {
+				RegularTimePeriod matchPeriod = RegularTimePeriod.createInstance(timePeriodClass, match.getStartTime(), TimeZone.getDefault());
+				if(currentPeriod == null || !matchPeriod.equals(currentPeriod)) {
+					// logger.info("new period:" + matchDate);
+					if (currentPeriod != null) {
+						addData(dataset, currentPeriod, false);
 					}
-					playerScores.clear();
+					currentPeriod = matchPeriod;
 				}
-				startOfPeriod = (Calendar)matchDate.clone();
-				// a period is one day -> set time of day to 0
-				startOfPeriod.set(Calendar.HOUR, 0);
-				startOfPeriod.set(Calendar.MINUTE, 0);
-				startOfPeriod.set(Calendar.SECOND, 0);
-				startOfPeriod.set(Calendar.MILLISECOND, 0);
-				startOfNextPeriod = (Calendar)startOfPeriod.clone();
-				startOfNextPeriod.add(Calendar.DAY_OF_YEAR, 1);
-			}
-			if(match.getGoalValues()!=null){
-				logger.info("add goal values of match: " + match.getMatchID());
+				// logger.info("add goal values of match: " + match.getMatchID());
 				Collection<? extends RoleInterface<?>> roles1;
 				if(roles == null) {
 					roles1 = match.getGame().getOrderedRoles();
@@ -261,10 +298,7 @@ public class GameStatisticsChartCreator {
 					String playerName = match.getPlayerInfo(role).getName(); 
 					RunningAverage runningAverage = playerScores.get(playerName);
 					if(runningAverage == null){
-						runningAverage = oldPlayerScores.get(playerName);
-						if(runningAverage == null) {
-							runningAverage = new RunningAverage();
-						}
+						runningAverage = new RunningAverage();
 						playerScores.put(playerName, runningAverage);
 					}
 					runningAverage.addValue(match.getGoalValues().get(role).doubleValue());
@@ -272,20 +306,93 @@ public class GameStatisticsChartCreator {
 			}
 		}
 
-		addData(dataset, startOfPeriod);
+		if( currentPeriod != null) // otherwise there is no data
+			addData(dataset, currentPeriod, true);
 		
 		return chart;
 	}
 
-	private void addData(TimeSeriesCollection dataset, Calendar startOfPeriod) {
-		logger.info("add point to graph:" + startOfPeriod);
-		for(Entry<String, RunningAverage> playerScore:playerScores.entrySet()){
-			TimeSeries series = dataset.getSeries(playerScore.getKey());
-			if (series == null) {
-				series = new TimeSeries(playerScore.getKey());
-				dataset.addSeries(series);
+	@SuppressWarnings("unchecked")
+	private Class<? extends RegularTimePeriod> getTimePeriodClass(List<? extends ServerMatch<?, ?>> matches) {
+		// the maximal number of periods we could get is minNbOfPeriods * max(sizeOfTimePeriod, sizeOfNextSmallerTimePeriod)
+		// that means we want to keep the steps between the different periods small such that the number of periods is relatively stable
+		if ( matches.size() >= 2 ) {
+			long idealNbOfPeriods = 40;
+			long timespan = matches.get(matches.size()-1).getStartTime().getTime() - matches.get(0).getStartTime().getTime();
+			
+			long timePeriods[] = {
+					1000L*60*60*24*365,
+					1000L*60*60*24*30*4,
+					1000L*60*60*24*30,
+					1000L*60*60*24*7,
+					1000L*60*60*24,
+					1000L*60*60,
+					1000L*60,
+					1000L
+				};
+			Class[] timePeriodClasses = {
+					Year.class,
+					Quarter.class,
+					Month.class,
+					Week.class,
+					Day.class,
+					Hour.class,
+					Minute.class,
+					Second.class
+					}; 
+
+			double bestDiffToIdealNb = Double.POSITIVE_INFINITY;
+			int i;
+			for(i=0; i<timePeriods.length; i++) {
+				double diffToIdealNb = ((double)timespan)/timePeriods[i] - idealNbOfPeriods;
+				if( diffToIdealNb<0 ) { // less then the ideal number
+					diffToIdealNb = ((double)diffToIdealNb)*diffToIdealNb/(idealNbOfPeriods/4.0);
+				}
+				if (diffToIdealNb>bestDiffToIdealNb) {
+					break;
+				}else{
+					bestDiffToIdealNb = diffToIdealNb;
+				}
 			}
-			series.add(new Day(startOfPeriod.getTime()), playerScore.getValue().getAverage());
+			return timePeriodClasses[i-1];
+		} else {
+			return Second.class;
+		}
+	}
+
+	private boolean isGoodMatch(ServerMatch<?, ?> match) {
+		if(match.getGoalValues()==null)
+			return false;
+		// TODO: filtering out matches with illegal moves is a good idea, but we have to do it in the tables in view_game_statitics.jsp as well
+//		for(List<GameControllerErrorMessage> errorMessages:match.getErrorMessages()) {
+//			for(GameControllerErrorMessage msg:errorMessages){
+//				if(GameControllerErrorMessage.ILLEGAL_MOVE.equals(msg.getType())) {
+//					return false;
+//				}
+//			}
+//		}
+		return true;
+	}
+
+	private void addData(TimeSeriesCollection dataset, RegularTimePeriod timePeriod, boolean finalPeriod) {
+		// logger.info("add points to graph:" + startOfPeriod);
+		for(Entry<String, RunningAverage> playerScore:playerScores.entrySet()){
+			RunningAverage runningAverage = playerScore.getValue();
+			// only show players with at least 1 match in the last period and with at least 10 matches in total
+			if( runningAverage.getCount() >= 10 ) {
+				if( finalPeriod && runningAverage.getCountSinceLastReset() >= 1 || runningAverage.getCountSinceLastReset() >= 5 ) {
+					TimeSeries series = dataset.getSeries(playerScore.getKey());
+					if (series == null) {
+						series = new TimeSeries(playerScore.getKey());
+						dataset.addSeries(series);
+					}
+					series.add(timePeriod, runningAverage.getAverage());
+					// TODO: change tooltips by adding a CustomXYToolTipGenerator for each series to plot.getRenderer()
+					runningAverage.resetCount();
+				} else {
+					runningAverage.ageing();
+				}
+			}
 		}
 	}
 
