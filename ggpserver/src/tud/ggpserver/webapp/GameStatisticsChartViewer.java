@@ -53,9 +53,13 @@ public class GameStatisticsChartViewer extends HttpServlet {
 			String tournamentID = request.getParameter("tournamentID");
 			String gameName = request.getParameter("gameName");
 			String roleIndexString = request.getParameter("roleIndex");
+			String minMatchNumberString = request.getParameter("minMatchNumber");
+			String smoothingFactorString = request.getParameter("smoothingFactor");
 			RoleInterface<?> role = null;
 			Game<?,?> game = null;
 			int roleIndex = -1;
+			long minMatchNumber = 0;
+			double smoothingFactor = 0.1;
 			if(gameName != null) {
 				game = db.getGame(gameName);
 				if (game == null) {
@@ -75,8 +79,28 @@ public class GameStatisticsChartViewer extends HttpServlet {
 				}
 				role = game.getOrderedRoles().get(roleIndex);
 			}
+			if(minMatchNumberString != null) {
+				try {
+					minMatchNumber = Long.parseLong(minMatchNumberString);
+				} catch(NumberFormatException e) {
+					throw new ServletException("minMatchNumber must be an integer", e);
+				}
+				if(minMatchNumber <= 0) {
+					throw new ServletException("minMatchNumber must be positive");
+				}
+			}
+			if(smoothingFactorString != null) {
+				try {
+					smoothingFactor = Double.parseDouble(smoothingFactorString);
+				} catch(NumberFormatException e) {
+					throw new ServletException("smoothingFactor must be an float", e);
+				}
+				if(smoothingFactor <= 0 || smoothingFactor>1) {
+					throw new ServletException("smoothingFactor must be >0 and <=1");
+				}
+			}
 			// make chart and send image
-			GameStatisticsChartCreator chartCreator = new GameStatisticsChartCreator(request.getSession(), imageID, tournamentID, game, role);
+			GameStatisticsChartCreator chartCreator = new GameStatisticsChartCreator(request.getSession(), imageID, tournamentID, game, role, minMatchNumber, smoothingFactor);
 			chartCreator.sendImage(request, response);
 		} catch (SQLException e) {
 			e.printStackTrace(response.getWriter());

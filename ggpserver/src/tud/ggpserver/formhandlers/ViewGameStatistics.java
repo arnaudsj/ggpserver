@@ -96,7 +96,7 @@ public class ViewGameStatistics {
 	}
 	
 	private ImageInfo getChart(int roleIndex, RoleInterface<?> role) throws SQLException, UnsupportedEncodingException, IOException {
-		GameStatisticsChartCreator chartCreator = new GameStatisticsChartCreator(session, getGame(), role);
+		GameStatisticsChartCreator chartCreator = new GameStatisticsChartCreator(session, getGame(), role, 10);
 		return new ImageInfo(chartCreator.getImageID(), chartCreator.getImageMap(), chartCreator.getImageMapID(), roleIndex);
 	}
 

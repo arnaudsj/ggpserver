@@ -19,6 +19,7 @@
 
 package tud.ggpserver.datamodel.statistics;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -88,20 +89,20 @@ public class GameStatisticsChartCreator {
 
 	private static class RunningAverage {
 				
-		private static final double MIN_LEARNING_RATE = 0.1;
 		private double average;
 		private long count;
 		private long countSinceLastReset;
+		private double minLearingRate;
 		
 		public RunningAverage() {
+			this(0.1); // default minimal learning rate is 0.1
+		}
+
+		public RunningAverage(double minLearingRate) {
 			this.average = 0;
 			this.count = 0;
 			this.countSinceLastReset = 0;
-		}
-
-		public RunningAverage(double initialValue) {
-			this.average = initialValue;
-			this.count = 1;
+			this.minLearingRate = minLearingRate;
 		}
 
 		public void addValue(double value) {
@@ -112,7 +113,7 @@ public class GameStatisticsChartCreator {
 		}
 		
 		private double getLearningRate() {
-			return Math.max(MIN_LEARNING_RATE, 1.0/(1+count));
+			return Math.max(minLearingRate, 1.0/(1+count));
 		}
 
 		public double getAverage() {
@@ -147,16 +148,20 @@ public class GameStatisticsChartCreator {
 	private ChartRenderingInfo chartRenderingInfo = null;
 	private BufferedImage chartImage = null;
 	private Map<String, RunningAverage> playerScores = null;
+	private long minNumberOfMatchesForShowingPlayer;
+	private double smoothingFactor;
 
-	public GameStatisticsChartCreator(HttpSession session, Game<?,?> game, RoleInterface<?> role) {
-		this(session, null, null, game, role);
+	public GameStatisticsChartCreator(HttpSession session, Game<?,?> game, RoleInterface<?> role, long minNumberOfMatchesForShowingPlayer) {
+		this(session, null, null, game, role, minNumberOfMatchesForShowingPlayer, 0.1);
 	}
 
-	public GameStatisticsChartCreator(HttpSession session, String imageID, String tournamentID, Game<?,?> game, RoleInterface<?> role) {
+	public GameStatisticsChartCreator(HttpSession session, String imageID, String tournamentID, Game<?,?> game, RoleInterface<?> role, long minNumberOfMatchesForShowingPlayer, double smoothingFactor) {
 		this.session = session;
 		this.tournamentID = tournamentID;
 		this.game = game;
 		this.role = role;
+		this.minNumberOfMatchesForShowingPlayer = minNumberOfMatchesForShowingPlayer;
+		this.smoothingFactor = smoothingFactor;
 
 		if(imageID != null) {
 			this.imageID = imageID;
@@ -176,6 +181,10 @@ public class GameStatisticsChartCreator {
 			sb.append("_g:").append(game.getName());
 		if(role!=null)
 			sb.append("_r:").append(role.getKIFForm().toLowerCase());
+		if(minNumberOfMatchesForShowingPlayer!=0)
+			sb.append("_m:").append(minNumberOfMatchesForShowingPlayer);
+		if(smoothingFactor!=0.1)
+			sb.append("_sF:").append(smoothingFactor);
 		sb.append("_").append(System.currentTimeMillis() % (1000*60*60)); // the chart is good for one hour
 		// TODO: really cache the chart for some period starting at the current time 
 		return sb.toString();
@@ -268,8 +277,10 @@ public class GameStatisticsChartCreator {
 		// plot.getDomainAxis().setLabelAngle(45/360*Math.PI); //.setCategoryLabelPositions(CategoryLabelPositions.DOWN_45);
 		// plot.getDomainAxis().setMaximumCategoryLabelLines(3);
 		// ((NumberAxis)plot.getRangeAxis()).setAutoRangeIncludesZero(false);
-
-		
+		chart.getPlot().setBackgroundPaint(Color.WHITE);
+		chart.getPlot().setOutlinePaint(Color.DARK_GRAY);
+		((XYPlot)chart.getPlot()).setDomainGridlinePaint(Color.DARK_GRAY);
+		((XYPlot)chart.getPlot()).setRangeGridlinePaint(Color.DARK_GRAY);
 		RegularTimePeriod currentPeriod = null;
 		playerScores = new HashMap<String, RunningAverage>();
 		
@@ -298,7 +309,7 @@ public class GameStatisticsChartCreator {
 					String playerName = match.getPlayerInfo(role).getName(); 
 					RunningAverage runningAverage = playerScores.get(playerName);
 					if(runningAverage == null){
-						runningAverage = new RunningAverage();
+						runningAverage = new RunningAverage(smoothingFactor);
 						playerScores.put(playerName, runningAverage);
 					}
 					runningAverage.addValue(match.getGoalValues().get(role).doubleValue());
@@ -376,11 +387,18 @@ public class GameStatisticsChartCreator {
 
 	private void addData(TimeSeriesCollection dataset, RegularTimePeriod timePeriod, boolean finalPeriod) {
 		// logger.info("add points to graph:" + startOfPeriod);
+
+		// minCountSinceLastReset is the number and age of matches needed to create a new point in the chart
+		// - should be 1 <= minCountSinceLastReset <= minNumberOfMatchesForShowingPlayer
+		// - is used for additional smoothing of the chart and for decluttering (i.e., to have less data points in the graph)
+		// - maximum is 5 at the moment, that means there is a data point if there are at least 5 matches in this period, 1 match 2 periods ago (because of aging),
+		// or 2 matches 1 period ago, ... 
+		long minCountSinceLastReset = Math.max(Math.min(minNumberOfMatchesForShowingPlayer / 2, 5), 1);
 		for(Entry<String, RunningAverage> playerScore:playerScores.entrySet()){
 			RunningAverage runningAverage = playerScore.getValue();
 			// only show players with at least 1 match in the last period and with at least 10 matches in total
-			if( runningAverage.getCount() >= 10 ) {
-				if( finalPeriod && runningAverage.getCountSinceLastReset() >= 1 || runningAverage.getCountSinceLastReset() >= 5 ) {
+			if( runningAverage.getCount() >= minNumberOfMatchesForShowingPlayer ) {
+				if( finalPeriod && runningAverage.getCountSinceLastReset() >= 1 || runningAverage.getCountSinceLastReset() >= minCountSinceLastReset ) {
 					TimeSeries series = dataset.getSeries(playerScore.getKey());
 					if (series == null) {
 						series = new TimeSeries(playerScore.getKey());
