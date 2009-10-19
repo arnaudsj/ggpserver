@@ -336,11 +336,11 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			int startclock,
 			int playclock,
 			Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayerInfos,
-			Tournament<TermType, ReasonerStateInfoType> tournament,
+			String tournamentID,
 			Date startTime, 
 			boolean scrambled, double weight) throws DuplicateInstanceException, SQLException {
 
-		if (matchID == null ||  game == null || startclock <= 0 || playclock <=0 || rolesToPlayerInfos == null || tournament == null || startTime == null || game.getNumberOfRoles() != rolesToPlayerInfos.size()) {
+		if (matchID == null ||  game == null || startclock <= 0 || playclock <=0 || rolesToPlayerInfos == null || tournamentID == null || startTime == null || game.getNumberOfRoles() != rolesToPlayerInfos.size()) {
 			throw new IllegalArgumentException();
 		}
 		
@@ -354,7 +354,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			ps.setInt(3, startclock);
 			ps.setInt(4, playclock);
 			ps.setTimestamp(5, new Timestamp(startTime.getTime()));
-			ps.setString(6, tournament.getTournamentID());
+			ps.setString(6, tournamentID);
 			ps.setBoolean(7, scrambled);
 			ps.setDouble(8, weight);
 			
@@ -387,7 +387,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 
 		logger.info("Creating new match: " + matchID); //$NON-NLS-1$
 		return new NewMatch<TermType, ReasonerStateInfoType>(matchID, game, startclock, playclock,
-				rolesToPlayerInfos, startTime, scrambled, tournament.getTournamentID(), weight, this);
+				rolesToPlayerInfos, startTime, scrambled, tournamentID, weight, this);
 	}
 	
 	/**
@@ -395,7 +395,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	 */
 	public NewMatch<TermType, ReasonerStateInfoType> createMatch(GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game,
 			int startclock, int playclock, Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayerInfos,
-			Tournament<TermType, ReasonerStateInfoType> tournament, Date startTime, boolean scrambled, double weight) throws SQLException {
+			String tournamentID, Date startTime, boolean scrambled, double weight) throws SQLException {
 		
 		long number = System.currentTimeMillis();
 		NewMatch<TermType, ReasonerStateInfoType> match = null;
@@ -403,8 +403,9 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		while (match == null) {
 			String matchID = generateMatchID(game, Long.toString(number));
 			try {
-				match = createMatch(matchID, game, startclock, playclock, rolesToPlayerInfos, tournament, startTime, scrambled, weight);
+				match = createMatch(matchID, game, startclock, playclock, rolesToPlayerInfos, tournamentID, startTime, scrambled, weight);
 			} catch (DuplicateInstanceException e) {
+				logger.info("duplicate MatchID: " + matchID + " -> creating new one");
 				number++;
 			}
 		}
@@ -417,8 +418,8 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	 */
 	public NewMatch<TermType, ReasonerStateInfoType> createMatch(GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game,
 			int startclock, int playclock, Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayerInfos, 
-			Tournament<TermType, ReasonerStateInfoType> tournament, boolean scrambled, double weight) throws SQLException {
-		return createMatch(game, startclock, playclock, rolesToPlayerInfos, tournament, new Date(), scrambled, weight);
+			String tournamentID, boolean scrambled, double weight) throws SQLException {
+		return createMatch(game, startclock, playclock, rolesToPlayerInfos, tournamentID, new Date(), scrambled, weight);
 	}
 
 	/**
@@ -426,8 +427,8 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	 */
 	public NewMatch<TermType, ReasonerStateInfoType> createMatch(GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game,
 			int startclock, int playclock, Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayerInfos, 
-			Tournament<TermType, ReasonerStateInfoType> tournament) throws SQLException {
-		return createMatch(game, startclock, playclock, rolesToPlayerInfos, tournament, new Date(), false, 1.0);
+			String tournamentID) throws SQLException {
+		return createMatch(game, startclock, playclock, rolesToPlayerInfos, tournamentID, new Date(), false, 1.0);
 	}
 
 	public ServerMatch<TermType, ReasonerStateInfoType> getMatch(String matchID)

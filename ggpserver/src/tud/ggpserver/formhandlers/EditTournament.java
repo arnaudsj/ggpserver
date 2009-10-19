@@ -141,7 +141,7 @@ public class EditTournament extends ShowMatches {
 		}
 		
 		db.createMatch(game, Tournament.DEFAULT_STARTCLOCK,
-				Tournament.DEFAULT_PLAYCLOCK, rolesToPlayerInfos, tournament);
+				Tournament.DEFAULT_PLAYCLOCK, rolesToPlayerInfos, tournament.getTournamentID());
 
 		correctlyPerformed = true;
 	}
@@ -168,7 +168,7 @@ public class EditTournament extends ShowMatches {
 	@SuppressWarnings("unchecked")
 	private void cloneMatch(ServerMatch match) throws SQLException {
 		db.createMatch(match.getGame(), match.getStartclock(), match.getPlayclock(), 
-				match.getRolesToPlayerInfos(), tournament, match.isScrambled(), match.getWeight());
+				match.getRolesToPlayerInfos(), tournament.getTournamentID(), match.isScrambled(), match.getWeight());
 		correctlyPerformed = true;
 	}
 

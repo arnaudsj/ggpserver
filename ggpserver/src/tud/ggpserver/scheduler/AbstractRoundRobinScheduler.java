@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+    Copyright (C) 2009 Martin Günther <mintar@gmx.de>
+                  2009 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GGP Server.
 
@@ -105,7 +106,7 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 	}
 
 	public void stopGracefully() {
-		logger.info("stopping RoundRobinScheduler after the currently running atches");
+		logger.info("stopping RoundRobinScheduler after the currently running Matches");
 		stopAfterCurrentMatches = true;
 	}
 	
@@ -205,6 +206,7 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		}
 		logger.info("waiting for some players to become available");
 		Collection<? extends PlayerInfo> availablePlayers = MatchRunner.getInstance().waitForAvailablePlayers();
+		logger.info("# available players: " + availablePlayers.size());
 		// If there are no enabled games, gamePicker.pickNextGame() will return null.
 		// In order to handle this case correctly, one would have to replace gamePicker.pickNextGame()
 		// by some function waitForEnabledGames(), similar to playerStatusTracker.waitForActivePlayers().
@@ -214,10 +216,11 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		logger.info("associating players to roles");
 		List<Map<RoleInterface<TermType>, PlayerInfo>> matchesToRolesToPlayerInfos = createPlayerInfos(nextGame, availablePlayers);
 		
-		logger.info("creating matches");
+		logger.info("creating " + matchesToRolesToPlayerInfos.size() + " matches");
 		for (Map<RoleInterface<TermType>, PlayerInfo> rolesToPlayerInfos : matchesToRolesToPlayerInfos) {
-			result.add(db.createMatch(nextGame, startclock, playclock, rolesToPlayerInfos, db.getTournament(ROUND_ROBIN_TOURNAMENT_ID)));
+			result.add(db.createMatch(nextGame, startclock, playclock, rolesToPlayerInfos, ROUND_ROBIN_TOURNAMENT_ID));
 		}
+		logger.info("done creating matches");
 		return result;
 	}
 

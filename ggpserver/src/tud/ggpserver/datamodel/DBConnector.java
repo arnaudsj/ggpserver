@@ -235,17 +235,17 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 			int startclock,
 			int playclock,
 			Map<? extends RoleInterface<Term>, ? extends PlayerInfo> rolesToPlayerInfos,
-			Tournament<Term, GameState> tournament,
+			String tournamentID,
 			Date startTime, boolean scrambled, double weight) throws DuplicateInstanceException,
 			SQLException {
 		NewMatch<Term, GameState> result;
 		synchronized (matches) {
 			result = super.createMatch(matchID, game, 
-					startclock, playclock, rolesToPlayerInfos, tournament, 
+					startclock, playclock, rolesToPlayerInfos, tournamentID, 
 					startTime, scrambled, weight);
 			matches.put(matchID, result);
 		}
-		clearCacheForTournament(tournament.getTournamentID());
+		clearCacheForTournament(tournamentID);
 		return result;
 	}
 
