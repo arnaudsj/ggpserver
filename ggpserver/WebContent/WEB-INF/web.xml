@@ -13,7 +13,7 @@
 	</welcome-file-list>
 
 	<!--
-		Define servlet for serving chart files
+		Define a servlet for serving chart files of the rating system
 		(see http://www.jfree.org/phpBB2/viewtopic.php?p=28493#p28493)
 	-->
 	<servlet>
@@ -25,6 +25,9 @@
 		<url-pattern>/servlet/ChartViewer</url-pattern>
 	</servlet-mapping>
 
+	<!--
+		Define a servlet for serving charts showing performance of players in a set of matches over time
+	-->
 	<servlet>
 	    <servlet-name>GameStatisticsChartViewer</servlet-name>
 	    <servlet-class>tud.ggpserver.webapp.GameStatisticsChartViewer</servlet-class>
@@ -34,6 +37,18 @@
 		<url-pattern>/servlet/GameStatisticsChartViewer</url-pattern>
 	</servlet-mapping>
   
+	<!--
+		Define a servlet for exporting match and tournament data as zipped set of xml files
+	-->
+	<servlet>
+	    <servlet-name>ExportXML</servlet-name>
+	    <servlet-class>tud.ggpserver.webapp.ExportXML</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ExportXML</servlet-name>
+		<url-pattern>/servlet/ExportXML</url-pattern>
+	</servlet-mapping>
+
 	<!-- Define the roles we want to use in the application -->
 	<security-role> 
 	    <role-name>admin</role-name> 

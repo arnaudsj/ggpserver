@@ -134,7 +134,7 @@
 		<tr>
 			<th>export</th>
 			<td>
-				<c:url value="export_xml.jsp" var="exportXMLURL">
+				<c:url value="/servlet/ExportXML" var="exportXMLURL">
 					<c:param name="matchID" value="${match.matchID}" />
 				</c:url>
 				<a href='<c:out value="${exportXMLURL}" />'>export xml</a>

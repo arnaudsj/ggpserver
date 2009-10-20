@@ -65,7 +65,7 @@
 				</td>
 				<td>
 					<c:if test="${tournament.numberOfMatches < 1000}">
-						<c:url value="export_xml.jsp" var="exportXMLURL">
+						<c:url value="/servlet/ExportXML" var="exportXMLURL">
 							<c:param name="tournamentID" value="${tournament.tournamentID}" />
 						</c:url>
 						<a href='<c:out value="${exportXMLURL}" />'>export xml</a>
