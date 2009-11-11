@@ -340,8 +340,29 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			Date startTime, 
 			boolean scrambled, double weight) throws DuplicateInstanceException, SQLException {
 
-		if (matchID == null ||  game == null || startclock <= 0 || playclock <=0 || rolesToPlayerInfos == null || tournamentID == null || startTime == null || game.getNumberOfRoles() != rolesToPlayerInfos.size()) {
-			throw new IllegalArgumentException();
+		if (matchID == null) {
+			throw new IllegalArgumentException("matchID == null");
+		}
+		if (game == null) {
+			throw new IllegalArgumentException("game == null");
+		}
+		if (startclock <= 0) {
+			throw new IllegalArgumentException("startclock <= 0: " + startclock);
+		}
+		if (playclock <= 0) {
+			throw new IllegalArgumentException("playclock <= 0: " + playclock);
+		}
+		if (rolesToPlayerInfos == null) {
+			throw new IllegalArgumentException("rolesToPlayerInfos == null");
+		}
+		if (tournamentID == null) {
+			throw new IllegalArgumentException("tournamentID == null");
+		}
+		if (startTime == null) {
+			throw new IllegalArgumentException("startTime == null");
+		}
+		if (game.getNumberOfRoles() != rolesToPlayerInfos.size()) {
+			throw new IllegalArgumentException("rolesToPlayerInfos.size() == " + rolesToPlayerInfos.size() + " but game has " + game.getNumberOfRoles() + " roles");
 		}
 		
 		Connection con = getConnection();

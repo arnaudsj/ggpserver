@@ -243,7 +243,7 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 			result = super.createMatch(matchID, game, 
 					startclock, playclock, rolesToPlayerInfos, tournamentID, 
 					startTime, scrambled, weight);
-			matches.put(matchID, result);
+			matches.put(matchID, result); 
 		}
 		clearCacheForTournament(tournamentID);
 		return result;
