@@ -70,15 +70,24 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 			setRunning(true);
 			stopAfterCurrentMatches=false;
 			
-			gameThread=new Thread(){
+			gameThread=new Thread("RoundRobinScheduler"){
 				@Override
 				public void run() {
-					try {
-						runMatches();
-					} catch (SQLException e) {
-						logger.severe("exception: " + e); //$NON-NLS-1$
-					} catch (InterruptedException e) {
-						logger.info("round robin scheduler interrupted");
+					boolean shouldRun=true;
+					while(shouldRun){
+						try {
+							runMatches();
+							shouldRun=false;
+						} catch (SQLException e) {
+							logger.severe("exception: " + e); //$NON-NLS-1$
+						} catch (InterruptedException e) {
+							logger.info("round robin scheduler interrupted");
+							shouldRun = false;
+						} catch (Exception e) {
+							logger.severe("unknown exception: " + e);
+							e.printStackTrace();
+							logger.severe("round robin scheduler aborted");
+						}
 					}
 					setRunning(false);
 				}
@@ -136,6 +145,7 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 	// anonymous inner Thread classes without overhead
 	private void runMatches() throws SQLException, InterruptedException {
 		while (!stopAfterCurrentMatches) {
+			logger.info("creating matches");
 			List<NewMatch<TermType, ReasonerStateInfoType>> currentMatches = createMatches();
 			logger.info("running matches");
 			getMatchRunner().runMatches(currentMatches);
@@ -149,6 +159,7 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 				}
 			}
 		}
+		logger.info("round robin scheduler stopped normally");
 		setRunning(false);
 	}
 
@@ -157,38 +168,6 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 	private List<NewMatch<TermType, ReasonerStateInfoType>> createMatches() throws SQLException, InterruptedException {
 		int playclock;
 		int startclock;
-		
-		if (logger.isLoggable(Level.CONFIG)) {
-			// debug mode -- you can change this by editing the
-			// logging.properties file (and starting the VM with special
-			// arguments).
-			// For now, this only really makes sense when executing
-			// RoundRobinSchedulerTest. The reason to reduce start and play
-			// clock is to speed up games.
-			playclock = 5;
-			startclock = 5;
-		} else {
-			int playclockMin = getPlayClockMin();
-			int startclockMin = getStartClockMin();
-			
-			// pick playclock as a multiple of 5 somewhere between playclockMin and playclockMax distributed according to a logistic distribution
-			playclock = 
-						Math.min(
-							playclockMin + 5 * (int)Math.round(
-								logisticDistributionQuantile(random.nextDouble(), (getPlayClockMean() - playclockMin) / 5.0, getPlayClockStdDeviation() / 5.0)),
-							getPlayClockMax()
-							);
-			// playclock =  playclockMin + 5 * random.nextInt( ( playclockMax - playclockMin) / 5 + 1 );
-			
-			// the same for startclock
-			startclock = 
-				Math.min(
-					startclockMin + 5 * (int)Math.round(
-						logisticDistributionQuantile(random.nextDouble(), (getStartClockMean() - startclockMin) / 5.0, getStartClockStdDeviation() / 5.0)),
-					getStartClockMax()
-					);
-			// startclock =  startclockMin + 5 * random.nextInt( ( startclockMax - startclockMin) / 5 + 1 );
-		}
 		
 		List<NewMatch<TermType, ReasonerStateInfoType>> result = new LinkedList<NewMatch<TermType,ReasonerStateInfoType>>();
 		
@@ -204,23 +183,58 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 			// change next game to play
 			gamePicker.pickNextGame();
 		}
-		logger.info("waiting for some players to become available");
 		Collection<? extends PlayerInfo> availablePlayers = MatchRunner.getInstance().waitForAvailablePlayers();
-		logger.info("# available players: " + availablePlayers.size());
 		// If there are no enabled games, gamePicker.pickNextGame() will return null.
 		// In order to handle this case correctly, one would have to replace gamePicker.pickNextGame()
 		// by some function waitForEnabledGames(), similar to playerStatusTracker.waitForActivePlayers().
 		// ATM, we will just run into a NullPointerException somewhere down the line, so let's hope that
 		// there is always at least one enabled game! :-)
 		
-		logger.info("associating players to roles");
 		List<Map<RoleInterface<TermType>, PlayerInfo>> matchesToRolesToPlayerInfos = createPlayerInfos(nextGame, availablePlayers);
 		
-		logger.info("creating " + matchesToRolesToPlayerInfos.size() + " matches");
-		for (Map<RoleInterface<TermType>, PlayerInfo> rolesToPlayerInfos : matchesToRolesToPlayerInfos) {
-			result.add(db.createMatch(nextGame, startclock, playclock, rolesToPlayerInfos, ROUND_ROBIN_TOURNAMENT_ID));
+		if (logger.isLoggable(Level.CONFIG)) {
+			// debug mode -- you can change this by editing the
+			// logging.properties file (and starting the VM with special
+			// arguments).
+			// For now, this only really makes sense when executing
+			// RoundRobinSchedulerTest. The reason to reduce start and play
+			// clock is to speed up games.
+			playclock = 5;
+			startclock = 5;
+		} else {
+			int playclockMin = getPlayClockMin();
+			int playclockMax = getPlayClockMax();
+			
+			// pick playclock as a multiple of 5 somewhere between playclockMin and playclockMax distributed according to a logistic distribution
+			playclock =
+				Math.max(playclockMin,
+						Math.min(
+							playclockMin + 5 * (int)Math.round(
+								logisticDistributionQuantile(random.nextDouble(), (getPlayClockMean() - playclockMin) / 5.0, getPlayClockStdDeviation() / 5.0)),
+							playclockMax
+							)
+						);
+			// playclock =  playclockMin + 5 * random.nextInt( ( playclockMax - playclockMin) / 5 + 1 );
+			
+			int startclockMin = getStartClockMin();
+			int startclockMax = getStartClockMax();
+			// the same for startclock
+			startclock = 
+				Math.max(startclockMin,
+					Math.min(
+						startclockMin + 5 * (int)Math.round(
+							logisticDistributionQuantile(random.nextDouble(), (getStartClockMean() - startclockMin) / 5.0, getStartClockStdDeviation() / 5.0)),
+						startclockMax
+						)
+					);
+			// startclock =  startclockMin + 5 * random.nextInt( ( startclockMax - startclockMin) / 5 + 1 );
 		}
-		logger.info("done creating matches");
+
+		logger.info("creating " + matchesToRolesToPlayerInfos.size() + " " + nextGame.getName() + " matches (startclock: " + startclock + ", playclock: " + playclock + ")");
+		for (Map<RoleInterface<TermType>, PlayerInfo> rolesToPlayerInfos : matchesToRolesToPlayerInfos) {
+			NewMatch<TermType, ReasonerStateInfoType> newMatch = db.createMatch(nextGame, startclock, playclock, rolesToPlayerInfos, ROUND_ROBIN_TOURNAMENT_ID);
+			result.add(newMatch);
+		}
 		return result;
 	}
 
