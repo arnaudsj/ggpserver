@@ -28,7 +28,7 @@ public class PlayerThreadStart<
 	TermType extends TermInterface> extends AbstractPlayerThread<TermType> {
 
 	public PlayerThreadStart(RoleInterface<TermType> role, Player<TermType> player, MatchInterface<TermType, ?> match, long deadline){
-		super(role, player, match, deadline);
+		super("StartMessageThread("+player.getName()+","+match.getMatchID()+")",role, player, match, deadline);
 	}
 	
 	public void run(){

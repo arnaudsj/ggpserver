@@ -34,7 +34,7 @@ public class PlayerThreadPlay<
 	private JointMoveInterface<TermType> priormoves;
 	
 	public PlayerThreadPlay(RoleInterface<TermType> role, Player<TermType> player, MatchInterface<TermType, ?> match, JointMoveInterface<TermType> priormoves, long deadline){
-		super(role, player, match, deadline);
+		super("PlayMessageThread("+player.getName()+","+match.getMatchID()+")", role, player, match, deadline);
 		this.priormoves=priormoves;
 		this.move=null;
 	}

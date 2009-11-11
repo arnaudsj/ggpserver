@@ -32,7 +32,7 @@ public class PlayerThreadStop<
 	private JointMoveInterface<TermType> priormoves;
 	
 	public PlayerThreadStop(RoleInterface<TermType> role, Player<TermType> player, MatchInterface<TermType, ?> match, JointMoveInterface<TermType> priormoves, long deadline){
-		super(role, player, match, deadline);
+		super("StopMessageThread("+player.getName()+","+match.getMatchID()+")",role, player, match, deadline);
 		this.priormoves=priormoves;
 	}
 	public void run(){

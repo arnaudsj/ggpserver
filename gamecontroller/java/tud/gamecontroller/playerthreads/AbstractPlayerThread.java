@@ -40,7 +40,8 @@ public abstract class AbstractPlayerThread<
 	private ChangeableBoolean connectionEstablished;
 	private ChangeableBoolean deadlineSet;
 	
-	public AbstractPlayerThread(RoleInterface<TermType> role, Player<TermType> player, MatchInterface<TermType, ?> match, long timeout){
+	public AbstractPlayerThread(String threadName, RoleInterface<TermType> role, Player<TermType> player, MatchInterface<TermType, ?> match, long timeout){
+		super(threadName);
 		this.role=role;
 		this.player=player;
 		this.match=match;
