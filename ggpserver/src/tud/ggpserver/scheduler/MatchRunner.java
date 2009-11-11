@@ -107,13 +107,13 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 		if( !running ) {
 			logger.info("starting MatchRunner");
 			running = true;
-			matchRunnerThread = new Thread() {
+			matchRunnerThread = new Thread("MatchRunner") {
 				@Override
 				public void run() {
 					try {
 						runMatches();
-					} catch (SQLException e) {
-						// TODO Auto-generated catch block
+					} catch (Exception e) {
+						logger.severe("exception in MatchRunner: " + e);
 						e.printStackTrace();
 					}
 					running = false;
@@ -224,7 +224,7 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 				availablePlayersTracker.notifyStartPlaying(p.getName());
 			}
 		}
-		Thread thread = new Thread() {
+		Thread thread = new Thread("runSingleMatch("+match.getMatchID()+")") {
 			@Override
 			public void run(){
 				runSingleMatch(match);
