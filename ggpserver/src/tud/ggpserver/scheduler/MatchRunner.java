@@ -54,7 +54,7 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 
 	// singleton pattern
 	private static MatchRunner<Term, GameState> instance = null;
-	public static MatchRunner<Term, GameState> getInstance() {
+	public synchronized static MatchRunner<Term, GameState> getInstance() {
 		if(instance == null)
 			instance = new MatchRunner<Term, GameState>(DBConnector.getInstance());
 		return instance;
@@ -176,7 +176,7 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 		logger.info("matchRunner stopped");
 	}
 
-	private synchronized ScheduledMatch<TermType, ReasonerStateInfoType> waitForRunnableMatch() throws InterruptedException {
+	private ScheduledMatch<TermType, ReasonerStateInfoType> waitForRunnableMatch() throws InterruptedException {
 		ScheduledMatch<TermType, ReasonerStateInfoType> runnableMatch = null;
 
 		while (runnableMatch == null) {
@@ -185,7 +185,9 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 				logger.info("found runnable match: " + runnableMatch.getMatchID());
 			}else if(scheduledMatches.isEmpty()) {
 				logger.info("no scheduled match -> stop MatchRunner");
-				stop = true;
+				synchronized (this) {
+					stop = true;
+				}
 				throw new InterruptedException();
 			}else{
 				logger.info("no runnable match found (but " + scheduledMatches.size() + " scheduled) -> wait");
@@ -275,8 +277,8 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 		matchThreads.remove(runningMatch.getMatchID());
 
 		// notify MatchRunner about changed player state
-
-//		notifyAboutChanges();  // causes deadlock
+		
+		notifyAboutChanges();  
 		logger.info("Thread for match " + matchID + " - END");
 	}
 	
@@ -372,7 +374,7 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 	 * @param matchID
 	 * @throws SQLException 
 	 */
-	public synchronized void delete(String matchID) throws SQLException {
+	public void delete(String matchID) throws SQLException {
 		// TODO: synchronize on scheduledMatches only
 		if(scheduledMatches.containsKey(matchID)){
 			scheduledMatches.remove(matchID).toNew(); // if the match was not running yet, set its status to new
