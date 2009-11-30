@@ -25,7 +25,9 @@ import java.sql.SQLException;
 import java.util.List;
 
 import tud.ggpserver.datamodel.RemotePlayerInfo;
+import tud.ggpserver.datamodel.Tournament;
 import tud.ggpserver.datamodel.User;
+import tud.ggpserver.scheduler.AbstractRoundRobinScheduler;
 
 public class Profile {
 	private User user = null;
@@ -45,5 +47,11 @@ public class Profile {
 		assert (user != null);
 		
 		return getDBConnector().getPlayerInfosForUser(user.getUserName());
+	}
+	
+	public List<? extends Tournament<?, ?>> getTournaments() throws SQLException {
+		List<? extends Tournament<?, ?>> tournaments = getDBConnector().getTournamentsCreatedByPlayer(getUserName());
+		return tournaments;
+
 	}
 }

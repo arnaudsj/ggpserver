@@ -36,6 +36,17 @@
 <c:set var="title">Admin Page</c:set>
 <jsp:directive.include file="/inc/header.jsp" />
 
+	<script type="text/javascript" language="JavaScript">
+	
+		function confirm_delete(matchid, url) {
+			var result = confirm("Do you really want to delete the tournament " + matchid + "? All included matches will be deleted too!");
+			if (result == true) {
+				window.location=url;
+			}
+		}
+	
+	</script>
+
     <h1 class="notopborder">Scheduler</h1>
     
 	<c:url value="index.jsp" var="urlStopGracefully">
@@ -133,7 +144,7 @@
 			<tr>
 				<th>tournament</th>
 				<th>owner</th>
-				<th colspan="2">actions</th>
+				<th colspan="3">actions</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -160,10 +171,20 @@
 						<div class="view"><a href='<c:out value="${viewURL}" />'><span>view</span></a></div>
 					</td>
 					<td>
-						<c:url value="edit_tournament.jsp" var="editURL">
+						<c:url value="../members/edit_tournament.jsp" var="editURL">
 							<c:param name="tournamentID" value="${tournament.tournamentID}" />
 						</c:url>
 						<div class="edit"><a href='<c:out value="${editURL}" />'><span>edit</span></a></div>
+					</td>
+					<td>
+							    <c:url value="../members/process_delete_tournament.jsp" var="deleteURL">
+								<c:param name="tournamentID" value="${tournament.tournamentID}"/>
+								<c:param name="returnURL" value="../admin/index.jsp"/>
+							    </c:url>
+
+							    <c:set var="realDeleteURL" value="javascript:confirm_delete('${tournament.tournamentID}', '${deleteURL}')"></c:set>							
+							    
+							    <a href='<c:out value="${realDeleteURL}" />'><div class="delete" title="delete tournament"><span>delete</span></div></a>
 					</td>
 				</tr>
 			</c:forEach>
@@ -178,7 +199,7 @@
 			</c:choose>
 			<tr class="${rowClass}">
 				<td colspan="4">
-					<div><a href='<%= response.encodeURL("create_tournament.jsp") %>'><span>Add new tournament</span></a></div>
+					<div><a href='<%= request.getContextPath() + response.encodeURL("/members/create_tournament.jsp") %>'><span>Add new tournament</span></a></div>
 				</td>
 			</tr>
 		</tbody>

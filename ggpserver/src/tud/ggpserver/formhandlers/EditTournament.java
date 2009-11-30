@@ -19,6 +19,8 @@
 
 package tud.ggpserver.formhandlers;
 
+import static tud.ggpserver.datamodel.DBConnectorFactory.getDBConnector;
+
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -32,6 +34,7 @@ import tud.gamecontroller.players.RandomPlayerInfo;
 import tud.ggpserver.datamodel.Game;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
 import tud.ggpserver.datamodel.Tournament;
+import tud.ggpserver.datamodel.User;
 import tud.ggpserver.datamodel.matches.NewMatch;
 import tud.ggpserver.datamodel.matches.RunningMatch;
 import tud.ggpserver.datamodel.matches.ScheduledMatch;
@@ -49,6 +52,7 @@ public class EditTournament extends ShowMatches {
 	private String action;
 	private ServerMatch<?, ?> match;
 	private boolean correctlyPerformed = false;
+	private User user = null;
 
 	@SuppressWarnings("unchecked")
 	public List<? extends Game<?, ?>> getGames() throws SQLException {
@@ -90,7 +94,21 @@ public class EditTournament extends ShowMatches {
 		return false;
 	}
 	
+	public boolean isAllow() {
+		if (tournament.getOwner().equals(user))
+			return true;
+		
+		if (user.getRoleNames().contains("admin"))
+			return true;
+		
+		return false;
+	}
+	
 	public boolean isValid() {
+		if (!tournament.getOwner().equals(user))
+			if (!user.getRoleNames().contains("admin"))
+				return false;
+		
 		if (action.equals(ADD_MATCH)) {
 			return true;
 		} else if (action.equals(START_MATCH) && match != null && match instanceof NewMatch) {
@@ -203,5 +221,9 @@ public class EditTournament extends ShowMatches {
 			matchID = matchID.substring(gameName.length()+1);
 		}
 		return matchID;
+	}
+	
+	public void setUserName(String userName) throws SQLException {
+		user = getDBConnector().getUser(userName);
 	}
 }

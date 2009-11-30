@@ -275,7 +275,8 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 		matchThreads.remove(runningMatch.getMatchID());
 
 		// notify MatchRunner about changed player state
-		notifyAboutChanges();
+
+//		notifyAboutChanges();  // causes deadlock
 		logger.info("Thread for match " + matchID + " - END");
 	}
 	
@@ -391,7 +392,6 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 	}
 	
 	private synchronized void notifyAboutChanges() {
-		logger.info("notify about changed state");
 		this.notifyAll();
 	}
 

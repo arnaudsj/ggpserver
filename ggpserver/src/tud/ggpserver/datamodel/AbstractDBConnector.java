@@ -586,9 +586,70 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		throw new IllegalArgumentException("Not an aborted match: " + matchID);
 	}
 	
+	private List<String> getAllMatchesFromTournament(Connection con, String tournamentID) throws SQLException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		List<String> result = new LinkedList<String>();
+		
+		try {
+			ps = con.prepareStatement("SELECT DISTINCT `match_id` FROM `matches` WHERE `tournament_id` = ?;");
+			ps.setString(1, tournamentID);
+			rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				result.add(rs.getString("match_id"));
+			}
+		} finally { 
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+			if (rs != null)
+				try {rs.close();} catch (SQLException e) {}
+		} 
+		
+		return result;
+	}
+
+	public void deleteTournament(String tournamentID) throws SQLException {
+		Connection con = getConnection();
+		List<String> matchIDs = getAllMatchesFromTournament(con, tournamentID);
+		
+		for (String matchID : matchIDs) {
+			deleteMatchWithDBConnection(matchID, con);
+		}
+		
+		PreparedStatement ps = null;
+		try {
+			con.setAutoCommit(false);
+			
+			// LOW_PRIORITY means that the actual deletion will only 
+			// be performed after there are no more reading clients. 
+			ps = con.prepareStatement("DELETE LOW_PRIORITY FROM `tournaments` WHERE `tournament_id` = ? LIMIT 1");
+			ps.setString(1, tournamentID);
+			ps.executeUpdate();
+			ps.close();
+			
+			con.commit();
+		} catch (SQLException e) {
+			if (con != null) {
+				con.rollback();
+			}
+			throw e;
+		} finally { 
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+		} 
+		
+	}
+	
 	public void deleteMatch(String matchID) throws SQLException {
 		Connection con = getConnection();
-		
+		deleteMatchWithDBConnection(matchID, con);
+		if (con != null)
+			try {con.close();} catch (SQLException e) {}
+	}
+	
+	private void deleteMatchWithDBConnection(String matchID, Connection con) throws SQLException {
 		PreparedStatement ps = null;
 		try {
 			con.setAutoCommit(false);
@@ -627,13 +688,10 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			}
 			throw e;
 		} finally { 
-			if (con != null)
-				try {con.close();} catch (SQLException e) {}
 			if (ps != null)
 				try {ps.close();} catch (SQLException e) {}
 		} 
 	}
-	
 	
 	public int getRowCount(String tableName) throws SQLException {
 		Connection con = getConnection();
@@ -1801,6 +1859,33 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		
 		try {
 			ps = con.prepareStatement("SELECT `tournament_id` FROM `tournaments` ORDER BY `tournament_id` ;");
+			rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				result.add(getTournament(rs.getString("tournament_id")));
+			}
+		} finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+			if (rs != null)
+				try {rs.close();} catch (SQLException e) {}
+		} 
+
+		return result;
+	}
+	
+	public List<Tournament<TermType , ReasonerStateInfoType>> getTournamentsCreatedByPlayer(String playerName) throws SQLException {
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		List<Tournament<TermType , ReasonerStateInfoType>> result = new LinkedList<Tournament<TermType , ReasonerStateInfoType>>();
+		
+		try {
+			ps = con.prepareStatement("SELECT `tournament_id` FROM `tournaments` WHERE `owner` = ? ORDER BY `tournament_id` ;");
+			ps.setString(1, playerName);
 			rs = ps.executeQuery();
 			
 			while (rs.next()) {

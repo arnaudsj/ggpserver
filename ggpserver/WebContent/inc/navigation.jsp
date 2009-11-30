@@ -42,7 +42,7 @@
 			<c:if test='<%= navigationUserBean.getUser().hasRole("admin") %>'>
 				<a href="<%= request.getContextPath() + response.encodeURL("/admin/index.jsp") %>">Admin Page</a>
 			</c:if>
-			<a href="<%= request.getContextPath() + response.encodeURL("/members/profile.jsp") %>">My Players</a> 
+			<a href="<%= request.getContextPath() + response.encodeURL("/members/profile.jsp") %>">User Profile</a> 
 			<a href="<%= request.getContextPath() + response.encodeURL("/members/create_game.jsp") %>">Create Game</a> 
 		</c:if>
 		<a href="<%= request.getContextPath() + response.encodeURL("/public/contact.jsp") %>">Contact</a>
