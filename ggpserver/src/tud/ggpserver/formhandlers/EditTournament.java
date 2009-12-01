@@ -240,10 +240,9 @@ public class EditTournament extends ShowMatches {
 			ListIterator<? extends RemotePlayerInfo> i = allRemotePlayers.listIterator();
 			while(i.hasNext()){
 				RemotePlayerInfo p = i.next();
-				if(user.isAdmin() || (
-					p.getStatus().equals(RemotePlayerInfo.STATUS_ACTIVE) &&
+				if(p.getStatus().equals(RemotePlayerInfo.STATUS_ACTIVE) &&
 					( p.isAvailableForManualMatches() || p.getOwner().equals(user))
-					)) {
+					) {
 						playerInfos.add(new PlayerInfoForEditTournament(p.getName(), true, p.getOwner()));
 						i.remove();
 				}
