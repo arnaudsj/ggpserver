@@ -37,6 +37,8 @@
 				<th>player name</th>
 				<th>owner</th>
 				<th>status</th>
+				<th>available for round robin play</th>
+				<th>available for manual play</th>
 				<c:if test='${navigationUserBean.user != null}'>
 					<c:if test='<%= navigationUserBean.getUser().hasRole("admin") %>'>
 						<th>host</th>
@@ -69,6 +71,8 @@
 					<a href='<c:out value="${userURL}" />'>${player.owner.userName}</a>
 				</td>
 				<td><div class="playerstatus-${player.status}"><span>${player.status}</span></div></td>
+				<td>${player.availableForRoundRobinMatches}</td>
+				<td>${player.availableForManualMatches}</td>
 				<c:if test='${navigationUserBean.user != null}'>
 					<c:if test='<%= navigationUserBean.getUser().hasRole("admin") %>'>
 						<td>${player.host}</td>

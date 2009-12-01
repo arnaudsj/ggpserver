@@ -123,6 +123,15 @@
 			</td>
 		</tr>
 		<tr>
+			<th>owner</th>
+			<td>
+				<c:url value="view_user.jsp" var="viewUserURL">
+					<c:param name="userName" value="${match.owner.userName}" />
+				</c:url>
+				<a href='<c:out value="${viewUserURL}" />'><c:out value="${match.owner.userName}" /></a>
+			</td>
+		</tr>
+		<tr>
 			<th>tournament</th>
 			<td>
 				<c:url value="view_tournament.jsp" var="viewTournamentURL">

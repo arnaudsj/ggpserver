@@ -36,6 +36,9 @@ public class Tournament<TermType extends TermInterface, ReasonerStateInfoType> {
 	private final AbstractDBConnector<TermType, ReasonerStateInfoType> db;
 	private int nbOfMatches = -1;
 	
+	public static final String ROUND_ROBIN_TOURNAMENT_ID = "round_robin_tournament";
+	public static final String MANUAL_TOURNAMENT_ID = "manual_matches";
+	
 	public Tournament(final String tournamentID, final User owner, AbstractDBConnector<TermType, ReasonerStateInfoType> db) {
 		this.tournamentID = tournamentID;
 		this.owner = owner;
@@ -43,12 +46,12 @@ public class Tournament<TermType extends TermInterface, ReasonerStateInfoType> {
 	}
 
 	public List<ServerMatch<TermType,ReasonerStateInfoType>> getMatches() throws SQLException {
-		return db.getMatches(0, Integer.MAX_VALUE, null, null, tournamentID, false);
+		return db.getMatches(0, Integer.MAX_VALUE, null, null, tournamentID, null, false);
 	}
 
 	public int getNumberOfMatches() throws SQLException {
 		if(nbOfMatches == -1){
-			nbOfMatches = db.getRowCountMatches(null, null, tournamentID, false);
+			nbOfMatches = db.getRowCountMatches(null, null, tournamentID, null, false);
 		}
 		return nbOfMatches;
 	}
@@ -83,6 +86,16 @@ public class Tournament<TermType extends TermInterface, ReasonerStateInfoType> {
 				return false;
 		} else if (!tournamentID.equals(other.tournamentID))
 			return false;
+		return true;
+	}
+
+	public boolean isDeletable() {
+		if (ROUND_ROBIN_TOURNAMENT_ID.equals(tournamentID))
+			return false;
+
+		if (MANUAL_TOURNAMENT_ID.equals(tournamentID))
+			return false;
+
 		return true;
 	}
 	

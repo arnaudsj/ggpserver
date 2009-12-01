@@ -44,7 +44,10 @@
 
 <h1 class="notopborder">Recent changes</h1>
 	<ul>
-		<li>There are now statistics for each game showing the best players and the bias of the roles. It can be reached from the View Game page of each game.</li>
+		<li>Users can now create/start matches manually.</li>
+		<li>Users can now create own tournaments.</li>
+		<li>You can choose if your players takes part in automatic round-robin tournament.</li>
+		<li>You can choose if your players may be used in matches created by users.</li>
 	</ul>
 
 <h1 class="notopborder">Sourceforge project</h1>

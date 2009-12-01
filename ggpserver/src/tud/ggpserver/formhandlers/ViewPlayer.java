@@ -45,7 +45,7 @@ public class ViewPlayer {
 		if(playerInfo instanceof RemotePlayerInfo){
 			return ((RemotePlayerInfo) playerInfo).getOwner();
 		}else if(playerInfo instanceof LocalPlayerInfo){
-			return DBConnectorFactory.getDBConnector().getUser("admin");
+			return DBConnectorFactory.getDBConnector().getAdminUser();
 		}
 		return null;
 	}
@@ -57,6 +57,24 @@ public class ViewPlayer {
 			return "active";
 		}
 		return "?";
+	}
+
+	public boolean isAvailableForRoundRobinMatches() {
+		if(playerInfo instanceof RemotePlayerInfo){
+			return ((RemotePlayerInfo) playerInfo).isAvailableForRoundRobinMatches();
+		}else if(playerInfo instanceof LocalPlayerInfo){
+			return true;
+		}
+		return false;
+	}
+
+	public boolean isAvailableForManualMatches() {
+		if(playerInfo instanceof RemotePlayerInfo){
+			return ((RemotePlayerInfo) playerInfo).isAvailableForManualMatches();
+		}else if(playerInfo instanceof LocalPlayerInfo){
+			return true;
+		}
+		return false;
 	}
 
 	public String getName() {

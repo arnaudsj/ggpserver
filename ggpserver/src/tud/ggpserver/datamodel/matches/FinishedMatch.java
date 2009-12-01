@@ -31,6 +31,7 @@ import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
+import tud.ggpserver.datamodel.User;
 import tud.ggpserver.datamodel.dblists.StaticDBBackedList;
 import tud.ggpserver.datamodel.dblists.ErrorMessageAccessor;
 import tud.ggpserver.datamodel.dblists.JointMovesAccessor;
@@ -52,9 +53,9 @@ public class FinishedMatch<TermType extends TermInterface, ReasonerStateInfoType
 			boolean scrambled,
 			String tournamentID,
 			double weight,
-			AbstractDBConnector<TermType, ReasonerStateInfoType> db,
+			User owner, AbstractDBConnector<TermType, ReasonerStateInfoType> db,
 			Map<? extends RoleInterface<TermType>, Integer> goalValues) {
-		super(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, scrambled, tournamentID, weight, db);
+		super(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, scrambled, tournamentID, weight, owner, db);
 		this.goalValues = goalValues;
 	}
 

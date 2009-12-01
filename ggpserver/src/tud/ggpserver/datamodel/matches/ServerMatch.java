@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+    Copyright (C) 2009 Martin Günther <mintar@gmx.de>
+                  2009 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GGP Server.
 
@@ -38,6 +39,7 @@ import tud.ggpserver.collectionviews.MapView;
 import tud.ggpserver.collectionviews.Mapping;
 import tud.ggpserver.collectionviews.Mappings;
 import tud.ggpserver.datamodel.AbstractDBConnector;
+import tud.ggpserver.datamodel.User;
 
 public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateInfoType>
 		extends Match<TermType, ReasonerStateInfoType> {
@@ -73,6 +75,8 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 	private final String tournamentID;
 
 	private final double weight;
+	
+	private User owner;
 
 	/**
 	 * State 0 = initial state, State 1 = state after first joint move, ..., State n = final state
@@ -97,20 +101,6 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 	/**
 	 * Don't use this constructor directly, use DBConnectorFactory.getDBConnector().getMatch() instead. 
 	 */
-	@Deprecated
-	public ServerMatch(
-			String matchID,
-			GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game,
-			int startclock,
-			int playclock,
-			Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayerInfos,
-			Date startTime,
-			boolean scrambled,
-			String tournamentID,
-			AbstractDBConnector<TermType, ReasonerStateInfoType> db) {
-		this(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, scrambled, tournamentID, 1.0, db);
-	}
-
 	public ServerMatch(
 			String matchID,
 			GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game,
@@ -121,6 +111,7 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 			boolean scrambled,
 			String tournamentID,
 			double weight,
+			User owner,
 			AbstractDBConnector<TermType, ReasonerStateInfoType> db) {
 		super(matchID, game, startclock, playclock);
 		this.rolesToPlayerInfos = rolesToPlayerInfos;
@@ -128,6 +119,7 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 		this.scrambled = scrambled;
 		this.tournamentID = tournamentID;
 		this.weight = weight;
+		this.owner = owner;
 		this.db = db;
 	}
 	
@@ -296,6 +288,9 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 		return tournamentID;
 	}
 
+	public User getOwner() {
+		return owner;
+	}
 
 	protected AbstractDBConnector<TermType, ReasonerStateInfoType> getDB() {
 		return db;

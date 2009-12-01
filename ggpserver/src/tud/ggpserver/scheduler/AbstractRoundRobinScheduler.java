@@ -39,11 +39,11 @@ import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.ConfigOption;
 import tud.ggpserver.datamodel.Game;
+import tud.ggpserver.datamodel.Tournament;
 import tud.ggpserver.datamodel.matches.FinishedMatch;
 import tud.ggpserver.datamodel.matches.NewMatch;
 
 public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface, ReasonerStateInfoType> {
-	public static final String ROUND_ROBIN_TOURNAMENT_ID = "round_robin_tournament";
 	private static final Logger logger = Logger.getLogger(AbstractRoundRobinScheduler.class.getName());
 	private static final Random random = new Random();
 
@@ -183,7 +183,7 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 			// change next game to play
 			gamePicker.pickNextGame();
 		}
-		Collection<? extends PlayerInfo> availablePlayers = MatchRunner.getInstance().waitForAvailablePlayers();
+		Collection<? extends PlayerInfo> availablePlayers = MatchRunner.getInstance().waitForPlayersAvailableForRoundRobin();
 		// If there are no enabled games, gamePicker.pickNextGame() will return null.
 		// In order to handle this case correctly, one would have to replace gamePicker.pickNextGame()
 		// by some function waitForEnabledGames(), similar to playerStatusTracker.waitForActivePlayers().
@@ -232,7 +232,7 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 
 		logger.info("creating " + matchesToRolesToPlayerInfos.size() + " " + nextGame.getName() + " matches (startclock: " + startclock + ", playclock: " + playclock + ")");
 		for (Map<RoleInterface<TermType>, PlayerInfo> rolesToPlayerInfos : matchesToRolesToPlayerInfos) {
-			NewMatch<TermType, ReasonerStateInfoType> newMatch = db.createMatch(nextGame, startclock, playclock, rolesToPlayerInfos, ROUND_ROBIN_TOURNAMENT_ID);
+			NewMatch<TermType, ReasonerStateInfoType> newMatch = db.createMatch(nextGame, startclock, playclock, rolesToPlayerInfos, Tournament.ROUND_ROBIN_TOURNAMENT_ID, db.getAdminUser());
 			result.add(newMatch);
 		}
 		return result;

@@ -39,7 +39,7 @@
 		<a href="<%= request.getContextPath() + response.encodeURL("/public/show_tournaments.jsp") %>">Tournaments</a>
 		
 		<c:if test='${navigationUserBean.user != null}'>
-			<c:if test='<%= navigationUserBean.getUser().hasRole("admin") %>'>
+			<c:if test='${navigationUserBean.user.admin}'>
 				<a href="<%= request.getContextPath() + response.encodeURL("/admin/index.jsp") %>">Admin Page</a>
 			</c:if>
 			<a href="<%= request.getContextPath() + response.encodeURL("/members/profile.jsp") %>">User Profile</a> 

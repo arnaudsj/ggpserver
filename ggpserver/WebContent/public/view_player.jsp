@@ -59,6 +59,14 @@ if (viewPlayer.getPlayer() == null) {
 			<td><c:out value="${viewPlayer.status}"></c:out></td>
 		</tr>
 		<tr>
+			<th>available for round robin play</th>
+			<td><c:out value="${viewPlayer.availableForRoundRobinMatches}"></c:out></td>
+		</tr>
+		<tr>
+			<th>available for manual play</th>
+			<td><c:out value="${viewPlayer.availableForManualMatches}"></c:out></td>
+		</tr>
+		<tr>
 			<th>matches</th>
 			<td>
 				<c:url value="show_matches.jsp" var="URL">

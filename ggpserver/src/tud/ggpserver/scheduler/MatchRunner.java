@@ -33,10 +33,11 @@ import tud.gamecontroller.GameController;
 import tud.gamecontroller.game.javaprover.Term;
 import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.PlayerInfo;
-import tud.gamecontroller.players.RemotePlayerInfo;
+import tud.ggpserver.datamodel.RemotePlayerInfo;
 import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnector;
+import tud.ggpserver.datamodel.Tournament;
 import tud.ggpserver.datamodel.matches.NewMatch;
 import tud.ggpserver.datamodel.matches.RunningMatch;
 import tud.ggpserver.datamodel.matches.ScheduledMatch;
@@ -207,6 +208,13 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 				if(availablePlayersTracker.isPlaying(player.getName())) {
 					runnableMatch = null;
 					break;
+				}
+				if(player instanceof RemotePlayerInfo){
+					RemotePlayerInfo remotePlayer = (RemotePlayerInfo)player;
+					if(!remotePlayer.isAvailableForManualMatches() && match.getTournamentID().equals(Tournament.MANUAL_TOURNAMENT_ID)){
+						runnableMatch = null;
+						break;
+					}
 				}
 			}
 			if(runnableMatch != null) {
@@ -408,8 +416,8 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 	 * @return a collection of all currently available players
 	 * @throws InterruptedException (if interrupt() was called on the waiting Thread)
 	 */
-	public Collection<tud.ggpserver.datamodel.RemotePlayerInfo> waitForAvailablePlayers() throws InterruptedException {
-		return availablePlayersTracker.waitForAvailablePlayers();
+	public Collection<tud.ggpserver.datamodel.RemotePlayerInfo> waitForPlayersAvailableForRoundRobin() throws InterruptedException {
+		return availablePlayersTracker.waitForPlayersAvailableForRoundRobin();
 	}
 
 }

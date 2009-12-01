@@ -29,6 +29,7 @@ import tud.gamecontroller.game.impl.State;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
+import tud.ggpserver.datamodel.User;
 
 public class ScheduledMatch<TermType extends TermInterface, ReasonerStateInfoType> extends NewMatch<TermType, ReasonerStateInfoType> {
 
@@ -42,8 +43,8 @@ public class ScheduledMatch<TermType extends TermInterface, ReasonerStateInfoTyp
 			boolean scrambled,
 			String tournamentID,
 			double weight,
-			AbstractDBConnector<TermType, ReasonerStateInfoType> db) {
-		super(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, scrambled, tournamentID, weight, db);
+			User owner, AbstractDBConnector<TermType, ReasonerStateInfoType> db) {
+		super(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, scrambled, tournamentID, weight, owner, db);
 	}
 
 	@Override

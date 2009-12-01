@@ -130,12 +130,12 @@ public class AvailablePlayersTracker<TermType extends TermInterface, ReasonerSta
 		return !playingPlayers.contains(name) && activePlayers.containsKey(name);
 	}
 
-	public synchronized Collection<RemotePlayerInfo> waitForAvailablePlayers() throws InterruptedException {
+	public synchronized Collection<RemotePlayerInfo> waitForPlayersAvailableForRoundRobin() throws InterruptedException {
 		Set<RemotePlayerInfo> availablePlayerSet = new HashSet<RemotePlayerInfo>();
 		while(availablePlayerSet.isEmpty()) {
 			Collection<RemotePlayerInfo> activePlayers=waitForActivePlayers();
 			for(RemotePlayerInfo player:activePlayers) {
-				if(!isPlaying(player.getName())) {
+				if(player.isAvailableForRoundRobinMatches() && !isPlaying(player.getName())) {
 					availablePlayerSet.add(player);
 				}
 			}

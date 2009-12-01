@@ -26,6 +26,7 @@
 		<jsp:setProperty name="pager" property="playerName"/>
 		<jsp:setProperty name="pager" property="gameName"/>
 		<jsp:setProperty name="pager" property="tournamentID"/>
+		<jsp:setProperty name="pager" property="owner"/>
 		<jsp:setProperty name="pager" property="page"/>
 	</c:catch>
 </jsp:useBean>

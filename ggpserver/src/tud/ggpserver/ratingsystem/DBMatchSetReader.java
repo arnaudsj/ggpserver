@@ -37,8 +37,8 @@ import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnector;
+import tud.ggpserver.datamodel.Tournament;
 import tud.ggpserver.datamodel.matches.ServerMatch;
-import tud.ggpserver.scheduler.AbstractRoundRobinScheduler;
 
 /**
  * DBMatchSetReader reads MatchSets of the round_robin_tournament from the database.
@@ -64,7 +64,7 @@ public class DBMatchSetReader implements MatchSetReader {
 		this.configuration = configuration;
 
 		// filter matches, such that only finished matches are in the list
-		matches = db.getMatches(0, Integer.MAX_VALUE, null, null, AbstractRoundRobinScheduler.ROUND_ROBIN_TOURNAMENT_ID, true);
+		matches = db.getMatches(0, Integer.MAX_VALUE, null, null, Tournament.ROUND_ROBIN_TOURNAMENT_ID, null, true);
 		Iterator<? extends ServerMatch<?, ?>> it = matches.iterator();
 		while(it.hasNext()){
 			if ( it.next().getStatus() != ServerMatch.STATUS_FINISHED ) {

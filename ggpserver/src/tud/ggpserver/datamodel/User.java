@@ -24,6 +24,8 @@ import java.util.Collections;
 
 
 public class User {
+	public static final String ADMIN_ROLE = "admin";
+
 	private final String userName;
 	private final Collection<String> roleNames;
 	
@@ -48,6 +50,10 @@ public class User {
 	
 	public boolean hasRole(String role) {
 		return roleNames.contains(role);
+	}
+
+	public boolean isAdmin() {
+		return hasRole(ADMIN_ROLE);
 	}
 
 	@Override

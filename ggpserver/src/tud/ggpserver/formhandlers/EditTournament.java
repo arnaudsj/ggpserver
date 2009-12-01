@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+                  2009 Stephan Schiffel <stephan.schiffel@gmx.de> 
 
     This file is part of GGP Server.
 
@@ -25,6 +26,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import tud.gamecontroller.game.RoleInterface;
@@ -53,6 +55,7 @@ public class EditTournament extends ShowMatches {
 	private ServerMatch<?, ?> match;
 	private boolean correctlyPerformed = false;
 	private User user = null;
+	private List<PlayerInfoForEditTournament> playerInfos = null;
 
 	@SuppressWarnings("unchecked")
 	public List<? extends Game<?, ?>> getGames() throws SQLException {
@@ -94,29 +97,49 @@ public class EditTournament extends ShowMatches {
 		return false;
 	}
 	
-	public boolean isAllow() {
+	/**
+	 * 
+	 * @return true if the user set with setUser is allowed to edit the tournament
+	 * @throws SQLException
+	 */
+	public boolean isAllow() throws SQLException {
 		if (tournament.getOwner().equals(user))
 			return true;
 		
-		if (user.getRoleNames().contains("admin"))
+		if (user.isAdmin())
 			return true;
 		
+		if (Tournament.MANUAL_TOURNAMENT_ID.equals(tournament.getTournamentID()))
+			return true;
+
 		return false;
 	}
 	
-	public boolean isValid() {
-		if (!tournament.getOwner().equals(user))
-			if (!user.getRoleNames().contains("admin"))
-				return false;
+	public boolean isValid() throws SQLException {
+		if (!isAllow())
+			return false;
 		
 		if (action.equals(ADD_MATCH)) {
 			return true;
-		} else if (action.equals(START_MATCH) && match != null && match instanceof NewMatch) {
-			// TODO: should we check that all players are active ?
+		} else if (action.equals(START_MATCH) && match != null && match instanceof NewMatch && match.getOwner().equals(user)) {
+			// check that all players are active
+			// TODO: somehow tell the user why the action was not performed 
+			
+			// There might still be a race condition such that a match is scheduled but never run (e.g., if a player goes offline
+			// right after this check), but we avoid most cases here. 
+			for(PlayerInfo playerInfo:match.getPlayerInfos()) {
+				if(playerInfo instanceof RemotePlayerInfo) {
+					RemotePlayerInfo remotePlayerInfo = (RemotePlayerInfo)playerInfo;
+					if(remotePlayerInfo.getStatus()!=RemotePlayerInfo.STATUS_ACTIVE)
+						return false;
+					if(!remotePlayerInfo.isAvailableForManualMatches() && !remotePlayerInfo.getOwner().equals(user))
+						return false;
+				}
+			}
 			return true;
-		} else if (action.equals(ABORT_MATCH) && match != null && (match instanceof ScheduledMatch || match instanceof RunningMatch)) {
+		} else if (action.equals(ABORT_MATCH) && match != null && (match instanceof ScheduledMatch || match instanceof RunningMatch) && match.getOwner().equals(user)) {
 			return true;
-		} else if (action.equals(DELETE_MATCH) && match != null) {
+		} else if (action.equals(DELETE_MATCH) && match != null && match.getOwner().equals(user)) {
 			return true;
 		} else if (action.equals(CLONE_MATCH) && match != null) {
 			return true;
@@ -159,7 +182,7 @@ public class EditTournament extends ShowMatches {
 		}
 		
 		db.createMatch(game, Tournament.DEFAULT_STARTCLOCK,
-				Tournament.DEFAULT_PLAYCLOCK, rolesToPlayerInfos, tournament.getTournamentID());
+				Tournament.DEFAULT_PLAYCLOCK, rolesToPlayerInfos, tournament.getTournamentID(), user);
 
 		correctlyPerformed = true;
 	}
@@ -186,7 +209,7 @@ public class EditTournament extends ShowMatches {
 	@SuppressWarnings("unchecked")
 	private void cloneMatch(ServerMatch match) throws SQLException {
 		db.createMatch(match.getGame(), match.getStartclock(), match.getPlayclock(), 
-				match.getRolesToPlayerInfos(), tournament.getTournamentID(), match.isScrambled(), match.getWeight());
+				match.getRolesToPlayerInfos(), tournament.getTournamentID(), match.isScrambled(), match.getWeight(), user);
 		correctlyPerformed = true;
 	}
 
@@ -205,13 +228,34 @@ public class EditTournament extends ShowMatches {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<PlayerInfo> getPlayerInfos() throws SQLException {
-		List<PlayerInfo> result = new LinkedList<PlayerInfo>();
-		result.add(new RandomPlayerInfo(-1));
-		result.add(new LegalPlayerInfo(-1));
-		result.addAll(db.getPlayerInfos());
-
-		return result;
+	public List<PlayerInfoForEditTournament> getPlayerInfos() throws SQLException {
+		if(playerInfos == null) {
+			playerInfos = new LinkedList<PlayerInfoForEditTournament>();
+			User admin=db.getAdminUser();
+			// add local players
+			playerInfos.add(new PlayerInfoForEditTournament(new RandomPlayerInfo(-1).getName(), true, admin));
+			playerInfos.add(new PlayerInfoForEditTournament(new LegalPlayerInfo(-1).getName(), true, admin));
+			List<? extends RemotePlayerInfo> allRemotePlayers = db.getPlayerInfos();
+			// add all available players
+			ListIterator<? extends RemotePlayerInfo> i = allRemotePlayers.listIterator();
+			while(i.hasNext()){
+				RemotePlayerInfo p = i.next();
+				if(user.isAdmin() || (
+					p.getStatus().equals(RemotePlayerInfo.STATUS_ACTIVE) &&
+					( p.isAvailableForManualMatches() || p.getOwner().equals(user))
+					)) {
+						playerInfos.add(new PlayerInfoForEditTournament(p.getName(), true, p.getOwner()));
+						i.remove();
+				}
+			}
+			// add all remaining players (but mark them as unavailable)
+			i = allRemotePlayers.listIterator();
+			while(i.hasNext()){
+				RemotePlayerInfo p = i.next();
+				playerInfos.add(new PlayerInfoForEditTournament(p.getName(), false, p.getOwner()));
+			}
+		}
+		return playerInfos;
 	}
 	
 	public String shortMatchID(ServerMatch<?, ?> match) {
@@ -225,5 +269,51 @@ public class EditTournament extends ShowMatches {
 	
 	public void setUserName(String userName) throws SQLException {
 		user = getDBConnector().getUser(userName);
+		if (!user.isAdmin())
+			super.setOwner(user.getUserName()); // normal users should only see their own matches for editing
+	}
+	
+	public boolean isGoalEditable() {
+		if (Tournament.MANUAL_TOURNAMENT_ID.equals(tournament.getTournamentID()))
+			return false;
+		if (Tournament.ROUND_ROBIN_TOURNAMENT_ID.equals(tournament.getTournamentID()))
+			return false;
+		return true;
+	}
+	
+	public class PlayerInfoForEditTournament{
+		private String name;
+		private boolean usable;
+		private User owner;
+
+		public PlayerInfoForEditTournament(String name, boolean usable, User owner) {
+			this.name = name;
+			this.usable = usable;
+			this.owner = owner;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setUsable(boolean usable) {
+			this.usable = usable;
+		}
+
+		public boolean isUsable() {
+			return usable;
+		}
+
+		public void setOwner(User owner) {
+			this.owner = owner;
+		}
+
+		public User getOwner() {
+			return owner;
+		}
 	}
 }

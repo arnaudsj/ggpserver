@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+                  2009 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GGP Server.
 
@@ -22,12 +23,13 @@ package tud.ggpserver.formhandlers;
 import static tud.ggpserver.datamodel.DBConnectorFactory.getDBConnector;
 
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
 
+import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
 import tud.ggpserver.datamodel.Tournament;
 import tud.ggpserver.datamodel.User;
-import tud.ggpserver.scheduler.AbstractRoundRobinScheduler;
 
 public class Profile {
 	private User user = null;
@@ -49,8 +51,11 @@ public class Profile {
 		return getDBConnector().getPlayerInfosForUser(user.getUserName());
 	}
 	
-	public List<? extends Tournament<?, ?>> getTournaments() throws SQLException {
-		List<? extends Tournament<?, ?>> tournaments = getDBConnector().getTournamentsCreatedByPlayer(getUserName());
+	public List<? extends Tournament<?,?>> getTournaments() throws SQLException {
+		AbstractDBConnector<?, ?> db = getDBConnector();
+		List<Tournament<?,?>> tournaments = new LinkedList<Tournament<?,?>>(db.getTournamentsCreatedByUser(getUserName()));
+		if(!this.equals(db.getAdminUser()))
+			tournaments.add(0, db.getTournament(Tournament.MANUAL_TOURNAMENT_ID));
 		return tournaments;
 
 	}

@@ -56,6 +56,8 @@
 			<th>host</th>
 			<th>port</th>
 			<th>status</th>
+			<th>available for<br>round robin play</th>
+			<th>available for<br>manual play</th>
 			<th colspan="2">actions</th>
 		</tr>
 	</thead>
@@ -76,6 +78,8 @@
 				<td>${player.host}</td>
 				<td>${player.port}</td>
 				<td><div class="playerstatus-${player.status}"><span>${player.status}</span></div></td>
+				<td>${player.availableForRoundRobinMatches}</td>
+				<td>${player.availableForManualMatches}</td>
 				<td>
 					<c:url value="../public/view_player.jsp" var="viewURL">
 						<c:param name="name" value="${player.name}" />
@@ -100,14 +104,14 @@
 			</c:otherwise>
 		</c:choose>
 		<tr class="${rowClass}">
-			<td colspan="6">
+			<td colspan="8">
 				<div class="add-new-player"><a href='<%= response.encodeURL("create_player.jsp") %>'><span>Add new player</span></a></div>
 			</td>
 		</tr>
 	</tbody>
 </table>
 
-<h1>My Tournaments</h1>
+<h1>My Matches</h1>
 
 	<table>
 		<thead>
@@ -133,6 +137,7 @@
 					<td>
 						<c:url value="../public/show_matches.jsp" var="viewURL">
 							<c:param name="tournamentID" value="${tournament.tournamentID}" />
+							<c:param name="owner" value="${profile.userName}" />
 						</c:url>
 						<div class="view"><a href='<c:out value="${viewURL}" />'><span>view</span></a></div>
 					</td>
@@ -143,14 +148,16 @@
 						<div class="edit"><a href='<c:out value="${editURL}" />'><span>edit</span></a></div>
 					</td>
 					<td>
-							    <c:url value="process_delete_tournament.jsp" var="deleteURL">
+						<c:if test="${tournament.deletable}">
+						    <c:url value="process_delete_tournament.jsp" var="deleteURL">
 								<c:param name="tournamentID" value="${tournament.tournamentID}"/>
 								<c:param name="returnURL" value="profile.jsp"/>
-							    </c:url>
+						    </c:url>
 
-							    <c:set var="realDeleteURL" value="javascript:confirm_delete('${tournament.tournamentID}', '${deleteURL}')"></c:set>							
-							    
-							    <a href='<c:out value="${realDeleteURL}" />'><div class="delete" title="delete tournament"><span>delete</span></div></a>
+						    <c:set var="realDeleteURL" value="javascript:confirm_delete('${tournament.tournamentID}', '${deleteURL}')"></c:set>							
+						    
+						    <a href='<c:out value="${realDeleteURL}" />'><div class="delete" title="delete tournament"><span>delete</span></div></a>
+						</c:if>
 					</td>
 				</tr>
 			</c:forEach>
@@ -172,19 +179,14 @@
 	</table>
 
 <h1>Hints</h1>
-A player can be in one of two states:
 <ul>
-	<li><b>active</b> - the player will take part in the round-robin tournament, 
-	i.e., the GGP Server will schedule it for matches against other active players.</li>
-	<li><b>inactive</b> - the opposite of active: the GGP Server will not send 
-	any messages to the player. </li>
+	<jsp:directive.include file="/inc/player_hints.jsp" />
+	<li>
+		To <b>create and start a match manually</b> click on the edit button
+		<c:url value="edit_tournament.jsp" var="editURL"><c:param name="tournamentID" value="manual_matches" /></c:url>
+		(<div class="edit"><a href='<c:out value="${editURL}" />'><span>edit</span></a></div>)
+		next to the <i>manual matches</i> above.
+	</li>
 </ul>
-
-<p>If an active player doesn't send a single legal move back for three matches in a row, it is assumed that this 
-player has crashed, and its status is automatically set to "inactive" by the 
-GGP Server.</p>
-
-<p>The GGP Server will never set a player's status back to "active". You have to
-do so manually.</p>
 
 <jsp:directive.include file="/inc/footer.jsp" />

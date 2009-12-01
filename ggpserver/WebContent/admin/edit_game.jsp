@@ -75,7 +75,7 @@
 		</tr>
 		<tr>
 			<td valign="top" align="right">
-				Enabled (for round-robin scheduler)
+				Enabled
 			</td>
 			<td>
 				<c:choose>

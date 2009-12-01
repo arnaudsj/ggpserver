@@ -47,6 +47,7 @@ import tud.gamecontroller.scrambling.GameScramblerInterface;
 import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DuplicateInstanceException;
+import tud.ggpserver.datamodel.User;
 import tud.ggpserver.datamodel.dblists.DynamicDBBackedList;
 import tud.ggpserver.datamodel.dblists.ErrorMessageAccessor;
 import tud.ggpserver.datamodel.dblists.JointMovesAccessor;
@@ -106,10 +107,10 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 			boolean scrambled,
 			String tournamentID,
 			double weight,
-			AbstractDBConnector<TermType, ReasonerStateInfoType> db,
+			User owner, AbstractDBConnector<TermType, ReasonerStateInfoType> db,
 			MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory,
 			GameScramblerInterface gameScrambler) {
-		super(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, scrambled, tournamentID, weight, db);
+		super(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, scrambled, tournamentID, weight, owner, db);
 		this.moveFactory = movefactory;
 		this.gameScrambler = gameScrambler;
 	}

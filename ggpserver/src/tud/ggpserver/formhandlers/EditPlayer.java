@@ -39,6 +39,8 @@ public class EditPlayer {
 	private String host = "";
 	private int port = 0;
 	private String status = RemotePlayerInfo.STATUS_INACTIVE;
+	private boolean availableForRoundRobinMatches = false;
+	private boolean availableForManualMatches = false;
 	
 	private List<String> errorsHost = new LinkedList<String>();
 	private List<String> errorsPort = new LinkedList<String>();
@@ -115,7 +117,7 @@ public class EditPlayer {
 		assert (isValidPlayer());
 		assert (isValid());
 		
-		DBConnectorFactory.getDBConnector().updatePlayerInfo(getPlayerName(), getHost(), getPort(), user, getStatus());
+		DBConnectorFactory.getDBConnector().updatePlayerInfo(getPlayerName(), getHost(), getPort(), user, getStatus(), availableForRoundRobinMatches, availableForManualMatches);
 		correctlyUpdated = true;
 	}
 	
@@ -168,6 +170,8 @@ public class EditPlayer {
 			host = player.getHost();
 			port = player.getPort();
 			status = player.getStatus();
+			availableForRoundRobinMatches = player.isAvailableForRoundRobinMatches();
+			availableForManualMatches = player.isAvailableForManualMatches();
 		}
 		this.player = player;
 	}
@@ -197,6 +201,23 @@ public class EditPlayer {
 
 	public void setUserName(String userName) throws SQLException {
 		user = DBConnectorFactory.getDBConnector().getUser(userName);
+	}
+
+	public boolean isAvailableForRoundRobinMatches() {
+		return availableForRoundRobinMatches;
+	}
+
+	public void setAvailableForRoundRobinMatches(
+			boolean availableForRoundRobinMatches) {
+		this.availableForRoundRobinMatches = availableForRoundRobinMatches;
+	}
+
+	public boolean isAvailableForManualMatches() {
+		return availableForManualMatches;
+	}
+
+	public void setAvailableForManualMatches(boolean availableForManualMatches) {
+		this.availableForManualMatches = availableForManualMatches;
 	}
 
 	public List<String> getErrorsHost() {

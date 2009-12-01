@@ -22,26 +22,11 @@ package tud.ggpserver.formhandlers;
 import static tud.ggpserver.datamodel.DBConnectorFactory.getDBConnector;
 
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
-import tud.gamecontroller.game.RoleInterface;
-import tud.gamecontroller.players.LegalPlayerInfo;
-import tud.gamecontroller.players.PlayerInfo;
-import tud.gamecontroller.players.RandomPlayerInfo;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
-import tud.ggpserver.datamodel.Game;
-import tud.ggpserver.datamodel.RemotePlayerInfo;
 import tud.ggpserver.datamodel.Tournament;
 import tud.ggpserver.datamodel.User;
-import tud.ggpserver.datamodel.matches.NewMatch;
-import tud.ggpserver.datamodel.matches.RunningMatch;
-import tud.ggpserver.datamodel.matches.ScheduledMatch;
-import tud.ggpserver.datamodel.matches.ServerMatch;
-import tud.ggpserver.scheduler.MatchRunner;
 
 public class DeleteTournament {
 	private Tournament<?, ?> tournament = null;
@@ -52,10 +37,13 @@ public class DeleteTournament {
 	private final AbstractDBConnector db = DBConnectorFactory.getDBConnector();
 	
 	public boolean isValid() throws SQLException {
+		if (!tournament.isDeletable())
+			return false;
+		
 		if (tournament.getOwner().equals(user))
 			return true;
 		
-		if (user.getRoleNames().contains("admin"))
+		if (user.isAdmin())
 			return true;
 		
 		return false;

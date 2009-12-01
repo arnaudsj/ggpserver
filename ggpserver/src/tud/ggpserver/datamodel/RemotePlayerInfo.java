@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+                  2009 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GGP Server.
 
@@ -26,6 +27,8 @@ public class RemotePlayerInfo extends tud.gamecontroller.players.RemotePlayerInf
 
 	private final User owner;
 	private final String status;
+	private final boolean availableForRoundRobinMatches;
+	private final boolean availableForManualMatches;
 
 //	/**
 //	 * copy constructor; needed, because role index is unfortunately stored here. destroys the singleton pattern.
@@ -37,19 +40,19 @@ public class RemotePlayerInfo extends tud.gamecontroller.players.RemotePlayerInf
 	/**
 	 * Use DBConnectorFactory.getDBConnector().getRemotePlayerInfo() instead
 	 */
-	protected RemotePlayerInfo(int roleindex, String name, String host, int port, User owner, String status) {
+	protected RemotePlayerInfo(int roleindex, String name, String host, int port, User owner, String status, boolean availableForRoundRobinMatches, boolean availableForManualMatches) {
 		super(roleindex, name, host, port);
 		this.owner = owner;
 		this.status = status;
+		this.availableForRoundRobinMatches = availableForRoundRobinMatches;
+		this.availableForManualMatches = availableForManualMatches;
 	}
 
 	/**
 	 * Use AbstractDBConnector.getRemotePlayerInfo() instead
 	 */
-	protected RemotePlayerInfo(String name, String host, int port, User owner, String status) {
-		super(-1, name, host, port);
-		this.owner = owner;
-		this.status = status;
+	protected RemotePlayerInfo(String name, String host, int port, User owner, String status, boolean availableForRoundRobinMatches, boolean availableForManualMatches) {
+		this(-1, name, host, port, owner, status, availableForRoundRobinMatches, availableForManualMatches);
 	}
 
 	public User getOwner() {
@@ -59,6 +62,14 @@ public class RemotePlayerInfo extends tud.gamecontroller.players.RemotePlayerInf
 
 	public String getStatus() {
 		return status;
+	}
+
+	public boolean isAvailableForRoundRobinMatches() {
+		return availableForRoundRobinMatches;
+	}
+
+	public boolean isAvailableForManualMatches() {
+		return availableForManualMatches;
 	}
 
 	public static boolean legalStatus(String status) {

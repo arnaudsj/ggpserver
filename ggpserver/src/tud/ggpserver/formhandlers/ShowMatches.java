@@ -32,6 +32,7 @@ public class ShowMatches extends AbstractPager {
 	private String playerName = null;
 	private String gameName = null;
 	private String tournamentID = null;
+	private String owner = null;
 
 	private List<? extends ServerMatch<?,?>> matches = null;
 
@@ -63,7 +64,7 @@ public class ShowMatches extends AbstractPager {
 	@SuppressWarnings("unchecked")
 	public List<? extends ServerMatch<?, ?>> getMatches() throws SQLException {
 		if (matches == null) {
-			matches = db.getMatches(getStartRow(), getNumDisplayedRows(), playerName, gameName, tournamentID, excludeNewMatches());
+			matches = db.getMatches(getStartRow(), getNumDisplayedRows(), playerName, gameName, tournamentID, owner, excludeNewMatches());
 		}
 		return matches;
 	}
@@ -75,9 +76,17 @@ public class ShowMatches extends AbstractPager {
 	@Override
 	protected int getRowCount() throws SQLException {
 		if (rowCountMatches == -1) {
-			rowCountMatches = db.getRowCountMatches(playerName, gameName, tournamentID, excludeNewMatches());
+			rowCountMatches = db.getRowCountMatches(playerName, gameName, tournamentID, owner, excludeNewMatches());
 		}
 		return rowCountMatches;
+	}
+
+	public String getOwner() {
+		return owner;
+	}
+
+	public void setOwner(String owner) {
+		this.owner = owner;
 	}
 
 	public String getPlayerName() {
@@ -101,7 +110,6 @@ public class ShowMatches extends AbstractPager {
 		return tournamentID;
 	}
 
-	@SuppressWarnings("unused")
 	public void setTournamentID(String tournamentID) throws SQLException {
 		this.tournamentID = tournamentID;
 	}
@@ -124,6 +132,9 @@ public class ShowMatches extends AbstractPager {
 		}
 		if (tournamentID != null) {
 			parameters.add("tournamentID=" + tournamentID);
+		}
+		if (owner != null) {
+			parameters.add("owner=" + owner);
 		}
 		
 		if (!parameters.isEmpty()) {

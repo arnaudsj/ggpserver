@@ -136,7 +136,9 @@ public class PlayerErrorTracker<TermType extends TermInterface, ReasonerStateInf
 			getDBConnector().updatePlayerInfo(playerInfo.getName(),
 					playerInfo.getHost(), playerInfo.getPort(),
 					playerInfo.getOwner(),
-					RemotePlayerInfo.STATUS_INACTIVE);
+					RemotePlayerInfo.STATUS_INACTIVE,
+					playerInfo.isAvailableForRoundRobinMatches(),
+					playerInfo.isAvailableForManualMatches());
 		} catch (SQLException e) {
 			logger.severe("exception: " + e);
 		}

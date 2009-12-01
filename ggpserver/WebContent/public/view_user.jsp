@@ -58,6 +58,26 @@ if (viewUser.getUser() == null) {
 				</c:forEach>
 			</td>
 		</tr>
+		<tr>
+			<th>matches</th>
+			<td>
+				<c:url value="show_matches.jsp" var="matchesURL">
+					<c:param name="owner" value="${viewUser.user.userName}" />
+				</c:url>
+				<a href='<c:out value="${matchesURL}" />'>show matches started by ${viewUser.user.userName}</a><br>
+			</td>
+		</tr>
+		<tr>
+			<th>tournaments</th>
+			<td>
+				<c:forEach var="tournament" items="${viewUser.tournaments}">
+					<c:url value="view_tournament.jsp" var="tournamentURL">
+						<c:param name="tournamentID" value="${tournament.tournamentID}" />
+					</c:url>
+					<a href='<c:out value="${tournamentURL}" />'>${tournament.tournamentID}</a><br>
+				</c:forEach>
+			</td>
+		</tr>
 	</tbody>
 </table>
 

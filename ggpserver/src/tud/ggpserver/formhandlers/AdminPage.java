@@ -29,7 +29,6 @@ import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.ConfigOption;
 import tud.ggpserver.datamodel.Game;
 import tud.ggpserver.datamodel.Tournament;
-import tud.ggpserver.scheduler.AbstractRoundRobinScheduler;
 import tud.ggpserver.scheduler.RoundRobinScheduler;
 
 public class AdminPage {
@@ -154,7 +153,7 @@ public class AdminPage {
 	
 	public List<? extends Tournament<?, ?>> getTournaments() throws SQLException {
 		List<? extends Tournament<?, ?>> tournaments = getDBConnector().getTournaments();
-		tournaments.remove(getDBConnector().getTournament(AbstractRoundRobinScheduler.ROUND_ROBIN_TOURNAMENT_ID));
+		tournaments.remove(getDBConnector().getTournament(Tournament.ROUND_ROBIN_TOURNAMENT_ID));
 		return tournaments;
 	}
 }

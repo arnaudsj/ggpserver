@@ -1,5 +1,5 @@
 <%--
-    Copyright (C) 2009 Martin Günther (mintar@gmx.de)
+    Copyright (C) 2009 Martin Gï¿½nther (mintar@gmx.de)
 
     This file is part of GGP Server.
 
@@ -27,6 +27,12 @@
 		<jsp:setProperty name="editPlayer" property="host"/>
 		<jsp:setProperty name="editPlayer" property="port"/>
 		<jsp:setProperty name="editPlayer" property="status"/>
+		<%-- setting availableForRoundRobinMatches to false is necessary because the property is only send with the request if the checkbox is checked --%>
+		<jsp:setProperty name="editPlayer" property="availableForRoundRobinMatches" value="false"/>
+		<jsp:setProperty name="editPlayer" property="availableForRoundRobinMatches"/>
+		<%-- setting availableForManualMatches to false is necessary because the property is only send with the request if the checkbox is checked --%>
+		<jsp:setProperty name="editPlayer" property="availableForManualMatches" value="false"/>
+		<jsp:setProperty name="editPlayer" property="availableForManualMatches"/>
 	</c:catch>
 </jsp:useBean>
 

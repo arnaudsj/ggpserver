@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+                  2009 Stephan Schiffel <stephan.schiffel@gmx.de> 
 
     This file is part of GGP Server.
 
@@ -24,6 +25,7 @@ import java.util.Collection;
 
 import tud.gamecontroller.players.PlayerInfo;
 import tud.ggpserver.datamodel.DBConnectorFactory;
+import tud.ggpserver.datamodel.Tournament;
 import tud.ggpserver.datamodel.User;
 
 
@@ -40,5 +42,9 @@ public class ViewUser {
 	
 	public Collection<? extends PlayerInfo> getPlayers() throws SQLException {
 		return DBConnectorFactory.getDBConnector().getPlayerInfosForUser(user.getUserName());
+	}
+	
+	public Collection<? extends Tournament<?,?>> getTournaments() throws SQLException {
+		return DBConnectorFactory.getDBConnector().getTournamentsCreatedByUser(user.getUserName());
 	}
 }

@@ -30,6 +30,7 @@ import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
+import tud.ggpserver.datamodel.User;
 import tud.ggpserver.datamodel.dblists.ErrorMessageAccessor;
 import tud.ggpserver.datamodel.dblists.JointMovesAccessor;
 import tud.ggpserver.datamodel.dblists.StaticDBBackedList;
@@ -48,8 +49,8 @@ public class AbortedMatch<TermType extends TermInterface, ReasonerStateInfoType>
 			boolean scrambled,
 			String tournamentID,
 			double weight,
-			AbstractDBConnector<TermType, ReasonerStateInfoType> db) {
-		super(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, scrambled, tournamentID, weight, db);
+			User owner, AbstractDBConnector<TermType, ReasonerStateInfoType> db) {
+		super(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, scrambled, tournamentID, weight, owner, db);
 	}
 
 

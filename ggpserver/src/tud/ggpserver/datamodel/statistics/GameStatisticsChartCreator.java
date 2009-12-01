@@ -207,7 +207,7 @@ public class GameStatisticsChartCreator {
 			// make the chart
 			String gameName = ( game!=null ? game.getName() : null);
 			
-			List<? extends ServerMatch<?, ?>> matches = db.getMatches(0, Integer.MAX_VALUE, null, gameName, tournamentID, true);
+			List<? extends ServerMatch<?, ?>> matches = db.getMatches(0, Integer.MAX_VALUE, null, gameName, tournamentID, null, true);
 			
 			Collection<? extends RoleInterface<?>> roles = null;
 			if (role != null) {

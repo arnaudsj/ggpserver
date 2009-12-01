@@ -27,6 +27,8 @@
 		<jsp:setProperty name="editPlayer" property="host"/>
 		<jsp:setProperty name="editPlayer" property="port"/>
 		<jsp:setProperty name="editPlayer" property="status"/>
+		<jsp:setProperty name="editPlayer" property="availableForRoundRobinMatches"/>
+		<jsp:setProperty name="editPlayer" property="availableForManualMatches"/>
 	</c:catch>
 </jsp:useBean>
 
@@ -110,6 +112,36 @@
 			</td>
 		</tr>
 		<tr>
+			<td valign="top" align="right">
+				available for round robin play
+			</td>
+			<td>
+				<c:choose>
+					<c:when test="${editPlayer.availableForRoundRobinMatches}">
+						<input type="checkbox" name="availableForRoundRobinMatches" value="true" checked="checked">
+					</c:when>
+					<c:otherwise>
+						<input type="checkbox" name="availableForRoundRobinMatches" value="true">
+					</c:otherwise>
+				</c:choose>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" align="right">
+				available for manual matches by other users
+			</td>
+			<td>
+				<c:choose>
+					<c:when test="${editPlayer.availableForManualMatches}">
+						<input type="checkbox" name="availableForManualMatches" value="true" checked="checked">
+					</c:when>
+					<c:otherwise>
+						<input type="checkbox" name="availableForManualMatches" value="true">
+					</c:otherwise>
+				</c:choose>
+			</td>
+		</tr>
+		<tr>
 			<td colspan="2" align="center">
 				<input type="submit" value="Submit">
 				<input type="reset" value="Reset"> 
@@ -117,5 +149,8 @@
 		</tr>
 	</table>
 	</form>
+
+<h1>Hints</h1>
+<jsp:directive.include file="/inc/player_hints.jsp" />
 
 <jsp:directive.include file="/inc/footer.jsp" />
