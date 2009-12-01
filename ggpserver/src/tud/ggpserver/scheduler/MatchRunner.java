@@ -176,7 +176,7 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 		logger.info("matchRunner stopped");
 	}
 
-	private ScheduledMatch<TermType, ReasonerStateInfoType> waitForRunnableMatch() throws InterruptedException {
+	private synchronized ScheduledMatch<TermType, ReasonerStateInfoType> waitForRunnableMatch() throws InterruptedException {
 		ScheduledMatch<TermType, ReasonerStateInfoType> runnableMatch = null;
 
 		while (runnableMatch == null) {
@@ -185,9 +185,7 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 				logger.info("found runnable match: " + runnableMatch.getMatchID());
 			}else if(scheduledMatches.isEmpty()) {
 				logger.info("no scheduled match -> stop MatchRunner");
-				synchronized (this) {
 					stop = true;
-				}
 				throw new InterruptedException();
 			}else{
 				logger.info("no runnable match found (but " + scheduledMatches.size() + " scheduled) -> wait");
