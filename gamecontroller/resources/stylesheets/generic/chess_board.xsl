@@ -473,10 +473,7 @@
 		<xsl:param name="coordArgIdx"/>
 		<xsl:param name="otherArgIdx"/>
 		
-		<xsl:variable name="SomeOtherCoord">
-			<xsl:value-of select="fact[prop-f=$cellFluentName]/arg[number($otherArgIdx)]"/>
-		</xsl:variable>
-		<xsl:for-each select="fact[prop-f=$cellFluentName and arg[number($otherArgIdx)]=$SomeOtherCoord]/arg[number($coordArgIdx)]">
+		<xsl:for-each select="fact[prop-f=$cellFluentName]/arg[number($coordArgIdx)]">
 			<xsl:sort order="ascending" select="."/>
 			<xsl:if test="position() = 1">
 				<xsl:call-template name="coord2number">
@@ -491,10 +488,7 @@
 		<xsl:param name="coordArgIdx"/>
 		<xsl:param name="otherArgIdx"/>
 		
-		<xsl:variable name="SomeOtherCoord">
-			<xsl:value-of select="fact[prop-f=$cellFluentName]/arg[number($otherArgIdx)]"/>
-		</xsl:variable>
-		<xsl:for-each select="fact[prop-f=$cellFluentName and arg[number($otherArgIdx)]=$SomeOtherCoord]/arg[number($coordArgIdx)]">
+		<xsl:for-each select="fact[prop-f=$cellFluentName]/arg[number($coordArgIdx)]">
 			<xsl:sort order="descending" select="."/>
 			<xsl:if test="position() = 1">
 				<xsl:call-template name="coord2number">
