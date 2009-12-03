@@ -129,7 +129,7 @@ public abstract class AbstractGameValidator {
 			// JavaProver likes to throw NullPointerExceptions when called with
 			// game descriptions such as "asdsdfsdfsdfg", so all we can do here
 			// is catch RuntimeExceptions.
-			errorsDescription.add("there was a syntax error in your game description");
+			errorsDescription.add("there was an error in your game description, JavaProver threw:" + e1.toString());
 		}
 		
 		//// stylesheet ////

@@ -44,6 +44,7 @@
 
 <h1 class="notopborder">Recent changes</h1>
 	<ul>
+		<li><span style="color:red;">A bug that prevented starting matches manually is fixed.</span></li>
 		<li>Users can now create/start matches manually.</li>
 		<li>Users can now create own tournaments.</li>
 		<li>You can choose if your players takes part in automatic round-robin tournament.</li>

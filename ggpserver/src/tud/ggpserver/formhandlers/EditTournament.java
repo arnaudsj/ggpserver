@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.players.LegalPlayerInfo;
@@ -50,6 +51,8 @@ public class EditTournament extends ShowMatches {
 	public static final String DELETE_MATCH = "delete_match";
 	public static final String CLONE_MATCH = "clone_match";
 	
+	private static final Logger logger = Logger.getLogger(EditTournament.class.getName());
+
 	private Tournament<?, ?> tournament;
 	private String action;
 	private ServerMatch<?, ?> match;
@@ -112,6 +115,7 @@ public class EditTournament extends ShowMatches {
 		if (Tournament.MANUAL_TOURNAMENT_ID.equals(tournament.getTournamentID()))
 			return true;
 
+		logger.warning("user '"+user.getUserName()+"' is not allowed to edit tournament '"+tournament.getTournamentID()+"'");
 		return false;
 	}
 	
@@ -130,10 +134,14 @@ public class EditTournament extends ShowMatches {
 			for(PlayerInfo playerInfo:match.getPlayerInfos()) {
 				if(playerInfo instanceof RemotePlayerInfo) {
 					RemotePlayerInfo remotePlayerInfo = (RemotePlayerInfo)playerInfo;
-					if(remotePlayerInfo.getStatus()!=RemotePlayerInfo.STATUS_ACTIVE)
+					if(!remotePlayerInfo.getStatus().equals(RemotePlayerInfo.STATUS_ACTIVE)) {
+						logger.warning("start match is invalid: "+remotePlayerInfo.getName()+" is " + remotePlayerInfo.getStatus() + "(not " + RemotePlayerInfo.STATUS_ACTIVE + ")");
 						return false;
-					if(!remotePlayerInfo.isAvailableForManualMatches() && !remotePlayerInfo.getOwner().equals(user))
+					}
+					if(!remotePlayerInfo.isAvailableForManualMatches() && !remotePlayerInfo.getOwner().equals(user)) {
+						logger.warning("start match is invalid: "+remotePlayerInfo.getName()+" is not available and not owned by "+user.getUserName());
 						return false;
+					}
 				}
 			}
 			return true;
@@ -144,6 +152,7 @@ public class EditTournament extends ShowMatches {
 		} else if (action.equals(CLONE_MATCH) && match != null) {
 			return true;
 		}
+		logger.warning("action '"+action+"' is invalid for match '"+match.getMatchID());
 		return false;
 	}
 	
@@ -152,7 +161,6 @@ public class EditTournament extends ShowMatches {
 		if (!isValid()) {
 			throw new IllegalStateException("performAction() called without checking isValid() first!");
 		}
-
 		if (action.equals(ADD_MATCH)) {
 			addMatch();
 		} else if (action.equals(START_MATCH)) {

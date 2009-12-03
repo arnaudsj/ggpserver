@@ -1,5 +1,6 @@
 <%--
     Copyright (C) 2009 Martin Günther (mintar@gmx.de)
+                  2009 Stephan Schiffel (stephan.schiffel@gmx.de)
 
     This file is part of GGP Server.
 
@@ -34,6 +35,7 @@
 		<thead>
 			<tr>
 				<th>tournament</th>
+				<th>owner</th>
 				<th colspan="3">actions</th>
 			</tr>
 		</thead>
@@ -50,6 +52,12 @@
 		     <tr class="${rowClass}">
 				<td>
 				    <c:out value="${tournament.tournamentID}" />
+				</td>
+				<td>
+					<c:url value="view_user.jsp" var="viewUserURL">
+						<c:param name="userName" value="${tournament.owner.userName}" />
+					</c:url>
+					<a href='<c:out value="${viewUserURL}" />'><c:out value="${tournament.owner.userName}" /></a>
 				</td>
 				<td>
 					<c:url value="view_tournament.jsp" var="viewTournamentURL">
