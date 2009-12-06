@@ -341,10 +341,6 @@
 			</tr>		
 		    </tbody>
 		</table>
-		
-		
-		<center><input type="submit" name="submitButton" value="Save" style="color:#c0c0c0; font-size:14pt; font-weight:bold;"></center>
-		
 	    </form>
 			    
 	    <jsp:directive.include file="/inc/pager.jsp" />
@@ -357,11 +353,6 @@
 			    
 	    <h1>Notes</h1>
 	    <ul>
-			<li>Before viewing, starting, deleting, cloning or adding 
-				a match, you have to save your changes.</li>
-			<li>When clicking "save", all changes will be stored
-			    persistently, including any new matches. They can still be 
-				edited.</li>
 			<li>New matches won't show up on the publicly visible 
 			    public/show_matches.jsp page; only running, aborted and 
 				finished matches do.</li>

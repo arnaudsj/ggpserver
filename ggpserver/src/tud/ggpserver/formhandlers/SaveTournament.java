@@ -24,6 +24,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import tud.ggpserver.datamodel.Tournament;
+import tud.ggpserver.datamodel.DBConnector;
+import tud.ggpserver.datamodel.User;
+import tud.ggpserver.datamodel.matches.ServerMatch;
 
 public class SaveTournament {
 	/**
@@ -53,9 +57,32 @@ public class SaveTournament {
 	private int page;
 	private boolean correctlyPerformed = false;
 	private boolean newContent = true;
-
+	private User user = null;
+	
 	private Map<String, EditableMatch> editableMatches = new HashMap<String, EditableMatch>();
 
+	public void setUserName(String userName) throws SQLException {
+		user = DBConnector.getInstance().getUser(userName);
+	}
+	
+	public boolean isAllow(String matchid) throws SQLException {
+		DBConnector db = DBConnector.getInstance();
+		ServerMatch<?, ?> match = db.getMatch(matchid);
+		if (match == null || user == null)
+			return false;
+		
+		if (match.getOwner().equals(user))
+			return true;
+		
+		if (user.isAdmin())
+			return true;
+		
+		errorString = "user '"+user.getUserName()+"' is not allowed to edit match '"+matchid+"'";
+		
+		logger.warning(errorString);
+		return false;
+	}
+	
 	public String getErrorString() {
 		return errorString;
 	}
@@ -83,37 +110,38 @@ public class SaveTournament {
 	
 
 	public void parseParameterMap(Map<String, String[]> parameterMap) throws SQLException {
-		for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
-			String key = entry.getKey();
-			String[] params = entry.getValue();
-			if (key.equals(PARAM_TOURNAMENT_ID)) {
-				parseTournamentID(params);
-			} else if (key.equals(PARAM_SUBMIT_BUTTON)) {
-				// ignore
-			} else if (key.startsWith(PREFIX_GAME_NAME)) {
-				parseGameName(key.substring(PREFIX_GAME_NAME.length()), params);
-			} else if (key.startsWith(PREFIX_START_CLOCK)) {
-				parseStartClock(key.substring(PREFIX_START_CLOCK.length()), params);
-			} else if (key.startsWith(PREFIX_PLAY_CLOCK)) {
-				parsePlayClock(key.substring(PREFIX_PLAY_CLOCK.length()), params);
-			} else if (key.startsWith(PREFIX_PLAYER_INFOS)) {
-				parsePlayerInfos(key.substring(PREFIX_PLAYER_INFOS.length()), params);
-			} else if (key.startsWith(PREFIX_SCRAMBLED)) {
-				parseScrambled(key.substring(PREFIX_SCRAMBLED.length()), params);
-			} else if (key.startsWith(PREFIX_GOALVALUE)) {
-				parseGoalValue(key.substring(PREFIX_GOALVALUE.length()), params);
-			} else if (key.startsWith(PREFIX_WEIGHT)) {
-				parseWeight(key.substring(PREFIX_WEIGHT.length()), params);
-			} else {
-				String message = "Map<String,String[]> - Unknown parameter: " + key + " (values ";
-				for (String value : params) {
-					message += value + " ";
-				}
-				message += ")";
-				logger.warning(message);
-			}
-		}
 		try {
+			for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
+				String key = entry.getKey();
+				String[] params = entry.getValue();
+				if (key.equals(PARAM_TOURNAMENT_ID)) {
+					parseTournamentID(params);
+				} else if (key.equals(PARAM_SUBMIT_BUTTON)) {
+					// ignore
+				} else if (key.startsWith(PREFIX_GAME_NAME)) {
+					parseGameName(key.substring(PREFIX_GAME_NAME.length()), params);
+				} else if (key.startsWith(PREFIX_START_CLOCK)) {
+					parseStartClock(key.substring(PREFIX_START_CLOCK.length()), params);
+				} else if (key.startsWith(PREFIX_PLAY_CLOCK)) {
+					parsePlayClock(key.substring(PREFIX_PLAY_CLOCK.length()), params);
+				} else if (key.startsWith(PREFIX_PLAYER_INFOS)) {
+					parsePlayerInfos(key.substring(PREFIX_PLAYER_INFOS.length()), params);
+				} else if (key.startsWith(PREFIX_SCRAMBLED)) {
+					parseScrambled(key.substring(PREFIX_SCRAMBLED.length()), params);
+				} else if (key.startsWith(PREFIX_GOALVALUE)) {
+					parseGoalValue(key.substring(PREFIX_GOALVALUE.length()), params);
+				} else if (key.startsWith(PREFIX_WEIGHT)) {
+					parseWeight(key.substring(PREFIX_WEIGHT.length()), params);
+				} else {
+					String message = "Map<String,String[]> - Unknown parameter: " + key + " (values ";
+					for (String value : params) {
+						message += value + " ";
+					}
+					message += ")";
+					logger.warning(message);
+				}
+			}
+			
 			commit();
 			correctlyPerformed = true;
 		} catch (IllegalArgumentException e) {
@@ -127,6 +155,7 @@ public class SaveTournament {
 
 	private void commit() throws SQLException {
 		for (EditableMatch match : editableMatches.values()) {
+			
 			match.commit();
 		}
 	}
@@ -214,8 +243,11 @@ public class SaveTournament {
 	private EditableMatch getEditableMatch(String matchID) throws SQLException {
 		EditableMatch result = editableMatches.get(matchID);
 		if (result == null) {
-			result = new EditableMatch(matchID);
-			editableMatches.put(matchID, result);
+			if (isAllow(matchID)) {
+				result = new EditableMatch(matchID);
+				editableMatches.put(matchID, result);
+			} else
+				throw new IllegalStateException("You are not allowed to edit this match!");
 		}
 		return result;
 	}

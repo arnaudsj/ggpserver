@@ -24,6 +24,7 @@
       <c:catch>
 	<jsp:setProperty name="saveTournament" property="page" />
 	<jsp:setProperty name="saveTournament" property="newContent" />
+	<jsp:setProperty name="saveTournament" property="userName" value="<%= request.getUserPrincipal().getName()%>" />
       </c:catch>
 </jsp:useBean>
 
