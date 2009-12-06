@@ -61,11 +61,19 @@
 	
 	    <jsp:directive.include file="/inc/pager.jsp" />
 	
-	    <c:url value="process_save_tournament.jsp" var="saveChangesURL">
+	    <c:url value="process_save_tournament.jsp" var="saveChangesURLWithNewContent">
 			<c:param name="tournamentID" value="${pager.tournamentID}"/>
 			<c:param name="page" value="${pager.page}" />
+			<c:param name="newContent" value="true" />
 	    </c:url>
-	    <form name="theForm" action="${saveChangesURL}" method="post">
+
+	    <c:url value="process_save_tournament.jsp" var="saveChangesURLWithNoNewContent">
+			<c:param name="tournamentID" value="${pager.tournamentID}"/>
+			<c:param name="page" value="${pager.page}" />
+			<c:param name="newContent" value="false" />
+	    </c:url>
+
+	    <form name="theForm" action="" method="post">
 		
 		<table>
 		    <thead>
@@ -100,7 +108,7 @@
 				<td>
 				    <c:choose>
 					<c:when test="${match.status == 'new'}">
-					    <select name="gameName+${match.matchID}" size="1" onChange="theForm.submit();" style="max-width:120px;">
+					    <select name="gameName+${match.matchID}" size="1" onChange="theForm.action='${saveChangesURLWithNewContent}'; theForm.submit();" style="max-width:120px;">
 						<c:forEach var="game" items="${pager.games}">
 							<c:choose>
 								<c:when test='${game.name == match.game.name}'>
@@ -126,7 +134,7 @@
 				<td>
 				    <c:choose>
 					<c:when test="${match.status == 'new'}">
-					    <input type="text" name="startclock+${match.matchID}" size="3" value="${match.startclock}" maxlength="4" style="text-align: right;" onchange="document.theForm.submitButton.style.color = '#ff0000';">
+					    <input type="text" name="startclock+${match.matchID}" size="3" value="${match.startclock}" maxlength="4" style="text-align: right;" onChange="theForm.action='${saveChangesURLWithNoNewContent}'; theForm.submit();">
 					</c:when>
 					<c:otherwise><c:out value="${match.startclock}" /></c:otherwise>
 				    </c:choose>
@@ -136,7 +144,7 @@
 				<td>
 				    <c:choose>
 					<c:when test="${match.status == 'new'}">
-					    <input type="text" name="playclock+${match.matchID}" size="3" value="${match.playclock}" maxlength="4" style="text-align: right;" onchange="document.theForm.submitButton.style.color = '#ff0000';">
+						<input type="text" name="playclock+${match.matchID}" size="3" value="${match.playclock}" maxlength="4" style="text-align: right;" onChange="theForm.action='${saveChangesURLWithNoNewContent}'; theForm.submit();">
 					</c:when>
 					<c:otherwise><c:out value="${match.playclock}" /></c:otherwise>
 				    </c:choose>
@@ -147,7 +155,7 @@
 				    <c:forEach var="selectedplayerinfo" items="${match.orderedPlayerInfos}">
 					<c:choose>
 					    <c:when test="${match.status == 'new'}">
-							<select name="playerInfos+${match.matchID}" size="1" onchange="document.theForm.submitButton.style.color = '#ff0000';" style="max-width:120px;">
+							<select name="playerInfos+${match.matchID}" size="1" onChange="theForm.action='${saveChangesURLWithNoNewContent}'; theForm.submit();" style="max-width:120px;">
 							    <c:forEach var="playerinfo" items="${pager.playerInfos}">
 									<c:choose>
 									    <c:when test='${playerinfo.name == selectedplayerinfo.name}'>
@@ -185,7 +193,7 @@
 				<td>
 				    <c:if test="${!(match.status == 'new')}"><c:set var="scrambling_disabled" value="disabled" /></c:if>
 				    <c:if test="${match.scrambled}"><c:set var="scrambling_checked" value="checked" /></c:if>
-				    <input type="checkbox" name="scrambled+${match.matchID}" value="checked" onchange="document.theForm.submitButton.style.color = '#ff0000';" ${scrambling_disabled} ${scrambling_checked}>
+				    <input type="checkbox" name="scrambled+${match.matchID}" value="checked" onChange="theForm.action='${saveChangesURLWithNoNewContent}'; theForm.submit();" ${scrambling_disabled} ${scrambling_checked}>
 				    
 				    <%-- clean variables up for next iteration --%>
 				    <c:set var="scrambling_disabled" value="" />
@@ -202,7 +210,7 @@
 						    <c:forEach var="roleindex" begin="0" end="${match.game.numberOfRoles - 1}">
 						    	<c:choose>
 							    	<c:when test="${pager.goalEditable}">
-						    			<input type="text" name="goalvalue+${match.matchID}" size="3" value="${match.orderedGoalValues[roleindex]}" maxlength="4" style="text-align: right;" onchange="document.theForm.submitButton.style.color = '#ff0000';">
+						    			<input type="text" name="goalvalue+${match.matchID}" size="3" value="${match.orderedGoalValues[roleindex]}" maxlength="4" style="text-align: right;" onChange="theForm.action='${saveChangesURLWithNoNewContent}'; theForm.submit();">
 						    		</c:when>
 						    		<c:otherwise>
 						    			<input type="hidden" name="goalvalue+${match.matchID}" value="${match.orderedGoalValues[roleindex]}">
@@ -217,7 +225,7 @@
 				<!-- weight -->
 			    <c:if test="${pager.goalEditable}">
 					<td>
-					    <input type="text" name="weight+${match.matchID}" size="3" value="${match.weight}" maxlength="10" style="text-align: right;" onchange="document.theForm.submitButton.style.color = '#ff0000';">
+					    <input type="text" name="weight+${match.matchID}" size="3" value="${match.weight}" maxlength="10" style="text-align: right;" onChange="theForm.action='${saveChangesURLWithNoNewContent}'; theForm.submit();">
 				    </td>
 				</c:if>
 				

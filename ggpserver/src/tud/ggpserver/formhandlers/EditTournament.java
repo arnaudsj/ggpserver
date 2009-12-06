@@ -53,16 +53,22 @@ public class EditTournament extends ShowMatches {
 	
 	private static final Logger logger = Logger.getLogger(EditTournament.class.getName());
 
-	private Tournament<?, ?> tournament;
-	private String action;
-	private ServerMatch<?, ?> match;
+	private Tournament<?, ?> tournament = null;
+	private String action = null;
+	private ServerMatch<?, ?> match = null;
 	private boolean correctlyPerformed = false;
 	private User user = null;
 	private List<PlayerInfoForEditTournament> playerInfos = null;
+	
+	private String errorString = "No error";
 
 	@SuppressWarnings("unchecked")
 	public List<? extends Game<?, ?>> getGames() throws SQLException {
 		return db.getAllEnabledGames();
+	}
+	
+	public String getErrorString() {
+		return errorString;
 	}
 
 	public void setMatchID(String matchID) throws SQLException {
@@ -106,6 +112,9 @@ public class EditTournament extends ShowMatches {
 	 * @throws SQLException
 	 */
 	public boolean isAllow() throws SQLException {
+		if (tournament == null || user == null)
+			return false;
+		
 		if (tournament.getOwner().equals(user))
 			return true;
 		
@@ -114,8 +123,10 @@ public class EditTournament extends ShowMatches {
 		
 		if (Tournament.MANUAL_TOURNAMENT_ID.equals(tournament.getTournamentID()))
 			return true;
-
-		logger.warning("user '"+user.getUserName()+"' is not allowed to edit tournament '"+tournament.getTournamentID()+"'");
+		
+		errorString = "user '"+user.getUserName()+"' is not allowed to edit tournament '"+tournament.getTournamentID()+"'";
+		
+		logger.warning(errorString);
 		return false;
 	}
 	
@@ -135,11 +146,13 @@ public class EditTournament extends ShowMatches {
 				if(playerInfo instanceof RemotePlayerInfo) {
 					RemotePlayerInfo remotePlayerInfo = (RemotePlayerInfo)playerInfo;
 					if(!remotePlayerInfo.getStatus().equals(RemotePlayerInfo.STATUS_ACTIVE)) {
-						logger.warning("start match is invalid: "+remotePlayerInfo.getName()+" is " + remotePlayerInfo.getStatus() + "(not " + RemotePlayerInfo.STATUS_ACTIVE + ")");
+						errorString = "start match is invalid: "+remotePlayerInfo.getName()+" is " + remotePlayerInfo.getStatus() + "(not " + RemotePlayerInfo.STATUS_ACTIVE + ")";
+						logger.warning(errorString);
 						return false;
 					}
 					if(!remotePlayerInfo.isAvailableForManualMatches() && !remotePlayerInfo.getOwner().equals(user)) {
-						logger.warning("start match is invalid: "+remotePlayerInfo.getName()+" is not available and not owned by "+user.getUserName());
+						errorString = "start match is invalid: "+remotePlayerInfo.getName()+" is not available and not owned by "+user.getUserName();
+						logger.warning(errorString);
 						return false;
 					}
 				}
@@ -152,7 +165,8 @@ public class EditTournament extends ShowMatches {
 		} else if (action.equals(CLONE_MATCH) && match != null) {
 			return true;
 		}
-		logger.warning("action '"+action+"' is invalid for match '"+match.getMatchID());
+		errorString = "action '"+action+"' is invalid for match '"+match.getMatchID() + "'";
+		logger.warning(errorString);
 		return false;
 	}
 	
@@ -222,6 +236,9 @@ public class EditTournament extends ShowMatches {
 	}
 
 	public boolean isCorrectlyPerformed() {
+		if (!correctlyPerformed) {
+			errorString = "There occurred an error while performing the action'" + action + "' for match '"+match.getMatchID() + "'";
+		}
 		return correctlyPerformed;
 	}
 	

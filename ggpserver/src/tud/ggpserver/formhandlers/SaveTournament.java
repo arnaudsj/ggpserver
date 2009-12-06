@@ -49,18 +49,38 @@ public class SaveTournament {
 	public static final String PREFIX_WEIGHT = "weight+";
 
 	private String tournamentID;
+	private String errorString = "";
 	private int page;
+	private boolean correctlyPerformed = false;
+	private boolean newContent = true;
 
 	private Map<String, EditableMatch> editableMatches = new HashMap<String, EditableMatch>();
 
+	public String getErrorString() {
+		return errorString;
+	}
+	
 	public void setTournamentID(String tournamentID) {
 		this.tournamentID = tournamentID;
 		logger.config("String - tournamentID: " + tournamentID); //$NON-NLS-1$
 	}
-
+	
+	public void setNewContent(boolean newContent) {
+		this.newContent = newContent;
+	}
+	
+	public boolean isNewContent() {
+		return newContent;
+	}
+	
 	public String getTournamentID() {
 		return tournamentID;
 	}
+	
+	public boolean isCorrectlyPerformed() {
+		return correctlyPerformed;
+	}
+	
 
 	public void parseParameterMap(Map<String, String[]> parameterMap) throws SQLException {
 		for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
@@ -93,7 +113,16 @@ public class SaveTournament {
 				logger.warning(message);
 			}
 		}
-		commit();
+		try {
+			commit();
+			correctlyPerformed = true;
+		} catch (IllegalArgumentException e) {
+			errorString = e.getMessage();
+			correctlyPerformed = false;
+		} catch (IllegalStateException e) {
+			errorString = e.getMessage();
+			correctlyPerformed = false;
+		}
 	}
 
 	private void commit() throws SQLException {

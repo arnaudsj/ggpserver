@@ -20,13 +20,13 @@
 <%@ page language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%> 
 
-<jsp:useBean id="pager"
+<jsp:useBean id="process_pager"
 	class="tud.ggpserver.formhandlers.EditTournament" scope="page">
 	<c:catch>
-		<jsp:setProperty name="pager" property="tournamentID" />
-		<jsp:setProperty name="pager" property="action" />
-		<jsp:setProperty name="pager" property="matchID" />
-		<jsp:setProperty name="pager" property="userName" value="<%= request.getUserPrincipal().getName()%>" />
+		<jsp:setProperty name="process_pager" property="tournamentID" />
+		<jsp:setProperty name="process_pager" property="action" />
+		<jsp:setProperty name="process_pager" property="matchID" />
+		<jsp:setProperty name="process_pager" property="userName" value="<%= request.getUserPrincipal().getName()%>" />
 	</c:catch>
 </jsp:useBean>
 
@@ -37,12 +37,12 @@
 
 
 <c:choose> 
-	<c:when test="${pager.valid}" > 
+	<c:when test="${process_pager.valid}" > 
 		<%
-			pager.performAction();
+			process_pager.performAction();
 		%>
 		<c:choose> 
-			<c:when test="${pager.correctlyPerformed}" >
+			<c:when test="${process_pager.correctlyPerformed}" >
 				<%
 					String urlWithSessionID = response.encodeRedirectURL("edit_tournament.jsp" 
 							+ "?tournamentID=" + request.getParameter("tournamentID")
@@ -51,12 +51,18 @@
 				%>
 			</c:when> 
 			<c:otherwise>
-				<jsp:forward page="edit_tournament.jsp"/>
+				<c:set var="title">Not correctly performed</c:set>
+				<jsp:directive.include file="/inc/header_no_nav.jsp" />
+				<h1 class="notopborder">${process_pager.errorString}</h1>
+				<a href="<%= request.getContextPath() + response.encodeURL("/members/edit_tournament.jsp?tournamentID=" + request.getParameter("tournamentID")) %>">&lt;&lt;&lt; back to edit tournament page</a>
 			</c:otherwise> 
 		</c:choose>
 	</c:when> 
 	<c:otherwise>
-		<jsp:forward page="edit_tournament.jsp"/>
+		<c:set var="title">Not valid</c:set>
+		<jsp:directive.include file="/inc/header_no_nav.jsp" />	
+		<h1 class="notopborder">${process_pager.errorString}</h1>
+		<a href="<%= request.getContextPath() + response.encodeURL("/members/edit_tournament.jsp?tournamentID=" + request.getParameter("tournamentID")) %>">&lt;&lt;&lt; back to edit tournament page</a>
 	</c:otherwise> 
 </c:choose>
 
