@@ -26,9 +26,13 @@
 	     class="tud.ggpserver.formhandlers.EditTournament" scope="page">
     <c:catch>
 	<% // this is for catching NumberFormatExceptions and the like  %>
-	<jsp:setProperty name="pager" property="tournamentID" />
-	<jsp:setProperty name="pager" property="page" />
+	<jsp:setProperty name="pager" property="playerName"/>
+	<jsp:setProperty name="pager" property="gameName"/>
+	<jsp:setProperty name="pager" property="tournamentID"/>
+	<jsp:setProperty name="pager" property="owner"/>
+	<% // we set the userName after the owner, such that the owner gets overwritten by the userName for non-admin users %>
 	<jsp:setProperty name="pager" property="userName" value="<%= request.getUserPrincipal().getName()%>" />
+	<jsp:setProperty name="pager" property="page" />
     </c:catch>
 </jsp:useBean>
 <%@page import="tud.ggpserver.formhandlers.EditTournament"%>
