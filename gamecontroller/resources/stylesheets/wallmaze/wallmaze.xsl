@@ -7,6 +7,8 @@
 	
 	<xsl:template name="print_state">
 		<xsl:call-template name="print_chess_state">
+			<xsl:with-param name="Width">13</xsl:with-param>
+			<xsl:with-param name="Height">9</xsl:with-param>
 			<xsl:with-param name="DefaultCellContent">no</xsl:with-param>
 		</xsl:call-template>
 	</xsl:template>
