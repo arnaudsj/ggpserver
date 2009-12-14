@@ -54,7 +54,7 @@ public class Profile {
 	public List<? extends Tournament<?,?>> getTournaments() throws SQLException {
 		AbstractDBConnector<?, ?> db = getDBConnector();
 		List<Tournament<?,?>> tournaments = new LinkedList<Tournament<?,?>>(db.getTournamentsCreatedByUser(getUserName()));
-		if(!this.equals(db.getAdminUser()))
+		if(!user.equals(db.getAdminUser()))
 			tournaments.add(0, db.getTournament(Tournament.MANUAL_TOURNAMENT_ID));
 		return tournaments;
 

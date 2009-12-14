@@ -153,7 +153,6 @@ public class AdminPage {
 	
 	public List<? extends Tournament<?, ?>> getTournaments() throws SQLException {
 		List<? extends Tournament<?, ?>> tournaments = getDBConnector().getTournaments();
-		tournaments.remove(getDBConnector().getTournament(Tournament.ROUND_ROBIN_TOURNAMENT_ID));
 		return tournaments;
 	}
 }
