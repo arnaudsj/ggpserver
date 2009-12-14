@@ -78,18 +78,12 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 		this.movefactory=movefactory;
 		this.gameScrambler=gamescrambler;
 		this.logger=Logger.getLogger("tud.gamecontroller");
-		
-		// try to get the host address in order to cache the DNS result 
-		try {
-			getHostAddress();
-		} catch (UnknownHostException e) {
-			logger.warning("Could not get host address!" + e.getMessage());
-		}		
 	}
 
 	@Override
 	public void gameStart(MatchInterface<TermType, ?> match, RoleInterface<TermType> role, ConnectionEstablishedNotifier notifier) {
 		super.gameStart(match, role, notifier);
+		hostAddress = null; // don't use an old hostAddress for a new match
 		connectionTimeoutBonus = CONNECTION_TIMEOUT_BONUS;
 		String msg="(START "+
 				match.getMatchID()+" "+
@@ -154,16 +148,19 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 		Socket s=null;
 		OutputStream out=null;
 		InputStream is=null;
+		InetAddress hostAddress=null;
 		
 		try {
 			logger.info("Begin creating Socket for " + this);
 			long t0 = System.currentTimeMillis();
+			hostAddress = getHostAddress();
+			int dnsTime = (int)(System.currentTimeMillis() - t0);
 			s = new Socket();
 			try {
-				s.connect(new InetSocketAddress(getHostAddress(), port), CONNECTION_TIMEOUT + connectionTimeoutBonus);
+				s.connect(new InetSocketAddress(hostAddress, port), CONNECTION_TIMEOUT + connectionTimeoutBonus - dnsTime);
 			} catch(InterruptedIOException e) {
 				connectionTimeoutBonus -= Math.max(0, System.currentTimeMillis() - t0 - CONNECTION_TIMEOUT); // subtract the excess connection time from the bonus if greater than CONNECTION_TIMEOUT
-				throw e; // will be catch again below
+				throw e; // will be catched again below
 			}
 			connectionTimeoutBonus -= Math.max(0, System.currentTimeMillis() - t0 - CONNECTION_TIMEOUT); // subtract the excess connection time from the bonus if greater than CONNECTION_TIMEOUT 
 			notifier.connectionEstablished();
@@ -234,8 +231,17 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 
 	@Override
 	public String toString(){
-		return "remote("+getName()+", "+host+":"+port+")";
-//		return "remote("+host+":"+port+")";
+		StringBuilder sb = new StringBuilder("remote(");
+		sb.append(getName());
+		String ip = (hostAddress!=null?hostAddress.getHostAddress():null);
+		if(!host.equals(ip)) {
+			sb.append(", host:").append(host);
+		}
+		if(ip!=null) {
+			sb.append(", ip:").append(ip);
+		}
+		sb.append(", port:").append(port).append(")");
+		return sb.toString();
 	}
 
 	private InetAddress getHostAddress() throws UnknownHostException {
