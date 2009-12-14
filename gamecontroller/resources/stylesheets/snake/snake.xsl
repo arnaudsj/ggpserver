@@ -115,9 +115,7 @@
 						<xsl:choose>
 							<xsl:when test="$goto=''"/>
 							<xsl:when test="$goto='head' and $comefrom=''">snakehead_s</xsl:when>
-							<xsl:when test="$goto='head'">
-								snakehead_<xsl:value-of select="$comefrom"/>
-							</xsl:when>
+							<xsl:when test="$goto='head'">snakehead_<xsl:value-of select="$comefrom"/></xsl:when>
 							<xsl:when test="$comefrom='s' and $goto='s'">snake_ns</xsl:when>
 							<xsl:when test="$goto='n'">snake_<xsl:value-of select="$goto"/><xsl:value-of select="$comefrom"/></xsl:when>
 							<xsl:when test="$comefrom='n'">snake_<xsl:value-of select="$comefrom"/><xsl:value-of select="$goto"/></xsl:when>
