@@ -144,6 +144,7 @@
 					<td>
 						<c:url value="edit_tournament.jsp" var="editURL">
 							<c:param name="tournamentID" value="${tournament.tournamentID}" />
+							<c:param name="owner" value="${profile.userName}" />
 						</c:url>
 						<div class="edit"><a href='<c:out value="${editURL}" />'><span>edit</span></a></div>
 					</td>
