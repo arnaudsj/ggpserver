@@ -112,8 +112,11 @@ public class EditTournament extends ShowMatches {
 	 * @throws SQLException
 	 */
 	public boolean isAllow() throws SQLException {
-		if (tournament == null || user == null)
+		if (tournament == null || user == null) {
+			errorString = "tournament or user not set";
+			logger.warning(errorString);
 			return false;
+		}
 		
 		if (tournament.getOwner().equals(user))
 			return true;
@@ -129,45 +132,64 @@ public class EditTournament extends ShowMatches {
 		logger.warning(errorString);
 		return false;
 	}
-	
+
+	private boolean checkMatchOwner() {
+		if (!match.getOwner().equals(user) && !user.isAdmin()) {
+			errorString = "match '" + match.getMatchID() + "' is not owned by '" + user.getUserName() + "'";
+			return false;
+		} else {
+			return true;
+		}
+	}
+
 	public boolean isValid() throws SQLException {
 		if (!isAllow())
 			return false;
 		
+		errorString = null;
 		if (action.equals(ADD_MATCH)) {
-			return true;
-		} else if (action.equals(START_MATCH) && match != null && match instanceof NewMatch && match.getOwner().equals(user)) {
-			// check that all players are active
-			// TODO: somehow tell the user why the action was not performed 
-			
-			// There might still be a race condition such that a match is scheduled but never run (e.g., if a player goes offline
-			// right after this check), but we avoid most cases here. 
-			for(PlayerInfo playerInfo:match.getPlayerInfos()) {
-				if(playerInfo instanceof RemotePlayerInfo) {
-					RemotePlayerInfo remotePlayerInfo = (RemotePlayerInfo)playerInfo;
-					if(!remotePlayerInfo.getStatus().equals(RemotePlayerInfo.STATUS_ACTIVE)) {
-						errorString = "start match is invalid: "+remotePlayerInfo.getName()+" is " + remotePlayerInfo.getStatus() + "(not " + RemotePlayerInfo.STATUS_ACTIVE + ")";
-						logger.warning(errorString);
-						return false;
-					}
-					if(!remotePlayerInfo.isAvailableForManualMatches() && !remotePlayerInfo.getOwner().equals(user)) {
-						errorString = "start match is invalid: "+remotePlayerInfo.getName()+" is not available and not owned by "+user.getUserName();
-						logger.warning(errorString);
-						return false;
+		} else if (match == null) {
+			errorString = "match does not exist";
+		} else if (action.equals(START_MATCH)) {
+			if (!(match instanceof NewMatch)) {
+				errorString = "match '" + match.getMatchID() + "' is not new (status: '" + match.getStatus() + "')";
+			}else if (checkMatchOwner()) {
+				// check that all players are active
+				
+				// There might still be a race condition such that a match is scheduled but never run (e.g., if a player goes offline
+				// right after this check), but we avoid most cases here. 
+				for(PlayerInfo playerInfo:match.getPlayerInfos()) {
+					if(playerInfo instanceof RemotePlayerInfo) {
+						RemotePlayerInfo remotePlayerInfo = (RemotePlayerInfo)playerInfo;
+						if(!remotePlayerInfo.getStatus().equals(RemotePlayerInfo.STATUS_ACTIVE)) {
+							errorString = "start match is invalid: "+remotePlayerInfo.getName()+" is " + remotePlayerInfo.getStatus() + "(not " + RemotePlayerInfo.STATUS_ACTIVE + ")";
+							break;
+						}
+						if(!remotePlayerInfo.isAvailableForManualMatches() && !remotePlayerInfo.getOwner().equals(user)) {
+							errorString = "start match is invalid: "+remotePlayerInfo.getName()+" is not available and not owned by "+user.getUserName();
+							break;
+						}
 					}
 				}
 			}
-			return true;
-		} else if (action.equals(ABORT_MATCH) && match != null && (match instanceof ScheduledMatch || match instanceof RunningMatch) && match.getOwner().equals(user)) {
-			return true;
-		} else if (action.equals(DELETE_MATCH) && match != null && match.getOwner().equals(user)) {
-			return true;
-		} else if (action.equals(CLONE_MATCH) && match != null) {
+		} else if (action.equals(ABORT_MATCH)) {
+			if (!(match instanceof ScheduledMatch) && !(match instanceof RunningMatch)) {
+				errorString = "match '" + match.getMatchID() + "' can not be aborted. It is neither scheduled nor running (status: '" + match.getStatus() + "').";
+			}else {
+				checkMatchOwner();
+			}
+		} else if (action.equals(DELETE_MATCH)) {
+			checkMatchOwner();
+		} else if (action.equals(CLONE_MATCH)) {
+		} else {
+			errorString = "invalid action: '" + action + "'";
+		}
+		if (errorString != null) {
+			logger.warning(errorString);
+			return false;
+		}else{
 			return true;
 		}
-		errorString = "action '"+action+"' is invalid for match '"+match.getMatchID() + "'";
-		logger.warning(errorString);
-		return false;
 	}
 	
 	@SuppressWarnings("unchecked")
