@@ -48,7 +48,7 @@ import cs227b.teamIago.util.GameState;
  * starts a scheduled match whenever all players of a match are available
  *
  */
-public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> {
+public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> implements AvailablePlayersListener {
 	private static final long DELAY_BETWEEN_MATCHES = 5000;   // time between two matches with the same players
 	
 	private static final Logger logger = Logger.getLogger(MatchRunner.class.getName());
@@ -211,7 +211,7 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 				}
 				if(player instanceof RemotePlayerInfo){
 					RemotePlayerInfo remotePlayer = (RemotePlayerInfo)player;
-					if(!remotePlayer.isAvailableForManualMatches() && match.getTournamentID().equals(Tournament.MANUAL_TOURNAMENT_ID)){
+					if(!remotePlayer.isAvailableForManualMatches() && match.getTournamentID().equals(Tournament.MANUAL_TOURNAMENT_ID) && !remotePlayer.getOwner().equals(match.getOwner())){
 						runnableMatch = null;
 						break;
 					}
@@ -418,6 +418,12 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 	 */
 	public Collection<tud.ggpserver.datamodel.RemotePlayerInfo> waitForPlayersAvailableForRoundRobin() throws InterruptedException {
 		return availablePlayersTracker.waitForPlayersAvailableForRoundRobin();
+	}
+
+	@Override
+	public void notifyAvailable(RemotePlayerInfo playerInfo) {
+		// TODO: only call notifyAll if we are interested in this player
+		this.notifyAll();
 	}
 
 }

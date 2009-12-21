@@ -46,12 +46,12 @@ public class Tournament<TermType extends TermInterface, ReasonerStateInfoType> {
 	}
 
 	public List<ServerMatch<TermType,ReasonerStateInfoType>> getMatches() throws SQLException {
-		return db.getMatches(0, Integer.MAX_VALUE, null, null, tournamentID, null, false);
+		return db.getMatches(0, Integer.MAX_VALUE, null, null, tournamentID, null, null, false);
 	}
 
 	public int getNumberOfMatches() throws SQLException {
 		if(nbOfMatches == -1){
-			nbOfMatches = db.getRowCountMatches(null, null, tournamentID, null, false);
+			nbOfMatches = db.getRowCountMatches(null, null, tournamentID, null, null, false);
 		}
 		return nbOfMatches;
 	}

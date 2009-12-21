@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+                  2009 Stephan Schiffel <stephan.schiffel@gmx.de> 
 
     This file is part of GGP Server.
 
@@ -33,6 +34,7 @@ public class ShowMatches extends AbstractPager {
 	private String gameName = null;
 	private String tournamentID = null;
 	private String owner = null;
+	private String status = null;
 
 	private List<? extends ServerMatch<?,?>> matches = null;
 
@@ -64,7 +66,7 @@ public class ShowMatches extends AbstractPager {
 	@SuppressWarnings("unchecked")
 	public List<? extends ServerMatch<?, ?>> getMatches() throws SQLException {
 		if (matches == null) {
-			matches = db.getMatches(getStartRow(), getNumDisplayedRows(), playerName, gameName, tournamentID, owner, excludeNewMatches());
+			matches = db.getMatches(getStartRow(), getNumDisplayedRows(), playerName, gameName, tournamentID, owner, status, excludeNewMatches());
 		}
 		return matches;
 	}
@@ -74,9 +76,9 @@ public class ShowMatches extends AbstractPager {
 	}
 	
 	@Override
-	protected int getRowCount() throws SQLException {
+	public int getRowCount() throws SQLException {
 		if (rowCountMatches == -1) {
-			rowCountMatches = db.getRowCountMatches(playerName, gameName, tournamentID, owner, excludeNewMatches());
+			rowCountMatches = db.getRowCountMatches(playerName, gameName, tournamentID, owner, status, excludeNewMatches());
 		}
 		return rowCountMatches;
 	}
@@ -87,6 +89,14 @@ public class ShowMatches extends AbstractPager {
 
 	public void setOwner(String owner) {
 		this.owner = owner;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 	public String getPlayerName() {
@@ -135,6 +145,9 @@ public class ShowMatches extends AbstractPager {
 		}
 		if (owner != null) {
 			parameters.add("owner=" + owner);
+		}
+		if (status != null) {
+			parameters.add("status=" + status);
 		}
 		
 		if (!parameters.isEmpty()) {

@@ -931,6 +931,8 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	 *            If not <code>null</code>, return only matches from this tournament
 	 * @param owner
 	 *            If not <code>null</code>, return only matches owned by owner
+	 * @param status
+	 *            If not <code>null</code>, return only matches with status (if "new" excludeNew must be false)
 	 * @param excludeNew
 	 *            If <code>true</code>, do not return matches with status "new"
 	 * @return All matches that match the given filter criteria. Filters can be
@@ -939,7 +941,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	 */
 	public List<ServerMatch<TermType, ReasonerStateInfoType>> getMatches(
 			int startRow, int numDisplayedRows, String playerName,
-			String gameName, String tournamentID, String owner, boolean excludeNew)
+			String gameName, String tournamentID, String owner, String status, boolean excludeNew)
 			throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
@@ -948,7 +950,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		List<ServerMatch<TermType, ReasonerStateInfoType>> result = new LinkedList<ServerMatch<TermType, ReasonerStateInfoType>>();
 		
 		try {
-			ps = prepareMatchesStatement(con, false, startRow, numDisplayedRows, playerName, gameName, tournamentID, owner, excludeNew);
+			ps = prepareMatchesStatement(con, false, startRow, numDisplayedRows, playerName, gameName, tournamentID, owner, status, excludeNew);
 			
 			rs = ps.executeQuery();
 			
@@ -967,13 +969,13 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return result;
 	}
 
-	public int getRowCountMatches(String playerName, String gameName, String tournamentID, String owner, boolean excludeNew) throws SQLException {
+	public int getRowCountMatches(String playerName, String gameName, String tournamentID, String owner, String status, boolean excludeNew) throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
 		try {
-			ps = prepareMatchesStatement(con, true, 0, Integer.MAX_VALUE, playerName, gameName, tournamentID, owner, excludeNew);
+			ps = prepareMatchesStatement(con, true, 0, Integer.MAX_VALUE, playerName, gameName, tournamentID, owner, status, excludeNew);
 			
 			rs = ps.executeQuery();
 			
@@ -1004,8 +1006,9 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	 *            If <code>true</code>, prepare a statement to count the
 	 *            number of rows
 	 * @param owner 
+	 * @param status 
 	 */
-	private PreparedStatement prepareMatchesStatement(Connection con, boolean onlyRowCount, int startRow, int numDisplayedRows, String playerName, String gameName, String tournamentID, String owner, boolean excludeNew) throws SQLException, InternalError {
+	private PreparedStatement prepareMatchesStatement(Connection con, boolean onlyRowCount, int startRow, int numDisplayedRows, String playerName, String gameName, String tournamentID, String owner, String status, boolean excludeNew) throws SQLException, InternalError {
 		PreparedStatement ps = null;
 
 		// initialize statement and parameters
@@ -1039,6 +1042,10 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		if (owner != null) {
 			where += " AND `m`.`owner` = ?";
 			parameters.add(owner);
+		}
+		if (status != null) {
+			where += " AND `m`.`status` = ?";
+			parameters.add(status);
 		}
 		if (excludeNew) {
 			where += " AND `m`.`status` != '" + ServerMatch.STATUS_NEW + "'";

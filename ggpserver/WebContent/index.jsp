@@ -21,20 +21,25 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%> 
 
-<c:set var="title">Start Page</c:set>
+<c:set var="title">Welcome to the Dresden GGP Server!</c:set>
 <jsp:directive.include file="/inc/header.jsp" />
 
-<h1 class="notopborder">Welcome to the Dresden GGP Server!</h1>
-	You can get information about 
-	<a href="<%= request.getContextPath() + response.encodeURL("/public/show_matches.jsp") %>">past or running matches</a>,
-	<a href="<%= request.getContextPath() + response.encodeURL("/public/show_tournaments.jsp") %>">tournaments</a> and
-	<a href="<%= request.getContextPath() + response.encodeURL("/public/show_games.jsp") %>">all available games</a>
-	by clicking on the links on the left. <br>
+<jsp:useBean id="pager" class="tud.ggpserver.formhandlers.ShowMatches" scope="page">
+	<c:catch> <% // this is for catching NumberFormatExceptions and the like %>
+		<jsp:setProperty name="pager" property="page"/>
+		<jsp:setProperty name="pager" property="status" value="running"/>
+	</c:catch>
+</jsp:useBean>
+<c:if test = "${pager.rowCount > 0}">
+	<h1 class="notopborder">Currently playing:</h1>
+	<jsp:directive.include file="/inc/match_table.jsp" />
+</c:if>
 
 <h1 class="notopborder">What is it all about?</h1>
 	The purpose of the server is to help development of <a href="http://www.general-game-playing.de/" target="_blank">General Game Playing</a> systems.
 	The server provides an easy way to test general game players on a wide range of games against other players. The idea is that you just register
-	your player and leave it online. The server will automatically pit players against each other on all games that are on the server.
+	your player and leave it online. The server will automatically pit players against each other on all games that are on the server. Of course, you can also 
+	start matches manually.
 
 <h1 class="notopborder">How to connect your player</h1>
 	We do not host your player. To participate in a match, your player has to run on a computer with a working internet connection.
@@ -44,7 +49,6 @@
 
 <h1 class="notopborder">Recent changes</h1>
 	<ul>
-		<li><span style="color:red;">A bug that prevented starting matches manually is fixed.</span></li>
 		<li>Users can now create/start matches manually.</li>
 		<li>Users can now create own tournaments.</li>
 		<li>You can choose if your players takes part in automatic round-robin tournament.</li>

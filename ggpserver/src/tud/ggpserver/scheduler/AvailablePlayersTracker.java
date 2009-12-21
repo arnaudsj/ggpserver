@@ -20,6 +20,7 @@ along with GGP Server.  If not, see <http://www.gnu.org/licenses/>.
 package tud.ggpserver.scheduler;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -62,6 +63,8 @@ public class AvailablePlayersTracker<TermType extends TermInterface, ReasonerSta
 	private Map<String, RemotePlayerInfo> activePlayers;
 	private Set<String> playingPlayers;
 
+	private Collection<AvailablePlayersListener> availablePlayersListeners = new ArrayList<AvailablePlayersListener>();
+	
 	public AvailablePlayersTracker(final AbstractDBConnector<TermType, ReasonerStateInfoType> dbConnector) {
 		activePlayers = new HashMap<String, RemotePlayerInfo>();
 		playingPlayers = Collections.synchronizedSet(new HashSet<String>());
@@ -77,6 +80,24 @@ public class AvailablePlayersTracker<TermType extends TermInterface, ReasonerSta
 				internalError.initCause(e);
 				throw internalError;
 			}
+		}
+	}
+
+	public void addAvailablePlayersListener(AvailablePlayersListener l) {
+		synchronized (availablePlayersListeners) {
+			availablePlayersListeners.add(l);
+		}
+	}
+
+	public void removeAvailablePlayersListener(AvailablePlayersListener l) {
+		synchronized (availablePlayersListeners) {
+			availablePlayersListeners.remove(l);
+		}
+	}
+	
+	private void notifyAvailablePlayersListeners(RemotePlayerInfo player) {
+		for(AvailablePlayersListener l:availablePlayersListeners) {
+			l.notifyAvailable(player);
 		}
 	}
 
@@ -104,9 +125,13 @@ public class AvailablePlayersTracker<TermType extends TermInterface, ReasonerSta
 	@Override
 	public synchronized void notifyStatusChange(RemotePlayerInfo player) {
 		if (player.getStatus().equals(RemotePlayerInfo.STATUS_ACTIVE)) {
+			logger.info("player " + player.getName() + " is now active");
 			activePlayers.put(player.getName(), player);   // since activePlayers is a set, we don't need to worry about duplicates
+			// it is also necessary to store the new player here in case the address has changed
 			this.notifyAll();
+			notifyAvailablePlayersListeners(player);
 		} else if (player.getStatus().equals(RemotePlayerInfo.STATUS_INACTIVE)) {
+			logger.info("player " + player.getName() + " is now inactive");
 			activePlayers.remove(player.getName());
 			this.notifyAll();
 		}
