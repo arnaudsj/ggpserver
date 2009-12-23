@@ -50,6 +50,7 @@
 		<xsl:param name="content"/>
 		<xsl:param name="piece"/>
 		<xsl:param name="background"/>
+		<xsl:param name="alt"/>
 
 		<xsl:choose>
 			<xsl:when test="$content='GREEN'"/>
@@ -57,7 +58,7 @@
 				<xsl:call-template name="make_chess_img">
 					<xsl:with-param name="piece" select="$piece"/>
 					<xsl:with-param name="background" select="$background"/>
-					<xsl:with-param name="alt" select="$content"/>
+					<xsl:with-param name="alt" select="$alt"/>
 				</xsl:call-template>
 			</xsl:otherwise>
 		</xsl:choose>

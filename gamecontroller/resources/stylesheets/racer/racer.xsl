@@ -110,6 +110,13 @@
 						top:  <xsl:value-of select="$yCar"/>px;
 						background-color: <xsl:value-of select="$player"/>;
 					</xsl:attribute>
+					<xsl:attribute name="title">
+						<xsl:value-of select="$player"/>
+							(x:<xsl:value-of select="$posx"/>,
+							 y:<xsl:value-of select="$posy"/>,
+							 velx:<xsl:value-of select="$velx"/>,
+							 vely:<xsl:value-of select="$vely"/>)
+					</xsl:attribute>
 				</div>
 			
 				<!-- Draw north-south velocity -->				

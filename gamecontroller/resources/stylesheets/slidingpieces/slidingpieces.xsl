@@ -18,6 +18,7 @@
 
 	<xsl:template name="make_cell_content">
 		<xsl:param name="content"/>
+		<xsl:param name="alt"/>
 		<xsl:if test="$content!='BLANK'">
 			<div>
 				<xsl:attribute name="style">
@@ -40,6 +41,7 @@
 					line-height: 44px;
 					vertical-align:middle;
 				</xsl:attribute>
+				<xsl:attribute name="title"><xsl:value-of select="$alt"/></xsl:attribute>
 				<xsl:if test="substring($content,1,5)='PIECE'">
 					<xsl:value-of select="substring-after($content, 'PIECE')"/>
 				</xsl:if>

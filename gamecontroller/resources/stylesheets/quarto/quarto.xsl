@@ -15,8 +15,10 @@
 		<span class="heading">Selected:</span><br/>
 		<div style="height:44px;">
 			<xsl:for-each select="fact[prop-f='SELECTED']">
+				<xsl:variable name="alt"><xsl:call-template name="fluent2text"/></xsl:variable>
 				<xsl:call-template name="make_cell_content">
 					<xsl:with-param name="content" select="arg[1]"/>
+					<xsl:with-param name="alt" select="$alt"/>
 				</xsl:call-template>
 			</xsl:for-each>
 		</div>
@@ -24,8 +26,10 @@
 		<span class="heading">Pool:</span><br/>
 		<div style="width: 176px; height: 200px;">
 			<xsl:for-each select="fact[prop-f='POOL']">
+				<xsl:variable name="alt"><xsl:call-template name="fluent2text"/></xsl:variable>
 				<xsl:call-template name="make_cell_content">
 					<xsl:with-param name="content" select="arg[1]"/>
+					<xsl:with-param name="alt" select="$alt"/>
 				</xsl:call-template>
 			</xsl:for-each>
 		</div>
@@ -39,6 +43,7 @@
 	
 	<xsl:template name="make_cell_content">
 		<xsl:param name="content"/>
+		<xsl:param name="alt"/>
 
 		<xsl:if test="$content!='EMPTY'">
 			<xsl:variable name="bit3" select="substring($content,2,1)"/>
@@ -70,7 +75,7 @@
 			<xsl:call-template name="make_chess_img">
 				<xsl:with-param name="piece" select="concat($piecename, $piececolor)"/>
 				<xsl:with-param name="background" select="$background"/>
-				<xsl:with-param name="alt" select="$content"/>
+				<xsl:with-param name="alt" select="$alt"/>
 			</xsl:call-template>
 		</xsl:if>
 	</xsl:template>

@@ -34,6 +34,8 @@
 				<xsl:sort select="arg[3]" order="ascending"/>
 				<xsl:sort select="arg[2]" order="ascending"/>
 
+				<xsl:variable name="alt"><xsl:call-template name="fluent2text"/></xsl:variable>
+				
 				<xsl:variable name="zCoord" select="arg[3]"/>
 				<xsl:variable name="yCoord" select="arg[1]"/>
 				<xsl:variable name="xCoord" select="arg[2]"/>
@@ -62,6 +64,8 @@
 							</xsl:choose>
 							<xsl:text>_cube.png</xsl:text>
 						</xsl:attribute>
+						<xsl:attribute name="alt"><xsl:value-of select="$alt"/></xsl:attribute>
+						<xsl:attribute name="title"><xsl:value-of select="$alt"/></xsl:attribute>
 					</img>
 				</div>
 			

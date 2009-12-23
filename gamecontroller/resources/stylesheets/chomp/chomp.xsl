@@ -18,6 +18,7 @@
 	<xsl:template name="make_cell_content">
 		<xsl:param name="xArg"/>
 		<xsl:param name="yArg"/>
+		<xsl:param name="alt"/>
 
 		<xsl:variable name="piece">
 			<xsl:choose>
@@ -29,7 +30,7 @@
 		<xsl:call-template name="make_chess_img">
 			<xsl:with-param name="piece" select="$piece"/>
 			<xsl:with-param name="background">dark</xsl:with-param>
-			<xsl:with-param name="alt"><xsl:value-of select="$xArg"/>,<xsl:value-of select="$yArg"/></xsl:with-param>
+			<xsl:with-param name="alt"><xsl:value-of select="$alt"/></xsl:with-param>
 		</xsl:call-template>
 	</xsl:template>
 	

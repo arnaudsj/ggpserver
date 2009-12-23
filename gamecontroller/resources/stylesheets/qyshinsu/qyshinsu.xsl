@@ -15,10 +15,16 @@
 
 			<xsl:for-each select="fact[prop-f='POSITION']">
 				<xsl:if test="./arg[2]!='EMPTY'">
-
 					<xsl:variable name="pos" select="./arg[1]"/>
 					<xsl:variable name="owner" select="../fact[prop-f='OWNER' and arg[1]=$pos]/arg[2]"/>
 					<xsl:variable name="value" select="./arg[2]"/>
+					<xsl:variable name="alt">
+						<xsl:value-of select="$owner"/>
+						<xsl:text> piece </xsl:text>
+						<xsl:value-of select="$value"/>
+						<xsl:text> at position </xsl:text>
+						<xsl:value-of select="$pos"/>
+					</xsl:variable>
 
 					<img>
 						<xsl:attribute name="src">
@@ -67,12 +73,15 @@
 								</xsl:when>
 							</xsl:choose>
 						</xsl:attribute>
+						<xsl:attribute name="alt"><xsl:value-of select="$alt"/></xsl:attribute>
+						<xsl:attribute name="title"><xsl:value-of select="$alt"/></xsl:attribute>
 					</img>
 
 				</xsl:if>
 			</xsl:for-each>
 		
 			<xsl:for-each select="fact[prop-f='LEGALPLAYLOC']">
+				<xsl:variable name="alt"><xsl:call-template name="fluent2text"/></xsl:variable>
 				<xsl:variable name="pos" select="./arg[1]"/>
 				<xsl:if test="
 							../fact[prop-f='OWNER' and arg[1]=$pos]/arg[2] = ../fact[prop-f='CONTROL']/arg[1]
@@ -125,6 +134,7 @@
 								</xsl:when>
 							</xsl:choose>
 						</xsl:attribute>
+						<xsl:attribute name="title"><xsl:value-of select="$alt"/></xsl:attribute>
 					</div>
 				</xsl:if>
 			</xsl:for-each>

@@ -60,6 +60,7 @@
 		
 		<div class="merrillsboard">
 			<xsl:for-each select="fact[prop-f='PIT']">
+				<xsl:variable name="alt"><xsl:call-template name="fluent2text"/></xsl:variable>
 				<div>
 					<xsl:attribute name="class"><xsl:value-of select="arg[1]"/>_<xsl:value-of select="arg[2]"/></xsl:attribute>
 					<xsl:choose>
@@ -67,6 +68,7 @@
 						<xsl:otherwise>
 							<xsl:call-template name="make_stone">
 								<xsl:with-param name="role" select="arg[3]"></xsl:with-param>
+								<xsl:with-param name="alt" select="$alt"></xsl:with-param>
 							</xsl:call-template>
 						</xsl:otherwise>
 					</xsl:choose>
@@ -95,7 +97,10 @@
 		<xsl:param name="role"/>
 		<xsl:param name="size"/>
 		<xsl:if test="$size!='0'">
-			<xsl:call-template name="make_stone"><xsl:with-param name="role" select="$role"/></xsl:call-template>
+			<xsl:call-template name="make_stone">
+				<xsl:with-param name="role" select="$role"/>
+				<xsl:with-param name="alt" select="$role"/>
+			</xsl:call-template>
 			<xsl:call-template name="makeheap">
 				<xsl:with-param name="role" select="$role"/>
 				<xsl:with-param name="size"><xsl:value-of select="$size - 1"/></xsl:with-param>
@@ -105,7 +110,12 @@
 	
 	<xsl:template name="make_stone">
 		<xsl:param name="role"/>
-		<img width="26" height="26"><xsl:attribute name="src"><xsl:value-of select="$stylesheetURL"/>/merrills/<xsl:value-of select="translate($role,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')"/>stone.gif</xsl:attribute></img>
+		<xsl:param name="alt"/>
+		<img width="26" height="26">
+			<xsl:attribute name="src"><xsl:value-of select="$stylesheetURL"/>/merrills/<xsl:value-of select="translate($role,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')"/>stone.gif</xsl:attribute>
+			<xsl:attribute name="alt"><xsl:value-of select="$alt"/></xsl:attribute>
+			<xsl:attribute name="title"><xsl:value-of select="$alt"/></xsl:attribute>
+		</img>
 	</xsl:template>
 
 </xsl:stylesheet>

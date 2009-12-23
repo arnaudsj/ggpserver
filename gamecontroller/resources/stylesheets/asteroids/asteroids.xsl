@@ -85,7 +85,7 @@
 			<xsl:variable name="yShip" select="2 + (20 - fact[prop-f=$shipYFluent]/arg[1]) * 20"/>
 	
 			<!-- Draw ship -->
-			<div class="asteroidsShip">
+			<div class="asteroidsShip" title="ship">
 				<xsl:attribute name="style">
 					left: <xsl:value-of select="$xShip"/>px;
 					top:  <xsl:value-of select="$yShip"/>px;
@@ -171,6 +171,7 @@
 				<xsl:attribute name="style">
 					background-color: #99CCFF;
 				</xsl:attribute>
+				<xsl:attribute name="title">planet</xsl:attribute>
 			</xsl:if>
 		</div>
 	</xsl:template>

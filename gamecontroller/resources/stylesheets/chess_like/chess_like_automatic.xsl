@@ -2,7 +2,7 @@
 
 <!--
 	should work for most chess like games (chess, checkers, ...)
-	tries to detect the size of the board automatically (length of the first row and column)
+	tries to detect the size of the board automatically
 -->
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">

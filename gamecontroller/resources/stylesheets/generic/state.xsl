@@ -64,9 +64,9 @@
 
 				<tr>
 					<td>
-						<span class="heading">(<xsl:value-of select="./prop-f"/></span>
+						<span class="heading">(<xsl:value-of select="prop-f"/></span>
 						<span class="content">
-							<xsl:for-each select="./arg">
+							<xsl:for-each select="arg">
 								<xsl:text> </xsl:text>
 								<xsl:value-of select="."/>
 							</xsl:for-each>
@@ -77,6 +77,10 @@
 			</xsl:for-each>
 		</table>
 
+	</xsl:template>
+
+	<xsl:template name="fluent2text">
+		(<xsl:value-of select="prop-f"/><xsl:for-each select="arg">&#160;<xsl:value-of select="."/></xsl:for-each>)
 	</xsl:template>
 
 </xsl:stylesheet>

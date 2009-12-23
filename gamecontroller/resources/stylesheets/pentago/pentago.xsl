@@ -55,6 +55,7 @@
 
 			<!-- Draw Marks -->
 			<xsl:for-each select="fact[prop-f='CELLHOLDS']">
+				<xsl:variable name="alt"><xsl:call-template name="fluent2text"/></xsl:variable>
 
 				<xsl:variable name="quad" select="./arg[1]"/>
 				<xsl:variable name="x"    select="48 * (./arg[2]-1) + 2"/>
@@ -89,7 +90,7 @@
 
 					<xsl:call-template name="make_chess_img">
 						<xsl:with-param name="piece" select="$piece"/>
-						<xsl:with-param name="alt" select="./arg[4]"/>
+						<xsl:with-param name="alt" select="$alt"/>
 					</xsl:call-template>
 				</div>
 			</xsl:for-each>

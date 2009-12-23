@@ -126,6 +126,7 @@
 		<xsl:param name="content"/>
 		<xsl:param name="piece"/>
 		<xsl:param name="background"/>
+		<xsl:param name="alt"/>
 
 		<xsl:choose>
 			<xsl:when test="$content='BOMB3'">
@@ -158,8 +159,8 @@
 				</xsl:variable>
 				<img>
 					<xsl:attribute name="src"><xsl:value-of select="concat($stylesheetURL, '/mazegames/', $imgName, '.png')"/></xsl:attribute>
-					<xsl:attribute name="alt"><xsl:value-of select="$content"/></xsl:attribute>
-					<xsl:attribute name="title"><xsl:value-of select="$content"/></xsl:attribute>
+					<xsl:attribute name="alt"><xsl:value-of select="$alt"/></xsl:attribute>
+					<xsl:attribute name="title"><xsl:value-of select="$alt"/></xsl:attribute>
 				</img>
 			</xsl:otherwise>
 		</xsl:choose>

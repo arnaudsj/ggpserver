@@ -16,6 +16,7 @@
 	</xsl:template>
 	
 	<xsl:template name="make_cell_content">
+		<xsl:param name="alt"/>
 		<!-- with a little abuse of the chess templates we just ignore pieces and background information and use the arguments of the fluent directly -->
 		<xsl:variable name="value" select="arg[3]"/>
 		<xsl:variable name="color" select="translate(arg[4], 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
@@ -23,7 +24,7 @@
 		<img>
 			<xsl:attribute name="width">44</xsl:attribute>
 			<xsl:attribute name="height">44</xsl:attribute>
-			<xsl:attribute name="alt"><xsl:value-of select="$color"/> die showing <xsl:value-of select="$value"/></xsl:attribute>
+			<xsl:attribute name="alt"><xsl:value-of select="$alt"/></xsl:attribute>
 			<xsl:attribute name="src">
 				<xsl:value-of select="$stylesheetURL"/>
 				<xsl:text>/generic/dice_images/die_</xsl:text>

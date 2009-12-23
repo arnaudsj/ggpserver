@@ -88,6 +88,7 @@
 		<div class="kalaha_board">
 
 			<xsl:for-each select="fact[prop-f='PIT']">
+				<xsl:variable name="alt"><xsl:call-template name="fluent2text"/></xsl:variable>
 				<xsl:variable name="seeds" select="substring-after(./arg[2], 'S')"/>
 				<xsl:variable name="classname">
 					<xsl:choose>
@@ -99,9 +100,14 @@
 					<xsl:attribute name="id"><xsl:value-of select="arg[1]"/></xsl:attribute>
 					<div>
 						<xsl:attribute name="class"><xsl:value-of select="$classname"/></xsl:attribute>
+						<xsl:attribute name="title"><xsl:value-of select="$alt"/></xsl:attribute>
 						<xsl:choose>
 							<xsl:when test="$seeds &lt; 10">
-								<img><xsl:attribute name="src"><xsl:value-of select="$stylesheetURL"/>/kalaha/kalaha_hole_<xsl:value-of select="arg[2]"/>.gif</xsl:attribute></img>
+								<img>
+									<xsl:attribute name="src"><xsl:value-of select="$stylesheetURL"/>/kalaha/kalaha_hole_<xsl:value-of select="arg[2]"/>.gif</xsl:attribute>
+									<xsl:attribute name="alt"><xsl:value-of select="$alt"/></xsl:attribute>
+									<xsl:attribute name="title"><xsl:value-of select="$alt"/></xsl:attribute>
+								</img>
 							</xsl:when>
 							<xsl:otherwise>
 								<xsl:value-of select="$seeds"/>

@@ -33,6 +33,7 @@
 		<xsl:param name="content"/>
 		<xsl:param name="piece"/>
 		<xsl:param name="background"/>
+		<xsl:param name="alt"/>
 
 		<xsl:choose>
 			<xsl:when test="$content='0'"/>
@@ -42,7 +43,7 @@
 					<xsl:with-param name="background">light</xsl:with-param>
 					<xsl:with-param name="imgWidth">22</xsl:with-param>
 					<xsl:with-param name="imgHeight">22</xsl:with-param>
-					<xsl:with-param name="alt" select="$content"/>
+					<xsl:with-param name="alt" select="$alt"/>
 					<xsl:with-param name="style">
 						position: absolute;
 						left: <xsl:value-of select="(number($content) mod 2)*22"/>px;

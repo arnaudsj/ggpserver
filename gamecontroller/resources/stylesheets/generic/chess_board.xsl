@@ -254,6 +254,8 @@
 
 			<!-- for each cell print the content -->
 			<xsl:for-each select="fact[prop-f=$internalCellFluentName]">
+				<xsl:variable name="alt"><xsl:call-template name="fluent2text"/></xsl:variable>
+				
 				<xsl:variable name="xArg" select="./arg[number($xArgIdx)]"/>
 				<xsl:variable name="yArg" select="./arg[number($yArgIdx)]"/>
 				<xsl:variable name="content" select="./arg[number($contentArgIdx)]"/>
@@ -291,6 +293,7 @@
 				</xsl:variable>
 
 				<div class="chesscellcontent">
+					<xsl:attribute name="title"><xsl:value-of select="$alt"/></xsl:attribute>
 					<xsl:attribute name="style">
 						left: <xsl:value-of select="$xPosCell"/>px;
 						top: <xsl:value-of select="$yPosCell"/>px;
@@ -377,6 +380,7 @@
 								<xsl:with-param name="content" select="$content"/>
 								<xsl:with-param name="piece" select="$piece"/>
 								<xsl:with-param name="background" select="$CellColor"/>
+								<xsl:with-param name="alt" select="$alt"/>
 							</xsl:call-template>
 						</xsl:when>
 						<xsl:when test="$piece=''"/> <!-- empty cell -->
@@ -387,7 +391,7 @@
 								<xsl:with-param name="background" select="$CellColor"/>
 								<xsl:with-param name="imgWidth" select="$CellWidth - 2 * $BorderWidth"/>
 								<xsl:with-param name="imgHeight" select="$CellHeight - 2 * $BorderWidth"/>
-								<xsl:with-param name="alt" select="$content"/>
+								<xsl:with-param name="alt" select="$alt"/>
 							</xsl:call-template>
 						</xsl:otherwise>
 					</xsl:choose>

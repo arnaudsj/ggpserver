@@ -18,6 +18,7 @@
 	</xsl:template>
 
 	<xsl:template name="make_cell_content">
+		<xsl:param name="alt"/>
 		<div>
 			<xsl:variable name="col" select="./arg[1]"/>
 			<xsl:variable name="row" select="./arg[2]"/>
@@ -37,6 +38,7 @@
 					</xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
+			<xsl:attribute name="title"><xsl:value-of select="$alt"/></xsl:attribute>
 			<xsl:value-of select="$value"/>
 		</div>
 	</xsl:template>

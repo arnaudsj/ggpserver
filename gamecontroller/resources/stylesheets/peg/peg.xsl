@@ -18,6 +18,7 @@
 		<xsl:param name="content"/>
 		<xsl:param name="piece"/>
 		<xsl:param name="background"/>
+		<xsl:param name="alt"/>
 
 		<xsl:variable name="piece2">
 			<xsl:choose>
@@ -30,7 +31,7 @@
 		<xsl:call-template name="make_chess_img">
 			<xsl:with-param name="piece" select="$piece2"/>
 			<xsl:with-param name="background" select="$background"/>
-			<xsl:with-param name="alt" select="$content"/>
+			<xsl:with-param name="alt" select="$alt"/>
 		</xsl:call-template>
 	</xsl:template>
 	
