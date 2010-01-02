@@ -969,6 +969,36 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return result;
 	}
 
+	public List<ServerMatch<TermType, ReasonerStateInfoType>> getSelectedMatches(String sql_select) {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		List<ServerMatch<TermType, ReasonerStateInfoType>> result = new LinkedList<ServerMatch<TermType, ReasonerStateInfoType>>();
+		
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(sql_select + ";");
+			
+			rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				result.add(getMatch(rs.getString("match_id")));
+			}
+		} catch(java.sql.SQLException e) {}
+		finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+			if (rs != null)
+				try {rs.close();} catch (SQLException e) {}
+		} 
+
+		return result;
+	}
+	
+
 	public int getRowCountMatches(String playerName, String gameName, String tournamentID, String owner, String status, boolean excludeNew) throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
