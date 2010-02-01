@@ -70,6 +70,7 @@ import tud.ggpserver.datamodel.statistics.PerformanceInformation;
 import tud.ggpserver.datamodel.statistics.TournamentStatistics;
 import tud.ggpserver.scheduler.PlayerStatusListener;
 import tud.ggpserver.util.Digester;
+import tud.ggpserver.util.MatchInfo;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 
@@ -984,6 +985,44 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			
 			while (rs.next()) {
 				result.add(getMatch(rs.getString("match_id")));
+			}
+		} catch(java.sql.SQLException e) {}
+		finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+			if (rs != null)
+				try {rs.close();} catch (SQLException e) {}
+		} 
+
+		return result;
+	}
+	
+	public List<MatchInfo> getSelectedMatcheInfos(String sql_select) {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		List<MatchInfo> result = new ArrayList<MatchInfo>();
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(sql_select + ";");
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				String tmp_match_id = rs.getString(1);
+				MatchInfo matchInfo = new MatchInfo(tmp_match_id, rs.getString(5), rs.getInt(6),  rs.getInt(7), rs.getString(8), rs.getString(9));
+				matchInfo.addPlayer(rs.getString(2), rs.getInt(3), rs.getInt(4));
+				while (rs.next()) {
+					if (rs.getString(1).equals(tmp_match_id)) {
+						matchInfo.addPlayer(rs.getString(2), rs.getInt(3), rs.getInt(4));
+					}
+					else {
+						rs.previous();
+						break;
+					}
+				}				
+				result.add(matchInfo);
 			}
 		} catch(java.sql.SQLException e) {}
 		finally { 

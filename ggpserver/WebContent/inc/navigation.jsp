@@ -33,6 +33,7 @@
 		<div id="ntitle">&nbsp;</div>
 		<a href="<%= request.getContextPath() + response.encodeURL("/index.jsp") %>">Start Page</a>
 		<a href="<%= request.getContextPath() + response.encodeURL("/public/show_matches.jsp") %>">Matches</a>
+		<a href="<%= request.getContextPath() + response.encodeURL("/public/show_filter.jsp") %>">Filter</a>
 		<a href="<%= request.getContextPath() + response.encodeURL("/public/show_games.jsp") %>">Games</a>
 		<a href="<%= request.getContextPath() + response.encodeURL("/public/show_players.jsp") %>">Players</a>
 		<a href="<%= request.getContextPath() + response.encodeURL("/public/show_users.jsp") %>">Users</a>
