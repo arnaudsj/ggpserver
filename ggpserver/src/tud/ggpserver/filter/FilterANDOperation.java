@@ -18,48 +18,28 @@
     along with GGP Server.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package tud.ggpserver.util;
+package tud.ggpserver.filter;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collection;
 
-/**
- * implements a map that associates unique IDs to arbitrary items
- *
- * @param <T>
- */
-public class IdPool<T extends IDItem> {
-	private long lastId = 0l;
-	private Map<Long, T> idMap = new HashMap<Long, T>();
-	
-	public Long getNewId() {
-		if (lastId == Long.MAX_VALUE) {
-			throw new RuntimeException("Ran out of unique ids in IdPool.getNewId()!");
+import tud.ggpserver.util.IdPool;
+import tud.ggpserver.datamodel.MatchInfo;
+
+public class FilterANDOperation extends FilterOperation{
+
+	protected FilterANDOperation(IdPool<FilterNode> ids) {
+		this(ids, null);
+	}
+	protected FilterANDOperation(IdPool<FilterNode> ids, Collection<FilterNode> successors) {
+		super(ids, FilterType.And, successors);
+	}
+
+	@Override
+	public boolean isMatching(MatchInfo matchInfo) {
+		for (FilterNode node : successors) {
+			if (!node.isMatching(matchInfo))
+				return false;
 		}
-		++lastId;
-		return lastId;
-	}
-
-	public long getNewId(T item) {
-		long id = getNewId();
-		addItem(item, id);
-		item.setID(id);
-		return id;
-	}
-
-	private void addItem(T item, long id) {
-		idMap.put(id, item);
-	}
-	
-	public void removeItem(long id) {
-		idMap.remove(id);
-	}
-	
-	public T getItem(long id) {
-		return idMap.get(id);
-	}
-	
-	public boolean containsItem(long id) {
-		return idMap.containsKey(id);
+		return true;
 	}
 }

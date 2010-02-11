@@ -70,7 +70,6 @@ import tud.ggpserver.datamodel.statistics.PerformanceInformation;
 import tud.ggpserver.datamodel.statistics.TournamentStatistics;
 import tud.ggpserver.scheduler.PlayerStatusListener;
 import tud.ggpserver.util.Digester;
-import tud.ggpserver.util.MatchInfo;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 
@@ -999,7 +998,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return result;
 	}
 	
-	public List<MatchInfo> getSelectedMatcheInfos(String sql_select) {
+	public List<MatchInfo> getSelectedMatchInfos() {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -1007,7 +1006,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		List<MatchInfo> result = new ArrayList<MatchInfo>();
 		try {
 			con = getConnection();
-			ps = con.prepareStatement(sql_select + ";");
+			ps = con.prepareStatement("SELECT mp.match_id,player,roleindex,goal_value,game,start_clock,play_clock,start_time,status FROM match_players AS mp JOIN matches AS m ON mp.match_id = m.match_id ORDER BY mp.match_id;");
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				String tmp_match_id = rs.getString(1);

@@ -1,5 +1,5 @@
 <%--
-    Copyright (C) 2009 Martin Günther (mintar@gmx.de)
+    Copyright (C) 2010 Peter Steinke (peter.steinke@inf.tu-dresden.de)
 
     This file is part of GGP Server.
 
@@ -22,7 +22,7 @@
 
 <jsp:useBean id="saveFilter" class="tud.ggpserver.formhandlers.SaveFilter" scope="page">
       <c:catch>
-	<jsp:setProperty name="saveFilter" property="show_matches" />
+	<jsp:setProperty name="saveFilter" property="showMatches" />
       </c:catch>
 </jsp:useBean>
 
@@ -34,13 +34,11 @@
 <% saveFilter.setFilter(session.getAttribute("filter")); %>
 <% saveFilter.parseParameterMap(request.getParameterMap()); %>
 
-<c:if test="${saveFilter.show_matches == 1}">
-	  <jsp:forward page="show_filter.jsp?show_matches=1"/>
-</c:if>
-
-<c:if test="${saveFilter.show_matches == 0}">
-	  <jsp:forward page="show_filter.jsp?show_matches=0"/>
-</c:if>
-
-
-
+<c:choose>
+	<c:when test="${saveFilter.showMatches}">
+		<jsp:forward page="show_filter.jsp?showMatches=true"/>
+	</c:when>
+	<c:otherwise>
+		<jsp:forward page="show_filter.jsp?showMatches=false"/>
+	</c:otherwise>
+</c:choose>

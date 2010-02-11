@@ -18,48 +18,36 @@
     along with GGP Server.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package tud.ggpserver.util;
+package tud.ggpserver.filter;
 
-import java.util.HashMap;
-import java.util.Map;
+import tud.ggpserver.datamodel.MatchInfo;
+import tud.ggpserver.util.IdPool;
+import tud.ggpserver.util.PlayerInfo;
 
-/**
- * implements a map that associates unique IDs to arbitrary items
- *
- * @param <T>
- */
-public class IdPool<T extends IDItem> {
-	private long lastId = 0l;
-	private Map<Long, T> idMap = new HashMap<Long, T>();
+public class PlayerFilterRule extends StringMatchFilterRule{
+		
+	public PlayerFilterRule(IdPool<FilterNode> ids) {
+		super(ids, FilterType.Player);
+	}
 	
-	public Long getNewId() {
-		if (lastId == Long.MAX_VALUE) {
-			throw new RuntimeException("Ran out of unique ids in IdPool.getNewId()!");
+	@Override
+	public boolean isMatching(MatchInfo matchInfo) {
+		boolean foundPlayer = false;
+		for (PlayerInfo player : matchInfo.getPlayers()) {
+			if (patternMatches(player.getPlayerName())) {
+				foundPlayer = true;
+				break;
+			}
 		}
-		++lastId;
-		return lastId;
+		
+		if (isMenu.getSelectedValue().equals("is"))
+			return foundPlayer;
+		else
+			return !foundPlayer;
 	}
 
-	public long getNewId(T item) {
-		long id = getNewId();
-		addItem(item, id);
-		item.setID(id);
-		return id;
-	}
-
-	private void addItem(T item, long id) {
-		idMap.put(id, item);
-	}
-	
-	public void removeItem(long id) {
-		idMap.remove(id);
-	}
-	
-	public T getItem(long id) {
-		return idMap.get(id);
-	}
-	
-	public boolean containsItem(long id) {
-		return idMap.containsKey(id);
+	@Override
+	public String toString() {
+		return "FilterRule[id:"+getID()+", player "+isMenu.getSelectedValue()+" "+patternTextBox.getValue()+"]";
 	}
 }
