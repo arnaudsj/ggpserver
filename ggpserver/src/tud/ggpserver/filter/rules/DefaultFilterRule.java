@@ -21,12 +21,11 @@ package tud.ggpserver.filter.rules;
 
 import tud.ggpserver.datamodel.MatchInfo;
 import tud.ggpserver.filter.FilterNode;
-import tud.ggpserver.filter.FilterNode.FilterType;
 import tud.ggpserver.util.IdPool;
 
-public class DefaultFilterNode extends FilterNode {
+public class DefaultFilterRule extends FilterRule {
 
-	protected DefaultFilterNode(IdPool<FilterNode> ids) {
+	public DefaultFilterRule(IdPool<FilterNode> ids) {
 		super(ids, FilterType.Default);
 	}
 

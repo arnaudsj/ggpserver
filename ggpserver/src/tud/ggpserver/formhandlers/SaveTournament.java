@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import tud.ggpserver.datamodel.Tournament;
 import tud.ggpserver.datamodel.DBConnector;
 import tud.ggpserver.datamodel.User;
 import tud.ggpserver.datamodel.matches.ServerMatch;

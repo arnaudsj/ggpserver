@@ -26,7 +26,6 @@ import java.util.ArrayList;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import tud.ggpserver.datamodel.MatchInfo;
 import tud.ggpserver.datamodel.matches.ServerMatch;
@@ -50,7 +49,7 @@ public class ShowMatchFilter extends ShowMatches {
 	 */
 	private List<String> selectedMatchIds = null;
 
-	private static final Logger logger = Logger.getLogger(ShowMatchFilter.class.getName());
+//	private static final Logger logger = Logger.getLogger(ShowMatchFilter.class.getName());
 
 	public ShowMatchFilter() {
 		filter =  new Filter();

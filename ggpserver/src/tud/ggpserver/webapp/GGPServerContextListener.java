@@ -26,9 +26,6 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import tud.ggpserver.datamodel.DBConnectorFactory;
-import tud.ggpserver.scheduler.AbstractRoundRobinScheduler;
-import tud.ggpserver.scheduler.MatchRunner;
-import tud.ggpserver.scheduler.RoundRobinScheduler;
 
 /**
  * On application startup, this class starts the database cleanup function.

@@ -22,7 +22,6 @@ package tud.ggpserver.filter.rules;
 import java.util.Date;
 
 import tud.ggpserver.filter.FilterNode;
-import tud.ggpserver.filter.FilterNode.FilterType;
 import tud.ggpserver.filter.matcher.DateMatcher;
 import tud.ggpserver.util.IdPool;
 

@@ -22,7 +22,6 @@ package tud.ggpserver.filter.rules;
 
 import tud.ggpserver.datamodel.MatchInfo;
 import tud.ggpserver.filter.FilterNode;
-import tud.ggpserver.filter.FilterNode.FilterType;
 import tud.ggpserver.util.IdPool;
 
 public class GameFilterRule extends StringMatchFilterRule{

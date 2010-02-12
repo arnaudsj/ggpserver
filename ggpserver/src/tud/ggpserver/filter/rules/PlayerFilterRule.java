@@ -24,7 +24,6 @@ import org.apache.commons.lang.StringEscapeUtils;
 
 import tud.ggpserver.datamodel.MatchInfo;
 import tud.ggpserver.filter.FilterNode;
-import tud.ggpserver.filter.FilterNode.FilterType;
 import tud.ggpserver.filter.matcher.LongMatcher;
 import tud.ggpserver.filter.matcher.StringMatcher;
 import tud.ggpserver.util.IdPool;
