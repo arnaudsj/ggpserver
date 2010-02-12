@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2010 Peter Steinke <peter.steinke@inf.tu-dresden.de>
-                  2010 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2010 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GGP Server.
 
@@ -22,12 +21,38 @@ package tud.ggpserver.filter.rules;
 
 import tud.ggpserver.filter.FilterNode;
 import tud.ggpserver.filter.FilterNode.FilterType;
+import tud.ggpserver.filter.matcher.Matcher;
 import tud.ggpserver.util.IdPool;
 
-public abstract class FilterRule extends FilterNode {
+public abstract class MatchFilterRule<T> extends FilterRule{
+	
+	protected Matcher<T> matcher;
 
-	public FilterRule(IdPool<FilterNode> ids, FilterType type) {
+	public MatchFilterRule(IdPool<FilterNode> ids, FilterType type) {
 		super(ids, type);
+		this.matcher = createMatcher();
 	}
 	
+	public abstract Matcher<T> createMatcher();
+	
+	@Override
+	public boolean update(String[] values) {
+		if (super.update(values)) // type has changed
+			return true;
+		return matcher.update(values[1], values[2]);
+	}
+
+	@Override
+	public String getHtml() {
+		return super.getHtml() + matcher.getHtml();
+	}
+	
+	public boolean isMatching(T t) {
+		return matcher.isMatching(t);
+	}
+	
+	@Override
+	public String toString() {
+		return "MatchFilterRule[type:"+getType()+ ", "+matcher.toString()+"]";
+	}
 }

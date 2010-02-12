@@ -26,6 +26,7 @@ import java.util.List;
 import tud.ggpserver.datamodel.MatchInfo;
 import tud.ggpserver.filter.htmlform.DropDownMenu;
 import tud.ggpserver.filter.htmlform.DropDownMenu.Option;
+import tud.ggpserver.filter.rules.FilterRule;
 import tud.ggpserver.util.IDItem;
 import tud.ggpserver.util.IdPool;
 

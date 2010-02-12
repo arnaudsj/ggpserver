@@ -18,9 +18,11 @@
     along with GGP Server.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package tud.ggpserver.filter;
+package tud.ggpserver.filter.rules;
 
 import tud.ggpserver.datamodel.MatchInfo;
+import tud.ggpserver.filter.FilterNode;
+import tud.ggpserver.filter.FilterNode.FilterType;
 import tud.ggpserver.util.IdPool;
 
 public class GameFilterRule extends StringMatchFilterRule{

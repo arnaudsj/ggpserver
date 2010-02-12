@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2010 Peter Steinke <peter.steinke@inf.tu-dresden.de>
-                  2010 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2010 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GGP Server.
 
@@ -20,14 +19,25 @@
 
 package tud.ggpserver.filter.rules;
 
+import tud.ggpserver.datamodel.MatchInfo;
 import tud.ggpserver.filter.FilterNode;
 import tud.ggpserver.filter.FilterNode.FilterType;
 import tud.ggpserver.util.IdPool;
 
-public abstract class FilterRule extends FilterNode {
-
-	public FilterRule(IdPool<FilterNode> ids, FilterType type) {
-		super(ids, type);
+public class TournamentFilterRule extends StringMatchFilterRule{
+	
+	public TournamentFilterRule(IdPool<FilterNode> ids) {
+		super(ids, FilterType.Tournament);
 	}
 	
+	@Override
+	public boolean isMatching(MatchInfo matchInfo) {
+		return isMatching(matchInfo.getTournament());
+	}
+
+	@Override
+	public String toString() {
+		return "FilterRule[id:"+getID()+", tournament matches "+super.toString()+"]";
+	}
+
 }

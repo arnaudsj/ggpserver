@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2010 Peter Steinke <peter.steinke@inf.tu-dresden.de>
-                  2010 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2010 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GGP Server.
 
@@ -20,14 +19,20 @@
 
 package tud.ggpserver.filter.rules;
 
+import java.util.Date;
+
 import tud.ggpserver.filter.FilterNode;
 import tud.ggpserver.filter.FilterNode.FilterType;
+import tud.ggpserver.filter.matcher.DateMatcher;
 import tud.ggpserver.util.IdPool;
 
-public abstract class FilterRule extends FilterNode {
-
-	public FilterRule(IdPool<FilterNode> ids, FilterType type) {
+public abstract class DateMatchFilterRule extends MatchFilterRule<Date>{
+	
+	public DateMatchFilterRule(IdPool<FilterNode> ids, FilterType type) {
 		super(ids, type);
 	}
 	
+	public DateMatcher createMatcher() {
+		return new DateMatcher(String.valueOf(getID()));
+	}
 }
