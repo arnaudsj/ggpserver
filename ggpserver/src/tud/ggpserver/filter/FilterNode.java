@@ -33,7 +33,7 @@ import tud.ggpserver.util.IdPool;
 
 public abstract class FilterNode implements IDItem {
 	public static enum FilterType {
-		Default("new node"), And("AND"), Or("OR"), Game("game"), RoleNumber("#roles"), PlayClock("play clock"), Player("player"), StartClock("start clock"), StartTime("start time"), Tournament("tournament");
+		Default("new node"), And("AND"), Or("OR"), Game("game"), RoleNumber("#roles"), PlayClock("play clock"), Player("player"), StartClock("start clock"), StartTime("start time"), Status("status"), Tournament("tournament");
 		private String name;
 		private FilterType(String name) {
 			this.name = name;

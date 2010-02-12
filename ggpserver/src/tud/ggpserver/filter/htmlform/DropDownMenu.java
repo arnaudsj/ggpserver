@@ -53,6 +53,8 @@ public class DropDownMenu extends HtmlForm {
 		}
 	}
 
+	// TODO: implement support for multiple selections
+	
 	private List<Option> options;
 	private String selectedValue;
 	private boolean doSubmitOnChange = false;

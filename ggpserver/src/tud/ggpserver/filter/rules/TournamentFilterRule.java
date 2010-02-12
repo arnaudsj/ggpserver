@@ -33,10 +33,4 @@ public class TournamentFilterRule extends StringMatchFilterRule{
 	public boolean isMatching(MatchInfo matchInfo) {
 		return isMatching(matchInfo.getTournament());
 	}
-
-	@Override
-	public String toString() {
-		return "FilterRule[id:"+getID()+", tournament matches "+super.toString()+"]";
-	}
-
 }

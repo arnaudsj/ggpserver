@@ -43,8 +43,7 @@ public class LongMatcher extends ComparableMatcher<Long> {
 			patternTextBox.setMaxLength(maxLength);
 		}
 		long initialValue = Math.min(Math.max(0, minValue), maxValue);
-		patternTextBox.setValue(String.valueOf(initialValue));
-		initMatcher();
+		setPattern(String.valueOf(initialValue));
 	}
 
 	@Override

@@ -29,6 +29,7 @@ import tud.ggpserver.filter.rules.PlayerFilterRule;
 import tud.ggpserver.filter.rules.RoleNumberFilterRule;
 import tud.ggpserver.filter.rules.StartClockFilterRule;
 import tud.ggpserver.filter.rules.StartTimeFilterRule;
+import tud.ggpserver.filter.rules.StatusFilterRule;
 import tud.ggpserver.filter.rules.TournamentFilterRule;
 import tud.ggpserver.util.IdPool;
 
@@ -65,6 +66,9 @@ public class FilterFactory {
 			break;
 		case StartTime:
 			node = new StartTimeFilterRule(ids);
+			break;
+		case Status:
+			node = new StatusFilterRule(ids);
 			break;
 		case Tournament:
 			node = new TournamentFilterRule(ids);

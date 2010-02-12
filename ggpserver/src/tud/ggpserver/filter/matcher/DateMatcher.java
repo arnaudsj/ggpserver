@@ -25,7 +25,6 @@ import java.util.Date;
 import java.util.Locale;
 
 import tud.ggpserver.filter.htmlform.DropDownMenu;
-import tud.ggpserver.filter.htmlform.TextBox;
 
 public class DateMatcher extends ComparableMatcher<Date> {
 
@@ -33,6 +32,7 @@ public class DateMatcher extends ComparableMatcher<Date> {
 
 	public DateMatcher(String id) {
 		super(id);
+		setPattern(dateFormat.format(new Date()));
 	}
 	
 	@Override
@@ -40,11 +40,6 @@ public class DateMatcher extends ComparableMatcher<Date> {
 		DropDownMenu menu = super.createMenu();
 		menu.setSelectedValue(Comparison.SmallerEqual.toString());
 		return menu;
-	}
-
-	@Override
-	protected TextBox createTextBox() {
-		return new TextBox(getId(), dateFormat.format(new Date()));
 	}
 
 	@Override
