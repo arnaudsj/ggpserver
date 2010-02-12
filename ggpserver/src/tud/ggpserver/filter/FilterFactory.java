@@ -32,7 +32,7 @@ public class FilterFactory {
 		FilterNode node = null;
 		switch(type) {
 		case Default:
-			node = new FilterNode(ids);
+			node = new DefaultFilterNode(ids);
 			break;
 		case And:
 			node = new FilterANDOperation(ids);
@@ -40,11 +40,26 @@ public class FilterFactory {
 		case Or:
 			node = new FilterOROperation(ids);
 			break;
+		case Game:
+			node = new GameFilterRule(ids);
+			break;
+		case RoleNumber:
+			node = new RoleNumberFilterRule(ids);
+			break;
+		case PlayClock:
+			node = new PlayClockFilterRule(ids);
+			break;
 		case Player:
 			node = new PlayerFilterRule(ids);
 			break;
-		case Game:
-			node = new GameFilterRule(ids);
+		case StartClock:
+			node = new StartClockFilterRule(ids);
+			break;
+		case StartTime:
+			node = new StartTimeFilterRule(ids);
+			break;
+		case Tournament:
+			node = new TournamentFilterRule(ids);
 			break;
 		default:
 			logger.severe("unknown type:"+type);
@@ -53,7 +68,7 @@ public class FilterFactory {
 	}
 
 	public static FilterNode getDefaultNode(IdPool<FilterNode> ids) {
-		return new FilterNode(ids);
+		return new DefaultFilterNode(ids);
 	}
 
 }

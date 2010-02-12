@@ -37,6 +37,8 @@ public class Filter extends FilterANDOperation {
 	 * is set to null if the filter is changed on update
 	 */
 	private Object userData = null;
+
+	private static final Logger logger = Logger.getLogger(Filter.class.getName());
 	
 	public Filter() {
 		super(new IdPool<FilterNode>());
@@ -47,6 +49,7 @@ public class Filter extends FilterANDOperation {
 	 */
 	@Override
 	public String getHtml() {
+		logger.info(this.toString());
 		StringBuilder sb = new StringBuilder();
 		sb.append("<div id=\"div_filter\">");
 		sb.append(successors.get(0).getHtml());

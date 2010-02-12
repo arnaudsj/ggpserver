@@ -20,74 +20,23 @@
 
 package tud.ggpserver.filter;
 
-import java.util.LinkedList;
-import java.util.regex.Pattern;
-
-import tud.ggpserver.filter.DropDownMenu.Option;
+import tud.ggpserver.filter.matcher.Matcher;
+import tud.ggpserver.filter.matcher.StringMatcher;
 import tud.ggpserver.util.IdPool;
 
-public abstract class StringMatchFilterRule extends FilterRule{
+public abstract class StringMatchFilterRule extends MatchFilterRule<String>{
 	
-	private static final String IS = "is"; 
-	private static final String ISNOT = "is not"; 
-
-	protected DropDownMenu isMenu;
-	protected TextBox patternTextBox;
-	protected Pattern pattern;
-
 	public StringMatchFilterRule(IdPool<FilterNode> ids, FilterType type) {
 		super(ids, type);
-
-		LinkedList<Option> options = new LinkedList<Option>();
-		options.add(new Option(IS));
-		options.add(new Option(ISNOT));
-		
-		isMenu = new DropDownMenu(options, String.valueOf(getID()));
-		isMenu.setSelectedValue(IS);
-		
-		patternTextBox = new TextBox(String.valueOf(getID()));
-		patternTextBox.setValue("");
-
-		init_matcher();
 	}
 	
-	private void init_matcher() {
-		String patternString;
-		patternString = patternTextBox.getValue().replace('?', '.');
-		patternString = patternString.replace("*", ".*");
-		pattern = Pattern.compile(patternString);
-		
-	}
-
-	public boolean isMatching(String s) {
-		return (!patternMatches(s)) ^ isMenu.getSelectedValue().equals(IS); // (matches && "is") || (!matches && !"is")   
+	@Override
+	public Matcher<String> createMatcher() {
+		return new StringMatcher(String.valueOf(getID()));
 	}
 
 	public boolean patternMatches(String s) {
-		return pattern.matcher(s).matches();
+		return ((StringMatcher)matcher).patternMatches(s);
 	}
 
-	@Override
-	public boolean update(String[] values) {
-		if (super.update(values)) // type has changed
-			return true;
-
-		boolean changed = false;
-		if (!isMenu.getSelectedValue().equals(values[1])) {
-			isMenu.setSelectedValue(values[1]);
-			changed = true;
-		};
-		
-		if (!values[2].equals(patternTextBox.getValue())) {
-			patternTextBox.setValue(values[2]);
-			init_matcher();
-			changed = true;
-		}
-		return changed;
-	}
-
-	@Override
-	public String getHtml() {
-		return super.getHtml() + isMenu.getHtml() + patternTextBox.getHtml();
-	}
 }

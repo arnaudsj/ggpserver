@@ -20,27 +20,57 @@
 
 package tud.ggpserver.filter;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 import tud.ggpserver.datamodel.MatchInfo;
+import tud.ggpserver.filter.matcher.LongMatcher;
+import tud.ggpserver.filter.matcher.StringMatcher;
 import tud.ggpserver.util.IdPool;
 import tud.ggpserver.util.PlayerInfo;
 
-public class PlayerFilterRule extends StringMatchFilterRule{
-		
+public class PlayerFilterRule extends FilterRule{
+	
+	private static final String HINT = "<span class=\"hint\">" + StringEscapeUtils.escapeHtml("(role is a number >=1 or '*' for any; the player name may contain the wildcards '?' and '*')") + "</span>";
+	private LongMatcher roleMatcher;  
+	private StringMatcher playerMatcher;
+	
 	public PlayerFilterRule(IdPool<FilterNode> ids) {
 		super(ids, FilterType.Player);
+		roleMatcher = new LongMatcher(String.valueOf(getID()));
+		roleMatcher.setPattern("*");
+		playerMatcher = new StringMatcher(String.valueOf(getID()));
+	}
+
+	@Override
+	public boolean update(String[] values) {
+		if (super.update(values)) // type has changed -> no further changes to make
+			return true;
+		boolean changed = false;
+		if(roleMatcher.update(values[1], values[2]))
+			changed=true;
+		if(playerMatcher.update(values[3], values[4]))
+			changed=true;
+		return changed;
+	}
+
+	@Override
+	public String getHtml() {
+		return super.getHtml() + "with role " + roleMatcher.getHtml() + playerMatcher.getHtml() + "<br/>" + HINT;
 	}
 	
 	@Override
 	public boolean isMatching(MatchInfo matchInfo) {
 		boolean foundPlayer = false;
 		for (PlayerInfo player : matchInfo.getPlayers()) {
-			if (patternMatches(player.getPlayerName())) {
-				foundPlayer = true;
-				break;
+			if(roleMatcher.isMatching(player.getRoleindex().longValue())) { // only consider the roles that match the RoleIndex
+				if (playerMatcher.patternMatches(player.getPlayerName())) {
+					foundPlayer = true;
+					break;
+				}
 			}
 		}
 		
-		if (isMenu.getSelectedValue().equals("is"))
+		if (playerMatcher.shouldMatch())
 			return foundPlayer;
 		else
 			return !foundPlayer;
@@ -48,6 +78,6 @@ public class PlayerFilterRule extends StringMatchFilterRule{
 
 	@Override
 	public String toString() {
-		return "FilterRule[id:"+getID()+", player "+isMenu.getSelectedValue()+" "+patternTextBox.getValue()+"]";
+		return "FilterRule[id:"+getID()+", player at role "+roleMatcher.toString()+" "+playerMatcher.toString()+"]";
 	}
 }

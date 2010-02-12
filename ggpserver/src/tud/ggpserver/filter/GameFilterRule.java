@@ -36,7 +36,7 @@ public class GameFilterRule extends StringMatchFilterRule{
 
 	@Override
 	public String toString() {
-		return "FilterRule[id:"+getID()+", game "+isMenu.getSelectedValue()+" "+patternTextBox.getValue()+"]";
+		return "FilterRule[id:"+getID()+", game matches "+super.toString()+"]";
 	}
 
 }

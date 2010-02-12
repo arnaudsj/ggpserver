@@ -22,17 +22,17 @@ package tud.ggpserver.filter;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import tud.ggpserver.datamodel.MatchInfo;
-import tud.ggpserver.filter.DropDownMenu.Option;
+import tud.ggpserver.filter.htmlform.DropDownMenu;
+import tud.ggpserver.filter.htmlform.DropDownMenu.Option;
 import tud.ggpserver.util.IDItem;
 import tud.ggpserver.util.IdPool;
 
 
-public class FilterNode implements IDItem {
+public abstract class FilterNode implements IDItem {
 	public static enum FilterType {
-		Default("new node"), And("AND"), Or("OR"), Player("player"), Game("game");
+		Default("new node"), And("AND"), Or("OR"), Game("game"), RoleNumber("#roles"), PlayClock("play clock"), Player("player"), StartClock("start clock"), StartTime("start time"), Tournament("tournament");
 		private String name;
 		private FilterType(String name) {
 			this.name = name;
@@ -53,17 +53,14 @@ public class FilterNode implements IDItem {
 
 	private FilterType type;
 	
-	protected FilterNode(IdPool<FilterNode> ids) {
-		this(ids, FilterType.Default);
-	}
-
 	protected FilterNode(IdPool<FilterNode> ids, FilterType type) {
 		super();
 		this.ids = ids;
 		this.type = type;
 		id = ids.getNewId(this);
-		menu = new DropDownMenu(getMenuOptions(), String.valueOf(getID()));
+		menu = new DropDownMenu(String.valueOf(getID()), getMenuOptions());
 		menu.setSelectedValue(type.toString());
+		menu.setSubmitOnChange(true);
 	}
 
 	private static List<Option> getMenuOptions() {
@@ -83,12 +80,13 @@ public class FilterNode implements IDItem {
 		this.parent = parent;
 	}
 
-	public boolean isMatching(MatchInfo matchInfo) {
-		if(parent == null) { // default filter is true for an "and", false for an "or" and true if it is the root
-			return true;
-		}
-		return parent.getType().equals(FilterType.And); 
-	}
+	public abstract boolean isMatching(MatchInfo matchInfo);
+//	public boolean isMatching(MatchInfo matchInfo) {
+//		if(parent == null) { // default filter is true for an "and", false for an "or" and true if it is the root
+//			return true;
+//		}
+//		return parent.getType().equals(FilterType.And); 
+//	}
 	
 	/**
 	 * deletes this node and all successors
@@ -156,5 +154,9 @@ public class FilterNode implements IDItem {
 	@Override
 	public String toString() {
 		return "FilterNode[id:"+id+", type:"+type+"]";
+	}
+	
+	public FilterOperation getParent() {
+		return parent;
 	}
 }

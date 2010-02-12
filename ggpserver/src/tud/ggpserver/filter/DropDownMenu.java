@@ -17,9 +17,11 @@
     along with GGP Server.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package tud.ggpserver.filter;
+package tud.ggpserver.filter.htmlform;
 
 import java.util.List;
+
+import org.apache.commons.lang.StringEscapeUtils;
 
 
 /**
@@ -29,7 +31,16 @@ import java.util.List;
 public class DropDownMenu extends HtmlForm {
 
 	public static class Option {
-		public String name;
+		/**
+		 * the name of the option, i.e., what is shown on the web page
+		 */
+		public String name; 
+
+		/**
+		 * the value of the option, i.e., what is sent with the http-request
+		 * 
+		 * The value must be a string of characters that does not have to be escaped. I.e., it must not contain &quot;, &lt;, etc. 
+		 */
 		public String value;
 		
 		public Option(String name) {
@@ -44,7 +55,25 @@ public class DropDownMenu extends HtmlForm {
 
 	private List<Option> options;
 	private String selectedValue;
+	private boolean doSubmitOnChange = false;
 
+	public DropDownMenu(String id, List<Option> options) {
+		this(id, options, options.get(0).value);
+	}
+
+	public DropDownMenu(String id, List<Option> options, String selectedValue) {
+		super(id);
+		this.options = options;
+		this.selectedValue = selectedValue;
+	}
+
+	public boolean isSubmitOnChange() {
+		return doSubmitOnChange;
+	}
+
+	public void setSubmitOnChange(boolean submitOnChange) {
+		this.doSubmitOnChange = submitOnChange;
+	}
 
 	public String getSelectedValue() {
 		return selectedValue;
@@ -54,30 +83,18 @@ public class DropDownMenu extends HtmlForm {
 		this.selectedValue = selectedValue;
 	}
 
-	public DropDownMenu(List<Option> options, String id) {
-		super();
-		this.options = options;
-		this.id = id;
-		this.selectedValue = "";
-	}
-
-	public DropDownMenu(List<Option> options, String selectedValue, String id) {
-		super();
-		this.options = options;
-		this.selectedValue = selectedValue;
-		this.id = id;
-	}
-
 	@Override
 	public String getHtml() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("<select name=\"").append(id).append("\"").append(onChange).append(">");
+		sb.append("<select name=\"").append(StringEscapeUtils.escapeHtml(getId())).append("\"");
+		if(doSubmitOnChange) sb.append(submitOnChange);
+		sb.append(">");
 		for (Option option : options) {
 			sb.append("<option");
 			if (option.value.equals(selectedValue)) {
 				 sb.append(" selected=\"selected\"");
 			}
-			sb.append(" value=\"").append(option.value).append("\">").append(option.name).append("</option>\n");
+			sb.append(" value=\"").append(option.value).append("\">").append(StringEscapeUtils.escapeHtml(option.name)).append("</option>\n");
 		}
 		sb.append("</select>");
 		return sb.toString();

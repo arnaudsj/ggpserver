@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2010 Peter Steinke <peter.steinke@inf.tu-dresden.de>
+                  2010 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GGP Server.
 
@@ -17,21 +18,48 @@
     along with GGP Server.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package tud.ggpserver.filter;
+package tud.ggpserver.filter.htmlform;
+
+import org.apache.commons.lang.StringEscapeUtils;
 
 public abstract class HtmlForm {
-	protected final static String onChange = " onChange=\"form.submit()\" ";
-	protected final static String onClick = " onClick=\"form.submit()\" ";
+	protected final static String submitOnChange = " onChange=\"form.submit()\" ";
+	protected final static String submitOnClick = " onClick=\"form.submit()\" ";
 
-	protected String id;
-	public abstract String getHtml();
+	private String id;
+	private String errorMessage = null;
+	
+	public HtmlForm(String id) {
+		this.id=id;
+	}
 	
 	public String getId() {
 		return id;
 	}
-	public void setId(Long id) {
-		this.id = String.valueOf(id);
+
+	public abstract String getHtml();
+
+	public String getErrorHtml() {
+		if (errorMessage != null) {
+			return "<span class=\"error_msg\">" + StringEscapeUtils.escapeHtml(errorMessage) + "</span>";
+		}
+		return "";
 	}
-	
-	
+
+	public void addErrorMessage(String msg) {
+		if (errorMessage == null) {
+			errorMessage = msg;
+		} else {
+			errorMessage = errorMessage + ";" + msg;
+		}
+	}
+
+	public void resetErrorMessage() {
+		errorMessage = null;
+	}
+
+	public String getErrorMessage() {
+		return errorMessage;
+	}
+
 }
