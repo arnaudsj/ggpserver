@@ -20,6 +20,7 @@
 package tud.ggpserver.datamodel;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import tud.ggpserver.util.PlayerInfo;
@@ -30,12 +31,13 @@ public class MatchInfo {
 	private String gameName;
 	private Integer start_clock;
 	private Integer play_clock;
-	private String start_time;
+	private Date start_time;
 	private String status;
+	private String tournament;
 	private Integer numberOfRoles = 0;
 	
 	public MatchInfo(String matchID, String gameName, Integer startClock,
-			Integer playClock, String startTime, String status) {
+			Integer playClock, Date startTime, String status, String tournament) {
 		super();
 		this.matchID = matchID;
 		this.gameName = gameName;
@@ -44,6 +46,7 @@ public class MatchInfo {
 		start_time = startTime;
 		this.status = status;
 		players = new ArrayList<PlayerInfo>();
+		this.tournament = tournament;
 	}
 	
 	public void addPlayer(PlayerInfo player) {
@@ -81,12 +84,16 @@ public class MatchInfo {
 		return play_clock;
 	}
 
-	public String getStartTime() {
+	public Date getStartTime() {
 		return start_time;
 	}
 
 	public String getStatus() {
 		return status;
+	}
+
+	public String getTournament() {
+		return tournament;
 	}
 	
 	

@@ -71,9 +71,9 @@ public class ShowMatchFilter extends ShowMatches {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private List<String> getSelectedMatchIDs() {
+	private List<String> getSelectedMatchIDs() throws SQLException {
 		if (selectedMatchIds == null) {
-			List<MatchInfo> selectedMatchInfos = db.getSelectedMatchInfos();
+			List<MatchInfo> selectedMatchInfos = db.getMatchInfos();
 			selectedMatchIds = new ArrayList<String>();
 			for (MatchInfo matchInfo : selectedMatchInfos) {
 				if (filter.isMatching(matchInfo))
@@ -115,7 +115,7 @@ public class ShowMatchFilter extends ShowMatches {
 	}
 
 	@Override
-	public int getRowCount() {
+	public int getRowCount() throws SQLException {
 		return getSelectedMatchIDs().size();
 	}
 	/*------- for pager - end ---------*/

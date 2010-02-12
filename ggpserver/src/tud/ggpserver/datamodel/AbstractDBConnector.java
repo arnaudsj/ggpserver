@@ -998,33 +998,29 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return result;
 	}
 	
-	public List<MatchInfo> getSelectedMatchInfos() {
+	public List<MatchInfo> getMatchInfos() throws SQLException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
 		List<MatchInfo> result = new ArrayList<MatchInfo>();
+		MatchInfo currentMatchInfo = null;
 		try {
 			con = getConnection();
-			ps = con.prepareStatement("SELECT mp.match_id,player,roleindex,goal_value,game,start_clock,play_clock,start_time,status FROM match_players AS mp JOIN matches AS m ON mp.match_id = m.match_id ORDER BY mp.match_id;");
+			ps = con.prepareStatement("SELECT m.match_id, player, roleindex, goal_value, game, start_clock, play_clock, start_time, status, tournament_id FROM match_players AS mp JOIN matches AS m ON mp.match_id = m.match_id ORDER BY m.start_time ASC, m.match_id ASC;");
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				String tmp_match_id = rs.getString(1);
-				MatchInfo matchInfo = new MatchInfo(tmp_match_id, rs.getString(5), rs.getInt(6),  rs.getInt(7), rs.getString(8), rs.getString(9));
-				matchInfo.addPlayer(rs.getString(2), rs.getInt(3), rs.getInt(4));
-				while (rs.next()) {
-					if (rs.getString(1).equals(tmp_match_id)) {
-						matchInfo.addPlayer(rs.getString(2), rs.getInt(3), rs.getInt(4));
-					}
-					else {
-						rs.previous();
-						break;
-					}
-				}				
-				result.add(matchInfo);
+				String matchID = rs.getString("m.match_id");
+				if (currentMatchInfo == null || !matchID.equals(currentMatchInfo.getMatchID())) {
+					// new match
+					if (currentMatchInfo != null) result.add(currentMatchInfo);
+					currentMatchInfo = new MatchInfo(matchID, rs.getString("game"), rs.getInt("start_clock"), rs.getInt("play_clock"), new Date(rs.getDate("start_time").getTime()), rs.getString("status"), rs.getString("tournament_id"));
+				}
+				currentMatchInfo.addPlayer(rs.getString("player"), rs.getInt("roleindex"), rs.getInt("goal_value"));
 			}
-		} catch(java.sql.SQLException e) {}
-		finally { 
+			// add last match to result
+			if (currentMatchInfo != null) result.add(currentMatchInfo);
+		} finally { 
 			if (con != null)
 				try {con.close();} catch (SQLException e) {}
 			if (ps != null)
