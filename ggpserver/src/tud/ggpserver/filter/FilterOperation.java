@@ -27,20 +27,28 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.logging.Logger;
 
+import tud.ggpserver.filter.htmlform.DropDownMenu;
+import tud.ggpserver.filter.htmlform.DropDownMenu.Option;
 import tud.ggpserver.util.IdPool;
 
 public abstract class FilterOperation extends FilterNode{
 	private static final Logger logger = Logger.getLogger(FilterOperation.class.getName());
 
+	protected static final Option NEW_NODE_OPTION = new Option("new", "new node"); 
+	
 	protected List<FilterNode> successors = new LinkedList<FilterNode>();
+
+	protected DropDownMenu newNodeMenu;
 	
 	protected FilterOperation(IdPool<FilterNode> ids, FilterType type, Collection<FilterNode> successors) {
 		super(ids, type);
 		if(successors!=null){
 			addSuccessors(successors);
-		} else {
-			addSuccessor(FilterFactory.getDefaultNode(ids));
 		}
+		List<Option> options = getTypeOptions();
+		options.add(0, NEW_NODE_OPTION);
+		newNodeMenu = new DropDownMenu(String.valueOf(getID()), options);
+		newNodeMenu.setSubmitOnChange(true);
 	}
 
 	public synchronized void removeSuccessor(FilterNode node) {
@@ -52,11 +60,6 @@ public abstract class FilterOperation extends FilterNode{
 		successors.add(node);
 	}
 	
-	public synchronized void insertSuccessor(FilterNode node) {
-		node.setParent(this);
-		successors.add(0, node);
-	}
-
 	public synchronized void addSuccessors(Collection<FilterNode> nodes) {
 		for (FilterNode node : nodes) {
 			node.setParent(this);
@@ -110,10 +113,9 @@ public abstract class FilterOperation extends FilterNode{
 		sb.append("<br/>");
 		sb.append("<ul>");
 		for (FilterNode node : successors) {
-			sb.append("<li>");
-			sb.append(node.getHtml());
-			sb.append("</li>");
+			sb.append("<li>").append(node.getHtml()).append("</li>");
 		}
+		sb.append("<li>").append(newNodeMenu.getHtml()).append("</li>");
 		sb.append("</ul>");
 		return sb.toString();
 	}
@@ -130,14 +132,28 @@ public abstract class FilterOperation extends FilterNode{
 				break;
 			}
 		}
-		if (found) {
-			if(!isRoot() && !i.hasNext() && !newNode.getType().equals(FilterType.Default)) {
-				// the type of last node is changed -> add a new "new node"  
-				addSuccessor(FilterFactory.getDefaultNode(ids));
-			}
-		} else {
+		if (!found) {
 			logger.warning("node "+node+" is not a successor");
-			insertSuccessor(newNode);
+			addSuccessor(newNode);
+		}
+	}
+
+	@Override
+	public boolean update(String[] values) {
+		if(super.update(values)) // type has changed
+			return true;
+		if(values.length>=2){
+			String menuSelection = values[1];
+			if (menuSelection.equals(NEW_NODE_OPTION.value)) {
+				return false;
+			} else {
+				FilterType newFilterType = FilterType.valueOf(menuSelection);
+				FilterNode newNode = FilterFactory.createFilterNode(newFilterType, ids);
+				addSuccessor(newNode);
+				return true;
+			}
+		}else{
+			return false;
 		}
 	}
 

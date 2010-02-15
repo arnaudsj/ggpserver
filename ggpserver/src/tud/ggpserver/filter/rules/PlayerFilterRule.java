@@ -37,7 +37,7 @@ public class PlayerFilterRule extends FilterRule{
 	
 	public PlayerFilterRule(IdPool<FilterNode> ids) {
 		super(ids, FilterType.Player);
-		roleMatcher = new LongMatcher(String.valueOf(getID()));
+		roleMatcher = new LongMatcher(String.valueOf(getID()), 1, 100);
 		roleMatcher.setPattern("*");
 		playerMatcher = new StringMatcher(String.valueOf(getID()));
 	}
@@ -47,10 +47,12 @@ public class PlayerFilterRule extends FilterRule{
 		if (super.update(values)) // type has changed -> no further changes to make
 			return true;
 		boolean changed = false;
-		if(roleMatcher.update(values[1], values[2]))
-			changed=true;
-		if(playerMatcher.update(values[3], values[4]))
-			changed=true;
+		if(values.length>=5) {
+			if(roleMatcher.update(values[1], values[2]))
+				changed=true;
+			if(playerMatcher.update(values[3], values[4]))
+				changed=true;
+		}
 		return changed;
 	}
 
@@ -63,7 +65,7 @@ public class PlayerFilterRule extends FilterRule{
 	public boolean isMatching(MatchInfo matchInfo) {
 		boolean foundPlayer = false;
 		for (PlayerInfo player : matchInfo.getPlayers()) {
-			if(roleMatcher.isMatching(player.getRoleindex().longValue())) { // only consider the roles that match the RoleIndex
+			if(roleMatcher.isMatching(player.getRoleindex().longValue() + 1)) { // only consider the roles that match the RoleIndex
 				if (playerMatcher.patternMatches(player.getPlayerName())) {
 					foundPlayer = true;
 					break;

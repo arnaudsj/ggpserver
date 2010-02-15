@@ -38,7 +38,11 @@ public abstract class MatchFilterRule<T> extends FilterRule{
 	public boolean update(String[] values) {
 		if (super.update(values)) // type has changed
 			return true;
-		return matcher.update(values[1], values[2]);
+		if(values.length>=3) {
+			return matcher.update(values[1], values[2]);
+		}else{
+			return false;
+		}
 	}
 
 	@Override

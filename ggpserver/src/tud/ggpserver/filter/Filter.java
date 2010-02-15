@@ -51,9 +51,15 @@ public class Filter extends FilterANDOperation {
 	public String getHtml() {
 		logger.info(this.toString());
 		StringBuilder sb = new StringBuilder();
-		sb.append("<div id=\"div_filter\">");
-		sb.append(successors.get(0).getHtml());
-		sb.append("</div>");
+		sb.append("<div id=\"div_filter\">\n");
+		if(successors.size()>0) {
+			sb.append(successors.get(0).getHtml());
+		}else{
+			// this is necessary because the newNodeMenu has to be the second value with the id getID() 
+			sb.append("<input type=\"hidden\" name=\"").append(getID()).append("\" value=\"").append(getType()).append("\">\n");
+			sb.append(newNodeMenu.getHtml());
+		}
+		sb.append("</div>\n");
 		return sb.toString();
 	}
 	
@@ -72,11 +78,6 @@ public class Filter extends FilterANDOperation {
 		}
 	}
 
-	@Override
-	public boolean update(String[] values) {
-		throw new UnsupportedOperationException("Filter.update: root node of the Filter is fixed");
-	}
-
 	public Object getUserData() {
 		return userData;
 	}
@@ -88,9 +89,6 @@ public class Filter extends FilterANDOperation {
 	@Override
 	public synchronized void removeSuccessor(FilterNode node) {
 		super.removeSuccessor(node);
-		if (successors.isEmpty()) {
-			addSuccessor(FilterFactory.getDefaultNode(ids));
-		}
 	}
 
 	// TODO: override all addSuccessor/deleteSuccessor operations to throw UnsupportedOperationException

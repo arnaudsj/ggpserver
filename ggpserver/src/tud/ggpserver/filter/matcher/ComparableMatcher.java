@@ -61,17 +61,21 @@ public abstract class ComparableMatcher<T extends Comparable<T>> extends Matcher
 	
 	@Override
 	protected void initMatcher() {
-		try{
-			pattern = parsePattern(patternTextBox.getValue());
-		} catch(IllegalArgumentException ex) {
-			pattern = null;
-			addErrorMessage(ex.getMessage());
+		if (patternTextBox.getValue().equals("*")) {
+			pattern = null; 
+		} else {
+			try{
+				pattern = parsePattern(patternTextBox.getValue());
+			} catch(IllegalArgumentException ex) {
+				pattern = null;
+				addErrorMessage(ex.getMessage());
+			}
 		}
 	}
 
 	public boolean isMatching(T t) {
-		if (pattern == null || t == null) return false;
 		if (patternTextBox.getValue().equals("*")) return true;
+		if (pattern == null || t == null) return false;
 		switch(Comparison.valueOf(comparisonMenu.getSelectedValue())){
 			case Equal: return t.compareTo(pattern) == 0;
 			case NotEqual: return t.compareTo(pattern) != 0;

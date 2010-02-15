@@ -53,10 +53,15 @@ public class StatusFilterRule extends FilterRule{
 	public boolean update(String[] values) {
 		if(super.update(values)) // type has changed
 			return true;
-		if (!statusMenu.getSelectedValue().equals(values[1])) {
+		if (values.length>=2 && !statusMenu.getSelectedValue().equals(values[1])) {
 			statusMenu.setSelectedValue(values[1]);
 			return true;
 		}
 		return false;
+	}
+	
+	@Override
+	public String getHtml() {
+		return super.getHtml()+statusMenu.getHtml();
 	}
 }

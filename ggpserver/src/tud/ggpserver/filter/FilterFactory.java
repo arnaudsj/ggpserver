@@ -22,7 +22,6 @@ package tud.ggpserver.filter;
 import java.util.logging.Logger;
 
 import tud.ggpserver.filter.FilterNode.FilterType;
-import tud.ggpserver.filter.rules.DefaultFilterRule;
 import tud.ggpserver.filter.rules.GameFilterRule;
 import tud.ggpserver.filter.rules.PlayClockFilterRule;
 import tud.ggpserver.filter.rules.PlayerFilterRule;
@@ -40,9 +39,6 @@ public class FilterFactory {
 	public static FilterNode createFilterNode(FilterType type, IdPool<FilterNode> ids) {
 		FilterNode node = null;
 		switch(type) {
-		case Default:
-			node = new DefaultFilterRule(ids);
-			break;
 		case And:
 			node = new FilterANDOperation(ids);
 			break;
@@ -78,9 +74,4 @@ public class FilterFactory {
 		}
 		return node;
 	}
-
-	public static FilterNode getDefaultNode(IdPool<FilterNode> ids) {
-		return new DefaultFilterRule(ids);
-	}
-
 }

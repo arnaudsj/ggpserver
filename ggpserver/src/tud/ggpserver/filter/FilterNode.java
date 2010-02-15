@@ -33,7 +33,7 @@ import tud.ggpserver.util.IdPool;
 
 public abstract class FilterNode implements IDItem {
 	public static enum FilterType {
-		Default("new node"), And("AND"), Or("OR"), Game("game"), RoleNumber("#roles"), PlayClock("play clock"), Player("player"), StartClock("start clock"), StartTime("start time"), Status("status"), Tournament("tournament");
+		And("AND"), Or("OR"), Game("game"), RoleNumber("#roles"), PlayClock("play clock"), Player("player"), StartClock("start clock"), StartTime("start time"), Status("status"), Tournament("tournament");
 		private String name;
 		private FilterType(String name) {
 			this.name = name;
@@ -65,11 +65,17 @@ public abstract class FilterNode implements IDItem {
 	}
 
 	private static List<Option> getMenuOptions() {
+		List<Option> options = getTypeOptions();
+		options.add(new Option(deleteString));
+		return options;
+	}
+
+	public static List<Option> getTypeOptions() {
 		List<Option> options = new LinkedList<Option>();
 		for (FilterType type : FilterType.values()) {
+			// don't add "new node" entries to nodes that already have a different type
 			options.add(new Option(type.getName(), type.toString()));
 		}
-		options.add(new Option(deleteString));
 		return options;
 	}
 
@@ -102,33 +108,40 @@ public abstract class FilterNode implements IDItem {
 	 * @return true if some value has changed, false otherwise
 	 */
 	public boolean update(String[] values) {
-		boolean changed = true;
-		String menuSelection = values[0];
-		if (menuSelection.equals(type.toString())) {
-			changed = false;
-		} else if (menuSelection.equals(deleteString)) {
-			dispose();
-			parent.removeSuccessor(this);
-		} else {
-			FilterType newFilterType = FilterType.valueOf(menuSelection);
-			FilterNode newNode = FilterFactory.createFilterNode(newFilterType, ids);
-			parent.replaceSuccessor(this, newNode);
-			if(newNode instanceof FilterOperation) {
-				if(this instanceof FilterOperation) {
-					// keep the successors of the old FilterOperation
-					((FilterOperation)newNode).setSuccessors(((FilterOperation)this).unlinkSuccessors());
-					dispose();
-				} else if(this instanceof FilterRule) {
-					// add the old node as first successor to the new FilterOperation 
-					((FilterOperation)newNode).insertSuccessor(this);
+		if(isRoot()) {
+			return false; // the type of the root not can not change
+		}
+		if(values.length>=1) {
+			boolean changed = true;
+			String menuSelection = values[0];
+			if (menuSelection.equals(type.toString())) {
+				changed = false;
+			} else if (menuSelection.equals(deleteString)) {
+				dispose();
+				parent.removeSuccessor(this);
+			} else {
+				FilterType newFilterType = FilterType.valueOf(menuSelection);
+				FilterNode newNode = FilterFactory.createFilterNode(newFilterType, ids);
+				parent.replaceSuccessor(this, newNode);
+				if(newNode instanceof FilterOperation) {
+					if(this instanceof FilterOperation) {
+						// keep the successors of the old FilterOperation
+						((FilterOperation)newNode).setSuccessors(((FilterOperation)this).unlinkSuccessors());
+						dispose();
+					} else if(this instanceof FilterRule) {
+						// add the old node as successor to the new FilterOperation 
+						((FilterOperation)newNode).addSuccessor(this);
+					}else{
+						dispose();
+					}
 				}else{
 					dispose();
 				}
-			}else{
-				dispose();
 			}
+			return changed;
+		}else{
+			return false;
 		}
-		return changed;
 	}
 
 	/**
