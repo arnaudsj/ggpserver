@@ -24,6 +24,7 @@ package tud.ggpserver.formhandlers;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -152,11 +153,14 @@ public class ShowMatchFilter extends ShowMatches {
 			for (Entry<String, String[]> entry : entrySet) {
 				String key = entry.getKey();
 				if (key.equals("show_matches")) {
+					logger.info("show_matches="+Arrays.toString(entry.getValue()));
 					showMatches = true;
 				}else if (key.equals("delete_filter")) {
+					logger.info("delete_filter="+Arrays.toString(entry.getValue()));
 					filterSet.deleteFilter(filterID);
 					setFilter(filterSet.getFirstFilter());
 				}else if (key.equals("add_new_filter")) {
+					logger.info("add_new_filter="+Arrays.toString(entry.getValue()));
 					setFilter(filterSet.addNewFilter());
 				} else {
 					String[] values = entry.getValue();

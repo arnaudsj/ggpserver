@@ -58,6 +58,9 @@ public class FilterSet {
 	public synchronized void deleteFilter(long id) {
 		Filter f = filters.remove(id);
 		f.dispose();
+		if (filters.isEmpty()) {
+			addNewFilter();
+		}
 	}
 
 	/**

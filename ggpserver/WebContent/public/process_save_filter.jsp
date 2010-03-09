@@ -27,7 +27,7 @@
 		saveFilter.setFilterSet((tud.ggpserver.filter.FilterSet)session.getAttribute("filterset")); 
 		saveFilter.parseParameterMap(request.getParameterMap());
 	
-		String urlWithSessionID = response.encodeRedirectURL("show_filter.jsp?showMatches=" + saveFilter.getShowMatches() + "&filterID=" saveFilter.getFilterID() );
+		String urlWithSessionID = response.encodeRedirectURL("show_filter.jsp?showMatches=" + saveFilter.getShowMatches() + "&filterID=" + saveFilter.getFilterID() );
 		response.sendRedirect(urlWithSessionID);
 	}
 %>

@@ -41,6 +41,8 @@
 <jsp:directive.include file="/inc/header.jsp" />
 
 <form name="form" action="process_save_filter.jsp" method="post">
+	<%-- default submit button (is used on ENTER) --%>
+	<input type="submit" name="save_filter" value="save filter" style="position: absolute; left:-999px; top:-999px; height:0; width:0;" />
 	<%-- select the filter --%> 
 	<select name="filterID" onchange="form.submit()">
 		<c:forEach var="id" items="${pager.filterIDs}" varStatus="lineInfo">
