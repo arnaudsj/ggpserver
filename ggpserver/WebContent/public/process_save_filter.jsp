@@ -1,5 +1,6 @@
 <%--
     Copyright (C) 2010 Peter Steinke (peter.steinke@inf.tu-dresden.de)
+                  2010 Stephan Schiffel (stephan.schiffel@gmx.de)
 
     This file is part of GGP Server.
 
@@ -16,29 +17,17 @@
     You should have received a copy of the GNU General Public License
     along with GGP Server.  If not, see <http://www.gnu.org/licenses/>.
 --%>
-
 <%@ page language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%> 
-
-<jsp:useBean id="saveFilter" class="tud.ggpserver.formhandlers.SaveFilter" scope="page">
-      <c:catch>
-	<jsp:setProperty name="saveFilter" property="showMatches" />
-      </c:catch>
-</jsp:useBean>
-
-<% if (session.getAttribute("filter") == null) { %>
-      <jsp:forward page="show_filter.jsp"/>
-<%   } %>
-  
-
-<% saveFilter.setFilter(session.getAttribute("filter")); %>
-<% saveFilter.parseParameterMap(request.getParameterMap()); %>
-
-<c:choose>
-	<c:when test="${saveFilter.showMatches}">
-		<jsp:forward page="show_filter.jsp?showMatches=true"/>
-	</c:when>
-	<c:otherwise>
-		<jsp:forward page="show_filter.jsp?showMatches=false"/>
-	</c:otherwise>
-</c:choose>
+<jsp:useBean id="saveFilter" class="tud.ggpserver.formhandlers.ShowMatchFilter" scope="page"/>
+<%
+	if (session.getAttribute("filterset") == null) {
+		%> <jsp:forward page="show_filter.jsp"/> <%
+	} else {
+		saveFilter.setFilterSet((tud.ggpserver.filter.FilterSet)session.getAttribute("filterset")); 
+		saveFilter.parseParameterMap(request.getParameterMap());
+	
+		String urlWithSessionID = response.encodeRedirectURL("show_filter.jsp?showMatches=" + saveFilter.getShowMatches() + "&filterID=" saveFilter.getFilterID() );
+		response.sendRedirect(urlWithSessionID);
+	}
+%>

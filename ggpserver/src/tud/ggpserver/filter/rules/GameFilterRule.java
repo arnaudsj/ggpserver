@@ -21,13 +21,14 @@
 package tud.ggpserver.filter.rules;
 
 import tud.ggpserver.datamodel.MatchInfo;
+import tud.ggpserver.filter.Filter;
 import tud.ggpserver.filter.FilterNode;
 import tud.ggpserver.util.IdPool;
 
 public class GameFilterRule extends StringMatchFilterRule{
 	
-	public GameFilterRule(IdPool<FilterNode> ids) {
-		super(ids, FilterType.Game);
+	public GameFilterRule(IdPool<FilterNode> ids, Filter filter) {
+		super(ids, FilterType.Game, filter);
 	}
 	
 	@Override

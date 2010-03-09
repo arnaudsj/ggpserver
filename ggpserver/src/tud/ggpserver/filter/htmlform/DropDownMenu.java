@@ -85,6 +85,11 @@ public class DropDownMenu extends HtmlForm {
 		this.selectedValue = selectedValue;
 	}
 
+	public void setOptions(List<Option> options) {
+		this.options = options;
+		this.selectedValue = options.get(0).value;
+	}
+	
 	@Override
 	public String getHtml() {
 		StringBuilder sb = new StringBuilder();

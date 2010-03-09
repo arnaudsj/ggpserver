@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -114,14 +115,19 @@ public class PlayerErrorTracker<TermType extends TermInterface, ReasonerStateInf
 
 	/**
 	 * @return <code>true</code> iff the given player caused an error message
-	 *         in every single state of the given match.
+	 *         in every single state of the given match, except for the terminal state.
 	 */
 	private boolean returnedOnlyErrors(FinishedMatch<TermType, ReasonerStateInfoType> match, PlayerInfo playerInfo) {
+		if (match.getStatus() != ServerMatch.STATUS_FINISHED)
+			return false;
+	
 		List<List<GameControllerErrorMessage>> errorMessages = match.getErrorMessagesForPlayer(playerInfo);
 		assert (errorMessages.size() == match.getXmlStates().size());
-		for(List<GameControllerErrorMessage> l:errorMessages) {
-			if (l.isEmpty()) {
-				// no error messages for this state
+		Iterator<List<GameControllerErrorMessage>> i = errorMessages.iterator();
+		while (i.hasNext()) {
+			List<GameControllerErrorMessage> l = i.next();
+			if(l.isEmpty() && i.hasNext()) {
+				// no error messages for this state and the state is not the terminal one (i.hasNext())
 				return false;
 			}
 		}

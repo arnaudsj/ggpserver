@@ -34,6 +34,7 @@ import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.javaprover.Reasoner;
 import tud.gamecontroller.game.javaprover.Term;
+import tud.ggpserver.datamodel.User;
 import cs227b.teamIago.parser.Axioms;
 import cs227b.teamIago.util.GameState;
 
@@ -52,6 +53,7 @@ public abstract class AbstractGameValidator {
 	private String gameDescription = "";
 	private String stylesheet = "../stylesheets/generic/generic.xsl";
 	private boolean enabled = false;
+	private User creator = null;
 	
 	private List<String> errorsGameName = new LinkedList<String>();
 	private List<String> errorsDescription = new LinkedList<String>();
@@ -75,27 +77,32 @@ public abstract class AbstractGameValidator {
 	}
 	
 	public boolean isValid() throws SQLException {
+		errorsGameName.clear();
+
+		//// creator ////
+		if (creator != null) {
+			errorsGameName.add("You are not logged in (perhaps the session expired)!");
+		}
+
 		///// game name ////
-		getErrorsGameName().clear();
-		
 		assert (gameName != null);
 		
 		if (gameName.equals("")) {
-			getErrorsGameName().add("game name must not be empty");
+			errorsGameName.add("game name must not be empty");
 		}
 		if (gameName.length() > 40) {
-			getErrorsGameName().add("game name must not be longer than 40 characters");
+			errorsGameName.add("game name must not be longer than 40 characters");
 		}
 		if (!gameName.matches("[a-zA-Z0-9._-]*")) {
-			getErrorsGameName().add("game name must only contain the following characters: a-z A-Z 0-9 . _ -");
+			errorsGameName.add("game name must only contain the following characters: a-z A-Z 0-9 . _ -");
 		}
 		boolean gameExists = (getDBConnector().getGame(gameName) != null);
 		if (gameExists && !isGameExpectedToExist()) {			// the game must not exist already
-			getErrorsGameName().add("there is already a game with name '" + gameName + "', please pick a different one");
+			errorsGameName.add("there is already a game with name '" + gameName + "', please pick a different one");
 		} else if (!gameExists && isGameExpectedToExist()) {	// the game has to exist already
-			getErrorsGameName().add("there is no game with name '" + gameName + "'");
+			errorsGameName.add("there is no game with name '" + gameName + "'");
 		}
-		
+
 		//// game description////
 		errorsDescription.clear();
 		
@@ -201,6 +208,14 @@ public abstract class AbstractGameValidator {
 
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
+	}
+
+	public void setCreator(String creatorName) throws SQLException {
+		this.creator = getDBConnector().getUser(creatorName);
+	}
+
+	public User getCreator() {
+		return creator;
 	}
 
 	public List<String> getErrorsDescription() {

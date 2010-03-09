@@ -284,6 +284,10 @@ span.highlight {
 	background-color: #ffec44;
 }
 
+div.div_filter {
+    background-color:    #e7e7ef;	
+}
+
 /**************** ICONS ****************/
 /* action: view a player / match / game / ... */
 .view {

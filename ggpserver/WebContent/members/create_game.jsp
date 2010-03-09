@@ -26,6 +26,7 @@
 		<jsp:setProperty name="createGame" property="gameDescription"/>
 		<jsp:setProperty name="createGame" property="stylesheet"/>
 		<jsp:setProperty name="createGame" property="enabled"/>
+		<jsp:setProperty name="createGame" property="creator" value="<%= request.getUserPrincipal().getName() %>" >
 	</c:catch>
 </jsp:useBean>
 

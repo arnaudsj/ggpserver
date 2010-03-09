@@ -115,7 +115,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		// this class doesn't cache anything, so there is nothing to do here.
 	}
 	
-	public User createUser(String userName, String password) throws DuplicateInstanceException, SQLException {
+	public User createUser(String userName, String password, String emailAddress) throws DuplicateInstanceException, SQLException {
 		Connection con = getConnection(); 
 		PreparedStatement ps = null;
 		
@@ -123,9 +123,10 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 //			String hashedPass = RealmBase.Digest(password, "SHA-1", null);
 			String hashedPass = Digester.digest(password, "SHA-1");
 			
-			ps = con.prepareStatement("INSERT INTO `users` (`user_name`, `user_pass`) VALUES (?, ?);");
+			ps = con.prepareStatement("INSERT INTO `users` (`user_name`, `user_pass`, `email_address`) VALUES (?, ?);");
 			ps.setString(1, userName);
 			ps.setString(2, hashedPass);
+			ps.setString(3, emailAddress);
 			ps.executeUpdate();
 			try {ps.close();} catch (SQLException e) {}
 
@@ -146,7 +147,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		} 
 
 		logger.info("Creating new user: " + userName); //$NON-NLS-1$
-		return new User(userName, defaultRoleNames);
+		return new User(userName, emailAddress, defaultRoleNames);
 	}
 
 	public User getUser(String userName) throws SQLException {
@@ -158,7 +159,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		try { 
 //			ps = con.prepareStatement("SELECT `user_name` FROM `users` WHERE `user_name` = ? ;");
 //			ps = con.prepareStatement("SELECT `role_name` FROM `user_roles` WHERE `user_name` = ? ;");   // (*)
-			ps = con.prepareStatement("SELECT `r`.`user_name`, `r`.`role_name` " + 
+			ps = con.prepareStatement("SELECT `r`.`user_name`, `r`.`role_name`, `u`.`email_address` " + 
 					"FROM `users` AS `u`, `user_roles` as `r` " + 
 					"WHERE `u`.`user_name` = `r`.`user_name` AND `u`.`user_name` = ? ;");  // (**)
 			// strictly speaking, query (**) could by replaced by (*), but (**) also checks if the user exists in table "users". 
@@ -166,7 +167,12 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			ps.setString(1, userName);
 			rs = ps.executeQuery();
 			
+			String emailAddress = null;
 			Collection<String> roleNames = new ArrayList<String>(2);
+			if(rs.next()) {
+				roleNames.add(rs.getString("role_name"));
+				emailAddress = rs.getString("email_address");
+			}
 			while (rs.next()) {
 				roleNames.add(rs.getString("role_name"));
 			}
@@ -177,7 +183,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			}
 			
 			// logger.info("Returning new User: " + userName); //$NON-NLS-1$
-			result = new User(userName, roleNames);
+			result = new User(userName, emailAddress, roleNames);
 		} finally { 
 			if (con != null)
 				try {con.close();} catch (SQLException e) {}
@@ -271,17 +277,18 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	}
 
 	public Game<TermType, ReasonerStateInfoType> createGame(String gameDescription,
-			String name, String stylesheet, boolean enabled) throws DuplicateInstanceException,
+			String name, String stylesheet, boolean enabled, User creator) throws DuplicateInstanceException,
 			SQLException {
 		
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		try {
-			ps = con.prepareStatement("INSERT INTO `games` (`name` , `gamedescription` , `stylesheet`, `enabled`) VALUES (?, ?, ?, ?);");
+			ps = con.prepareStatement("INSERT INTO `games` (`name` , `gamedescription` , `stylesheet`, `enabled`, `creator`) VALUES (?, ?, ?, ?, ?);");
 			ps.setString(1, name);
 			ps.setString(2, gameDescription);
 			ps.setString(3, stylesheet);
 			ps.setBoolean(4, enabled);
+			ps.setString(5, creator.getUserName());
 			
 			ps.executeUpdate();
 		} catch (MySQLIntegrityConstraintViolationException e) {
@@ -295,7 +302,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		} 
 
 		logger.info("Creating new game: " + name); //$NON-NLS-1$
-		return new Game<TermType, ReasonerStateInfoType>(gameDescription, name, reasonerFactory, stylesheet, enabled);
+		return new Game<TermType, ReasonerStateInfoType>(gameDescription, name, reasonerFactory, stylesheet, enabled, creator);
 	}
 
 	public Game<TermType, ReasonerStateInfoType> getGame(String name) throws SQLException {
@@ -306,7 +313,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		Game<TermType,ReasonerStateInfoType> result = null;
 		
 		try { 
-			ps = con.prepareStatement("SELECT `gamedescription` , `stylesheet`, `enabled` FROM `games` WHERE `name` = ? ;");
+			ps = con.prepareStatement("SELECT `gamedescription` , `stylesheet`, `enabled`, `creator` FROM `games` WHERE `name` = ? ;");
 			ps.setString(1, name);
 			rs = ps.executeQuery();
 			
@@ -314,9 +321,11 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				String gameDescription = rs.getString("gamedescription");
 				String stylesheet = rs.getString("stylesheet");
 				boolean enabled = rs.getBoolean("enabled");
+				String creatorName = rs.getString("creator");
+				User creator = getUser(creatorName);
 				
 				// logger.info("Returning new game: " + name); //$NON-NLS-1$
-				result = new Game<TermType, ReasonerStateInfoType>(gameDescription, name, reasonerFactory, stylesheet, enabled);
+				result = new Game<TermType, ReasonerStateInfoType>(gameDescription, name, reasonerFactory, stylesheet, enabled, creator);
 				
 			}
 		} finally { 
@@ -752,7 +761,34 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 
 		return result;
 	}
-	
+
+	public Collection<String> getGamesCreatedByUser(String userName) throws SQLException {
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		List<String> result = new LinkedList<String>();
+		
+		try {
+			ps = con.prepareStatement("SELECT `name` FROM `games` WHERE `creator` = ? ORDER BY `name` ;");
+			ps.setString(1, userName);
+			rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				result.add(rs.getString("name"));
+			}
+		} finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+			if (rs != null)
+				try {rs.close();} catch (SQLException e) {}
+		} 
+
+		return result;
+	}
+
 	public List<Game<TermType, ReasonerStateInfoType>> getAllEnabledGames() throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;

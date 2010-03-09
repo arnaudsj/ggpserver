@@ -149,10 +149,10 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 
 	/////////////////// GAME ///////////////////
 	@Override
-	public Game<Term, GameState> createGame(String gameDescription, String name, String stylesheet, boolean enabled)
+	public Game<Term, GameState> createGame(String gameDescription, String name, String stylesheet, boolean enabled, User creator)
 			throws DuplicateInstanceException, SQLException {
 		synchronized (games) {
-			Game<Term, GameState> result = super.createGame(gameDescription, name, stylesheet, enabled);
+			Game<Term, GameState> result = super.createGame(gameDescription, name, stylesheet, enabled, creator);
 			games.put(name, result);
 			return result;
 		}
@@ -440,10 +440,10 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 
 	/////////////////// USER ///////////////////
 	@Override
-	public User createUser(String userName, String password)
+	public User createUser(String userName, String password, String emailAddress)
 			throws DuplicateInstanceException, SQLException {
 		synchronized (users) {
-			User result = super.createUser(userName, password);
+			User result = super.createUser(userName, password, emailAddress);
 			users.put(userName, result);
 			return result;
 		}

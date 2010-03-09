@@ -20,13 +20,14 @@
 
 package tud.ggpserver.filter.rules;
 
+import tud.ggpserver.filter.Filter;
 import tud.ggpserver.filter.FilterNode;
 import tud.ggpserver.util.IdPool;
 
 public abstract class FilterRule extends FilterNode {
 
-	public FilterRule(IdPool<FilterNode> ids, FilterType type) {
-		super(ids, type);
+	public FilterRule(IdPool<FilterNode> ids, FilterType type, Filter filter) {
+		super(ids, type, filter);
 	}
 	
 }

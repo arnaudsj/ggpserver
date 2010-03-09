@@ -26,14 +26,25 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%> 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <fmt:setLocale value="en_US"/>
+<c:set var="internal_show_tournament">
+	<c:out value="${show_tournament}" default="false"/>
+</c:set>
+<c:set var="internal_show_goal_values">
+	<c:out value="${show_goal_values}" default="true"/>
+</c:set>
 <table>
 	<thead>
 		<tr>
 			<th>match name</th>
+			<c:if test="${internal_show_tournament == true}">
+				<th>tournament</th>
+			</c:if>
 			<th>start &amp; play clock</th>
 			<th>start time</th>
 			<th>players</th>
-			<th>goal values</th>
+			<c:if test="${internal_show_goal_values == true}">
+				<th>goal values</th>
+			</c:if>
 			<th>actions</th>
 		</tr>
 	</thead>
@@ -52,7 +63,9 @@
 			<c:forEach var="playerinfo" items="${match.orderedPlayerInfos}" varStatus="playerinfoIndex">
 				<tr class="${rowClass}">
 			    	<c:if test="${playerinfoIndex.count==1}">
-						<td rowspan="${numberOfPlayers}">  <%-- match id --%>
+
+			    		<%-- match id --%>
+						<td rowspan="${numberOfPlayers}">
 							<c:url value="/public/view_match.jsp" var="matchURL">
 								<c:param name="matchID" value="${match.matchID}" />
 							    <c:if test="${ pager.playerName != null }">
@@ -61,11 +74,22 @@
 							</c:url>
 							<a href='<c:out value="${matchURL}" />'>${match.matchID}</a>
 						</td>
-						<%-- <td rowspan="${numberOfPlayers}">${match.status}</td> --%>  <%-- status --%>
-						<td rowspan="${numberOfPlayers}">${match.startclock}, ${match.playclock}</td> <%-- start &amp; play clock --%>
-						<td rowspan="${numberOfPlayers}"><fmt:formatDate value="${match.startTime}" pattern="dd.MM.yyyy HH:mm:ss z"/></td>  <%-- start time --%>
+
+						<%-- tournament id --%>
+						<c:if test="${internal_show_tournament==true}">
+							<td rowspan="${numberOfPlayers}"><c:out value="${match.tournamentID}" /></td>
+						</c:if>
+						
+						<%-- start &amp; play clock --%>
+						<td rowspan="${numberOfPlayers}">${match.startclock}, ${match.playclock}</td>
+						
+						<%-- start time --%>
+						<td rowspan="${numberOfPlayers}"><fmt:formatDate value="${match.startTime}" pattern="dd.MM.yyyy HH:mm:ss z"/></td>
+
 					</c:if>
-					<td style="white-space:nowrap;">  <%-- players --%>
+
+					<%-- players --%>
+					<td style="white-space:nowrap;">
 						<c:url value="/public/view_player.jsp" var="playerURL">
 							<c:param name="name" value="${playerinfo.name}" />
 						</c:url>
@@ -95,28 +119,32 @@
 							<a href='<c:out value="${errorURL}"/>'><span class="${errorclass}" title="Show Errors of ${playerinfo.name}"></span></a>
 						</c:if>
 					</td>
+
 					<%-- goal values / status --%>
-					<c:choose>
-						<c:when test="${match.goalValues==null}">
-					    	<c:if test="${playerinfoIndex.count==1}">
-								<td rowspan="${numberOfPlayers}">
-									${match.status}
+					<c:if test="${internal_show_goal_values}">
+						<c:choose>
+							<c:when test="${match.goalValues==null}">
+						    	<c:if test="${playerinfoIndex.count==1}">
+									<td rowspan="${numberOfPlayers}">
+										${match.status}
+									</td>
+						    	</c:if>
+							</c:when>
+							<c:otherwise>
+								<td>
+									<c:choose>
+										<c:when test="${ match.orderedPlayerInfos[playerinfoIndex.count - 1].name == pager.playerName }">
+											<span class="highlight">${match.orderedGoalValues[playerinfoIndex.count - 1]}</span>
+										</c:when>
+										<c:otherwise>
+											${match.orderedGoalValues[playerinfoIndex.count - 1]}
+										</c:otherwise>
+									</c:choose>
 								</td>
-					    	</c:if>
-						</c:when>
-						<c:otherwise>
-							<td>
-								<c:choose>
-									<c:when test="${ match.orderedPlayerInfos[playerinfoIndex.count - 1].name == pager.playerName }">
-										<span class="highlight">${match.orderedGoalValues[playerinfoIndex.count - 1]}</span>
-									</c:when>
-									<c:otherwise>
-										${match.orderedGoalValues[playerinfoIndex.count - 1]}
-									</c:otherwise>
-								</c:choose>
-							</td>
-						</c:otherwise>
-					</c:choose>
+							</c:otherwise>
+						</c:choose>
+					</c:if>
+
 					<%-- actions --%>
 			    	<c:if test="${playerinfoIndex.count==1}">
 						<td rowspan="${numberOfPlayers}">

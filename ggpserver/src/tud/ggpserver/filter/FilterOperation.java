@@ -40,8 +40,8 @@ public abstract class FilterOperation extends FilterNode{
 
 	protected DropDownMenu newNodeMenu;
 	
-	protected FilterOperation(IdPool<FilterNode> ids, FilterType type, Collection<FilterNode> successors) {
-		super(ids, type);
+	protected FilterOperation(IdPool<FilterNode> ids, FilterType type, Filter filter, Collection<FilterNode> successors) {
+		super(ids, type, filter);
 		if(successors!=null){
 			addSuccessors(successors);
 		}
@@ -148,7 +148,7 @@ public abstract class FilterOperation extends FilterNode{
 				return false;
 			} else {
 				FilterType newFilterType = FilterType.valueOf(menuSelection);
-				FilterNode newNode = FilterFactory.createFilterNode(newFilterType, ids);
+				FilterNode newNode = FilterFactory.createFilterNode(newFilterType, ids, filter);
 				addSuccessor(newNode);
 				return true;
 			}

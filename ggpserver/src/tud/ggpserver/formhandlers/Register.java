@@ -23,17 +23,22 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.DuplicateInstanceException;
 
 public class Register {
 	private List<String> errorsPassword1 = new LinkedList<String>();
 	private List<String> errorsPassword2 = new LinkedList<String>();
+	private List<String> errorsEmailAddress = new LinkedList<String>();
 	private List<String> errorsUserName = new LinkedList<String>();
 
 	private String userName = "";
 	private String password1 = "";
 	private String password2 = "";
+	private String emailAddress = "";
 	
 	private boolean correctlyCreated = false;
 	
@@ -43,6 +48,10 @@ public class Register {
 
 	public String getPassword2() {
 		return password2;
+	}
+
+	public String getEmailAddress() {
+		return emailAddress;
 	}
 
 	public String getUserName() {
@@ -55,6 +64,10 @@ public class Register {
 
 	public void setPassword2(String p2) {
 		password2 = p2;
+	}
+
+	public void setEmailAddress(String e) {
+		emailAddress = e;
 	}
 
 	public void setUserName(String u) {
@@ -102,7 +115,19 @@ public class Register {
 			// validate confirmation of password because of html form problem
 			password2 = "";
 		}
-		
+
+		/* email address */
+		errorsEmailAddress.clear();
+		if (emailAddress.equals("")) {
+			errorsEmailAddress.add("email address must not be empty");
+		}
+		if (emailAddress.length() > 320) {
+			errorsEmailAddress.add("email address must not be longer than 320 characters");
+		}
+		if (!isValidEmailAddress(emailAddress)) {
+			errorsEmailAddress.add("invalid email address");
+		}
+
 		/* check for errors */
 		boolean result = true;
 
@@ -118,6 +143,9 @@ public class Register {
 			password2 = "";
 			result = false;
 		}
+		if (errorsEmailAddress.size() > 0) {
+			result = false;
+		}
 		
 		return result;
 	}
@@ -130,7 +158,7 @@ public class Register {
 	 */
 	public void createUser() throws SQLException {
 		try {
-			DBConnectorFactory.getDBConnector().createUser(userName, password1);
+			DBConnectorFactory.getDBConnector().createUser(userName, password1, emailAddress);
 			correctlyCreated = true;
 		} catch (DuplicateInstanceException e) {
 			errorsUserName.add("user name already exists, please pick a different one");
@@ -152,6 +180,43 @@ public class Register {
 
 	public List<String> getErrorsUserName() {
 		return errorsUserName;
+	}
+
+	/**
+	  * Validate the form of an email address.
+	  *
+	  * <P>Return <tt>true</tt> only if 
+	  *<ul> 
+	  * <li> <tt>aEmailAddress</tt> can successfully construct an 
+	  * {@link javax.mail.internet.InternetAddress} 
+	  * <li> when parsed with "@" as delimiter, <tt>aEmailAddress</tt> contains 
+	  * two tokens which satisfy {@link hirondelle.web4j.util.Util#textHasContent}.
+	  *</ul>
+	  *
+	  *<P> The second condition arises since local email addresses, simply of the form
+	  * "<tt>albert</tt>", for example, are valid for 
+	  * {@link javax.mail.internet.InternetAddress}, but almost always undesired.
+	  * 
+	  * from http://www.javapractices.com/topic/TopicAction.do?Id=180
+	  */
+	public static boolean isValidEmailAddress(String emailAddressString){
+		if (emailAddressString == null) return false;
+		boolean result = true;
+		try {
+			/* InternetAddress emailAddr = */ new InternetAddress(emailAddressString);
+			if ( !hasNameAndDomain(emailAddressString) ) {
+				result = false;
+			}
+		}
+		catch (AddressException ex){
+			result = false;
+		}
+		return result;
+	}
+	
+	private static boolean hasNameAndDomain(String aEmailAddress){
+		String[] tokens = aEmailAddress.split("@");
+	    return tokens.length == 2 && !tokens[0].trim().isEmpty() && !tokens[1].trim().isEmpty();
 	}
 
 }

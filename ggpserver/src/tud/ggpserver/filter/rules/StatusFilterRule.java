@@ -24,6 +24,7 @@ import java.util.List;
 
 import tud.ggpserver.datamodel.MatchInfo;
 import tud.ggpserver.datamodel.matches.ServerMatch;
+import tud.ggpserver.filter.Filter;
 import tud.ggpserver.filter.FilterNode;
 import tud.ggpserver.filter.htmlform.DropDownMenu;
 import tud.ggpserver.filter.htmlform.DropDownMenu.Option;
@@ -33,8 +34,8 @@ public class StatusFilterRule extends FilterRule{
 	
 	private DropDownMenu statusMenu;
 	
-	public StatusFilterRule(IdPool<FilterNode> ids) {
-		super(ids, FilterType.Status);
+	public StatusFilterRule(IdPool<FilterNode> ids, Filter filter) {
+		super(ids, FilterType.Status, filter);
 		List<Option> options = Arrays.asList(
 				new Option(ServerMatch.STATUS_NEW),
 				new Option(ServerMatch.STATUS_SCHEDULED),

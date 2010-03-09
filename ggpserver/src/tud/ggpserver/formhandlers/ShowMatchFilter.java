@@ -24,19 +24,28 @@ package tud.ggpserver.formhandlers;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 import tud.ggpserver.datamodel.MatchInfo;
 import tud.ggpserver.datamodel.matches.ServerMatch;
 import tud.ggpserver.filter.Filter;
+import tud.ggpserver.filter.FilterSet;
 
 public class ShowMatchFilter extends ShowMatches {
 	
 	/**
-	 * the match filter
+	 * the match filters
 	 */
+	private FilterSet filterSet = null;
+	
 	private Filter filter = null;
+	private long filterID = -1;
 
 	/**
 	 * flag that should be set, if the matches resulting from the filter should be shown
@@ -49,26 +58,55 @@ public class ShowMatchFilter extends ShowMatches {
 	 */
 	private List<String> selectedMatchIds = null;
 
-//	private static final Logger logger = Logger.getLogger(ShowMatchFilter.class.getName());
+	private static final Logger logger = Logger.getLogger(ShowMatchFilter.class.getName());
 
-	public ShowMatchFilter() {
-		filter =  new Filter();
-	}
+	public ShowMatchFilter() { }
 
 	public String getFilterHtml() {
 		return filter.getHtml();
 	}
 
-	public Filter getFilter() {
-		return filter;
+	public FilterSet getFilterSet() {
+		if (filterSet == null) {
+			setFilterSet(new FilterSet());
+		}
+		return filterSet;
 	}
 
+	public void setFilterSet(FilterSet filterSet) {
+		logger.info("setFilterSet("+filterSet+")");
+		this.filterSet = filterSet;
+		setFilter(filterSet.getFirstFilter());
+	}
+
+	public void setFilterID(long id) {
+		logger.info("setFilterID("+id+")");
+		filter = filterSet.getFilter(id);
+		setFilter(filter);
+	}
+
+	public long getFilterID() {
+		return filterID;
+	}
+	
 	@SuppressWarnings("unchecked")
-	public void setFilter(Filter filter) {
-		this.filter = filter;
+	public void setFilter(Filter f) {
+		filter = f;
+		if( filter == null ) {
+			filter = filterSet.getFirstFilter();
+		}
+		filterID = filter.getID();
 		this.selectedMatchIds = (List<String>)filter.getUserData();
 	}
 	
+	public Filter getFilter() {
+		return filter;
+	}
+	
+	public Collection<Long> getFilterIDs() {
+		return filterSet.getFilterIDs();
+	}
+
 	@SuppressWarnings("unchecked")
 	private List<String> getSelectedMatchIDs() throws SQLException {
 		if (selectedMatchIds == null) {
@@ -100,6 +138,35 @@ public class ShowMatchFilter extends ShowMatches {
 		}
 		return result;
 	}
+
+	public void parseParameterMap(Map<String, String[]> parameterMap) throws SQLException {
+		logger.info("parseParameterMap()");
+		if (filterSet != null) {
+			String[] filterIDList = parameterMap.get("filterID");
+			if (filterIDList != null && filterIDList.length>0) {
+				try {
+					setFilterID(Long.valueOf(filterIDList[0]));
+				} catch (NumberFormatException ex) {}
+			}
+			Set<Entry<String,String[]>> entrySet = parameterMap.entrySet();
+			for (Entry<String, String[]> entry : entrySet) {
+				String key = entry.getKey();
+				if (key.equals("show_matches")) {
+					showMatches = true;
+				}else if (key.equals("delete_filter")) {
+					filterSet.deleteFilter(filterID);
+					setFilter(filterSet.getFirstFilter());
+				}else if (key.equals("add_new_filter")) {
+					setFilter(filterSet.addNewFilter());
+				} else {
+					String[] values = entry.getValue();
+					try {
+						filterSet.update(Long.valueOf(key), values);
+					} catch (NumberFormatException ex) {}
+				}
+			}
+		}
+	}
 	
 	/*------- for pager ---------*/
 	@Override
@@ -109,8 +176,7 @@ public class ShowMatchFilter extends ShowMatches {
 
 	@Override
 	public String getTargetJsp() {
-		// TODO Auto-generated method stub
-		return "show_filter.jsp?showMatches=true";
+		return "show_filter.jsp?showMatches=true&filterID="+getFilterID();
 	}
 
 	@Override

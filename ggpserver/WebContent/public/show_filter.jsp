@@ -24,14 +24,15 @@
 
 <jsp:useBean id="pager" class="tud.ggpserver.formhandlers.ShowMatchFilter" scope="page"/>
 <%
-   if (session.getAttribute("filter") == null) {
-      session.setAttribute("filter", pager.getFilter());      
+   if (session.getAttribute("filterset") == null) {
+      session.setAttribute("filterset", pager.getFilterSet());      
    } else {
-      pager.setFilter((tud.ggpserver.filter.Filter)session.getAttribute("filter"));
+      pager.setFilterSet((tud.ggpserver.filter.FilterSet)session.getAttribute("filterset"));
    }
 %>
-<%-- it is necessary to set the filter before setting the page number, because computing the number of pages depends on the filter --%>
+<%-- it is necessary to set the filter before setting the filterID and page number, because computing the number of pages depends on the filter --%>
 <c:catch>
+	<jsp:setProperty name="pager" property="filterID"/>
 	<jsp:setProperty name="pager" property="showMatches"/>
 	<jsp:setProperty name="pager" property="page"/>
 </c:catch>
@@ -40,12 +41,30 @@
 <jsp:directive.include file="/inc/header.jsp" />
 
 <form name="form" action="process_save_filter.jsp" method="post">
-  ${pager.filterHtml}
-  
-  <% // strange bug .. submit name has to start with a number%>
-  <input type="submit" name="0submit" onClick="form.submit()" value="Search for matches" />
+	<%-- select the filter --%> 
+	<select name="filterID" onchange="form.submit()">
+		<c:forEach var="id" items="${pager.filterIDs}" varStatus="lineInfo">
+			<c:choose>
+				<c:when test="${id == pager.filterID}">
+					<option value="${id}" selected=\"selected\">filter ${lineInfo.count}</option>
+				</c:when>
+				<c:otherwise>
+					<option value="${id}">filter ${lineInfo.count}</option>
+				</c:otherwise>
+			</c:choose>
+		</c:forEach>
+	</select>
+	<input type="submit" name="delete_filter" value="delete" />
+	<input type="submit" name="add_new_filter" value="add new" />
+
+	<%-- show the selected filter for editing --%> 
+	${pager.filterHtml}
+	
+	<%-- submit name must not be "submit" --%>
+	<input type="submit" name="show_matches" value="Show matches" />
 </form>
  
+<%-- show the filtered list of matches --%> 
 <c:if test="${pager.showMatches}">
 	<jsp:directive.include file="/inc/match_table.jsp" />
 </c:if>

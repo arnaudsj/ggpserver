@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+                  2010 Stephan Schiffel <stephan.schiffel@gmx.de> 
 
     This file is part of GGP Server.
 
@@ -27,14 +28,21 @@ public class Game<TermType extends TermInterface, ReasonerStateInfoType>
 
 	private boolean enabled;
 	
+	private User creator;
+	
 	public Game(String gameDescription, String name,
-			ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory, String stylesheet, boolean enabled) {
+			ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory, String stylesheet, boolean enabled, User creator) {
 		super(gameDescription, name, reasonerFactory, stylesheet);
 		this.enabled=enabled;
+		this.creator=creator;
 	}
 
 	public boolean isEnabled() {
 		return enabled;
+	}
+
+	public User getCreator() {
+		return creator;
 	}
 
 }

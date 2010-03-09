@@ -21,14 +21,15 @@ package tud.ggpserver.filter.rules;
 
 import java.util.Date;
 
+import tud.ggpserver.filter.Filter;
 import tud.ggpserver.filter.FilterNode;
 import tud.ggpserver.filter.matcher.DateMatcher;
 import tud.ggpserver.util.IdPool;
 
 public abstract class DateMatchFilterRule extends MatchFilterRule<Date>{
 	
-	public DateMatchFilterRule(IdPool<FilterNode> ids, FilterType type) {
-		super(ids, type);
+	public DateMatchFilterRule(IdPool<FilterNode> ids, FilterType type, Filter filter) {
+		super(ids, type, filter);
 	}
 	
 	public DateMatcher createMatcher() {

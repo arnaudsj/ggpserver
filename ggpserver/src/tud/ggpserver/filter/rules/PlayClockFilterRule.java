@@ -20,6 +20,7 @@
 package tud.ggpserver.filter.rules;
 
 import tud.ggpserver.datamodel.MatchInfo;
+import tud.ggpserver.filter.Filter;
 import tud.ggpserver.filter.FilterNode;
 import tud.ggpserver.filter.matcher.LongMatcher;
 import tud.ggpserver.filter.matcher.Matcher;
@@ -27,8 +28,8 @@ import tud.ggpserver.util.IdPool;
 
 public class PlayClockFilterRule extends LongMatchFilterRule{
 	
-	public PlayClockFilterRule(IdPool<FilterNode> ids) {
-		super(ids, FilterType.PlayClock);
+	public PlayClockFilterRule(IdPool<FilterNode> ids, Filter filter) {
+		super(ids, FilterType.PlayClock, filter);
 	}
 	
 	@Override

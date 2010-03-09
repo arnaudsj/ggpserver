@@ -31,14 +31,14 @@ public class CreateGame extends AbstractGameValidator {
 	public void create() throws SQLException {
 		assert(isValid());
 		try {
-			getDBConnector().createGame(getGameDescription(), getGameName(), getStylesheet(), getEnabled());
+			getDBConnector().createGame(getGameDescription(), getGameName(), getStylesheet(), getEnabled(), getCreator());
 			correctlyCreated = true;
 		} catch (DuplicateInstanceException e) {
 			getErrorsGameName().add("game name already exists, please pick a different one");
 			correctlyCreated = false;
 		}
 	}
-	
+
 	public boolean isCorrectlyCreated() {
 		return correctlyCreated;
 	}

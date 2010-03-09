@@ -47,6 +47,8 @@ public abstract class FilterNode implements IDItem {
 
 	protected IdPool<FilterNode> ids;
 
+	protected Filter filter;
+
 	private FilterOperation parent = null;
 	private long id;
 
@@ -54,10 +56,11 @@ public abstract class FilterNode implements IDItem {
 
 	private FilterType type;
 	
-	protected FilterNode(IdPool<FilterNode> ids, FilterType type) {
+	protected FilterNode(IdPool<FilterNode> ids, FilterType type, Filter filter) {
 		super();
 		this.ids = ids;
 		this.type = type;
+		this.filter = filter;
 		id = ids.getNewId(this);
 		menu = new DropDownMenu(String.valueOf(getID()), getMenuOptions());
 		menu.setSelectedValue(type.toString());
@@ -73,7 +76,6 @@ public abstract class FilterNode implements IDItem {
 	public static List<Option> getTypeOptions() {
 		List<Option> options = new LinkedList<Option>();
 		for (FilterType type : FilterType.values()) {
-			// don't add "new node" entries to nodes that already have a different type
 			options.add(new Option(type.getName(), type.toString()));
 		}
 		return options;
@@ -121,7 +123,7 @@ public abstract class FilterNode implements IDItem {
 				parent.removeSuccessor(this);
 			} else {
 				FilterType newFilterType = FilterType.valueOf(menuSelection);
-				FilterNode newNode = FilterFactory.createFilterNode(newFilterType, ids);
+				FilterNode newNode = FilterFactory.createFilterNode(newFilterType, ids, filter);
 				parent.replaceSuccessor(this, newNode);
 				if(newNode instanceof FilterOperation) {
 					if(this instanceof FilterOperation) {
@@ -172,5 +174,9 @@ public abstract class FilterNode implements IDItem {
 	
 	public FilterOperation getParent() {
 		return parent;
+	}
+	
+	public Filter getFilter() {
+		return filter;
 	}
 }

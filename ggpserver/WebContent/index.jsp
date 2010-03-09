@@ -32,6 +32,8 @@
 </jsp:useBean>
 <c:if test = "${pager.rowCount > 0}">
 	<h1 class="notopborder">Currently playing:</h1>
+	<c:set var="show_tournament" value="true" />
+	<c:set var="show_goal_values" value="false" />
 	<jsp:directive.include file="/inc/match_table.jsp" />
 </c:if>
 

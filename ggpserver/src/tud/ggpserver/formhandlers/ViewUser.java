@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
-                  2009 Stephan Schiffel <stephan.schiffel@gmx.de> 
+                  2009,2010 Stephan Schiffel <stephan.schiffel@gmx.de> 
 
     This file is part of GGP Server.
 
@@ -46,5 +46,9 @@ public class ViewUser {
 	
 	public Collection<? extends Tournament<?,?>> getTournaments() throws SQLException {
 		return DBConnectorFactory.getDBConnector().getTournamentsCreatedByUser(user.getUserName());
+	}
+
+	public Collection<String> getGameNames() throws SQLException {
+		return DBConnectorFactory.getDBConnector().getGamesCreatedByUser(user.getUserName());
 	}
 }

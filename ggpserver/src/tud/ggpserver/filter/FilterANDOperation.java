@@ -27,11 +27,11 @@ import tud.ggpserver.datamodel.MatchInfo;
 
 public class FilterANDOperation extends FilterOperation{
 
-	protected FilterANDOperation(IdPool<FilterNode> ids) {
-		this(ids, null);
+	protected FilterANDOperation(IdPool<FilterNode> ids, Filter filter) {
+		this(ids, filter, null);
 	}
-	protected FilterANDOperation(IdPool<FilterNode> ids, Collection<FilterNode> successors) {
-		super(ids, FilterType.And, successors);
+	protected FilterANDOperation(IdPool<FilterNode> ids, Filter filter, Collection<FilterNode> successors) {
+		super(ids, FilterType.And, filter, successors);
 	}
 
 	@Override

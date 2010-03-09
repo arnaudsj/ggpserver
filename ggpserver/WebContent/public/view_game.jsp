@@ -54,6 +54,17 @@
 			</td>
 		</tr>
 		<tr>
+			<th>creator</th>
+			<td>
+				<c:url value="view_user.jsp" var="creatorURL">
+					<c:param name="userName" value="${viewGame.game.creator.userName}" />
+				</c:url>
+				<a href='<c:out value="${creatorURL}" />'><c:out value="${viewGame.game.creator.userName}"/></a>
+			</td>
+			<td>
+			</td>
+		</tr>
+		<tr>
 			<th>number of roles</th>
 			<td><c:out value="${viewGame.game.numberOfRoles}"></c:out></td>
 		</tr>

@@ -36,38 +36,38 @@ public class FilterFactory {
 
 	private static final Logger logger = Logger.getLogger(FilterFactory.class.getName());
 
-	public static FilterNode createFilterNode(FilterType type, IdPool<FilterNode> ids) {
+	public static FilterNode createFilterNode(FilterType type, IdPool<FilterNode> ids, Filter filter) {
 		FilterNode node = null;
 		switch(type) {
 		case And:
-			node = new FilterANDOperation(ids);
+			node = new FilterANDOperation(ids, filter);
 			break;
 		case Or:
-			node = new FilterOROperation(ids);
+			node = new FilterOROperation(ids, filter);
 			break;
 		case Game:
-			node = new GameFilterRule(ids);
+			node = new GameFilterRule(ids, filter);
 			break;
 		case RoleNumber:
-			node = new RoleNumberFilterRule(ids);
+			node = new RoleNumberFilterRule(ids, filter);
 			break;
 		case PlayClock:
-			node = new PlayClockFilterRule(ids);
+			node = new PlayClockFilterRule(ids, filter);
 			break;
 		case Player:
-			node = new PlayerFilterRule(ids);
+			node = new PlayerFilterRule(ids, filter);
 			break;
 		case StartClock:
-			node = new StartClockFilterRule(ids);
+			node = new StartClockFilterRule(ids, filter);
 			break;
 		case StartTime:
-			node = new StartTimeFilterRule(ids);
+			node = new StartTimeFilterRule(ids, filter);
 			break;
 		case Status:
-			node = new StatusFilterRule(ids);
+			node = new StatusFilterRule(ids, filter);
 			break;
 		case Tournament:
-			node = new TournamentFilterRule(ids);
+			node = new TournamentFilterRule(ids, filter);
 			break;
 		default:
 			logger.severe("unknown type:"+type);

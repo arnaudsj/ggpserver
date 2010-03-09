@@ -27,11 +27,11 @@ import tud.ggpserver.util.IdPool;
 
 public class FilterOROperation extends FilterOperation{
 
-	protected FilterOROperation(IdPool<FilterNode> ids) {
-		this(ids, null);
+	protected FilterOROperation(IdPool<FilterNode> ids, Filter filter) {
+		this(ids, filter, null);
 	}
-	protected FilterOROperation(IdPool<FilterNode> ids, Collection<FilterNode> successors) {
-		super(ids, FilterType.Or, successors);
+	protected FilterOROperation(IdPool<FilterNode> ids, Filter filter, Collection<FilterNode> successors) {
+		super(ids, FilterType.Or, filter, successors);
 	}
 	
 	@Override

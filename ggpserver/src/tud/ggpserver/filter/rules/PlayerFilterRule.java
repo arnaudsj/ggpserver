@@ -23,6 +23,7 @@ package tud.ggpserver.filter.rules;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import tud.ggpserver.datamodel.MatchInfo;
+import tud.ggpserver.filter.Filter;
 import tud.ggpserver.filter.FilterNode;
 import tud.ggpserver.filter.matcher.LongMatcher;
 import tud.ggpserver.filter.matcher.StringMatcher;
@@ -35,8 +36,8 @@ public class PlayerFilterRule extends FilterRule{
 	private LongMatcher roleMatcher;  
 	private StringMatcher playerMatcher;
 	
-	public PlayerFilterRule(IdPool<FilterNode> ids) {
-		super(ids, FilterType.Player);
+	public PlayerFilterRule(IdPool<FilterNode> ids, Filter filter) {
+		super(ids, FilterType.Player, filter);
 		roleMatcher = new LongMatcher(String.valueOf(getID()), 1, 100);
 		roleMatcher.setPattern("*");
 		playerMatcher = new StringMatcher(String.valueOf(getID()));

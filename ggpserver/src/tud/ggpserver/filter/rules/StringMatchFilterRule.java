@@ -20,6 +20,7 @@
 
 package tud.ggpserver.filter.rules;
 
+import tud.ggpserver.filter.Filter;
 import tud.ggpserver.filter.FilterNode;
 import tud.ggpserver.filter.matcher.Matcher;
 import tud.ggpserver.filter.matcher.StringMatcher;
@@ -27,8 +28,8 @@ import tud.ggpserver.util.IdPool;
 
 public abstract class StringMatchFilterRule extends MatchFilterRule<String>{
 	
-	public StringMatchFilterRule(IdPool<FilterNode> ids, FilterType type) {
-		super(ids, type);
+	public StringMatchFilterRule(IdPool<FilterNode> ids, FilterType type, Filter filter) {
+		super(ids, type, filter);
 	}
 	
 	@Override

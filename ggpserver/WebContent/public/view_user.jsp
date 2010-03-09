@@ -78,6 +78,18 @@ if (viewUser.getUser() == null) {
 				</c:forEach>
 			</td>
 		</tr>
+
+		<tr>
+			<th>games</th>
+			<td>
+				<c:forEach var="gameName" items="${viewUser.gameNames}">
+					<c:url value="view_game.jsp" var="gameURL">
+						<c:param name="name" value="${gameName}" />
+					</c:url>
+					<a href='<c:out value="${gameURL}"/>'><c:out value="${gameName}"/></a><br>
+				</c:forEach>
+			</td>
+		</tr>
 	</tbody>
 </table>
 

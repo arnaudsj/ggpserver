@@ -20,8 +20,6 @@
 
 package tud.ggpserver.filter;
 
-import java.util.logging.Logger;
-
 import tud.ggpserver.util.IdPool;
 
 /**
@@ -38,10 +36,9 @@ public class Filter extends FilterANDOperation {
 	 */
 	private Object userData = null;
 
-	private static final Logger logger = Logger.getLogger(Filter.class.getName());
-	
-	public Filter() {
-		super(new IdPool<FilterNode>());
+	public Filter(IdPool<FilterNode> idPool) {
+		super(idPool, null);
+		this.filter = this;
 	}
 
 	/**
@@ -49,7 +46,6 @@ public class Filter extends FilterANDOperation {
 	 */
 	@Override
 	public String getHtml() {
-		logger.info(this.toString());
 		StringBuilder sb = new StringBuilder();
 		sb.append("<div id=\"div_filter\">\n");
 		if(successors.size()>0) {
@@ -63,21 +59,6 @@ public class Filter extends FilterANDOperation {
 		return sb.toString();
 	}
 	
-	/**
-	 * updates the FilterNode with the specified id
-	 * @param id
-	 * @param values
-	 */
-	public void update(Long id, String[] values) {
-		FilterNode node = ids.getItem(id);
-		if (node!=null) { // if it is null it got probably deleted
-			if (node.update(values)) {
-				// only set to null if something has changed
-				userData = null;
-			}
-		}
-	}
-
 	public Object getUserData() {
 		return userData;
 	}
@@ -86,6 +67,10 @@ public class Filter extends FilterANDOperation {
 		this.userData = userData;
 	}
 	
+	public void resetUserData() {
+		userData = null;
+	}
+
 	@Override
 	public synchronized void removeSuccessor(FilterNode node) {
 		super.removeSuccessor(node);

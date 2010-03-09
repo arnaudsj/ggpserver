@@ -20,13 +20,14 @@
 package tud.ggpserver.filter.rules;
 
 import tud.ggpserver.datamodel.MatchInfo;
+import tud.ggpserver.filter.Filter;
 import tud.ggpserver.filter.FilterNode;
 import tud.ggpserver.util.IdPool;
 
 public class StartTimeFilterRule extends DateMatchFilterRule{
 	
-	public StartTimeFilterRule(IdPool<FilterNode> ids) {
-		super(ids, FilterType.StartTime);
+	public StartTimeFilterRule(IdPool<FilterNode> ids, Filter filter) {
+		super(ids, FilterType.StartTime, filter);
 	}
 	
 	@Override

@@ -1,5 +1,5 @@
 # install tomcat, some webapps and the admin webapp, some java stuff
-sudo apt-get install tomcat5.5 tomcat5.5-webapps tomcat5.5-admin libcommons-lang-java
+sudo apt-get install tomcat5.5 tomcat5.5-webapps tomcat5.5-admin libcommons-lang-java libgnumail-java libmysql-java
 
 # add a manager user in /etc/tomcat5.5/tomcat-users.xml e.g.:
 <?xml version='1.0' encoding='utf-8'?>
@@ -23,9 +23,6 @@ sudo apt-get install mysql-server
 
 # Tomcat needs the files mysql-connector-java.jar (MySQL driver), commons-lang.jar (some helper classes) and jstl.jar / standard.jar (JSTL standard taglib).
 
-# Steps to install under Ubuntu:
-
-sudo apt-get install libmysql-java libcommons-lang-java
 sudo ln -s /usr/share/java/mysql-connector-java.jar /usr/share/tomcat5.5/common/lib/
 sudo ln -s /usr/share/java/commons-lang.jar /usr/share/tomcat5.5/common/lib/
 
@@ -33,7 +30,8 @@ sudo ln -s /usr/share/java/commons-lang.jar /usr/share/tomcat5.5/common/lib/
 sudo ln -s /usr/share/tomcat5.5-webapps/jsp-examples/WEB-INF/lib/standard.jar /usr/share/tomcat5.5/common/lib/
 sudo ln -s /usr/share/tomcat5.5-webapps/jsp-examples/WEB-INF/lib/jstl.jar /usr/share/tomcat5.5/common/lib/
 
-
+# javax.mail.* is needed to check email-addresses 
+sudo ln -s /usr/share/java/gnumail.jar /usr/share/tomcat5.5/common/lib/
 
 # ========================================================================================
 

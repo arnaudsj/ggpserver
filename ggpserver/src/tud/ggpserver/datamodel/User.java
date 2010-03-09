@@ -28,20 +28,26 @@ public class User {
 
 	private final String userName;
 	private final Collection<String> roleNames;
+	private final String emailAddress;
 	
 	/**
 	 * Use DBConnectorFactory.getDBConnector().getUser() instead
 	 */
-	protected User(final String userName, final Collection<String> roleNames) {
+	protected User(final String userName, final String emailAddress, final Collection<String> roleNames) {
 		if (userName == null || roleNames == null) {
 			throw new NullPointerException();
 		}
 		this.userName = userName;
+		this.emailAddress = emailAddress;
 		this.roleNames = Collections.unmodifiableCollection(roleNames);
 	}
 	
 	public String getUserName() {
 		return userName;
+	}
+
+	public String getEmailAddress() {
+		return emailAddress;
 	}
 
 	public Collection<String> getRoleNames() {
