@@ -46,6 +46,21 @@
 		</tr>
 		<tr>
 			<td valign="top" align="right">
+				Email Address
+			</td>
+			<td>
+				<input type="text" name="emailAddress" size="60" value="${register.emailAddress}" maxlength="320"> <br>
+				<c:if test="<%= register.getErrorsEmailAddress().size() > 0 %>">
+					<ul>
+				    	<c:forEach var="errormessage" items="${register.errorsEmailAddress}">
+							<li class="validationerror">${errormessage}</li>
+				    	</c:forEach>
+		      		</ul>
+	      		</c:if>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" align="right">
 				Password
 			</td>
 			<td>

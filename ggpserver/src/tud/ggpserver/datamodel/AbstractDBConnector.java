@@ -123,7 +123,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 //			String hashedPass = RealmBase.Digest(password, "SHA-1", null);
 			String hashedPass = Digester.digest(password, "SHA-1");
 			
-			ps = con.prepareStatement("INSERT INTO `users` (`user_name`, `user_pass`, `email_address`) VALUES (?, ?);");
+			ps = con.prepareStatement("INSERT INTO `users` (`user_name`, `user_pass`, `email_address`) VALUES (?, ?, ?);");
 			ps.setString(1, userName);
 			ps.setString(2, hashedPass);
 			ps.setString(3, emailAddress);

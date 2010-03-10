@@ -178,6 +178,10 @@ public class Register {
 		return errorsPassword2;
 	}
 
+	public List<String> getErrorsEmailAddress() {
+		return errorsEmailAddress;
+	}
+
 	public List<String> getErrorsUserName() {
 		return errorsUserName;
 	}
