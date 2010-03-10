@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+    Copyright (C) 2009-2010 Martin Günther <mintar@gmx.de>, Nicolas JEAN <njean42@gmail.com> 
 
     This file is part of GGP Server.
 
@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.GameControllerListener;
 import tud.gamecontroller.XMLGameStateWriter;
 import tud.gamecontroller.game.GameInterface;
@@ -80,8 +81,8 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 	 */
 	private List<JointMoveInterface<? extends TermInterface>> jointMoves = new LinkedList<JointMoveInterface<? extends TermInterface>>();   // all joint moves executed so far
 
-	private Map<RoleInterface<TermType>, Player<TermType>> players;
-	private List<Player<TermType>> orderedPlayers = null;
+	private Map<RoleInterface<TermType>, Player<TermType, State<TermType, ReasonerStateInfoType>>> players;
+	private List<Player<TermType, State<TermType, ReasonerStateInfoType>>> orderedPlayers = null;
 
 	/**
 	 * stepNumber is always the same as errorMessages.size().
@@ -96,6 +97,26 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 	 */
 	private int stepNumber = 0;
 	
+	private GDLVersion gdlVersion;
+	
+	
+	public RunningMatch(
+			String matchID,
+			GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game,
+			int startclock,
+			int playclock,
+			Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayerInfos,
+			Date startTime,
+			boolean scrambled,
+			String tournamentID,
+			double weight,
+			User owner,
+			AbstractDBConnector<TermType, ReasonerStateInfoType> db,
+			MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory,
+			GameScramblerInterface gameScrambler) {
+		this(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, scrambled, tournamentID, weight, owner, db, movefactory, gameScrambler, GDLVersion.v1);
+	}
+	
 
 	public RunningMatch(
 			String matchID,
@@ -109,10 +130,12 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 			double weight,
 			User owner, AbstractDBConnector<TermType, ReasonerStateInfoType> db,
 			MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory,
-			GameScramblerInterface gameScrambler) {
+			GameScramblerInterface gameScrambler,
+			GDLVersion gdlVersion) {
 		super(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, scrambled, tournamentID, weight, owner, db);
 		this.moveFactory = movefactory;
 		this.gameScrambler = gameScrambler;
+		this.gdlVersion = gdlVersion;
 	}
 	
 	/**
@@ -167,12 +190,12 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 	}
 
 	@Override
-	public List<? extends Player<TermType>> getOrderedPlayers() {
+	public List<? extends Player<TermType, State<TermType, ReasonerStateInfoType>>> getOrderedPlayers() {
 		if (players == null) {
 			initPlayers();
 		}
 		if (orderedPlayers == null) {
-			orderedPlayers = new LinkedList<Player<TermType>>();
+			orderedPlayers = new LinkedList<Player<TermType, State<TermType, ReasonerStateInfoType>>>();
 			for (RoleInterface<TermType> role : getGame().getOrderedRoles()) {
 				orderedPlayers.add(players.get(role));
 			}
@@ -181,7 +204,7 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 	}
 
 	@Override
-	public Player<TermType> getPlayer(RoleInterface<TermType> role) {
+	public Player<TermType, State<TermType, ReasonerStateInfoType>> getPlayer(RoleInterface<TermType> role) {
 		if (players == null) {
 			initPlayers();
 		}
@@ -189,7 +212,7 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 	}
 
 	@Override
-	public Collection<? extends Player<TermType>> getPlayers() {
+	public Collection<? extends Player<TermType, State<TermType, ReasonerStateInfoType>>> getPlayers() {
 		if (players == null) {
 			initPlayers();
 		}
@@ -197,12 +220,12 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 	}
 	
 	private void initPlayers() {
-		players = new HashMap<RoleInterface<TermType>, Player<TermType>>();
+		players = new HashMap<RoleInterface<TermType>, Player<TermType, State<TermType, ReasonerStateInfoType>>>();
 		
 		for (RoleInterface<TermType> role : getGame().getOrderedRoles()) {
 			PlayerInfo playerInfo = getRolesToPlayerInfos().get(role);
 			
-			Player<TermType> player = PlayerFactory.<TermType> createPlayer(playerInfo, moveFactory, gameScrambler);
+			Player<TermType, State<TermType, ReasonerStateInfoType>> player = PlayerFactory.<TermType, State<TermType, ReasonerStateInfoType>> createPlayer(playerInfo, moveFactory, gameScrambler, gdlVersion);
 			players.put(role, player);
 		}
 	}
@@ -314,7 +337,15 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 	}
 
 	private void updateXmlState(StateInterface<? extends TermInterface, ?> currentState, Map<? extends RoleInterface<?>, Integer> goalValues) {
-		String xmlState = XMLGameStateWriter.createXMLOutputStream(this, currentState, jointMoves, goalValues, getGame().getStylesheet()).toString();
+//		System.out.println("goalValues = "+goalValues);
+//		System.out.println("this.players = "+players);
+//		System.out.println("super.game = "+getGame());
+//		System.out.println("currentState =  = "+currentState);
+		RoleInterface<? extends TermInterface> role = getGame().getRole(0);
+		String xmlState = XMLGameStateWriter.createXMLOutputStream(this, currentState, jointMoves, goalValues, getGame().getStylesheet(),
+				role, gdlVersion
+			).toString();
+		// currentState.toString();?
 		
 //		xmlStates.add(xmlState);
 //		int stepNumber = getNumberOfStates();
