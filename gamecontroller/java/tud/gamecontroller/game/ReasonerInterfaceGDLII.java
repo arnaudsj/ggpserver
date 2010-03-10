@@ -17,24 +17,19 @@
     along with GameController.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package tud.gamecontroller.game.javaprover;
+package tud.gamecontroller.game;
 
-import java.io.File;
+import java.util.Collection;
 
-import tud.gamecontroller.GDLVersion;
-import tud.gamecontroller.ReasonerFactory;
-import tud.gamecontroller.term.TermFactoryInterface;
-import cs227b.teamIago.util.GameState;
+public interface ReasonerInterfaceGDLII<TermType, ReasonerStateInfoType>
+			extends ReasonerInterface<TermType, ReasonerStateInfoType> {
 
-public class GameControllerGuiRunner extends
-		tud.gamecontroller.gui.AbstractGameControllerGuiRunner<Term, GameState> {
+	/** MODIFIED (ADDED)
+	 * used to calculate the sees fluents to send to player "role", given that the joint move is "jointMove"
+	 */
+	Collection<? extends FluentInterface<TermType>>
+		getSeesFluents(	ReasonerStateInfoType state,
+						RoleInterface<TermType> role,
+						JointMoveInterface<TermType> jointMove);
 
-	public GameControllerGuiRunner(File gameFile, ReasonerFactory<Term, GameState> reasonerFactory, GDLVersion gdlVersion) {
-		super(gameFile, reasonerFactory, gdlVersion);
-	}
-
-	@Override
-	protected TermFactoryInterface<Term> getTermFactory() {
-		return new TermFactory();
-	}
 }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>, Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
 
@@ -51,8 +51,8 @@ import tud.auxiliary.NamedObject;
 import tud.gamecontroller.game.FluentInterface;
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.JointMoveInterface;
-import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.RoleInterface;
+import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.term.GameObjectInterface;
 import tud.gamecontroller.term.TermInterface;
@@ -63,27 +63,39 @@ public class XMLGameStateWriter
 	private String outputDir, matchDir;
 	private List<JointMoveInterface<? extends TermInterface>> moves;
 	private int step;
-	private RunnableMatchInterface<? extends TermInterface, ?> match;
+	protected RunnableMatchInterface<? extends TermInterface, ?> match;
 	private String stylesheet;
+	
+	// MODIFIED (ADDED) for GDL-II
+	protected RoleInterface<? extends TermInterface> role;
+	protected GDLVersion gdlVersion;
+	
 		
-	public XMLGameStateWriter(String outputDir, String stylesheet) {
+	public XMLGameStateWriter(String outputDir, String stylesheet, RoleInterface<? extends TermInterface> role, GDLVersion gdlVersion) {
 		this.outputDir=outputDir;
 		this.stylesheet=stylesheet;
 		this.moves=new LinkedList<JointMoveInterface<? extends TermInterface>>();
 		this.match=null;
+		this.role = role;
+		this.gdlVersion = gdlVersion;
 	}
-
+	
 	public void gameStarted(RunnableMatchInterface<? extends TermInterface, ?> match, StateInterface<? extends TermInterface, ?> currentState) {
-		this.match=match;
+		this.match = match;
 		this.step=1;
-		matchDir=outputDir+File.separator+match.getMatchID();
+		// MODIFIED
+		if (this.gdlVersion == GDLVersion.v1) { // Regular GDL
+			matchDir=outputDir+File.separator+match.getMatchID();
+		} else { // GDL-II
+			matchDir=outputDir+File.separator+match.getMatchID()+"-"+this.role;
+		}
 		(new File(matchDir)).mkdirs();
 		writeState(currentState, null);
 	}
-
+	
 	public void gameStep(JointMoveInterface<? extends TermInterface> jointMove, StateInterface<? extends TermInterface,?> currentState) {
 		step++;
-		moves.add(jointMove);
+		moves.add(jointMove );
 		writeState(currentState, null);
 	}
 
@@ -96,8 +108,10 @@ public class XMLGameStateWriter
 		ByteArrayOutputStream os = null; 
 		FileOutputStream fileOutputStream = null;
 		
+		//System.out.println( ((Game)match.getGame()).getGameDescription() );
+		
 		try {
-			os = createXMLOutputStream(match, currentState, moves, goalValues, stylesheet);
+			os = createXMLOutputStream(match, currentState, moves, goalValues, stylesheet, this.role, this.gdlVersion);
 			fileOutputStream = new FileOutputStream(new File(matchDir+File.separator+"step_"+step+".xml"));
 			fileOutputStream.write(os.toByteArray());
 			if(goalValues!=null){ // write the final state twice (once as step_X.xml and once as finalstate.xml)
@@ -132,12 +146,14 @@ public class XMLGameStateWriter
 			StateInterface<? extends TermInterface, ?> currentState,
 			List<JointMoveInterface<? extends TermInterface>> moves,
 			Map<?, Integer> goalValues,
-			String stylesheet)
+			String stylesheet,
+			RoleInterface<? extends TermInterface> role,
+			GDLVersion gdlVersion)
 			throws TransformerFactoryConfigurationError,
 			IllegalArgumentException {
 		ByteArrayOutputStream os=new ByteArrayOutputStream();
 		try{
-			Document xmldoc=createXML(match, currentState, moves, goalValues, stylesheet);
+			Document xmldoc=createXML(match, currentState, moves, goalValues, stylesheet, role, gdlVersion);
 			// Serialization through Transform.
 			DOMSource domSource = new DOMSource(xmldoc);
 			
@@ -172,7 +188,8 @@ public class XMLGameStateWriter
 	 * @return
 	 * @throws ParserConfigurationException
 	 */
-	static public Document createXML(RunnableMatchInterface<? extends TermInterface, ?> match, StateInterface<? extends TermInterface,?> currentState, List<JointMoveInterface<? extends TermInterface>> moves, Map<?, Integer> goalValues, String stylesheet) 
+	static public Document createXML(RunnableMatchInterface<? extends TermInterface, ?> match, StateInterface<? extends TermInterface,?> currentState, List<JointMoveInterface<? extends TermInterface>> moves, Map<?, Integer> goalValues, String stylesheet,
+			RoleInterface<? extends TermInterface> role, GDLVersion gdlVersion)
 	throws ParserConfigurationException {
 		
 		 Document xmldoc = null;
@@ -189,16 +206,16 @@ public class XMLGameStateWriter
 			 Node xsl=xmldoc.createProcessingInstruction("xml-stylesheet","type=\"text/xsl\" href=\""+stylesheet+"\"");
 			 xmldoc.appendChild(xsl);
 		 }
-		 xmldoc.appendChild(impl.createDocumentType("match", null, "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd"));
+		 xmldoc.appendChild(impl.createDocumentType("match", null, "http://games.stanford.edu/gamemaster/xml/viewmatch.dtd")); // TODO: modify this DTD..?
 		 // Root element.
 		 Element root = xmldoc.createElement("match");
 		 xmldoc.appendChild(root);
 		 e=xmldoc.createElement("match-id");
 		 e.setTextContent(match.getMatchID());
 		 root.appendChild(e);
-		 for(GameObjectInterface role:match.getGame().getOrderedRoles()){
+		 for(GameObjectInterface onerole: match.getGame().getOrderedRoles()){
 			 e=xmldoc.createElement("role");
-			 e.setTextContent(role.getPrefixForm());
+			 e.setTextContent(onerole.getPrefixForm());
 			 root.appendChild(e);
 		 }
 		 for(NamedObject p:match.getOrderedPlayers()){
@@ -217,16 +234,40 @@ public class XMLGameStateWriter
 			 e.setTextContent(Integer.toString(match.getPlayclock()));
 			 root.appendChild(e);
 		 }
-		 root.appendChild(createHistoryElement(xmldoc, moves));
+		 
+		 if (gdlVersion == GDLVersion.v1) { // Regular GDL
+			 root.appendChild(createHistoryElement(xmldoc, moves));
+		 } else { //GDL-II
+			 root.appendChild(createHistoryElement(xmldoc, moves)); // temporary
+			 // do not do anything, we don't want the history to appear
+		 }
+		 
+		 
 		 if(goalValues!=null) root.appendChild(createScoresElement(xmldoc, match.getGame(), goalValues));
-		 root.appendChild(createStateElement(xmldoc, currentState));
+		 
+		 root.appendChild(createStateElement(xmldoc, currentState, role, gdlVersion));
+		 
 		 return xmldoc;
 	}
-
-	private static Node createStateElement(Document xmldoc, StateInterface<? extends TermInterface, ?> currentState) {
+	
+	@SuppressWarnings("unchecked")
+	private static Node createStateElement(Document xmldoc, StateInterface<? extends TermInterface, ?> currentState,
+			RoleInterface<? extends TermInterface> role, GDLVersion gdlVersion) {
 		Element state=xmldoc.createElement("state");
-		Collection<? extends FluentInterface<? extends TermInterface>> fluents=currentState.getFluents();
-		for(FluentInterface<? extends TermInterface> f:fluents){
+		
+		// MODIFIED
+		Collection<? extends FluentInterface<? extends TermInterface>> fluents = null;
+		if (gdlVersion == GDLVersion.v1) { // Regular GDL
+			
+			fluents = currentState.getFluents();
+			
+		} else { // GDL-II
+			
+			fluents = currentState.getSeesXMLFluents( (RoleInterface) role);
+			
+		}
+		
+		for(FluentInterface<? extends TermInterface> f:fluents) {
 			state.appendChild(createTermElement(xmldoc, "fact", f.getTerm()));
 		}
 		return state;

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+   Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>, Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
 
@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.Collection;
 
 import tud.gamecontroller.AbstractGameControllerRunner;
+import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.ReasonerFactory;
 import tud.gamecontroller.game.MoveFactoryInterface;
 import tud.gamecontroller.game.MoveInterface;
@@ -39,6 +40,7 @@ public abstract class AbstractGameControllerGuiRunner<
 
 	private File gameFile=null;
 	private String styleSheet=null;
+	private String sightFile=null;
 	private String xmlOutputDir=null;
 	private String matchID=null;
 	private int startclock=0, playclock=0;
@@ -46,8 +48,8 @@ public abstract class AbstractGameControllerGuiRunner<
 	private Collection<PlayerInfo> playerInfos=null;
 	private GameControllerFrame<TermType,ReasonerStateInfoType> frame=null;
 	
-	public AbstractGameControllerGuiRunner(File gameFile, ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory) {
-		super(reasonerFactory);
+	public AbstractGameControllerGuiRunner(File gameFile, ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory, GDLVersion gdlVersion) {
+		super(reasonerFactory, gdlVersion);
 		this.gameFile=gameFile;
 	}
 
@@ -97,6 +99,11 @@ public abstract class AbstractGameControllerGuiRunner<
 	protected String getStyleSheet() {
 		return styleSheet;
 	}
+	
+	@Override
+	protected String getSightFile() {
+		return sightFile;
+	}
 
 	@Override
 	protected String getXmlOutputDir() {
@@ -109,6 +116,10 @@ public abstract class AbstractGameControllerGuiRunner<
 
 	public void setStyleSheet(String styleSheet) {
 		this.styleSheet = styleSheet;
+	}
+	
+	public void setSightFile(String sightFile) {
+		this.sightFile = sightFile;
 	}
 
 	public void setXmlOutputDir(String xmlOutputDir) {

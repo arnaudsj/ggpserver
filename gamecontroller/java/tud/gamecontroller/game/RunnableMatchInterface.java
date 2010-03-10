@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>, Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
 
@@ -32,10 +32,10 @@ import tud.gamecontroller.players.Player;
 public interface RunnableMatchInterface<TermType, StateType extends StateInterface<TermType, ? extends StateType>>
 		extends MatchInterface<TermType, StateType> {
 
-	Collection<? extends Player<TermType>> getPlayers();
+	Collection<? extends Player<TermType, StateType>> getPlayers();
 
-	List<? extends Player<TermType>> getOrderedPlayers();
+	List<? extends Player<TermType, StateType>> getOrderedPlayers();
 
-	Player<TermType> getPlayer(RoleInterface<TermType> role);
+	Player<TermType, StateType> getPlayer(RoleInterface<TermType> role);
 
 }

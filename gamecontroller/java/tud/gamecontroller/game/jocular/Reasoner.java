@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>, Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
 
@@ -46,7 +46,6 @@ import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.ReasonerInterface;
 import tud.gamecontroller.game.RoleInterface;
-import tud.gamecontroller.game.impl.Fluent;
 import tud.gamecontroller.game.impl.Move;
 import tud.gamecontroller.game.impl.Role;
 
@@ -56,6 +55,7 @@ public class Reasoner implements ReasonerInterface<Term, ProofContext> {
 
 	private Fact queryTerminal;
 	private Fact queryNext;
+	@SuppressWarnings("unused")
 	private Fact queryTrue;
 	private Fact queryInit;
 	private RelationNameProcessor trueProcessor;
@@ -159,12 +159,22 @@ public class Reasoner implements ReasonerInterface<Term, ProofContext> {
 	 * @see tud.gamecontroller.game.jocular.ReasonerInterface#getFluents(tud.gamecontroller.game.jocular.State)
 	 */
 	public synchronized Collection<? extends FluentInterface<Term>> getFluents(ProofContext state) {
-		Collection<FluentInterface<Term>> fluents=new LinkedList<FluentInterface<Term>>();
+		
+		try {
+			throw new NotImplementedException();
+		} catch (NotImplementedException e) {
+			e.printStackTrace();
+		}
+		
+		/*Collection<FluentInterface<Term>> fluents=new LinkedList<FluentInterface<Term>>();
         Iterable<GroundFact> trues = stanfordlogicReasoner.getAllAnswers(queryTrue,state);
         for (GroundFact init : trues) {
         	fluents.add(new Fluent<Term>(new Term(parser.getSymbolTable(), init.getTerm(0))));
         }
-		return fluents;
+		return fluents;*/
+		
+		return null;
+		
 	}
 
 	/* (non-Javadoc)
@@ -187,5 +197,31 @@ public class Reasoner implements ReasonerInterface<Term, ProofContext> {
 	public SymbolTable getSymbolTable() {
 		return parser.getSymbolTable();
 	}
+
+	@Override
+	public Collection<? extends FluentInterface<Term>> getSeesFluents(
+			ProofContext state, RoleInterface<Term> role,
+			JointMoveInterface<Term> jointMove) {
+		try {
+			throw new NotImplementedException();
+		} catch (NotImplementedException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	@Override
+	public Collection<? extends FluentInterface<Term>> getSeesXMLFluents(
+			ProofContext state, RoleInterface<Term> role) {
+		try {
+			throw new NotImplementedException();
+		} catch (NotImplementedException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	@SuppressWarnings("serial")
+	public class NotImplementedException extends Exception {}
 
 }

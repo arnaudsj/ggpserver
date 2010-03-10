@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>, Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
 
@@ -20,19 +20,27 @@
 package tud.gamecontroller.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.io.File;
 
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 
+import tud.gamecontroller.GDLVersion;
+
 public class GameControllerApp {
 
 	private JFrame jFrame = null;  //  @jve:decl-index=0:visual-constraint="10,10"
 	private JPanel jContentPane = null;
 	private JFileChooser jFileChooser = null;
+	
+	// choose the GDL version
+	private JComboBox jGDLVersionComboBox = null;
 	
 	public GameControllerApp(){
 	}
@@ -63,8 +71,20 @@ public class GameControllerApp {
 			jContentPane = new JPanel();
 			jContentPane.setLayout(new BorderLayout());
 			jContentPane.add(getJFileChooser(), BorderLayout.CENTER);
+			jContentPane.add(getJGDLVersion(), BorderLayout.SOUTH);
 		}
 		return jContentPane;
+	}
+
+	private Component getJGDLVersion() {
+		
+		if (jGDLVersionComboBox == null) {
+			jGDLVersionComboBox = new JComboBox(new String[]{"Regular GDL", "GDL-II"});
+			jGDLVersionComboBox.setEditable(false);
+			jGDLVersionComboBox.setPreferredSize(new Dimension(80, 24));
+		}
+		return jGDLVersionComboBox;
+		
 	}
 
 	private JFileChooser getJFileChooser() {
@@ -85,7 +105,16 @@ public class GameControllerApp {
 			jFileChooser.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent event) {
 					if(event.getActionCommand().equals(JFileChooser.APPROVE_SELECTION)){
-						GameControllerGuiRunnerFactory.createGameControllerGuiRunner(jFileChooser.getSelectedFile()).runGui();
+						
+						GDLVersion gdlVersion = GDLVersion.v1;
+						if ( ((String) jGDLVersionComboBox.getSelectedItem()) == "GDL-II") {
+							gdlVersion = GDLVersion.v2;
+						}
+						
+						GameControllerGuiRunnerFactory.createGameControllerGuiRunner(
+								jFileChooser.getSelectedFile(),
+								gdlVersion
+							).runGui();
 					}else{
 						jFrame.dispose();
 					}

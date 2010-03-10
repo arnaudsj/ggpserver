@@ -20,12 +20,14 @@
 package tud.gamecontroller.players;
 
 import tud.gamecontroller.ConnectionEstablishedNotifier;
+import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.RoleInterface;
+import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.term.TermInterface;
 
-public abstract class AbstractPlayer<TermType extends TermInterface> implements Player<TermType> {
+public abstract class AbstractPlayer<TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>> implements Player<TermType, StateType> {
 
 	protected MatchInterface<TermType, ?> match=null;
 	protected RoleInterface<TermType> role=null;
@@ -33,14 +35,21 @@ public abstract class AbstractPlayer<TermType extends TermInterface> implements 
 	private long runtime;
 	private long startRunningTime;
 	private long lastMessageRuntime;
+	
+	protected GDLVersion gdlVersion;
 
 	public AbstractPlayer(String name){
+		this(name, GDLVersion.v1);
+	}
+	
+	public AbstractPlayer(String name, GDLVersion gdlVersion) {
 		this.name=name;
 		this.runtime=0;
 		this.lastMessageRuntime=0;
+		this.gdlVersion = gdlVersion;
 	}
 	
-	public void gameStart(MatchInterface<TermType, ?> match, RoleInterface<TermType> role, ConnectionEstablishedNotifier notifier) {
+	public void gameStart(MatchInterface<TermType, StateType> match, RoleInterface<TermType> role, ConnectionEstablishedNotifier notifier) {
 		this.match=match;
 		this.role=role;
 		this.runtime=0;

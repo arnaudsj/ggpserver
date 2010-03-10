@@ -19,6 +19,7 @@
 
 package tud.gamecontroller.game.javaprover;
 
+import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.ReasonerFactory;
 import tud.gamecontroller.cli.AbstractGameControllerCLIRunner;
 import tud.gamecontroller.game.MoveFactoryInterface;
@@ -33,8 +34,8 @@ public class GameControllerCLIRunner
 			GameState
 		> {
 
-	public GameControllerCLIRunner(ReasonerFactory<Term, GameState> reasonerFactory) {
-		super(reasonerFactory);
+	public GameControllerCLIRunner(ReasonerFactory<Term, GameState> reasonerFactory, GDLVersion gdlVersion) {
+		super(reasonerFactory, gdlVersion);
 	}
 
 	public static void main(String[] args) {
@@ -44,7 +45,7 @@ public class GameControllerCLIRunner
 			}
 		};
 		
-		GameControllerCLIRunner gcRunner=new GameControllerCLIRunner(reasonerFactory);
+		GameControllerCLIRunner gcRunner=new GameControllerCLIRunner(reasonerFactory, GDLVersion.v1);
 		gcRunner.runFromCommandLine(args);
 	}
 

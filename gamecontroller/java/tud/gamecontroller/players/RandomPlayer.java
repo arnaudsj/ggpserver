@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>, Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
 
@@ -19,27 +19,37 @@
 
 package tud.gamecontroller.players;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
+import java.util.Vector;
 
+import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.game.MoveInterface;
+import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.term.TermInterface;
 
 public class RandomPlayer<
-	TermType extends TermInterface
-	> extends LocalPlayer<TermType>  {
+	TermType extends TermInterface,
+	StateType extends StateInterface<TermType, ? extends StateType>> extends LocalPlayer<TermType, StateType>  {
 
 	private Random random;
 	
 	public RandomPlayer(String name){
-		super(name);
+		this(name,GDLVersion.v1);
+	}
+	
+	public RandomPlayer(String name, GDLVersion gdlVersion) {
+		super(name, gdlVersion);
 		random=new Random();
 	}
 	
+	// MODIFIED
 	public MoveInterface<TermType> getNextMove() {
-		List<MoveInterface<TermType>> legalmoves=new ArrayList<MoveInterface<TermType>>(currentState.getLegalMoves(role));
-		int i=random.nextInt(legalmoves.size());
-		return legalmoves.get(i);
+		
+		// does the work of getting either legal moves the regular GDL way, or the GDL-II way
+		Vector<MoveInterface<TermType>> legalMoves = super.getLegalMoves();
+		
+		int i=random.nextInt(legalMoves.size());
+		return (MoveInterface<TermType>) legalMoves.get(i);
+		
 	}
 }

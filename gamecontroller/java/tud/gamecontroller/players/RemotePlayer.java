@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>, Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
 
@@ -30,30 +30,39 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import tud.gamecontroller.ConnectionEstablishedNotifier;
+import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.auxiliary.InvalidKIFException;
+import tud.gamecontroller.game.FluentInterface;
 import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.MoveFactoryInterface;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
+import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.logging.ErrorMessageListener;
 import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.scrambling.GameScramblerInterface;
 import tud.gamecontroller.term.TermInterface;
 
-public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer<TermType>  {
-
+public class RemotePlayer<TermType extends TermInterface,
+	StateType extends StateInterface<TermType, ? extends StateType>> extends AbstractPlayer<TermType, StateType>  {
+	
 	private String host;
 	private InetAddress hostAddress;
 	private int port;
 	private MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory;
 	private GameScramblerInterface gameScrambler;
 	private Logger logger;
-
+	
+	// MODIFIED: as we don't have the rule that the first turn is the only one where no moves are sent, we have to manage this with a boolean
+	private boolean firstTurn;
+	
 	/**
 	 * the idea to handle connection timeouts by Sam Schreiber <schreib@cs.stanford.edu>:
 	 * "[...] one way to deal with unresponsive 
@@ -72,16 +81,20 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 	private static final int CONNECTION_TIMEOUT_BONUS = 30000;
 	
 	public RemotePlayer(String name, String host, int port, MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory, GameScramblerInterface gamescrambler) {
-		super(name);
+		this(name, host, port, movefactory, gamescrambler, GDLVersion.v1);
+	}
+	
+	public RemotePlayer(String name, String host, int port, MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory, GameScramblerInterface gamescrambler, GDLVersion gdlVersion) {
+		super(name, gdlVersion);
 		this.host=host;
 		this.port=port;
 		this.movefactory=movefactory;
 		this.gameScrambler=gamescrambler;
 		this.logger=Logger.getLogger("tud.gamecontroller");
 	}
-
+	
 	@Override
-	public void gameStart(MatchInterface<TermType, ?> match, RoleInterface<TermType> role, ConnectionEstablishedNotifier notifier) {
+	public void gameStart(MatchInterface<TermType, StateType> match, RoleInterface<TermType> role, ConnectionEstablishedNotifier notifier) {
 		super.gameStart(match, role, notifier);
 		hostAddress = null; // don't use an old hostAddress for a new match
 		connectionTimeoutBonus = CONNECTION_TIMEOUT_BONUS;
@@ -94,17 +107,54 @@ public class RemotePlayer<TermType extends TermInterface> extends AbstractPlayer
 		String reply=sendMsg(msg, notifier);
 		notifyStopRunning();
 		logger.info("reply from "+this.getName()+": "+reply+ " after "+getLastMessageRuntime()+"ms");
+		
+		this.firstTurn = true; // MODIFIED
 			
 	}
 
-	public MoveInterface<TermType> gamePlay(JointMoveInterface<TermType> jointMove, ConnectionEstablishedNotifier notifier) {
+	/** MODIFIED
+	 * This is the core of the GDL-II:
+	 * Instead of sending the actual joint move to the remote players, they only get the computed "sees fluents".
+	 * (and this is the only place where we apply two different behaviors: send the sees fluents in GDL-II games,
+	 * and send the prior moves in regular GDL games)
+	 */
+	@SuppressWarnings("unchecked")
+	public MoveInterface<TermType> gamePlay(Object seesFluents, ConnectionEstablishedNotifier notifier) {
 		MoveInterface<TermType> move=null;
 		String msg="(PLAY "+match.getMatchID()+" ";
-		if(jointMove==null){
+		
+		if (this.firstTurn) { // MODIFIED
+			
+			this.firstTurn = false; // MODIFIED
 			msg+="NIL";
+			
 		}else{
-			msg+=gameScrambler.scramble(jointMove.getKIFForm()).toUpperCase();
+			
+			if (this.gdlVersion == GDLVersion.v1) { // Regular GDL
+				
+				JointMoveInterface<TermType> jointMove = (JointMoveInterface<TermType>) seesFluents;
+				msg+=gameScrambler.scramble(jointMove.getKIFForm()).toUpperCase();
+				
+			} else { // GDL-II
+				
+				Collection<? extends FluentInterface<TermType>> seesFluents2 =
+					(Collection<? extends FluentInterface<TermType>>) seesFluents;
+				
+				// MODIFIED ↓↓
+				// Let's send the seesTerms (or jointMove transformed into seesTerms) to each player via the PLAY message
+				// TODO: scramble this part of the message
+				msg += "(";
+				Iterator<? extends FluentInterface<TermType>> itF = seesFluents2.iterator();
+				while(itF.hasNext()) {
+					FluentInterface<TermType> fluent = itF.next();
+					msg += fluent.getKIFForm() + " ";
+				}
+				msg += ")";
+
+			}
+			
 		}
+		
 		msg+=")";
 		String reply, descrambledReply;
 		notifyStartRunning();

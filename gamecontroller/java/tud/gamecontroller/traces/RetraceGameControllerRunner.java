@@ -42,12 +42,12 @@ public class RetraceGameControllerRunner {
 		GameInterface<Term, State<Term, GameState>> game = new Game<Term, GameState>(gameFile, reasonerFactory);
 		
 		/* create players */
-		Map<RoleInterface<Term>, Player<Term>> players = new HashMap<RoleInterface<Term>, Player<Term>>();
+		Map<RoleInterface<Term>, Player<Term, State<Term, GameState>>> players = new HashMap<RoleInterface<Term>, Player<Term, State<Term, GameState>>>();
 		MatchTrace trace = new MatchTraceReader().read(inputFile);
 		
 		List<? extends RoleInterface<Term>> roles = game.getOrderedRoles();
 		for (RoleInterface<Term> role : roles) {
-			Player<Term> player = new MovelistPlayer<Term>(role.getKIFForm().toLowerCase(), trace.getMovesForRole(role.getKIFForm().toLowerCase()));
+			Player<Term, State<Term, GameState>> player = new MovelistPlayer<Term, State<Term, GameState>>(role.getKIFForm().toLowerCase(), trace.getMovesForRole(role.getKIFForm().toLowerCase()));
 			players.put(role, player);
 		}
 		

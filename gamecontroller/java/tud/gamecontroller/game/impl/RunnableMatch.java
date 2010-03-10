@@ -33,10 +33,10 @@ import tud.gamecontroller.term.TermInterface;
 public class RunnableMatch<TermType extends TermInterface, ReasonerStateInfoType>
 		extends Match<TermType, ReasonerStateInfoType>
 		implements RunnableMatchInterface<TermType, State<TermType, ReasonerStateInfoType>> {
-	private final Map<? extends RoleInterface<TermType>, ? extends Player<TermType>> players;
-	private List<Player<TermType>> orderedPlayers = null;
+	private final Map<? extends RoleInterface<TermType>, ? extends Player<TermType, State<TermType, ReasonerStateInfoType>>> players;
+	private List<Player<TermType, State<TermType, ReasonerStateInfoType>>> orderedPlayers = null;
 	
-	public RunnableMatch(String matchID, GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game, int startclock, int playclock, Map<? extends RoleInterface<TermType>, ? extends Player<TermType>> players){
+	public RunnableMatch(String matchID, GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game, int startclock, int playclock, Map<? extends RoleInterface<TermType>, ? extends Player<TermType, State<TermType, ReasonerStateInfoType>>> players){
 		super(matchID, game, startclock, playclock);
 		this.players=players;
 	}
@@ -44,16 +44,16 @@ public class RunnableMatch<TermType extends TermInterface, ReasonerStateInfoType
 	/* (non-Javadoc)
 	 * @see tud.gamecontroller.game.RunnableMatchInterface#getPlayers()
 	 */
-	public Collection<? extends Player<TermType>> getPlayers() {
+	public Collection<? extends Player<TermType, State<TermType, ReasonerStateInfoType>>> getPlayers() {
 		return players.values();
 	}
 
 	/* (non-Javadoc)
 	 * @see tud.gamecontroller.game.RunnableMatchInterface#getOrderedPlayers()
 	 */
-	public List<? extends Player<TermType>> getOrderedPlayers() {
+	public List<? extends Player<TermType, State<TermType, ReasonerStateInfoType>>> getOrderedPlayers() {
 		if(orderedPlayers==null){
-			orderedPlayers=new LinkedList<Player<TermType>>();
+			orderedPlayers=new LinkedList<Player<TermType, State<TermType, ReasonerStateInfoType>>>();
 			for(RoleInterface<TermType> role:getGame().getOrderedRoles()){
 				orderedPlayers.add(players.get(role));
 			}
@@ -64,7 +64,7 @@ public class RunnableMatch<TermType extends TermInterface, ReasonerStateInfoType
 	/* (non-Javadoc)
 	 * @see tud.gamecontroller.game.RunnableMatchInterface#getPlayer(RoleType)
 	 */
-	public Player<TermType> getPlayer(RoleInterface<TermType> role) {
+	public Player<TermType, State<TermType, ReasonerStateInfoType>> getPlayer(RoleInterface<TermType> role) {
 		return players.get(role);
 	}
 }

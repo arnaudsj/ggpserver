@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>, Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
 
@@ -290,6 +290,7 @@ public class GameControllerFrame<
 		gcGuiRunner.setMatchID(jMatchIDTextField.getText());
 		gcGuiRunner.setStartclock(((Integer)jStartclockComboBox.getSelectedItem()).intValue());
 		gcGuiRunner.setPlayclock(((Integer)jPlayclockComboBox.getSelectedItem()).intValue());
+		
 
 		Collection<PlayerInfo> players=new LinkedList<PlayerInfo>();
 		for(PlayerRecord p:playerTableModel.getPlayerRecords()){

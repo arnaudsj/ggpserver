@@ -20,8 +20,11 @@ package tud.gamecontroller.players;
 
 import java.util.Collection;
 import java.util.List;
+
+import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.exceptions.NoLegalMoveException;
 import tud.gamecontroller.game.MoveInterface;
+import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.term.TermInterface;
 
 /**
@@ -31,14 +34,19 @@ import tud.gamecontroller.term.TermInterface;
  * 
  * @author martin
  */
-public class MovelistPlayer<TermType extends TermInterface>
-		extends LocalPlayer<TermType> {
+public class MovelistPlayer<TermType extends TermInterface,
+		StateType extends StateInterface<TermType, ? extends StateType>>
+		extends LocalPlayer<TermType, StateType> {
 
 	private final List<String> moveStrings;
 	private int stepNumber = 0;
 	
 	public MovelistPlayer(String name, List<String> moveStrings) {
-		super(name);
+		this(name, moveStrings, GDLVersion.v1);
+	}
+	
+	public MovelistPlayer(String name, List<String> moveStrings, GDLVersion gdlVersion) {
+		super(name, gdlVersion);
 		this.moveStrings = moveStrings;
 	}
 

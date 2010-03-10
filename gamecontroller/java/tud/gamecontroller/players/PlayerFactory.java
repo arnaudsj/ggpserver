@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>, Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
 
@@ -19,29 +19,38 @@
 
 package tud.gamecontroller.players;
 
+import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.game.MoveFactoryInterface;
 import tud.gamecontroller.game.MoveInterface;
+import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.scrambling.GameScramblerInterface;
 import tud.gamecontroller.term.TermInterface;
 
 public class PlayerFactory {
 
-	public static <TermType extends TermInterface> Player<TermType> createRemotePlayer(RemotePlayerInfo info, MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory, GameScramblerInterface gameScrambler) {
-		return new RemotePlayer<TermType>(info.getName(), info.getHost(), info.getPort(), movefactory, gameScrambler);
+	public static <TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
+		Player<TermType, StateType> createRemotePlayer(RemotePlayerInfo info, MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory, GameScramblerInterface gameScrambler, GDLVersion gdlVersion) {
+		return new RemotePlayer<TermType, StateType>(info.getName(), info.getHost(), info.getPort(), movefactory, gameScrambler, gdlVersion);
 	}
-	public static <TermType extends TermInterface> Player<TermType> createRandomPlayer(RandomPlayerInfo info) {
-		return new RandomPlayer<TermType>(info.getName());
+	
+	public static <TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
+		Player<TermType, StateType> createRandomPlayer(RandomPlayerInfo info, GDLVersion gdlVersion) {
+		return new RandomPlayer<TermType, StateType>(info.getName(), gdlVersion);
 	}
-	public static <TermType extends TermInterface> Player<TermType> createLegalPlayer(LegalPlayerInfo info) {
-		return new LegalPlayer<TermType>(info.getName());
+	
+	public static <TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
+		Player<TermType, StateType> createLegalPlayer(LegalPlayerInfo info, GDLVersion gdlVersion) {
+		return new LegalPlayer<TermType, StateType>(info.getName(), gdlVersion);
 	}
-	public static <TermType extends TermInterface> Player<TermType> createPlayer(PlayerInfo info, MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory, GameScramblerInterface gameScrambler) {
+	
+	public static <TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
+		Player<TermType, StateType> createPlayer(PlayerInfo info, MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory, GameScramblerInterface gameScrambler, GDLVersion gdlVersion) {
 		if(info instanceof RemotePlayerInfo){
-			return createRemotePlayer((RemotePlayerInfo)info, movefactory, gameScrambler);
+			return PlayerFactory. <TermType, StateType> createRemotePlayer((RemotePlayerInfo)info, movefactory, gameScrambler, gdlVersion);
 		}else if(info instanceof RandomPlayerInfo){
-			return createRandomPlayer((RandomPlayerInfo)info);
+			return PlayerFactory. <TermType, StateType> createRandomPlayer((RandomPlayerInfo)info, gdlVersion);
 		}else if(info instanceof LegalPlayerInfo){
-			return createLegalPlayer((LegalPlayerInfo)info);
+			return PlayerFactory. <TermType, StateType> createLegalPlayer((LegalPlayerInfo)info, gdlVersion);
 		}
 		return null;
 	}

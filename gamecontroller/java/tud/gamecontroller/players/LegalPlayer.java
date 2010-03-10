@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>, Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
 
@@ -19,18 +19,28 @@
 
 package tud.gamecontroller.players;
 
+import java.util.Vector;
+
+import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.game.MoveInterface;
+import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.term.TermInterface;
 
 public class LegalPlayer<
-	TermType extends TermInterface
-	> extends LocalPlayer<TermType>  {
+	TermType extends TermInterface,
+	StateType extends StateInterface<TermType, ? extends StateType>> extends LocalPlayer<TermType, StateType>  {
 
 	public LegalPlayer(String name) {
-		super(name);
+		this(name, GDLVersion.v1);
+	}
+	
+	public LegalPlayer(String name, GDLVersion gdlVersion) {
+		super(name, gdlVersion);
 	}
 
+	// MODIFIED
 	public MoveInterface<TermType> getNextMove() {
-		return currentState.getLegalMove(role);
+		Vector<MoveInterface<TermType>> legalMoves = super.getLegalMoves();
+		return legalMoves.get(0);
 	}
 }

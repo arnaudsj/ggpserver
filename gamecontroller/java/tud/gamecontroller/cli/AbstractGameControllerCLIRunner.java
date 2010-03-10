@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>, Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
 
@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import tud.gamecontroller.AbstractGameControllerRunner;
+import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.ReasonerFactory;
 import tud.gamecontroller.game.impl.Game;
 import tud.gamecontroller.logging.PlainTextLogFormatter;
@@ -46,13 +47,14 @@ public abstract class AbstractGameControllerCLIRunner<
 	private int startClock=0, playClock=0;
 	private boolean doPrintXML=false;
 	private String styleSheet=null;
+	private String sightFile=null;
 	private String xmlOutputDir=null;
 	private String matchID=null;
 	private File scrambleWordList=null;
 	private Collection<PlayerInfo> playerInfos=null;
 	
-	public AbstractGameControllerCLIRunner(ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory){
-		super(reasonerFactory);
+	public AbstractGameControllerCLIRunner(ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory, GDLVersion gdlVersion){
+		super(reasonerFactory, gdlVersion);
 		Logger logger=getLogger();
 		logger.setUseParentHandlers(false);
 		logger.addHandler(new UnbufferedStreamHandler(System.out, new PlainTextLogFormatter()));
@@ -84,6 +86,7 @@ public abstract class AbstractGameControllerCLIRunner<
 			startClock=getIntArg(argv[index],"startclock"); ++index;
 			playClock=getIntArg(argv[index],"playclock"); ++index;
 			
+			sightFile = null;
 			playerInfos=new LinkedList<PlayerInfo>();
 			while(index<argv.length){
 				if(argv[index].equals("-printxml")){
@@ -98,6 +101,25 @@ public abstract class AbstractGameControllerCLIRunner<
 					++index;
 					if(index<argv.length){
 						scrambleWordList=getFileArg(argv[index], "word list", true); ++index;
+					}else{
+						missingArgumentsExit(argv[index-1]);
+					}
+				} else if (argv[index].equals("-sightfile")) {
+					++index;
+					if(index<argv.length){
+						sightFile=argv[index]; ++index;
+					}else{
+						missingArgumentsExit(argv[index-1]);
+					}
+				} else if (argv[index].equals("-gdlversion")) {
+					++index;
+					if(index<argv.length){
+						gdlVersion = GDLVersion.v1;
+						if (argv[index].equals("2")) {
+							//System.out.println("Retrieving GDL version 2 from command line");
+							gdlVersion=GDLVersion.v2;
+						}
+						++index;
 					}else{
 						missingArgumentsExit(argv[index-1]);
 					}
@@ -245,6 +267,11 @@ public abstract class AbstractGameControllerCLIRunner<
 	@Override
 	protected String getStyleSheet() {
 		return styleSheet;
+	}
+	
+	@Override
+	protected String getSightFile() {
+		return sightFile;
 	}
 
 	@Override

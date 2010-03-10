@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>, Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
 
@@ -41,7 +41,11 @@ public interface ReasonerInterface<
 	Collection<? extends MoveInterface<TermType>> getLegalMoves(ReasonerStateInfoType state, RoleInterface<TermType> role);
 
 	Collection<? extends FluentInterface<TermType>> getFluents(ReasonerStateInfoType state);
-
+	
+	public Collection<? extends FluentInterface<TermType>> getSeesFluents (ReasonerStateInfoType state, RoleInterface<TermType> role, JointMoveInterface<TermType> jointMove);
+	
+	public Collection<? extends FluentInterface<TermType>> getSeesXMLFluents (ReasonerStateInfoType state, RoleInterface<TermType> role);
+	
 	String getKIFGameDescription();
 
 }

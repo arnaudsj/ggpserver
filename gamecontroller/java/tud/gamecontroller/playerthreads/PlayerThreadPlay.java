@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>, Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
 
@@ -19,30 +19,33 @@
 
 package tud.gamecontroller.playerthreads;
 
-import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
+import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.players.Player;
 import tud.gamecontroller.term.TermInterface;
 
 public class PlayerThreadPlay<
-		TermType extends TermInterface
-		> extends AbstractPlayerThread<TermType> {
+		TermType extends TermInterface,
+		StateType extends StateInterface<TermType, ? extends StateType>
+		> extends AbstractPlayerThread<TermType, StateType> {
 
 	private MoveInterface<TermType> move;
-	private JointMoveInterface<TermType> priormoves;
+	//private JointMoveInterface<TermType> priormoves; // we don't want any jointMove here anymore (in regular GDL games, it is contained in the seesTerms) 
+	private Object seesFluents; //MODIFIED
 	
-	public PlayerThreadPlay(RoleInterface<TermType> role, Player<TermType> player, MatchInterface<TermType, ?> match, JointMoveInterface<TermType> priormoves, long deadline){
+	public PlayerThreadPlay(RoleInterface<TermType> role, Player<TermType, StateType> player, MatchInterface<TermType, StateType> match, Object seesFluents, long deadline){
 		super("PlayMessageThread("+player.getName()+","+match.getMatchID()+")", role, player, match, deadline);
-		this.priormoves=priormoves;
+		//this.priormoves=priormoves;
 		this.move=null;
+		this.seesFluents = seesFluents; // MODIFIED (ADDED)
 	}
 	public MoveInterface<TermType> getMove() {
 		return move;
 	}
 	public void run(){
-		move=player.gamePlay(priormoves, this);
+		move=player.gamePlay(this.seesFluents, this);
 	}
 	
 	@Override
@@ -57,8 +60,10 @@ public class PlayerThreadPlay<
 		buffer.append(role);
 		buffer.append(" player: ");
 		buffer.append(player);
-		buffer.append(" priormoves: ");
-		buffer.append(priormoves);
+		//buffer.append(" priormoves: ");
+		//buffer.append(priormoves);
+		buffer.append(" seesFluents: ");
+		buffer.append(seesFluents);
 		buffer.append(" move: ");
 		buffer.append(move);
 		buffer.append("]");

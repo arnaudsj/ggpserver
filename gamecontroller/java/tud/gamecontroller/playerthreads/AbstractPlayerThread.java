@@ -24,23 +24,25 @@ package tud.gamecontroller.playerthreads;
 import tud.gamecontroller.ConnectionEstablishedNotifier;
 import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.RoleInterface;
+import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.players.Player;
 import tud.gamecontroller.term.TermInterface;
 
 public abstract class AbstractPlayerThread<
-		TermType extends TermInterface
+		TermType extends TermInterface,
+		StateType extends StateInterface<TermType, ? extends StateType>
 		> extends Thread implements ConnectionEstablishedNotifier {
 	// private static final Logger logger = Logger.getLogger(AbstractPlayerThread.class.getName());
 	
-	protected Player<TermType> player;
+	protected Player<TermType, StateType> player;
 	protected RoleInterface<TermType> role;
-	protected MatchInterface<TermType, ?> match;
+	protected MatchInterface<TermType, StateType> match;
 	private long deadline;
 	private long timeout;
 	private ChangeableBoolean connectionEstablished;
 	private ChangeableBoolean deadlineSet;
 	
-	public AbstractPlayerThread(String threadName, RoleInterface<TermType> role, Player<TermType> player, MatchInterface<TermType, ?> match, long timeout){
+	public AbstractPlayerThread(String threadName, RoleInterface<TermType> role, Player<TermType, StateType> player, MatchInterface<TermType, StateType> match, long timeout){
 		super(threadName);
 		this.role=role;
 		this.player=player;
@@ -49,7 +51,7 @@ public abstract class AbstractPlayerThread<
 		deadline=0;
 		// logger.info("Player thread initialized: " + this); // this.toString() will miss properties that are initialized in subclasses
 	}
-	public Player<TermType> getPlayer() {
+	public Player<TermType, StateType> getPlayer() {
 		return player;
 	}
 	public RoleInterface<TermType> getRole(){

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008,2009 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>, Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
 
@@ -44,11 +44,21 @@ public class Game<
 	private String name;
 //	private List<RoleInterface<TermType>> orderedRoles=null;
 	private String stylesheet = null;  // this can remain null (no stylesheet will be used)
+	private String seesXMLRules = null;
 	private String gameDescription = null;
 	private final String kifGameDescription;
 	private final List<? extends RoleInterface<TermType>> roles;
 
 	public Game(File gameFile, ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory) throws IOException {
+		this(gameFile, reasonerFactory, null, null);
+	}
+
+	public Game(File gameFile, ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory, String stylesheet) throws IOException {
+		this(gameFile, reasonerFactory, stylesheet, null);
+	}
+	
+	public Game(File gameFile, ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory, String stylesheet, File sightFile) throws IOException {
+		
 		StringBuffer sb = new StringBuffer();
 		BufferedReader br = null;
 		
@@ -77,19 +87,68 @@ public class Game<
 					.createReasoner(gameDescription, name);
 			roles = reasoner.getRoles();
 			kifGameDescription = reasoner.getKIFGameDescription();
+			
 		} finally {
 			if (br != null) {
 				br.close();
 			}
 		}
-	}
-
-	public Game(File gameFile, ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory, String stylesheet) throws IOException {
-		this(gameFile, reasonerFactory);
-		this.stylesheet = stylesheet;
+		
+		
+		// add sees_xml(..) rules
+		
+		if (sightFile != null) {
+			
+			sb = new StringBuffer();
+			br = null;
+			
+			try {
+				br = new BufferedReader(new FileReader(sightFile));
+				String line;
+	
+				while ((line = br.readLine()) != null) {
+					line = line.trim();
+					sb.append(line + "\n"); // artificial EOLN marker
+				}
+				
+				String fileName = gameFile.getName();
+				
+				int firstDot = fileName.indexOf(".");
+				if (firstDot == -1) {
+					// no "." in filename
+					this.name = fileName;
+				} else {
+					this.name = fileName.substring(0, firstDot);
+				}
+				
+				this.seesXMLRules = sb.toString();
+				
+			}
+			catch (IOException ioe) {
+				
+			}
+			finally {
+				if (br != null) {
+					br.close();
+				}
+			}
+			
+		}
+		
+		this.setDefaultXMLSeesRules();
+		this.gameDescription += "\n\n"+this.seesXMLRules;
+		
 	}
 
 	public Game(String gameDescription, String name, ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory) {
+		this(gameDescription, name, reasonerFactory, null, null);
+	}
+	
+	public Game(String gameDescription, String name, ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory, String stylesheet) {
+		this(gameDescription, name, reasonerFactory, stylesheet, null);
+	}
+	
+	public Game(String gameDescription, String name, ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory, String stylesheet, String seesXMLRules) {
 		this.name=name;
 		this.reasonerFactory=reasonerFactory;
 		this.gameDescription=gameDescription;
@@ -97,13 +156,31 @@ public class Game<
 				.createReasoner(gameDescription, name);
 		roles = reasoner.getRoles();
 		kifGameDescription = reasoner.getKIFGameDescription();
-	}
-
-	public Game(String gameDescription, String name, ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory, String stylesheet) {
-		this(gameDescription, name, reasonerFactory);
+		
 		this.stylesheet = stylesheet;
+		this.seesXMLRules = seesXMLRules;
+		
+		this.setDefaultXMLSeesRules();
+		this.gameDescription += "\n\n"+this.seesXMLRules;
+		
 	}
-
+	
+	
+	private void setDefaultXMLSeesRules() {
+		
+		if (this.seesXMLRules == null || this.seesXMLRules == "") {
+			/* MODIFIED (ADDED)
+			 * We don't have a sightFile, or the file was not found
+			 * → let's add the default sees_xml(..) rule for each player
+			 */
+			this.seesXMLRules = "";
+			for (RoleInterface<TermType> role: this.getOrderedRoles())
+				this.seesXMLRules += "(<= (sees_xml "+role+" ?t) (true ?t) )\n";
+		}
+		
+	}
+	
+	
 	public State<TermType, ReasonerStateInfoType> getInitialState() {
 		ReasonerInterface<TermType, ReasonerStateInfoType> reasoner = reasonerFactory.createReasoner(gameDescription, name);
 		return new State<TermType,ReasonerStateInfoType>(reasoner , reasoner.getInitialState());
@@ -138,7 +215,7 @@ public class Game<
 
 	/**
 	 *
-	 * @return the rules of the game including comments and whitespace
+	 * @return the rules of the game including comments and whitespace (and sees_xml() rules)
 	 */
 	public String getGameDescription() {
 		return gameDescription ;
@@ -174,6 +251,10 @@ public class Game<
 
 	public String getStylesheet() {
 		return stylesheet ;
+	}
+	
+	public String getSeesXMLRules() {
+		return seesXMLRules ;
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>, Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
 
@@ -25,10 +25,21 @@ import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
+import tud.gamecontroller.game.StateInterface;
 
-public interface Player<TermType> extends NamedObject{
-	public void gameStart(MatchInterface<TermType, ?> match, RoleInterface<TermType> role, ConnectionEstablishedNotifier notifier);
-	public MoveInterface<TermType> gamePlay(JointMoveInterface<TermType> jointMove, ConnectionEstablishedNotifier notifier);
+public interface Player<TermType, StateType extends StateInterface<TermType, ? extends StateType>> extends NamedObject{
+	
+	public void gameStart(MatchInterface<TermType, StateType> match, RoleInterface<TermType> role, ConnectionEstablishedNotifier notifier);
+	
+	/* MODIFIED: we don't use a jointMove any more, rather the seesTerms
+	 * - in GDL-II, they are just sent in place of the moves;
+	 * - in regular GDL, we want to put the jointMove that the players performed as if they were seesTerms
+	 * 		derived from the rules:
+	 * 			- sees(player1, move(player2, moveX)) <- does(player2, moveX)
+	 * 			- and likewise for every other pair of players
+	 */
+	public MoveInterface<TermType> gamePlay(Object seesFluents, ConnectionEstablishedNotifier notifier); // MODIFIED
+	
 	public void gameStop(JointMoveInterface<TermType> jointMove, ConnectionEstablishedNotifier notifier);
 	/**
 	 * 

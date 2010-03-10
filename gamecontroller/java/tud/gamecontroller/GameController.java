@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>, Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
 
@@ -26,11 +26,12 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import tud.gamecontroller.game.FluentInterface;
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.JointMoveInterface;
-import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
+import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.impl.JointMove;
 import tud.gamecontroller.game.impl.State;
 import tud.gamecontroller.logging.ErrorMessageListener;
@@ -65,14 +66,20 @@ public class GameController<
 	private Map<RoleInterface<TermType>, Integer> goalValues=null;
 	private Logger logger;
 	private Collection<GameControllerListener> listeners;
+	private GDLVersion gdlVersion;
 
 	public GameController(RunnableMatchInterface<TermType, State<TermType, ReasonerStateInfoType>> match) {
+		this(match, GDLVersion.v1);
+	}
+	
+	public GameController(RunnableMatchInterface<TermType, State<TermType, ReasonerStateInfoType>> match, GDLVersion gdlVersion) {
 		this.match=match;
 		this.game=match.getGame();
 		this.startclock=match.getStartclock();
 		this.playclock=match.getPlayclock();
 		listeners=new LinkedList<GameControllerListener>();
 		this.logger=Logger.getLogger("tud.gamecontroller");
+		this.gdlVersion = gdlVersion;
 	}
 
 	public void addListener(GameControllerListener l){
@@ -103,7 +110,7 @@ public class GameController<
 		int step=1;
 		currentState=game.getInitialState();
 		JointMoveInterface<TermType> priorJointMove=null;
-		logger.info("match:"+match.getMatchID());
+		logger.info("match:"+match.getMatchID()+", GDL "+gdlVersion);
 		logger.info("game:"+match.getGame().getName());
 		logger.info("starting game with startclock="+startclock+", playclock="+playclock);
 		logger.info("step:"+step);
@@ -112,7 +119,7 @@ public class GameController<
 		gameStart();
 		while(!currentState.isTerminal()){
 			Thread.sleep(DELAY_BEFORE_NEXT_MESSAGE);
-			JointMoveInterface<TermType> jointMove = gamePlay(step, priorJointMove);
+			JointMoveInterface<TermType> jointMove = gamePlay(step, priorJointMove, currentState);
 			currentState=currentState.getSuccessor(jointMove);
 			fireGameStep(jointMove, currentState);
 			priorJointMove=jointMove;
@@ -120,7 +127,7 @@ public class GameController<
 			logger.info("step:"+step);
 			logger.info("current state:"+currentState);
 		}
-
+		
 		String goalmsg="Game over! results: ";
 		goalValues=new HashMap<RoleInterface<TermType>, Integer>();
 		for(RoleInterface<TermType> role:game.getOrderedRoles()){
@@ -142,11 +149,11 @@ public class GameController<
 		logger.info("Done.");
 	}
 
-	private void runThreads(Collection<? extends AbstractPlayerThread<?>> threads, Level loglevel) throws InterruptedException{
-		for(AbstractPlayerThread<?> t:threads){
+	private void runThreads(Collection<? extends AbstractPlayerThread<?, ?>> threads, Level loglevel) throws InterruptedException{
+		for(AbstractPlayerThread<?, ?> t:threads){
 			t.start();
 		}
-		for(AbstractPlayerThread<?> t:threads){
+		for(AbstractPlayerThread<?, ?> t:threads){
 			if(!t.waitUntilDeadline()){
 				String message = "player "+t.getPlayer()+" timed out!";
 				GameControllerErrorMessage errorMessage = new GameControllerErrorMessage(GameControllerErrorMessage.TIMEOUT, message, t.getPlayer().getName());
@@ -159,28 +166,67 @@ public class GameController<
 	}
 
 	private void gameStart() throws InterruptedException {
-		Collection<PlayerThreadStart<TermType>> playerthreads=new LinkedList<PlayerThreadStart<TermType>>();
+		Collection<PlayerThreadStart<TermType, State<TermType, ReasonerStateInfoType>>> playerthreads=new LinkedList<PlayerThreadStart<TermType, State<TermType, ReasonerStateInfoType>>>();
 		for(RoleInterface<TermType> role:game.getOrderedRoles()){
 			logger.info("role: "+role+" => player: "+match.getPlayer(role));
-			playerthreads.add(new PlayerThreadStart<TermType>(role, match.getPlayer(role), match, startclock*1000+EXTRA_DEADLINE_TIME));
+			playerthreads.add(new PlayerThreadStart<TermType, State<TermType, ReasonerStateInfoType>>(role, match.getPlayer(role), match, startclock*1000+EXTRA_DEADLINE_TIME));
 		}
 		logger.info("Sending start messages ...");
 		runThreads(playerthreads, Level.WARNING);
 	}
 
-	private JointMoveInterface<TermType> gamePlay(int step, JointMoveInterface<TermType> priormoves) throws InterruptedException {
-		JointMoveInterface<TermType> jointMove=new JointMove<TermType>(game.getOrderedRoles());
-		Collection<PlayerThreadPlay<TermType>> playerthreads=new LinkedList<PlayerThreadPlay<TermType>>();
+	private JointMoveInterface<TermType> gamePlay(int step, JointMoveInterface<TermType> priormoves, State<TermType, ReasonerStateInfoType> priorState) throws InterruptedException {
+		
+		JointMoveInterface<TermType> jointMove = new JointMove<TermType>(game.getOrderedRoles());
+		Collection<PlayerThreadPlay<TermType, State<TermType, ReasonerStateInfoType>>> playerthreads = new LinkedList<PlayerThreadPlay<TermType, State<TermType, ReasonerStateInfoType>>>();
+		
 		for(RoleInterface<TermType> role:game.getOrderedRoles()){
-			playerthreads.add(new PlayerThreadPlay<TermType>(role, match.getPlayer(role), match, priormoves, playclock*1000+EXTRA_DEADLINE_TIME));
+			/** MODIFIED
+			 * Here is the only point at which the difference between regular GDL and GDL-II is made:
+			 * - if we play a regular GDL game, we will send the moves as seesFluents;
+			 * - and if on the contrary we play a GDL-II game, we will derive the seesFluents from the game description, and send them. 
+			 */
+			
+			Object seesFluents = new LinkedList<FluentInterface<TermType>>();
+			
+			if (this.gdlVersion == GDLVersion.v1) { // Regular GDL
+				
+				// let's transform our priormoves into seesTerms
+				//System.out.println("priormoves: "+priormoves);
+				if (priormoves != null) {
+					
+					/* LinkedList<FluentInterface<TermType>> seesFluents2 = new LinkedList<FluentInterface<TermType>>();
+					
+					for (MoveInterface<TermType> move: priormoves.getOrderedMoves())
+						seesFluents2.add( (FluentInterface<TermType>) new SeesTerm<TermType>(move.getTerm()) );
+					
+					seesFluents = seesFluents2;
+					*/
+					
+					seesFluents = priormoves;
+					
+				}
+				
+			} else { // GDL-II
+				
+				// retrieve seesTerms, and send them in the PLAY messages
+				seesFluents = priorState.getSeesFluents(role, priormoves);
+				
+			}
+			
+			System.out.println("GameController.gamePlay,   seesFluents (player "+role+") = "+seesFluents);
+			
+			playerthreads.add(new PlayerThreadPlay<TermType, State<TermType, ReasonerStateInfoType>>(role, match.getPlayer(role), match, seesFluents, playclock*1000+EXTRA_DEADLINE_TIME));
+			
 		}
+		
 		logger.info("Sending play messages ...");
 		runThreads(playerthreads, Level.SEVERE);
-		for(PlayerThreadPlay<TermType> pt:playerthreads){
+		for(PlayerThreadPlay<TermType, State<TermType, ReasonerStateInfoType>> pt:playerthreads){
 			RoleInterface<TermType> role=pt.getRole();
 			MoveInterface<TermType> move=pt.getMove();
 			if(move==null || !currentState.isLegal(role, move)){
-				Player<TermType> player = match.getPlayer(role);
+				Player<TermType, State<TermType, ReasonerStateInfoType>> player = match.getPlayer(role);
 				String message = "Illegal move \""+move+"\" from "+player+ " in step "+step;
 				GameControllerErrorMessage errorMessage = new GameControllerErrorMessage(GameControllerErrorMessage.ILLEGAL_MOVE, message, player.getName());
 				if (match instanceof ErrorMessageListener) {
@@ -197,9 +243,9 @@ public class GameController<
 	}
 
 	private void gameStop(JointMoveInterface<TermType> priorJointMove) throws InterruptedException {
-		Collection<PlayerThreadStop<TermType>> playerthreads=new LinkedList<PlayerThreadStop<TermType>>();
+		Collection<PlayerThreadStop<TermType, State<TermType, ReasonerStateInfoType>>> playerthreads=new LinkedList<PlayerThreadStop<TermType, State<TermType, ReasonerStateInfoType>>>();
 		for(RoleInterface<TermType> role:game.getOrderedRoles()){
-			playerthreads.add(new PlayerThreadStop<TermType>(role, match.getPlayer(role), match, priorJointMove, playclock*1000+EXTRA_DEADLINE_TIME));
+			playerthreads.add(new PlayerThreadStop<TermType, State<TermType, ReasonerStateInfoType>>(role, match.getPlayer(role), match, priorJointMove, playclock*1000+EXTRA_DEADLINE_TIME));
 		}
 		logger.info("Sending stop messages ...");
 		runThreads(playerthreads, Level.WARNING);

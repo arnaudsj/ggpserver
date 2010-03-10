@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>, Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
 
@@ -30,16 +30,12 @@ import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.term.GameObjectInterface;
 import tud.gamecontroller.term.TermInterface;
 
-public class State<
-	TermType extends TermInterface,
-	ReasonerStateInfoType
-	> implements StateInterface<
-			TermType,
-			State<TermType, ReasonerStateInfoType>> {
-
+public class State<TermType extends TermInterface, ReasonerStateInfoType>
+		implements StateInterface<TermType, State<TermType, ReasonerStateInfoType>> {
+	
 	protected ReasonerInterface<TermType, ReasonerStateInfoType> reasoner;
-	protected ReasonerStateInfoType stateInformation; 
-
+	protected ReasonerStateInfoType stateInformation;
+	
 	public State(ReasonerInterface<TermType, ReasonerStateInfoType> reasoner, ReasonerStateInfoType stateInformation){
 		this.reasoner=reasoner;
 		this.stateInformation=stateInformation;
@@ -72,7 +68,27 @@ public class State<
 	public Collection<? extends FluentInterface<TermType>> getFluents() {
 		return reasoner.getFluents(stateInformation);
 	}
-
+	
+	/** MODIFIED (ADDED)
+	 * get the sees fluents to send to players
+	 */
+	public Collection<? extends FluentInterface<TermType>> getSeesFluents (RoleInterface<TermType> role, JointMoveInterface<TermType> jointMove) {
+		return reasoner.getSeesFluents(	stateInformation, role, jointMove);
+	}
+	
+	/** MODIFIED (ADDED)
+	 * get the sees fluents to send to players
+	 */
+	public Collection<? extends FluentInterface<TermType>> getSeesXMLFluents (RoleInterface<TermType> role) {
+		return reasoner.getSeesXMLFluents(	stateInformation, role);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean equals (Object o) {
+		return this.stateInformation.equals( ((State<TermType, ReasonerStateInfoType>)o).stateInformation );
+	}
+	
 	public String toString(){
 		StringBuilder sb=new StringBuilder();
 		sb.append('(');
@@ -83,4 +99,5 @@ public class State<
 		sb.append(')');
 		return sb.toString();
 	}
+
 }

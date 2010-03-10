@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>, Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
 
@@ -53,9 +53,12 @@ public abstract class AbstractGameControllerRunner<
 		ReasonerStateInfoType
 		> gameController=null;
 	
-	public AbstractGameControllerRunner(final ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory) {
+	protected GDLVersion gdlVersion;
+	
+	public AbstractGameControllerRunner(final ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory, GDLVersion gdlVersion) {
 		super();
 		this.reasonerFactory = reasonerFactory;
+		this.gdlVersion = gdlVersion;
 	}
 
 	public Logger getLogger(){
@@ -71,7 +74,7 @@ public abstract class AbstractGameControllerRunner<
 		}
 
 		Game<TermType, ReasonerStateInfoType> game=getGame();
-		Map<RoleInterface<TermType>,Player<TermType>> players=
+		Map<RoleInterface<TermType>,Player<TermType, State<TermType, ReasonerStateInfoType>>> players=
 				createPlayers(game, gameScrambler);
 		RunnableMatchInterface<TermType, State<TermType, ReasonerStateInfoType>> match=
 				new RunnableMatch<TermType, ReasonerStateInfoType>(
@@ -79,26 +82,39 @@ public abstract class AbstractGameControllerRunner<
 		gameController=new GameController<
 			TermType,
 			ReasonerStateInfoType
-			>(match);
+			>(match, gdlVersion);
 
 		if(doPrintXML()){
-			XMLGameStateWriter gsw=new XMLGameStateWriter(getXmlOutputDir(), getStyleSheet());
-			gameController.addListener( gsw);
+			
+			if (this.gdlVersion == GDLVersion.v1) { // Regular GDL
+				
+				XMLGameStateWriter gsw = new XMLGameStateWriter(getXmlOutputDir(), getStyleSheet(), null, this.gdlVersion);
+				gameController.addListener(gsw);
+				
+			} else { // GDL-II
+				
+				for (RoleInterface<TermType> role: game.getOrderedRoles()) {
+					XMLGameStateWriter gsw = new XMLGameStateWriter(getXmlOutputDir(), getStyleSheet(), role, this.gdlVersion);
+					gameController.addListener(gsw);
+				}
+				
+			}
+			
 		}
 		gameController.runGame();
 	}
 
-	private Map<RoleInterface<TermType>,Player<TermType>> createPlayers(Game<TermType, ReasonerStateInfoType> game, GameScramblerInterface gameScrambler) {
-		Map<RoleInterface<TermType>,Player<TermType>> players=new HashMap<RoleInterface<TermType>,Player<TermType>>();
+	private Map<RoleInterface<TermType>,Player<TermType, State<TermType, ReasonerStateInfoType>>> createPlayers(Game<TermType, ReasonerStateInfoType> game, GameScramblerInterface gameScrambler) {
+		Map<RoleInterface<TermType>,Player<TermType, State<TermType, ReasonerStateInfoType>>> players=new HashMap<RoleInterface<TermType>,Player<TermType, State<TermType, ReasonerStateInfoType>>>();
 		MoveFactoryInterface<? extends MoveInterface<TermType>> moveFactory=getMoveFactory();
 		for(PlayerInfo playerInfo:getPlayerInfos()){
 			RoleInterface<TermType> role=game.getRole(playerInfo.getRoleindex());
-			players.put(role, PlayerFactory. <TermType> createPlayer(playerInfo, moveFactory, gameScrambler));
+			players.put(role, PlayerFactory. <TermType, State<TermType, ReasonerStateInfoType>> createPlayer(playerInfo, moveFactory, gameScrambler, gdlVersion));
 		}
 		// make sure that we have a player for each role (fill up with random players)
 		for(int i=0; i<game.getNumberOfRoles(); i++){
 			if(!players.containsKey(game.getRole(i))){
-				players.put(game.getRole(i), PlayerFactory. <TermType> createRandomPlayer(new RandomPlayerInfo(i)));
+				players.put(game.getRole(i), PlayerFactory. <TermType, State<TermType, ReasonerStateInfoType>> createRandomPlayer(new RandomPlayerInfo(i), gdlVersion));
 			}
 		}
 		return players;
@@ -113,6 +129,12 @@ public abstract class AbstractGameControllerRunner<
 	protected abstract File getScrambleWordListFile();
 
 	protected abstract String getStyleSheet();
+	
+	/**
+	 * 
+	 * @return the path to the sightFile
+	 */
+	protected abstract String getSightFile();
 
 	protected abstract String getXmlOutputDir();
 
@@ -127,7 +149,12 @@ public abstract class AbstractGameControllerRunner<
 	protected Game<TermType, ReasonerStateInfoType> createGame(File gameFile){
 		Game<TermType, ReasonerStateInfoType> game = null;
 		try{
-			game = new Game<TermType, ReasonerStateInfoType>(gameFile, reasonerFactory);
+			String sightFile = getSightFile();
+			if (sightFile != null) {
+				game = new Game<TermType, ReasonerStateInfoType>(gameFile, reasonerFactory, getStyleSheet(), new File(getSightFile()));
+			} else {
+				game = new Game<TermType, ReasonerStateInfoType>(gameFile, reasonerFactory, getStyleSheet());
+			}
 		} catch (IOException e){
 			System.out.println(e);
 			System.exit(-1);
@@ -135,8 +162,8 @@ public abstract class AbstractGameControllerRunner<
 		return game;
 	}
 
-	protected Game<TermType, ReasonerStateInfoType> createGame(String gameDescription, String name){
-		return new Game<TermType, ReasonerStateInfoType>(gameDescription, name, reasonerFactory);
+	protected Game<TermType, ReasonerStateInfoType> createGame(String gameDescription, String name) throws IOException{
+		return new Game<TermType, ReasonerStateInfoType>(gameDescription, name, reasonerFactory, getStyleSheet(), getSightFile());
 	}
 
 	public GameController<

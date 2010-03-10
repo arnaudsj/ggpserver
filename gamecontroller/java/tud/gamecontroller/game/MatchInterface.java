@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>, Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
 
@@ -33,7 +33,7 @@ package tud.gamecontroller.game;
 public interface MatchInterface<TermType, StateType extends StateInterface<TermType, ? extends StateType>> {
 
 	public abstract String getMatchID();
-
+	
 	public abstract GameInterface<TermType, StateType> getGame();
 
 	public abstract int getStartclock();
