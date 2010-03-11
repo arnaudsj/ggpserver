@@ -23,11 +23,18 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 
+import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.ReasonerFactory;
+import tud.gamecontroller.XMLGameStateWriter;
 import tud.gamecontroller.game.GameInterface;
+import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.ReasonerInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.term.TermInterface;
@@ -39,6 +46,8 @@ public class Game<
 		TermType,
 		State<TermType, ReasonerStateInfoType>> {
 
+	private static final Logger logger = Logger.getLogger(Game.class.getName());
+	
 	private final ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory;
 
 	private String name;
@@ -136,7 +145,6 @@ public class Game<
 		}
 		
 		this.setDefaultXMLSeesRules();
-		this.gameDescription += "\n\n"+this.seesXMLRules;
 		
 	}
 
@@ -161,7 +169,6 @@ public class Game<
 		this.seesXMLRules = seesXMLRules;
 		
 		this.setDefaultXMLSeesRules();
-		this.gameDescription += "\n\n"+this.seesXMLRules;
 		
 	}
 	
@@ -182,7 +189,8 @@ public class Game<
 	
 	
 	public State<TermType, ReasonerStateInfoType> getInitialState() {
-		ReasonerInterface<TermType, ReasonerStateInfoType> reasoner = reasonerFactory.createReasoner(gameDescription, name);
+		ReasonerInterface<TermType, ReasonerStateInfoType> reasoner =
+			reasonerFactory.createReasoner(gameDescription+"\n\n"+seesXMLRules, name);
 		return new State<TermType,ReasonerStateInfoType>(reasoner , reasoner.getInitialState());
 	}
 
@@ -276,4 +284,48 @@ public class Game<
 		buffer.append("]");
 		return buffer.toString();
 	}
+
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public String getXMLViewFor(
+			Match<?, ?> match,
+			String stringState,
+			List<List<String>> stringMoves,
+			RoleInterface<TermType> role,
+			GDLVersion gdlVersion) {
+		
+		// let's turn the stringState into a known State
+		ReasonerInterface<TermType, ReasonerStateInfoType> reasoner =
+			this.reasonerFactory.createReasoner(this.gameDescription+"\n\n"+seesXMLRules, "temp_game");
+		
+		ReasonerStateInfoType reasonerState = reasoner.getStateFromString(stringState);
+		State state = new State(reasoner, reasonerState);
+		
+		// compute goal values
+		Map<RoleInterface<TermType>,Integer> goalValues = new HashMap<RoleInterface<TermType>,Integer>();
+		
+		if (state.isTerminal()) {
+			Collection<? extends RoleInterface<TermType>> roles = this.getOrderedRoles();
+			for (RoleInterface<TermType> oneRole: roles) {
+				logger.info(oneRole+" has goal Value "+reasoner.getGoalValue(reasonerState, oneRole));
+				goalValues.put(role, reasoner.getGoalValue(reasonerState, oneRole));
+			}
+		} else {
+			goalValues = null;
+		}
+		
+		XMLGameStateWriter.createXMLOutputStream(
+				(MatchInterface<? extends TermInterface,?>) match,
+				state,
+				stringMoves, // moves...
+				goalValues,
+				this.stylesheet,
+				role,
+				gdlVersion);
+		
+		return null;
+		
+	}
+	
 }
