@@ -34,6 +34,7 @@ import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.players.LegalPlayerInfo;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.players.RandomPlayerInfo;
+import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.Game;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
 import tud.ggpserver.datamodel.Tournament;
@@ -225,7 +226,7 @@ public class EditTournament extends ShowMatches {
 			roleIndex++;
 		}
 		
-		db.createMatch(game, Tournament.DEFAULT_STARTCLOCK,
+		((AbstractDBConnector)db).createMatch(game, Tournament.DEFAULT_STARTCLOCK,
 				Tournament.DEFAULT_PLAYCLOCK, rolesToPlayerInfos, tournament.getTournamentID(), user);
 
 		correctlyPerformed = true;
