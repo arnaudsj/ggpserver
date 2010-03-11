@@ -38,8 +38,7 @@ public class ShowMatches extends AbstractPager {
 
 	private List<? extends ServerMatch<?,?>> matches = null;
 
-	@SuppressWarnings("unchecked")
-	protected final AbstractDBConnector db = DBConnectorFactory.getDBConnector();
+	protected final AbstractDBConnector<?, ?> db = DBConnectorFactory.getDBConnector();
 	
 	private int rowCountMatches = -1;
 	private int startRow = -1;
@@ -63,7 +62,6 @@ public class ShowMatches extends AbstractPager {
 		this.startRow = startRow;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public List<? extends ServerMatch<?, ?>> getMatches() throws SQLException {
 		if (matches == null) {
 			matches = db.getMatches(getStartRow(), getNumDisplayedRows(), playerName, gameName, tournamentID, owner, status, excludeNewMatches());

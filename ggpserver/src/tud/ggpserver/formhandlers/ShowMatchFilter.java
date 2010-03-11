@@ -21,6 +21,7 @@
 
 package tud.ggpserver.formhandlers;
 
+import java.lang.ref.SoftReference;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -97,7 +98,13 @@ public class ShowMatchFilter extends ShowMatches {
 			filter = filterSet.getFirstFilter();
 		}
 		filterID = filter.getID();
-		this.selectedMatchIds = (List<String>)filter.getUserData();
+		SoftReference<List<String>> ref = (SoftReference<List<String>>)filter.getUserData();
+		if (ref != null) {
+			this.selectedMatchIds = ref.get();
+		} else {
+			logger.warning("selectedMatchIds stored in the filter were garbage collected");
+			this.selectedMatchIds = null;
+		}
 	}
 	
 	public Filter getFilter() {
@@ -108,7 +115,6 @@ public class ShowMatchFilter extends ShowMatches {
 		return filterSet.getFilterIDs();
 	}
 
-	@SuppressWarnings("unchecked")
 	private List<String> getSelectedMatchIDs() throws SQLException {
 		if (selectedMatchIds == null) {
 			List<MatchInfo> selectedMatchInfos = db.getMatchInfos();
@@ -117,7 +123,7 @@ public class ShowMatchFilter extends ShowMatches {
 				if (filter.isMatching(matchInfo))
 					selectedMatchIds.add(matchInfo.getMatchID());
 			}
-			filter.setUserData(selectedMatchIds);
+			filter.setUserData(new SoftReference<List<String>>(selectedMatchIds));
 		}
 		return selectedMatchIds;
 	}
