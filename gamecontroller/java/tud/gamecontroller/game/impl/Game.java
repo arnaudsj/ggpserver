@@ -309,22 +309,20 @@ public class Game<
 			Collection<? extends RoleInterface<TermType>> roles = this.getOrderedRoles();
 			for (RoleInterface<TermType> oneRole: roles) {
 				logger.info(oneRole+" has goal Value "+reasoner.getGoalValue(reasonerState, oneRole));
-				goalValues.put(role, reasoner.getGoalValue(reasonerState, oneRole));
+				goalValues.put(oneRole, reasoner.getGoalValue(reasonerState, oneRole));
 			}
 		} else {
 			goalValues = null;
 		}
 		
-		XMLGameStateWriter.createXMLOutputStream(
+		return XMLGameStateWriter.createXMLOutputStream(
 				(MatchInterface<? extends TermInterface,?>) match,
 				state,
 				stringMoves, // moves...
 				goalValues,
 				this.stylesheet,
 				role,
-				gdlVersion);
-		
-		return null;
+				gdlVersion).toString();
 		
 	}
 	
