@@ -80,6 +80,9 @@ public class GameController<
 		listeners=new LinkedList<GameControllerListener>();
 		this.logger=Logger.getLogger("tud.gamecontroller");
 		this.gdlVersion = gdlVersion;
+		if(gdlVersion == GDLVersion.v2) {
+			logger.info("gdlVersion = II");
+		}
 	}
 
 	public void addListener(GameControllerListener l){
@@ -187,7 +190,7 @@ public class GameController<
 			 * - and if on the contrary we play a GDL-II game, we will derive the seesFluents from the game description, and send them. 
 			 */
 			
-			Object seesFluents = new LinkedList<FluentInterface<TermType>>();
+			Object seesFluents = null;
 			
 			if (this.gdlVersion == GDLVersion.v1) { // Regular GDL
 				
@@ -211,10 +214,9 @@ public class GameController<
 				
 				// retrieve seesTerms, and send them in the PLAY messages
 				seesFluents = priorState.getSeesFluents(role, priormoves);
-				
+				logger.info("GameController.gamePlay,   seesFluents (player "+role+") = "+seesFluents);
+
 			}
-			
-			System.out.println("GameController.gamePlay,   seesFluents (player "+role+") = "+seesFluents);
 			
 			playerthreads.add(new PlayerThreadPlay<TermType, State<TermType, ReasonerStateInfoType>>(role, match.getPlayer(role), match, seesFluents, playclock*1000+EXTRA_DEADLINE_TIME));
 			

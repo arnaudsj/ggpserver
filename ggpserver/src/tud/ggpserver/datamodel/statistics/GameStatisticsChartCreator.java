@@ -31,6 +31,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
@@ -63,7 +64,9 @@ import tud.gamecontroller.game.RoleInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.Game;
+import tud.ggpserver.datamodel.MatchInfo;
 import tud.ggpserver.datamodel.matches.ServerMatch;
+import tud.ggpserver.util.PlayerInfo;
 
 import com.keypoint.PngEncoder;
 
@@ -142,6 +145,7 @@ public class GameStatisticsChartCreator {
 	private String imageID;
 	private String tournamentID;
 	private Game<?,?> game;
+	private String gameName = null;
 	private RoleInterface<?> role;
 	private HttpSession session;
 	private JFreeChart chart = null;
@@ -163,6 +167,9 @@ public class GameStatisticsChartCreator {
 		this.minNumberOfMatchesForShowingPlayer = minNumberOfMatchesForShowingPlayer;
 		this.smoothingFactor = smoothingFactor;
 
+		if(game != null) {
+			this.gameName = game.getName();
+		}
 		if(imageID != null) {
 			this.imageID = imageID;
 			chart = getCachedChart(imageID);
@@ -205,17 +212,14 @@ public class GameStatisticsChartCreator {
 //				chartTitle += " in " + tournamentID;
 
 			// make the chart
-			String gameName = ( game!=null ? game.getName() : null);
 			
-			List<? extends ServerMatch<?, ?>> matches = db.getMatches(0, Integer.MAX_VALUE, null, gameName, tournamentID, null, null, true);
-			
-			Collection<? extends RoleInterface<?>> roles = null;
-			if (role != null) {
-				roles = Collections.singletonList(role);
-			}else if (game!=null) {
-				roles = game.getOrderedRoles();
+			List<MatchInfo> matchInfos = db.getMatchInfos();
+			logger.info("processing "+matchInfos.size()+" matches");
+			int roleIndex = -1;
+			if (game != null && role != null) {
+				roleIndex = game.getOrderedRoles().indexOf(role);
 			}
-			chart = makeChart(matches, chartTitle, roles);
+			chart = makeChart(matchInfos, chartTitle, roleIndex);
 			
 			// save chart
 			session.setAttribute("gameStatisticsChart_"+imageID, new SoftReference<JFreeChart>(chart));
@@ -265,9 +269,9 @@ public class GameStatisticsChartCreator {
 		return chart;
 	}
 
-	private JFreeChart makeChart(List<? extends ServerMatch<?, ?>> matches, String title, Collection<? extends RoleInterface<?>> roles) throws SQLException {
+	private JFreeChart makeChart(List<MatchInfo> matchInfos, String title, int roleIndex) throws SQLException {
 		// decide which time period to use
-		Class<? extends RegularTimePeriod> timePeriodClass = getTimePeriodClass(matches);
+		Class<? extends RegularTimePeriod> timePeriodClass = getTimePeriodClass(matchInfos);
 
 		// setup chart
 		TimeSeriesCollection dataset = new TimeSeriesCollection();
@@ -285,8 +289,13 @@ public class GameStatisticsChartCreator {
 		playerScores = new HashMap<String, RunningAverage>();
 		
 		// fill in data
-		for(ServerMatch<?, ?> match:matches){
-			if(isGoodMatch(match)) {
+		for(MatchInfo match:matchInfos){
+			if(	isGoodMatch(match)
+				&&
+				(game == null || match.getGameName().equals(game.getName()))
+				&&
+				(tournamentID == null || match.getTournament().equals(tournamentID))
+				) {
 				RegularTimePeriod matchPeriod = RegularTimePeriod.createInstance(timePeriodClass, match.getStartTime(), TimeZone.getDefault());
 				if(currentPeriod == null || !matchPeriod.equals(currentPeriod)) {
 					// logger.info("new period:" + matchDate);
@@ -296,24 +305,23 @@ public class GameStatisticsChartCreator {
 					currentPeriod = matchPeriod;
 				}
 				// logger.info("add goal values of match: " + match.getMatchID());
-				Collection<? extends RoleInterface<?>> roles1;
-				if(roles == null) {
-					roles1 = match.getGame().getOrderedRoles();
-					if(roles1 == null) {
-						logger.severe("roles of game are null");
+				for(PlayerInfo playerInfo:match.getPlayers()) {
+					if (roleIndex == -1 || roleIndex == playerInfo.getRoleindex()) {
+						String playerName = playerInfo.getPlayerName();
+						RunningAverage runningAverage = playerScores.get(playerName);
+						if(runningAverage == null){
+							runningAverage = new RunningAverage(smoothingFactor);
+							playerScores.put(playerName, runningAverage);
+						}
+						runningAverage.addValue(playerInfo.getGoalValue().doubleValue());
 					}
-				}else{
-					roles1 = roles;
 				}
-				for(RoleInterface<?> role:roles1){
-					String playerName = match.getPlayerInfo(role).getName(); 
-					RunningAverage runningAverage = playerScores.get(playerName);
-					if(runningAverage == null){
-						runningAverage = new RunningAverage(smoothingFactor);
-						playerScores.put(playerName, runningAverage);
-					}
-					runningAverage.addValue(match.getGoalValues().get(role).doubleValue());
-				}
+			}else if(!isGoodMatch(match)){
+				logger.info("ignore match (not isGoodMatch): " + match);
+			}else if(!(game == null || match.getGameName().equals(game.getName()))){
+				logger.info("ignore match (not right game): " + match + " != " + game.getName());
+			}else if(!(tournamentID == null || match.getTournament().equals(tournamentID))){
+				logger.info("ignore match (not right tournament): " + match +" != " + tournamentID);
 			}
 		}
 
@@ -324,12 +332,12 @@ public class GameStatisticsChartCreator {
 	}
 
 	@SuppressWarnings("unchecked")
-	private Class<? extends RegularTimePeriod> getTimePeriodClass(List<? extends ServerMatch<?, ?>> matches) {
+	private Class<? extends RegularTimePeriod> getTimePeriodClass(List<MatchInfo> matchInfos) {
 		// the maximal number of periods we could get is minNbOfPeriods * max(sizeOfTimePeriod, sizeOfNextSmallerTimePeriod)
 		// that means we want to keep the steps between the different periods small such that the number of periods is relatively stable
-		if ( matches.size() >= 2 ) {
+		if ( matchInfos.size() >= 2 ) {
 			long idealNbOfPeriods = 40;
-			long timespan = matches.get(matches.size()-1).getStartTime().getTime() - matches.get(0).getStartTime().getTime();
+			long timespan = matchInfos.get(matchInfos.size()-1).getStartTime().getTime() - matchInfos.get(0).getStartTime().getTime();
 			
 			long timePeriods[] = {
 					1000L*60*60*24*365,
@@ -371,9 +379,9 @@ public class GameStatisticsChartCreator {
 		}
 	}
 
-	private boolean isGoodMatch(ServerMatch<?, ?> match) {
-		if(match.getGoalValues()==null)
-			return false;
+	private boolean isGoodMatch(MatchInfo match) {
+		if(match.getStatus().equals(ServerMatch.STATUS_FINISHED))
+			return true;
 		// TODO: filtering out matches with illegal moves is a good idea, but we have to do it in the tables in view_game_statitics.jsp as well
 //		for(List<GameControllerErrorMessage> errorMessages:match.getErrorMessages()) {
 //			for(GameControllerErrorMessage msg:errorMessages){
@@ -382,7 +390,7 @@ public class GameStatisticsChartCreator {
 //				}
 //			}
 //		}
-		return true;
+		return false;
 	}
 
 	private void addData(TimeSeriesCollection dataset, RegularTimePeriod timePeriod, boolean finalPeriod) {

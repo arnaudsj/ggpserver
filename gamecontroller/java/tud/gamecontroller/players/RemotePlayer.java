@@ -96,6 +96,7 @@ public class RemotePlayer<TermType extends TermInterface,
 	@Override
 	public void gameStart(MatchInterface<TermType, StateType> match, RoleInterface<TermType> role, ConnectionEstablishedNotifier notifier) {
 		super.gameStart(match, role, notifier);
+		this.firstTurn = true;
 		hostAddress = null; // don't use an old hostAddress for a new match
 		connectionTimeoutBonus = CONNECTION_TIMEOUT_BONUS;
 		String msg="(START "+
@@ -108,7 +109,6 @@ public class RemotePlayer<TermType extends TermInterface,
 		notifyStopRunning();
 		logger.info("reply from "+this.getName()+": "+reply+ " after "+getLastMessageRuntime()+"ms");
 		
-		this.firstTurn = true; // MODIFIED
 			
 	}
 
@@ -123,11 +123,9 @@ public class RemotePlayer<TermType extends TermInterface,
 		MoveInterface<TermType> move=null;
 		String msg="(PLAY "+match.getMatchID()+" ";
 		
-		if (this.firstTurn) { // MODIFIED
-			
-			this.firstTurn = false; // MODIFIED
+		if (this.firstTurn) {
+			this.firstTurn = false;
 			msg+="NIL";
-			
 		}else{
 			
 			if (this.gdlVersion == GDLVersion.v1) { // Regular GDL

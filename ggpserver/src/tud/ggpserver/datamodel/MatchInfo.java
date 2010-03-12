@@ -96,6 +96,8 @@ public class MatchInfo {
 		return tournament;
 	}
 	
-	
+	public String toString() {
+		return "MatchInfo[match:"+matchID+", game:"+gameName+", tournament:"+tournament+", status:"+status+"]";
+	}
 	
 }

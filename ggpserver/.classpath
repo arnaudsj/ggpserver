@@ -5,5 +5,18 @@
 	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.eclipse.jst.server.tomcat.runtimeTarget/Apache Tomcat v5.5"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/gamecontroller"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/GgpRatingSystem"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jcommon-1.0.16.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://www.jfree.org/jcommon/api/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jfreechart-1.0.13.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://www.jfree.org/jfreechart/api/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Tomcat5.5"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
