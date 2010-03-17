@@ -1,5 +1,5 @@
 <%--
-    Copyright (C) 2009 Martin G�nther (mintar@gmx.de)
+    Copyright (C) 2009 Martin Günther (mintar@gmx.de)
 
     This file is part of GGP Server.
 
@@ -42,6 +42,9 @@
 	</c:catch>
 	<c:catch>
 		<jsp:setProperty name="viewState" property="stepNumber" />
+	</c:catch>
+	<c:catch>
+		<jsp:setProperty name="viewState" property="role" />
 	</c:catch>
 </jsp:useBean>
 <c:if test="${e != null}">

@@ -20,6 +20,7 @@
 package tud.ggpserver.datamodel.matches;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -33,6 +34,7 @@ import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.User;
+import tud.gamecontroller.auxiliary.Pair;
 
 public class NewMatch<TermType extends TermInterface, ReasonerStateInfoType>
 		extends ServerMatch<TermType, ReasonerStateInfoType> {
@@ -85,7 +87,7 @@ public class NewMatch<TermType extends TermInterface, ReasonerStateInfoType>
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<String> getXmlStates() {
+	public List<Pair<Timestamp,String>> getStringStates() {
 		return Collections.EMPTY_LIST;
 	}
 }

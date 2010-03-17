@@ -1,5 +1,5 @@
 <%--
-    Copyright (C) 2009 Martin Günther (mintar@gmx.de)
+    Copyright (C) 2009 Martin Gï¿½nther (mintar@gmx.de)
 
     This file is part of GGP Server.
 
@@ -18,16 +18,21 @@
 --%>
 
 <%@ page language="java" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%> 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+create_game<%= request.getUserPrincipal().getName() %> 
 
 <jsp:useBean id="createGame" class="tud.ggpserver.formhandlers.CreateGame" scope="request">
 	<c:catch>
 		<jsp:setProperty name="createGame" property="gameName"/>
 		<jsp:setProperty name="createGame" property="gameDescription"/>
 		<jsp:setProperty name="createGame" property="stylesheet"/>
+		<jsp:setProperty name="createGame" property="creatorName" value="<%= request.getUserPrincipal().getName() %>" />
 		<%-- setting enabled to false is necessary because the enabled property is only send with the request if the checkbox is checked --%>
 		<jsp:setProperty name="createGame" property="enabled" value="false"/>
 		<jsp:setProperty name="createGame" property="enabled"/>
+		<jsp:setProperty name="createGame" property="gdlVersion"/>
+		<jsp:setProperty name="createGame" property="seesXMLRules"/>
 	</c:catch>
 </jsp:useBean>
 

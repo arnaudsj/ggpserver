@@ -73,6 +73,10 @@
 			<td><c:out value="${viewGame.game.stylesheet}"></c:out></td>
 		</tr>
 		<tr>
+			<th>GDL</th>
+			<td><c:out value="${viewGame.game.gdlVersion}"/></td>
+		</tr>
+		<tr>
 			<th>enabled</th>
 			<td>
 				<c:choose>
@@ -114,5 +118,8 @@
 	<a href='<c:out value="${downloadURL}" />'><span>Download</span></a>
 </div>
 <pre><code><c:out value="${viewGame.game.gameDescription}" /></code></pre>
+
+<h2>sees_XML(...) rules</h2>
+<pre><code><c:out value="${viewGame.game.seesXMLRules}" /></code></pre>
 
 <jsp:directive.include file="/inc/footer.jsp" />

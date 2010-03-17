@@ -1,6 +1,7 @@
 /*
-    Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
-                  2009 Stephan Schiffel <stephan.schiffel@gmx.de> 
+    Copyright (C) 2009 Martin Günther <mintar@gmx.de>
+                  2009-2010 Stephan Schiffel <stephan.schiffel@gmx.de>
+                  2010 Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GGP Server.
 
@@ -30,6 +31,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.players.LegalPlayerInfo;
 import tud.gamecontroller.players.PlayerInfo;
@@ -44,6 +46,7 @@ import tud.ggpserver.datamodel.matches.RunningMatch;
 import tud.ggpserver.datamodel.matches.ScheduledMatch;
 import tud.ggpserver.datamodel.matches.ServerMatch;
 import tud.ggpserver.scheduler.MatchRunner;
+import tud.ggpserver.util.Utilities;
 
 public class EditTournament extends ShowMatches {
 	public static final String ADD_MATCH = "add_match";
@@ -59,7 +62,7 @@ public class EditTournament extends ShowMatches {
 	private ServerMatch<?, ?> match = null;
 	private boolean correctlyPerformed = false;
 	private User user = null;
-	private List<PlayerInfoForEditTournament> playerInfos = null;
+	private HashMap<GDLVersion, List<PlayerInfoForEditTournament>> playerInfos = null;
 	
 	private String errorString = "No error";
 
@@ -169,6 +172,7 @@ public class EditTournament extends ShowMatches {
 							errorString = "start match is invalid: "+remotePlayerInfo.getName()+" is not available and not owned by "+user.getUserName();
 							break;
 						}
+						// TODO: compatible gdl
 					}
 				}
 			}
@@ -221,7 +225,7 @@ public class EditTournament extends ShowMatches {
 		
 		int roleIndex = 0;
 		for (RoleInterface<?> role : game.getOrderedRoles()) {
-			rolesToPlayerInfos.put(role, new RandomPlayerInfo(roleIndex));
+			rolesToPlayerInfos.put(role, new RandomPlayerInfo(roleIndex, game.getGdlVersion()));
 			roleIndex++;
 		}
 		
@@ -264,42 +268,54 @@ public class EditTournament extends ShowMatches {
 		return correctlyPerformed;
 	}
 	
-	public List<PlayerInfo> getEnabledPlayerInfos() throws SQLException {
+	/* [old and unused]
+	 * public List<PlayerInfo> getEnabledPlayerInfos() throws SQLException {
 		List<PlayerInfo> result = new LinkedList<PlayerInfo>();
-		result.add(new RandomPlayerInfo(-1));
-		result.add(new LegalPlayerInfo(-1));
+		result.add(new RandomPlayerInfo(-1,this.match.getGame().getGdlVersion()));
+		result.add(new LegalPlayerInfo(-1,this.match.getGame().getGdlVersion()));
 		result.addAll(db.getPlayerInfos(RemotePlayerInfo.STATUS_ACTIVE));
 
 		return result;
-	}
+	}*/
 
-	public List<PlayerInfoForEditTournament> getPlayerInfos() throws SQLException {
+	public Map<GDLVersion, List<PlayerInfoForEditTournament>> getPlayerInfos() throws SQLException {
+		
 		if(playerInfos == null) {
-			playerInfos = new LinkedList<PlayerInfoForEditTournament>();
-			User admin=db.getAdminUser();
-			// add local players
-			playerInfos.add(new PlayerInfoForEditTournament(new RandomPlayerInfo(-1).getName(), true, admin));
-			playerInfos.add(new PlayerInfoForEditTournament(new LegalPlayerInfo(-1).getName(), true, admin));
-			List<? extends RemotePlayerInfo> allRemotePlayers = db.getPlayerInfos();
-			// add all available players
-			ListIterator<? extends RemotePlayerInfo> i = allRemotePlayers.listIterator();
-			while(i.hasNext()){
-				RemotePlayerInfo p = i.next();
-				if(p.getStatus().equals(RemotePlayerInfo.STATUS_ACTIVE) &&
-					( p.isAvailableForManualMatches() || p.getOwner().equals(user))
-					) {
-						playerInfos.add(new PlayerInfoForEditTournament(p.getName(), true, p.getOwner()));
-						i.remove();
+			playerInfos = new HashMap<GDLVersion, List<PlayerInfoForEditTournament>>();
+			
+			for (GDLVersion gdlVersion: GDLVersion.values()) {
+				
+				playerInfos.put(gdlVersion, new LinkedList<PlayerInfoForEditTournament>());
+				
+				User admin=db.getAdminUser();
+				// add local players
+				playerInfos.get(gdlVersion).add(new PlayerInfoForEditTournament(new RandomPlayerInfo(-1,gdlVersion).getName(), true, admin));
+				playerInfos.get(gdlVersion).add(new PlayerInfoForEditTournament(new LegalPlayerInfo(-1,gdlVersion).getName(), true, admin));
+				List<? extends RemotePlayerInfo> allRemotePlayers = db.getPlayerInfos();
+				// add all available players (that comply with the given GDL Version)
+				ListIterator<? extends RemotePlayerInfo> i = allRemotePlayers.listIterator();
+				while(i.hasNext()){
+					RemotePlayerInfo p = i.next();
+					if(p.getStatus().equals(RemotePlayerInfo.STATUS_ACTIVE) &&
+						(p.isAvailableForManualMatches() || p.getOwner().equals(user)) &&
+						Utilities.areCompatible(p, gdlVersion)) { // compatibility check: only allow players to play games they understand!
+							playerInfos.get(gdlVersion).add(new PlayerInfoForEditTournament(p.getName(), true, p.getOwner()));
+							i.remove();
+					}
 				}
+				// add all remaining players (but mark them as unavailable)
+				i = allRemotePlayers.listIterator();
+				while(i.hasNext()){
+					RemotePlayerInfo p = i.next();
+					playerInfos.get(gdlVersion).add(new PlayerInfoForEditTournament(p.getName(), false, p.getOwner()));
+				}
+				
 			}
-			// add all remaining players (but mark them as unavailable)
-			i = allRemotePlayers.listIterator();
-			while(i.hasNext()){
-				RemotePlayerInfo p = i.next();
-				playerInfos.add(new PlayerInfoForEditTournament(p.getName(), false, p.getOwner()));
-			}
+				
 		}
+		
 		return playerInfos;
+		
 	}
 	
 	public String shortMatchID(ServerMatch<?, ?> match) {

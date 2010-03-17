@@ -24,7 +24,10 @@ import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import cs227b.teamIago.util.GameState;
 
+import java.util.HashMap;
+
 public class RoundRobinScheduler extends AbstractRoundRobinScheduler<Term, GameState> {
+	
 	private static RoundRobinScheduler instance = null;
 	
 	@SuppressWarnings("unchecked")
@@ -32,11 +35,14 @@ public class RoundRobinScheduler extends AbstractRoundRobinScheduler<Term, GameS
 		super(dbConnector);
 	}
 
-	public static synchronized AbstractRoundRobinScheduler<?,?> getInstance() {
+	public static synchronized AbstractRoundRobinScheduler<?,?> getInstance(  ) {
+		
 		if (instance == null) {
 			instance = new RoundRobinScheduler(DBConnectorFactory.getDBConnector());
 		}
+		
 		return instance;
+		
 	}
 
 	@Override

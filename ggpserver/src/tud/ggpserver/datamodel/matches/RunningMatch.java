@@ -20,6 +20,7 @@
 package tud.ggpserver.datamodel.matches;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -28,9 +29,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import tud.gamecontroller.auxiliary.Pair;
 import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.GameControllerListener;
-import tud.gamecontroller.XMLGameStateWriter;
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MoveFactoryInterface;
@@ -52,7 +53,7 @@ import tud.ggpserver.datamodel.User;
 import tud.ggpserver.datamodel.dblists.DynamicDBBackedList;
 import tud.ggpserver.datamodel.dblists.ErrorMessageAccessor;
 import tud.ggpserver.datamodel.dblists.JointMovesAccessor;
-import tud.ggpserver.datamodel.dblists.XMLStateAccessor;
+import tud.ggpserver.datamodel.dblists.StringStateAccessor;
 
 
 public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
@@ -172,11 +173,11 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 	}
 
 	@Override
-	public List<String> getXmlStates() {
-		if (xmlStates == null) {
-			xmlStates = new DynamicDBBackedList<String>(new XMLStateAccessor(getMatchID(), getDB(), getGame().getStylesheet()), false);
+	public List<Pair<Timestamp,String>> getStringStates() {
+		if (stringStates == null) {
+			stringStates = new DynamicDBBackedList<Pair<Timestamp,String>>(new StringStateAccessor(getMatchID(), getDB(), getGame().getStylesheet()), false);
 		}
-		return xmlStates;
+		return stringStates;
 	}
 
 	@Override
@@ -337,20 +338,16 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 	}
 
 	private void updateXmlState(StateInterface<? extends TermInterface, ?> currentState, Map<? extends RoleInterface<?>, Integer> goalValues) {
-//		System.out.println("goalValues = "+goalValues);
-//		System.out.println("this.players = "+players);
-//		System.out.println("super.game = "+getGame());
-//		System.out.println("currentState =  = "+currentState);
-		RoleInterface<? extends TermInterface> role = getGame().getRole(0);
-		String xmlState = XMLGameStateWriter.createXMLOutputStream(this, currentState, jointMoves, goalValues, getGame().getStylesheet(),
-				role, gdlVersion
-			).toString();
-		// currentState.toString();?
+		/* MODIFIED (COMMENTED) [this was valid when there was only Regular GDL] 
+		 * -- XMLGameStateWriter.createXMLOutputStream(this, currentState, jointMoves, goalValues, getGame().getStylesheet()).toString();
+		 */
+		String xmlState = currentState.toString();
+		System.out.println("xmlState = "+xmlState);
 		
 //		xmlStates.add(xmlState);
 //		int stepNumber = getNumberOfStates();
 
-		assert (stepNumber == getXmlStates().size() + 1);
+		assert (stepNumber == getStringStates().size() + 1);
 		
 		try {
 			getDB().addState(getMatchID(), stepNumber, xmlState);

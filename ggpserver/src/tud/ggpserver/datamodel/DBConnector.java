@@ -29,6 +29,7 @@ import java.util.Map;
 
 import org.apache.commons.collections.map.ReferenceMap;
 
+import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.ReasonerFactory;
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.MoveFactoryInterface;
@@ -149,10 +150,12 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 
 	/////////////////// GAME ///////////////////
 	@Override
-	public Game<Term, GameState> createGame(String gameDescription, String name, String stylesheet, boolean enabled, User creator)
+	public Game<Term, GameState> createGame(String gameDescription,
+			String name, String stylesheet, String seesXMLRules,
+			boolean enabled, User creator, GDLVersion gdlVersion)
 			throws DuplicateInstanceException, SQLException {
 		synchronized (games) {
-			Game<Term, GameState> result = super.createGame(gameDescription, name, stylesheet, enabled, creator);
+			Game<Term, GameState> result = super.createGame(gameDescription, name, stylesheet, seesXMLRules, enabled, creator, gdlVersion);
 			games.put(name, result);
 			return result;
 		}
@@ -175,12 +178,12 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 
 	@Override
 	public void updateGameInfo(String gameName, String gameDescription,
-			String stylesheet, boolean enabled) throws SQLException {
+			String stylesheet, String seesXMLRules, boolean enabled, GDLVersion gdlVersion) throws SQLException {
 		synchronized (games) {
 			// this has to be synchronized to ensure that no stale result gets re-introduced into the 
 			// cache after clearing it
 			clearCacheForGame(gameName);
-			super.updateGameInfo(gameName, gameDescription, stylesheet, enabled);
+			super.updateGameInfo(gameName, gameDescription, stylesheet, seesXMLRules, enabled, gdlVersion);
 		}
 	}
 
@@ -376,10 +379,10 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	/////////////////// PLAYERINFO ///////////////////
 	@Override
 	public RemotePlayerInfo createPlayerInfo(String name, String host,
-			int port, User owner, String status)
+			int port, User owner, String status, GDLVersion gdlVersion)
 			throws DuplicateInstanceException, SQLException {
 		synchronized (playerInfos) {
-			RemotePlayerInfo result = super.createPlayerInfo(name, host, port, owner, status);
+			RemotePlayerInfo result = super.createPlayerInfo(name, host, port, owner, status, gdlVersion);
 			playerInfos.put(name, result);
 			return result;
 		}
@@ -411,10 +414,10 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	 */
 	@Override
 	public void updatePlayerInfo(String playerName, String host, int port,
-			User user, String status, boolean availableForRoundRobinMatches, boolean availableForManualMatches) throws SQLException {
+			User user, String status, boolean availableForRoundRobinMatches, boolean availableForManualMatches, int gdlVersion) throws SQLException {
 		synchronized (playerInfos) {
 			clearCacheForPlayer(playerName);		
-			super.updatePlayerInfo(playerName, host, port, user, status, availableForRoundRobinMatches, availableForManualMatches);
+			super.updatePlayerInfo(playerName, host, port, user, status, availableForRoundRobinMatches, availableForManualMatches, gdlVersion);
 		}
 	}
 

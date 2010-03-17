@@ -20,6 +20,8 @@
 
 package tud.ggpserver.datamodel;
 
+import tud.gamecontroller.GDLVersion;
+
 public class RemotePlayerInfo extends tud.gamecontroller.players.RemotePlayerInfo {
 	public final static String STATUS_ACTIVE = "active";
 	public final static String STATUS_INACTIVE = "inactive";
@@ -40,19 +42,20 @@ public class RemotePlayerInfo extends tud.gamecontroller.players.RemotePlayerInf
 	/**
 	 * Use DBConnectorFactory.getDBConnector().getRemotePlayerInfo() instead
 	 */
-	protected RemotePlayerInfo(int roleindex, String name, String host, int port, User owner, String status, boolean availableForRoundRobinMatches, boolean availableForManualMatches) {
-		super(roleindex, name, host, port);
+	protected RemotePlayerInfo(int roleindex, String name, String host, int port, User owner, String status, boolean availableForRoundRobinMatches, boolean availableForManualMatches, GDLVersion gdlVersion) {
+		super(roleindex, name, host, port, gdlVersion);
 		this.owner = owner;
 		this.status = status;
 		this.availableForRoundRobinMatches = availableForRoundRobinMatches;
 		this.availableForManualMatches = availableForManualMatches;
+		this.setGdlVersion(gdlVersion);
 	}
 
 	/**
 	 * Use AbstractDBConnector.getRemotePlayerInfo() instead
 	 */
-	protected RemotePlayerInfo(String name, String host, int port, User owner, String status, boolean availableForRoundRobinMatches, boolean availableForManualMatches) {
-		this(-1, name, host, port, owner, status, availableForRoundRobinMatches, availableForManualMatches);
+	protected RemotePlayerInfo(String name, String host, int port, User owner, String status, boolean availableForRoundRobinMatches, boolean availableForManualMatches, GDLVersion gdlVersion) {
+		this(-1, name, host, port, owner, status, availableForRoundRobinMatches, availableForManualMatches, gdlVersion);
 	}
 
 	public User getOwner() {

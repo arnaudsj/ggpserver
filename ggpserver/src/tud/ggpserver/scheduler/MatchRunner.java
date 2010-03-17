@@ -42,6 +42,7 @@ import tud.ggpserver.datamodel.matches.NewMatch;
 import tud.ggpserver.datamodel.matches.RunningMatch;
 import tud.ggpserver.datamodel.matches.ScheduledMatch;
 import tud.ggpserver.datamodel.matches.ServerMatch;
+import tud.ggpserver.util.Utilities;
 import cs227b.teamIago.util.GameState;
 
 /**
@@ -209,9 +210,15 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 					runnableMatch = null;
 					break;
 				}
+				if (! Utilities.areCompatible(player, match.getGame().getGdlVersion())) {
+					runnableMatch = null;
+					break;
+				}
 				if(player instanceof RemotePlayerInfo){
 					RemotePlayerInfo remotePlayer = (RemotePlayerInfo)player;
-					if(!remotePlayer.isAvailableForManualMatches() && match.getTournamentID().equals(Tournament.MANUAL_TOURNAMENT_ID) && !remotePlayer.getOwner().equals(match.getOwner())){
+					if(		! remotePlayer.isAvailableForManualMatches() &&
+							match.getTournamentID().equals(Tournament.MANUAL_TOURNAMENT_ID) &&
+							! remotePlayer.getOwner().equals(match.getOwner()) ) {
 						runnableMatch = null;
 						break;
 					}
@@ -417,6 +424,7 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 	 * @throws InterruptedException (if interrupt() was called on the waiting Thread)
 	 */
 	public Collection<tud.ggpserver.datamodel.RemotePlayerInfo> waitForPlayersAvailableForRoundRobin() throws InterruptedException {
+		// TODO: compatible gdl
 		return availablePlayersTracker.waitForPlayersAvailableForRoundRobin();
 	}
 

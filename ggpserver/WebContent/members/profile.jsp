@@ -58,6 +58,7 @@
 			<th>status</th>
 			<th>available for<br>round robin play</th>
 			<th>available for<br>manual play</th>
+			<th>GDL</th>
 			<th colspan="2">actions</th>
 		</tr>
 	</thead>
@@ -80,6 +81,7 @@
 				<td><div class="playerstatus-${player.status}"><span>${player.status}</span></div></td>
 				<td>${player.availableForRoundRobinMatches}</td>
 				<td>${player.availableForManualMatches}</td>
+				<td>${player.gdlVersion}</td>
 				<td>
 					<c:url value="../public/view_player.jsp" var="viewURL">
 						<c:param name="name" value="${player.name}" />
@@ -104,7 +106,7 @@
 			</c:otherwise>
 		</c:choose>
 		<tr class="${rowClass}">
-			<td colspan="8">
+			<td colspan="9">
 				<div class="add-new-player"><a href='<%= response.encodeURL("create_player.jsp") %>'><span>Add new player</span></a></div>
 			</td>
 		</tr>

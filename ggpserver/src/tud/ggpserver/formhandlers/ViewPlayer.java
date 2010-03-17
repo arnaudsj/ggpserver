@@ -23,6 +23,7 @@ package tud.ggpserver.formhandlers;
 import java.sql.SQLException;
 import java.util.Collection;
 
+import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.players.LocalPlayerInfo;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.ggpserver.datamodel.DBConnectorFactory;
@@ -84,4 +85,9 @@ public class ViewPlayer {
 	public Collection<? extends Tournament<?,?>> getTournaments() throws SQLException {
 		return DBConnectorFactory.getDBConnector().getTournamentsForPlayer(playerInfo.getName());
 	}
+	
+	public GDLVersion getGdlVersion () {
+		return playerInfo.getGdlVersion();
+	}
+	
 }

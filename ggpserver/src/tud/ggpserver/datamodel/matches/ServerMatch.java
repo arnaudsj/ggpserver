@@ -27,6 +27,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import java.sql.Timestamp;
+
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.impl.Match;
@@ -40,9 +43,10 @@ import tud.ggpserver.collectionviews.Mapping;
 import tud.ggpserver.collectionviews.Mappings;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.User;
+import tud.gamecontroller.auxiliary.Pair;
 
 public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateInfoType>
-		extends Match<TermType, ReasonerStateInfoType> {
+		extends Match<TermType, ReasonerStateInfoType>{
 
 	private final class GoalValueToWeightedMapping implements
 			Mapping<Integer, Double> {
@@ -65,8 +69,9 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 	public static final String STATUS_SCHEDULED = "scheduled";
 	
 	private final Date startTime;
-	private final Map<? extends RoleInterface<?>, ? extends PlayerInfo> rolesToPlayerInfos;
-	private List<PlayerInfo> orderedPlayerInfos = null;
+	
+	protected final Map<? extends RoleInterface<?>, ? extends PlayerInfo> rolesToPlayerInfos;
+	protected List<PlayerInfo> orderedPlayerInfos = null;
 	
 	private List<Integer> orderedGoalValues;
 	
@@ -81,7 +86,7 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 	/**
 	 * State 0 = initial state, State 1 = state after first joint move, ..., State n = final state
 	 */
-	protected List<String> xmlStates;
+	protected List<Pair<Timestamp,String>> stringStates;
 	
 	protected List<List<String>> jointMovesStrings;
 	
@@ -122,6 +127,16 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 		this.owner = owner;
 		this.db = db;
 	}
+
+	/////////////////////// start time ///////////////////////
+
+	public Date getStartTime() {
+		return new Date(startTime.getTime());
+	}
+
+	/////////////////////// status ///////////////////////
+
+	public abstract String getStatus();
 	
 	/////////////////////// player infos ///////////////////////
 	
@@ -148,16 +163,14 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 	public Map<? extends RoleInterface<?>, ? extends PlayerInfo> getRolesToPlayerInfos() {
 		return new HashMap<RoleInterface<?>, PlayerInfo>(rolesToPlayerInfos);
 	}
-
-	/////////////////////// start time ///////////////////////
-
-	public Date getStartTime() {
-		return new Date(startTime.getTime());
+	
+	public List<String> getOrderedPlayerNames() {
+		ArrayList<String> orderedPlayerNames = new ArrayList<String>();
+		List<? extends PlayerInfo> orderedPlayerInfos = this.getOrderedPlayerInfos();
+		for (PlayerInfo info: orderedPlayerInfos)
+			orderedPlayerNames.add(info.getName());
+		return orderedPlayerNames;
 	}
-
-	/////////////////////// status ///////////////////////
-
-	public abstract String getStatus();
 
 	/////////////////////// goal values ///////////////////////
 	
@@ -189,6 +202,10 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 		return new ArrayList<Integer>(orderedGoalValues);
 	}
 	
+	public List<? extends RoleInterface<TermType>> getOrderedPlayerRoles () {
+		return this.getGame().getOrderedRoles();
+	}
+	
 	public Map<? extends RoleInterface<TermType>, Double> getWeightedGoalValues() {
 		
 		return new MapView<RoleInterface<TermType>, Double, RoleInterface<TermType>, Integer>(
@@ -210,9 +227,9 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 
 	public abstract List<List<String>> getJointMovesStrings();
 
-	/////////////////////// XML states ///////////////////////
+	/////////////////////// String states (Pair<String timestamp, String state>)///////////////////////
 	
-	public abstract List<String> getXmlStates();
+	public abstract List<Pair<Timestamp,String>> getStringStates();
 
 	/////////////////////// error messages ///////////////////////
 	
@@ -314,7 +331,7 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 		buffer.append(" rolesToPlayerInfos: ");
 		buffer.append(rolesToPlayerInfos);
 		buffer.append(" number of states: ");
-		buffer.append(getXmlStates().size());
+		buffer.append(getStringStates().size());
 		buffer.append(" jointMovesStrings: ");
 		buffer.append(getJointMovesStrings());
 		buffer.append(" errorMessages: ");

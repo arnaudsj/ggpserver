@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+    Copyright (C) 2009-2010 Martin Günther <mintar@gmx.de>, Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GGP Server.
 
@@ -20,13 +20,16 @@
 package tud.ggpserver.formhandlers;
 
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.matches.ServerMatch;
+import tud.ggpserver.util.Utilities;
 
 
 public class ViewMatch {
@@ -68,10 +71,14 @@ public class ViewMatch {
 	 * @return a list of moves as Strings for the current stepNumber and match
 	 */
 	public List<String> getMoves() {
-		if ((stepNumber < 1) || stepNumber > (match.getXmlStates().size() - 1)) {  // -1, because there is one less jointmove than states
+		if ((stepNumber < 1) || stepNumber > (match.getStringStates().size() - 1)) {  // -1, because there is one less jointmove than states
 			return new LinkedList<String>();
 		}
 		return match.getJointMovesStrings().get(stepNumber - 1);
+	}
+	
+	public boolean isNoMoves () {
+		return this.getMoves().isEmpty();
 	}
 	
 	/**
@@ -95,7 +102,7 @@ public class ViewMatch {
 	 */
 	public List<GameControllerErrorMessage> getErrorMessages() {
 		if(errorMessagesForStep==null){
-			int numberOfStates = match.getXmlStates().size();
+			int numberOfStates = match.getStringStates().size();
 			if ((stepNumber < 1) || (stepNumber > numberOfStates)) {
 				return new LinkedList<GameControllerErrorMessage>();
 			}
@@ -108,4 +115,13 @@ public class ViewMatch {
 		}
 		return errorMessagesForStep;
 	}
+	
+	public Date getTimestamp () {
+		return match.getStringStates().get(stepNumber-1).getLeft();
+	}
+	
+	public int getGdlVersion () {
+		return Utilities.gdlVersion(this.match.getGame().getGdlVersion());
+	}
+	
 }

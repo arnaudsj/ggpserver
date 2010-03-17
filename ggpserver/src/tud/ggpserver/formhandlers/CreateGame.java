@@ -23,6 +23,7 @@ import static tud.ggpserver.datamodel.DBConnectorFactory.getDBConnector;
 
 import java.sql.SQLException;
 
+import tud.ggpserver.util.Utilities;
 import tud.ggpserver.datamodel.DuplicateInstanceException;
 
 public class CreateGame extends AbstractGameValidator {
@@ -31,7 +32,9 @@ public class CreateGame extends AbstractGameValidator {
 	public void create() throws SQLException {
 		assert(isValid());
 		try {
-			getDBConnector().createGame(getGameDescription(), getGameName(), getStylesheet(), getEnabled(), getCreator());
+			getDBConnector().createGame(
+					getGameDescription(), getGameName(), getStylesheet(),
+					getSeesXMLRules(), getEnabled(), getCreator(), Utilities.gdlVersion(getGdlVersion()));
 			correctlyCreated = true;
 		} catch (DuplicateInstanceException e) {
 			getErrorsGameName().add("game name already exists, please pick a different one");

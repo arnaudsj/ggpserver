@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+    Copyright (C) 2009 Martin Günther <mintar@gmx.de>, Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GGP Server.
 
@@ -35,6 +35,7 @@ public class GamePicker<TermType extends TermInterface, ReasonerStateInfoType> {
 	private static final Logger logger = Logger.getLogger(GamePicker.class.getName());
 
 	private final AbstractDBConnector<TermType, ReasonerStateInfoType> dbConnector;
+	
 
 	public GamePicker(final AbstractDBConnector<TermType, ReasonerStateInfoType> dbConnector) {
 		this.dbConnector = dbConnector;
@@ -48,9 +49,10 @@ public class GamePicker<TermType extends TermInterface, ReasonerStateInfoType> {
 	 * Returns null if there are no enabled games in database.
 	 */
 	public Game<TermType, ReasonerStateInfoType> pickNextGame() throws SQLException {
+		
 		Game<TermType, ReasonerStateInfoType> oldNextPlayedGame = getNextPlayedGame();
 		
-		List<Game<TermType, ReasonerStateInfoType>> allGames = getDBConnector().getAllEnabledGames();
+		List<Game<TermType, ReasonerStateInfoType>> allGames = getDBConnector().getAllEnabledGamesCompatibleWith(SchedulerVersion.Original); // TODO: compatible gdl
 
 		if (oldNextPlayedGame == null) {
 			assert (allGames.isEmpty());   // otherwise, getNextPlayedGame() wouldn't have returned null.
@@ -66,12 +68,13 @@ public class GamePicker<TermType extends TermInterface, ReasonerStateInfoType> {
 	////////////////
 
 	public Game<TermType, ReasonerStateInfoType> getNextPlayedGame() throws SQLException {
+		
 		Game<TermType, ReasonerStateInfoType> nextPlayedGame = getDBConnector().getNextPlayedGame();
-
+		
 		if (nextPlayedGame == null) {
 			// key next_game didn't exist in Config, or game doesn't exist (any more?) in DB.
 			// fallback: pick first enabled game.
-			List<Game<TermType, ReasonerStateInfoType>> allGames = getDBConnector().getAllEnabledGames();
+			List<Game<TermType, ReasonerStateInfoType>> allGames = getDBConnector().getAllEnabledGamesCompatibleWith(SchedulerVersion.Original);
 			if (allGames.isEmpty()) {
 				logger.warning("No enabled games in database!"); //$NON-NLS-1$
 				return null;

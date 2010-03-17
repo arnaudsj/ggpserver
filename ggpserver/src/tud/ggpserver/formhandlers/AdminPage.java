@@ -27,14 +27,23 @@ import java.util.logging.Logger;
 
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.ConfigOption;
+import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.Game;
 import tud.ggpserver.datamodel.Tournament;
 import tud.ggpserver.scheduler.RoundRobinScheduler;
+import tud.ggpserver.scheduler.SchedulerVersion;
 
 public class AdminPage {
+	
 	private boolean cacheCleared = false;
 
 	private static final Logger logger = Logger.getLogger(AdminPage.class.getName());
+	private final SchedulerVersion schedulerVersion = SchedulerVersion.Original;
+	
+	public AdminPage() {
+		super();
+		this.cacheCleared = false;
+	}
 
 	public boolean isRunning() {
 		return RoundRobinScheduler.getInstance().isRunning();
@@ -148,7 +157,7 @@ public class AdminPage {
 	}
 
 	public List<? extends Game<?, ?>> getAllGames() throws SQLException {
-		return ((AbstractDBConnector<?,?>) getDBConnector()).getAllEnabledGames();
+		return ((AbstractDBConnector<?,?>) getDBConnector()).getAllEnabledGamesCompatibleWith(schedulerVersion);
 	}
 	
 	public List<? extends Tournament<?, ?>> getTournaments() throws SQLException {

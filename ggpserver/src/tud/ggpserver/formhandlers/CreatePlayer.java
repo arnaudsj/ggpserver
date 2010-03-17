@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
+import tud.gamecontroller.GDLVersion;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.DuplicateInstanceException;
@@ -68,7 +69,9 @@ public class CreatePlayer {
 	
 	public void createPlayer() throws SQLException {
 		try {
-			DBConnectorFactory.getDBConnector().createPlayerInfo(playerName, "", 0, DBConnectorFactory.getDBConnector().getUser(userName), RemotePlayerInfo.STATUS_NEW);
+			DBConnectorFactory.getDBConnector().createPlayerInfo(
+					playerName, "", 0, DBConnectorFactory.getDBConnector().getUser(userName),
+					RemotePlayerInfo.STATUS_NEW, GDLVersion.v1); // TODO: which GDLVersion should we use here?
 			correctlyCreated = true;
 		} catch (DuplicateInstanceException e) {
 			errors.add("player name already exists, please pick a different one");

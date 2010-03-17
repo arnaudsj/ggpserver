@@ -35,6 +35,7 @@
 			<th>number of players</th>
 			<th>stylesheet</th>
 			<th>enabled</th>
+			<th>GDL</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -66,6 +67,7 @@
 					</c:otherwise>
 				</c:choose>
 			</td>
+			<td><c:out value="${game.gdlVersion}"></c:out></td>
 		</tr>
       </c:forEach>
 	</tbody>

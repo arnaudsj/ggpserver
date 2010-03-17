@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import tud.ggpserver.util.Utilities;
 import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.term.TermInterface;
@@ -122,7 +123,7 @@ public class PlayerErrorTracker<TermType extends TermInterface, ReasonerStateInf
 			return false;
 	
 		List<List<GameControllerErrorMessage>> errorMessages = match.getErrorMessagesForPlayer(playerInfo);
-		assert (errorMessages.size() == match.getXmlStates().size());
+		assert (errorMessages.size() == match.getStringStates().size());
 		Iterator<List<GameControllerErrorMessage>> i = errorMessages.iterator();
 		while (i.hasNext()) {
 			List<GameControllerErrorMessage> l = i.next();
@@ -144,7 +145,8 @@ public class PlayerErrorTracker<TermType extends TermInterface, ReasonerStateInf
 					playerInfo.getOwner(),
 					RemotePlayerInfo.STATUS_INACTIVE,
 					playerInfo.isAvailableForRoundRobinMatches(),
-					playerInfo.isAvailableForManualMatches());
+					playerInfo.isAvailableForManualMatches(),
+					Utilities.gdlVersion(playerInfo.getGdlVersion()));
 		} catch (SQLException e) {
 			logger.severe("exception: " + e);
 		}

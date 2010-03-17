@@ -29,6 +29,7 @@
 		<jsp:setProperty name="editPlayer" property="status"/>
 		<jsp:setProperty name="editPlayer" property="availableForRoundRobinMatches"/>
 		<jsp:setProperty name="editPlayer" property="availableForManualMatches"/>
+		<jsp:setProperty name="editPlayer" property="gdlVersion"/>
 	</c:catch>
 </jsp:useBean>
 
@@ -139,6 +140,25 @@
 						<input type="checkbox" name="availableForManualMatches" value="true">
 					</c:otherwise>
 				</c:choose>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" align="right">
+				GDL version
+			</td>
+			<td>
+				<select name="gdlVersion" size="1" >
+					<c:choose>
+						<c:when test="${editPlayer.gdlVersion == 1}">
+							<option value="1" selected>Regular GDL (v1)</option>
+							<option value="2">GDL-II (v2)</option>
+						</c:when>
+						<c:otherwise>
+							<option value="1">Regular GDL (v1)</option>
+							<option value="2" selected>GDL-II (v2)</option>
+						</c:otherwise>
+					</c:choose>
+				</select>
 			</td>
 		</tr>
 		<tr>

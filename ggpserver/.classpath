@@ -2,21 +2,35 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.eclipse.jst.server.tomcat.runtimeTarget/Apache Tomcat v5.5"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/gamecontroller"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/GgpRatingSystem"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jcommon-1.0.16.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="http://www.jfree.org/jcommon/api/"/>
-		</attributes>
-	</classpathentry>
+	<classpathentry kind="lib" path="/usr/share/tomcat5.5/common/lib/commons-collections3.jar"/>
+	<classpathentry kind="lib" path="/usr/share/tomcat5.5/common/lib/commons-dbcp.jar"/>
+	<classpathentry kind="lib" path="/usr/share/tomcat5.5/common/lib/commons-el.jar"/>
+	<classpathentry kind="lib" path="/usr/share/tomcat5.5/common/lib/commons-pool.jar"/>
+	<classpathentry kind="lib" path="/usr/share/tomcat5.5/common/lib/jasper-compiler.jar"/>
+	<classpathentry kind="lib" path="/usr/share/tomcat5.5/common/lib/jasper-compiler-jdt.jar"/>
+	<classpathentry kind="lib" path="/usr/share/tomcat5.5/common/lib/jasper-runtime.jar"/>
+	<classpathentry kind="lib" path="/usr/share/tomcat5.5/common/lib/jsp-api.jar"/>
+	<classpathentry kind="lib" path="/usr/share/tomcat5.5/common/lib/naming-factory.jar"/>
+	<classpathentry kind="lib" path="/usr/share/tomcat5.5/common/lib/naming-resources.jar"/>
+	<classpathentry kind="lib" path="/usr/share/tomcat5.5/common/lib/servlet-api.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/catalina.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/commons-lang-2.4-javadoc.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/commons-lang-2.4-sources.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/commons-lang-2.4.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jcommon-1.0.16.jar"/>
+	<classpathentry kind="lib" path="/usr/users/sonstige/s3256264/MarchWork/Java/ggpserver-svn/trunk/GgpRatingSystem/build/jar/GgpRatingSystem.jar"/>
+	<classpathentry kind="lib" path="/usr/share/tomcat5.5/common/lib/commons-lang.jar"/>
+	<classpathentry kind="lib" path="/usr/share/tomcat5.5/common/lib/gnumail.jar"/>
+	<classpathentry kind="lib" path="/usr/share/tomcat5.5/common/lib/jstl.jar"/>
+	<classpathentry kind="lib" path="/usr/share/tomcat5.5/common/lib/mysql-connector-java.jar"/>
+	<classpathentry kind="lib" path="/usr/share/tomcat5.5/common/lib/standard.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jfreechart-1.0.13.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="http://www.jfree.org/jfreechart/api/javadoc/"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Tomcat5.5"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/gamecontroller"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

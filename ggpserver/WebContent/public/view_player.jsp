@@ -67,6 +67,10 @@ if (viewPlayer.getPlayer() == null) {
 			<td><c:out value="${viewPlayer.availableForManualMatches}"></c:out></td>
 		</tr>
 		<tr>
+			<th>GDL version</th>
+			<td><c:out value="${viewPlayer.gdlVersion}"></c:out></td>
+		</tr>
+		<tr>
 			<th>matches</th>
 			<td>
 				<c:url value="show_matches.jsp" var="URL">

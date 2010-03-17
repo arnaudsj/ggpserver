@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+    Copyright (C) 2009 Martin Günther <mintar@gmx.de>, Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GGP Server.
 
@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
+import tud.gamecontroller.game.impl.Game;
 import tud.gamecontroller.game.javaprover.Reasoner;
 import tud.gamecontroller.game.javaprover.Term;
 import tud.ggpserver.datamodel.User;
@@ -49,6 +50,9 @@ public abstract class AbstractGameValidator {
 	 * For example, gameDescription would remain "null" if setGameName() is
 	 * called with a non-existing game name.
 	 */
+	
+	protected static final Logger logger = Logger.getLogger(Game.class.getName());
+	
 	private String gameName = "";
 	private String gameDescription = "";
 	private String stylesheet = "../stylesheets/generic/generic.xsl";
@@ -58,6 +62,9 @@ public abstract class AbstractGameValidator {
 	private List<String> errorsGameName = new LinkedList<String>();
 	private List<String> errorsDescription = new LinkedList<String>();
 	private List<String> errorsStylesheet = new LinkedList<String>();
+	
+	private String seesXMLRules = "";
+	private int gdlVersion = 1;
 	
 	public AbstractGameValidator() {
 		Logger.getLogger(Axioms.class.getName()).addHandler(new Handler() {
@@ -78,12 +85,12 @@ public abstract class AbstractGameValidator {
 	
 	public boolean isValid() throws SQLException {
 		errorsGameName.clear();
-
+		
 		//// creator ////
-		if (creator != null) {
+		if (creator == null) {
 			errorsGameName.add("You are not logged in (perhaps the session expired)!");
 		}
-
+		
 		///// game name ////
 		assert (gameName != null);
 		
@@ -162,6 +169,11 @@ public abstract class AbstractGameValidator {
 			errorsStylesheet.add("stylesheet URI syntax exception: " + e.getMessage());
 		}
 		
+		//// gdlVersion ////
+		if (gdlVersion != 1 && gdlVersion != 2) {
+			return false;
+		}
+		
 		//// check result ////
 		boolean result = true;
 		
@@ -209,12 +221,14 @@ public abstract class AbstractGameValidator {
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
-
-	public void setCreator(String creatorName) throws SQLException {
+	               
+	public void setCreatorName(String creatorName) throws SQLException {
+		logger.info("setCreator("+creatorName+")");
 		this.creator = getDBConnector().getUser(creatorName);
 	}
 
 	public User getCreator() {
+		logger.info("setCreator()="+creator);
 		return creator;
 	}
 
@@ -235,4 +249,20 @@ public abstract class AbstractGameValidator {
 	 *         <code>false</code> if the game MUST NOT exist
 	 */
 	protected abstract boolean isGameExpectedToExist();
+
+	public void setSeesXMLRules(String seesXMLRules) {
+		this.seesXMLRules = seesXMLRules;
+	}
+
+	public String getSeesXMLRules() {
+		return seesXMLRules;
+	}
+
+	public void setGdlVersion(int gdlVersion) {
+		this.gdlVersion = gdlVersion;
+	}
+
+	public int getGdlVersion() {
+		return gdlVersion;
+	}
 }

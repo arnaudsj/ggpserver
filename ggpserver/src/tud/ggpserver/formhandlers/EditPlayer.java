@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+    Copyright (C) 2009-2010 Martin Günther <mintar@gmx.de>, Nicolas JEAN <njean42@gmail.com> 
 
     This file is part of GGP Server.
 
@@ -24,7 +24,10 @@ import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
+import tud.ggpserver.util.Utilities;
+import tud.gamecontroller.game.impl.Game;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
@@ -42,8 +45,12 @@ public class EditPlayer {
 	private boolean availableForRoundRobinMatches = false;
 	private boolean availableForManualMatches = false;
 	
+	private int gdlVersion = 1;
+	
 	private List<String> errorsHost = new LinkedList<String>();
 	private List<String> errorsPort = new LinkedList<String>();
+	
+	private static final Logger logger = Logger.getLogger(Game.class.getName());
 
 
 	public boolean isValid() {
@@ -117,7 +124,9 @@ public class EditPlayer {
 		assert (isValidPlayer());
 		assert (isValid());
 		
-		DBConnectorFactory.getDBConnector().updatePlayerInfo(getPlayerName(), getHost(), getPort(), user, getStatus(), availableForRoundRobinMatches, availableForManualMatches);
+		logger.info("gdlVersion="+gdlVersion+"");
+		logger.info("int="+new Integer(gdlVersion));
+		DBConnectorFactory.getDBConnector().updatePlayerInfo(getPlayerName(), getHost(), getPort(), user, getStatus(), availableForRoundRobinMatches, availableForManualMatches, new Integer(gdlVersion));
 		correctlyUpdated = true;
 	}
 	
@@ -137,6 +146,9 @@ public class EditPlayer {
 			return false;
 		}
 		if (!player.getOwner().equals(user)) {
+			return false;
+		}
+		if (gdlVersion != 1 && gdlVersion != 2) {
 			return false;
 		}
 		
@@ -172,6 +184,7 @@ public class EditPlayer {
 			status = player.getStatus();
 			availableForRoundRobinMatches = player.isAvailableForRoundRobinMatches();
 			availableForManualMatches = player.isAvailableForManualMatches();
+			gdlVersion = Utilities.gdlVersion(player.getGdlVersion());
 		}
 		this.player = player;
 	}
@@ -227,4 +240,15 @@ public class EditPlayer {
 	public List<String> getErrorsPort() {
 		return errorsPort;
 	}
+
+	public void setGdlVersion(int gdlVersion) {
+		logger.info("setGdlVersion("+gdlVersion+")");
+		this.gdlVersion = gdlVersion;
+	}
+
+	public int getGdlVersion() {
+		logger.info("getGdlVersion()="+gdlVersion);
+		return gdlVersion;
+	}
+	
 }

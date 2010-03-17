@@ -22,11 +22,13 @@ package tud.ggpserver.util;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import tud.gamecontroller.auxiliary.Pair;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
@@ -59,9 +61,9 @@ public class StateXMLExporter {
 		ZipEntry zipEntry=new ZipEntry(matchDir);
 		zip.putNextEntry(zipEntry);
 		String xmlState=null;
-		List<String> xmlStates=match.getXmlStates();
-		for(int step=0; step<xmlStates.size(); step++) {
-			xmlState=xmlStates.get(step);
+		List<Pair<Timestamp,String>> stringStates = match.getStringStates();
+		for(int step=0; step<stringStates.size(); step++) {
+			xmlState=stringStates.get(step).getRight(); // TODO: generate XMLStates from StringStates instead!
 			if(xmlState != null)
 				exportStepXML(xmlState, "step_"+(step+1), zip, matchDir);
 			

@@ -30,7 +30,7 @@ import java.util.ListIterator;
 import tud.ggpserver.datamodel.DBConnector;
 import tud.ggpserver.datamodel.MatchInfo;
 import tud.ggpserver.util.IdPool;
-import tud.ggpserver.util.Pair;
+import tud.gamecontroller.auxiliary.Pair;
 
 /**
  * 

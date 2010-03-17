@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
+import tud.ggpserver.util.Utilities;
 
 /**
  * Keeps track of active / inactive players and of players currently playing a match.
@@ -65,9 +66,11 @@ public class AvailablePlayersTracker<TermType extends TermInterface, ReasonerSta
 
 	private Collection<AvailablePlayersListener> availablePlayersListeners = new ArrayList<AvailablePlayersListener>();
 	
+	
 	public AvailablePlayersTracker(final AbstractDBConnector<TermType, ReasonerStateInfoType> dbConnector) {
 		activePlayers = new HashMap<String, RemotePlayerInfo>();
 		playingPlayers = Collections.synchronizedSet(new HashSet<String>());
+		
 		dbConnector.addPlayerStatusListener(this);
 		synchronized (this) {
 			try {
@@ -132,7 +135,8 @@ public class AvailablePlayersTracker<TermType extends TermInterface, ReasonerSta
 			notifyAvailablePlayersListeners(player);
 		} else if (player.getStatus().equals(RemotePlayerInfo.STATUS_INACTIVE)) {
 			logger.info("player " + player.getName() + " is now inactive");
-			activePlayers.remove(player.getName());
+			if (activePlayers.containsKey(player.getName())) // it could be that this player was not GDL-compatible, and therefore not in 'activePlayers'
+				activePlayers.remove(player.getName());
 			this.notifyAll();
 		}
 	}
@@ -158,9 +162,10 @@ public class AvailablePlayersTracker<TermType extends TermInterface, ReasonerSta
 	public synchronized Collection<RemotePlayerInfo> waitForPlayersAvailableForRoundRobin() throws InterruptedException {
 		Set<RemotePlayerInfo> availablePlayerSet = new HashSet<RemotePlayerInfo>();
 		while(availablePlayerSet.isEmpty()) {
-			Collection<RemotePlayerInfo> activePlayers=waitForActivePlayers();
+			Collection<RemotePlayerInfo> activePlayers = waitForActivePlayers();
 			for(RemotePlayerInfo player:activePlayers) {
-				if(player.isAvailableForRoundRobinMatches() && !isPlaying(player.getName())) {
+				if(		player.isAvailableForRoundRobinMatches() &&
+						!isPlaying(player.getName()) ) { // TODO: only take compatible player
 					availablePlayerSet.add(player);
 				}
 			}

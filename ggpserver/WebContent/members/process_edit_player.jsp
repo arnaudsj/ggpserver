@@ -33,6 +33,7 @@
 		<%-- setting availableForManualMatches to false is necessary because the property is only send with the request if the checkbox is checked --%>
 		<jsp:setProperty name="editPlayer" property="availableForManualMatches" value="false"/>
 		<jsp:setProperty name="editPlayer" property="availableForManualMatches"/>
+		<jsp:setProperty name="editPlayer" property="gdlVersion"/>
 	</c:catch>
 </jsp:useBean>
 

@@ -26,6 +26,8 @@
 		<jsp:setProperty name="editGame" property="gameDescription"/>
 		<jsp:setProperty name="editGame" property="stylesheet"/>
 		<jsp:setProperty name="editGame" property="enabled"/>
+		<jsp:setProperty name="editGame" property="gdlVersion"/>
+		<jsp:setProperty name="editGame" property="seesXMLRules"/>
 	</c:catch>
 </jsp:useBean>
 
@@ -101,6 +103,33 @@
 				    	</c:forEach>
 		      		</ul>
 	      		</c:if>
+			</td>		
+		</tr>
+		<tr>
+			<td valign="top" align="right">
+				GDL version
+			</td>
+			<td>
+				<select name="gdlVersion" size="1" >
+					<c:choose>
+						<c:when test="${editGame.gdlVersion == 1}">
+							<option value="1" selected>Regular GDL (v1)</option>
+							<option value="2">GDL-II (v2)</option>
+						</c:when>
+						<c:otherwise>
+							<option value="1">Regular GDL (v1)</option>
+							<option value="2" selected>GDL-II (v2)</option>
+						</c:otherwise>
+					</c:choose>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" align="right">
+				sees_XML(...) rules
+			</td>
+			<td>
+				<textarea rows="20" cols="80" name="seesXMLRules"><c:out value="${editGame.seesXMLRules}"></c:out></textarea><br>
 			</td>		
 		</tr>
 		<tr>

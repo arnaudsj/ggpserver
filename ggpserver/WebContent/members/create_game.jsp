@@ -21,13 +21,15 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%> 
 
 <jsp:useBean id="createGame" class="tud.ggpserver.formhandlers.CreateGame" scope="request">
-	<c:catch>
+	<%-- <c:catch> --%>
 		<jsp:setProperty name="createGame" property="gameName"/>
 		<jsp:setProperty name="createGame" property="gameDescription"/>
 		<jsp:setProperty name="createGame" property="stylesheet"/>
 		<jsp:setProperty name="createGame" property="enabled"/>
-		<jsp:setProperty name="createGame" property="creator" value="<%= request.getUserPrincipal().getName() %>" >
-	</c:catch>
+		<jsp:setProperty name="createGame" property="creatorName" value="<%= request.getUserPrincipal().getName() %>" />
+		<jsp:setProperty name="createGame" property="gdlVersion"/>
+		<jsp:setProperty name="createGame" property="seesXMLRules"/>
+	<%-- </c:catch> --%>
 </jsp:useBean>
 
 <%
@@ -97,6 +99,33 @@
 				    	</c:forEach>
 		      		</ul>
 	      		</c:if>
+			</td>		
+		</tr>
+		<tr>
+			<td valign="top" align="right">
+				GDL version
+			</td>
+			<td>
+				<select name="gdlVersion" size="1" >
+					<c:choose>
+						<c:when test="${createGame.gdlVersion == 1}">
+							<option value="1" selected>Regular GDL (v1)</option>
+							<option value="2">GDL-II (v2)</option>
+						</c:when>
+						<c:otherwise>
+							<option value="1">Regular GDL (v1)</option>
+							<option value="2" selected>GDL-II (v2)</option>
+						</c:otherwise>
+					</c:choose>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" align="right">
+				sees_XML(...) rules
+			</td>
+			<td>
+				<textarea rows="20" cols="80" name="seesXMLRules"><c:out value="${createGame.seesXMLRules}"></c:out></textarea><br>
 			</td>		
 		</tr>
 		<tr>

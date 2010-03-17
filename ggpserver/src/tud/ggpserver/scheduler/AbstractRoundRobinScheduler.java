@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2009 Martin Günther <mintar@gmx.de>
-                  2009 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2009-2010 Martin Günther <mintar@gmx.de>, Stephan Schiffel <stephan.schiffel@gmx.de>, Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GGP Server.
 
@@ -57,6 +56,7 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 	private final GamePicker<TermType, ReasonerStateInfoType> gamePicker;
 	private String lastPlayedGame = null;
 	private int nbMatchesToPlayForGame;
+	
 	
 	public AbstractRoundRobinScheduler(AbstractDBConnector<TermType, ReasonerStateInfoType> db) {
 		this.db = db;
@@ -294,7 +294,7 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		if (numberOfSurplusPlayers > 0) {
 			int numberOfRandomPlayers = numberOfRoles - numberOfSurplusPlayers;
 			for (int i = 0; i < numberOfRandomPlayers; i++) {
-				allPlayerInfos.add(new RandomPlayerInfo(-1));
+				allPlayerInfos.add(new RandomPlayerInfo(-1, game.getGdlVersion()));
 			}
 		}
 		

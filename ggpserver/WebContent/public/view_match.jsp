@@ -21,6 +21,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<fmt:setLocale value="en_US"/>
 <jsp:useBean id="viewMatch" class="tud.ggpserver.formhandlers.ViewMatch"
 	scope="page">
 	<c:catch>
@@ -68,10 +70,20 @@
 			<td><c:out value="${match.startTime}" /></td>
 		</tr>
 		<tr>
-			<th>players
+			<th>
+				<table><tbody>
+				<tr><td>
+					players
+				</td></tr>
+				<tr><td>
+					roles
+				</td></tr>
 				<c:if test="${match.orderedGoalValues != null}">
-					 &amp;<br />scores
+					 <tr><td>
+						scores
+					</td></tr>
 				</c:if>
+				</tbody></table>
 			</th>
 			<td>
 				<table>
@@ -98,6 +110,13 @@
 						<c:if test="${match.weight != 1.0}">
 							<td></td>
 						</c:if> 
+					</tr>
+					<tr class="even">
+						<c:forEach var="role" items="${match.orderedPlayerRoles}">
+							<td>
+								<c:out value="${role}"/>
+							</td>
+						</c:forEach>
 					</tr>
 					<c:if test="${match.orderedGoalValues != null}">
 						<tr class="even">
@@ -158,16 +177,46 @@
 <table>
 	<thead>
 		<tr>
-			<!--				<th>step number</th>-->
-			<th>state</th>
-			<th>joint move</th>
-			<th>
-			<center>errors</center>
+			<!--<th>step number</th>-->
+			<th align="center" rowspan="2">state</th>
+			
+			<th align="center" colspan="<c:out value="${match.game.numberOfRoles}"/>">moves</th>
+			
+			<th align="center" rowspan="2">
+				errors
+			</th>
+			<th align="center" rowspan="2">
+				date & time
 			</th>
 		</tr>
+		
+		<tr>
+		
+		<c:forEach var="role" items="${match.orderedPlayerRoles}">
+			<th>
+				<div style="align: center;">
+					<c:out value="${role}"/>
+					<c:choose>
+						<c:when test="${viewMatch.gdlVersion == 2}">
+							<c:url value="view_state.jsp" var="stateURL">
+								<c:param name="matchID" value="${match.matchID}" />
+								<c:param name="stepNumber" value="1" />
+								<c:param name="role" value="${role}" />
+							</c:url>
+							<a href='<c:out value="${stateURL}" />'>
+								<span class="view" title="View initial state from ${role}'s sight"></span></a>
+							</a>
+						</c:when>
+					</c:choose>
+				</div>
+			</th>
+		</c:forEach>
+		</tr>
+		
 	</thead>
+	
 	<tbody>
-		<c:forEach var="stepNumber" begin="1" end="<%= viewMatch.getMatch().getXmlStates().size() %>"
+		<c:forEach var="stepNumber" begin="1" end="<%= viewMatch.getMatch().getStringStates().size() %>"
 			varStatus="lineInfo">
 			<jsp:setProperty name="viewMatch" property="stepNumber"
 				value="${stepNumber}" />
@@ -180,7 +229,9 @@
 				</c:otherwise>
 			</c:choose>
 			<tr class="${rowClass}">
+				
 				<%--			<td><c:out value="${stepNumber}" /></td>--%>
+				
 				<td>
 					<c:url value="view_state.jsp" var="stateURL">
 						<c:param name="matchID" value="${match.matchID}" />
@@ -188,11 +239,22 @@
 					</c:url>
 					<a href='<c:out value="${stateURL}" />'>state ${stepNumber}</a>
 				</td>
-				<td>
-					<c:forEach var="move" items="${viewMatch.moves}">
-						<c:out value="${move}" />&nbsp;
-					</c:forEach>
-				</td>
+				
+				<c:choose>
+					<c:when test="${viewMatch.noMoves}">
+						<c:forEach var="roleindex" begin="0" end="${match.game.numberOfRoles - 1}">
+							<td></td>
+						</c:forEach>
+					</c:when>
+					<c:otherwise>
+						<c:forEach var="move" items="${viewMatch.moves}">
+							<td align="center">
+								${move}
+							</td>
+						</c:forEach>
+					</c:otherwise>
+				</c:choose>
+				
 				<td>
 					<center>
 						<c:choose>
@@ -225,6 +287,9 @@
 							</c:otherwise>
 						</c:choose>
 					</center>
+				</td>
+				<td> <%-- State timestamp --%>
+					<fmt:formatDate value="${viewMatch.timestamp}" pattern="dd.MM.yyyy HH:mm:ss z"/>
 				</td>
 			</tr>
 		</c:forEach>

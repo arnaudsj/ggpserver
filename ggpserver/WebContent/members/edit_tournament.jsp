@@ -97,6 +97,7 @@
 			</tr>
 		    </thead>
 		    <tbody>
+		    
 			<c:forEach var="match" items="${pager.matches}" varStatus="lineInfo">
 			    <c:choose>
 				<c:when test="${lineInfo.count % 2 == 0}">
@@ -160,7 +161,8 @@
 					<c:choose>
 					    <c:when test="${match.status == 'new'}">
 							<select name="playerInfos+${match.matchID}" size="1" onChange="theForm.action='${saveChangesURLWithNoNewContent}'; theForm.submit();" style="max-width:120px;">
-							    <c:forEach var="playerinfo" items="${pager.playerInfos}">
+								
+							    <c:forEach var="playerinfo" items="${pager.playerInfos[match.game.gdlVersion]}">
 									<c:choose>
 									    <c:when test='${playerinfo.name == selectedplayerinfo.name}'>
 									    	<c:set var="playerSelected">selected="selected"</c:set>

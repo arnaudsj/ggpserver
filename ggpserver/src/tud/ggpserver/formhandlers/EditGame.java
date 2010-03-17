@@ -23,6 +23,7 @@ import static tud.ggpserver.datamodel.DBConnectorFactory.getDBConnector;
 
 import java.sql.SQLException;
 
+import tud.ggpserver.util.Utilities;
 import tud.ggpserver.datamodel.Game;
 
 public class EditGame extends AbstractGameValidator {
@@ -30,7 +31,8 @@ public class EditGame extends AbstractGameValidator {
 	
 	public void updateGame() throws SQLException {
 		assert(isValid());
-		getDBConnector().updateGameInfo(getGameName(), getGameDescription(), getStylesheet(), getEnabled());
+		logger.info(""+getGameName()+", "+getGameDescription()+", "+getStylesheet()+", "+getSeesXMLRules()+", "+getEnabled()+", "+Utilities.gdlVersion(getGdlVersion()));
+		getDBConnector().updateGameInfo(getGameName(), getGameDescription(), getStylesheet(), getSeesXMLRules(), getEnabled(), Utilities.gdlVersion(getGdlVersion()));
 		correctlyUpdated = true;
 	}
 	
@@ -49,6 +51,8 @@ public class EditGame extends AbstractGameValidator {
 				setGameDescription(game.getGameDescription());
 				setStylesheet(game.getStylesheet());
 				setEnabled(game.isEnabled());
+				setGdlVersion(Utilities.gdlVersion(game.getGdlVersion()));
+				setSeesXMLRules(game.getSeesXMLRules());
 			}
 		} catch (SQLException e) {
 			getErrorsGameName().add("there was an error getting game '" + gameName + "'"

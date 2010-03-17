@@ -1,5 +1,5 @@
 <%--
-    Copyright (C) 2009 Martin Günther (mintar@gmx.de)
+    Copyright (C) 2009 Martin Gï¿½nther (mintar@gmx.de)
 
     This file is part of GGP Server.
 
@@ -25,9 +25,12 @@
 		<jsp:setProperty name="editGame" property="gameName"/>
 		<jsp:setProperty name="editGame" property="gameDescription"/>
 		<jsp:setProperty name="editGame" property="stylesheet"/>
+		<jsp:setProperty name="editGame" property="creatorName" value="<%= request.getUserPrincipal().getName() %>" />
 		<%-- setting enabled to false is necessary because the enabled property is only send with the request if the checkbox is checked --%>
 		<jsp:setProperty name="editGame" property="enabled" value="false"/> 
 		<jsp:setProperty name="editGame" property="enabled"/>
+		<jsp:setProperty name="editGame" property="gdlVersion"/>
+		<jsp:setProperty name="editGame" property="seesXMLRules"/>
 	</c:catch>
 </jsp:useBean>
 
