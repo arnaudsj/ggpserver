@@ -21,7 +21,6 @@ package tud.gamecontroller.players;
 import java.util.Collection;
 import java.util.List;
 
-import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.exceptions.NoLegalMoveException;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.StateInterface;
@@ -42,11 +41,7 @@ public class MovelistPlayer<TermType extends TermInterface,
 	private int stepNumber = 0;
 	
 	public MovelistPlayer(String name, List<String> moveStrings) {
-		this(name, moveStrings, GDLVersion.v1);
-	}
-	
-	public MovelistPlayer(String name, List<String> moveStrings, GDLVersion gdlVersion) {
-		super(name, gdlVersion);
+		super(name);
 		this.moveStrings = moveStrings;
 	}
 

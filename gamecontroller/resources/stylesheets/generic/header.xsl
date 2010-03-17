@@ -9,27 +9,45 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 	<xsl:template name="header">
+		
 		<div class="header" id="header">
 			<xsl:variable name="currentStep" select="count(/match/history/step)+1"/>
+			<xsl:variable name="role" select="/match/sight-of"/>
 			
 			<span class="heading">Match:</span><span class="content"><xsl:value-of select="/match/match-id"/></span>
 			<br/>
 			<span class="heading">Step:</span><span class="content"><xsl:value-of select="$currentStep"/></span>
+			<br/>
+			
+			<xsl:choose>
+				<xsl:when test="$role='RANDOM'">
+					<span class="heading">Complete Information</span>
+				</xsl:when>
+				<xsl:otherwise>
+					<span class="heading">Seen by:</span><span class="content"><xsl:value-of select="$role"/></span>
+				</xsl:otherwise>
+			</xsl:choose>
+			
+			
 			<xsl:call-template name="make_tab">
 				<xsl:with-param name="which">initial</xsl:with-param>
 				<xsl:with-param name="currentStep" select="$currentStep"/>
+				<xsl:with-param name="role" select="$role"/>
 			</xsl:call-template>
 			<xsl:call-template name="make_tab">
 				<xsl:with-param name="which">previous</xsl:with-param>
 				<xsl:with-param name="currentStep" select="$currentStep"/>
+				<xsl:with-param name="role" select="$role"/>
 			</xsl:call-template>
 			<xsl:call-template name="make_tab">
 				<xsl:with-param name="which">next</xsl:with-param>
 				<xsl:with-param name="currentStep" select="$currentStep"/>
+				<xsl:with-param name="role" select="$role"/>
 			</xsl:call-template>
 			<xsl:call-template name="make_tab">
 				<xsl:with-param name="which">final</xsl:with-param>
 				<xsl:with-param name="currentStep" select="$currentStep"/>
+				<xsl:with-param name="role" select="$role"/>
 			</xsl:call-template>
 			<div class="underline" style="clear:left;"/>
 		</div>
@@ -49,9 +67,12 @@
 		
 	</xsl:template>
 
+
+
 	<xsl:template name="make_tab">
 		<xsl:param name="which"/>
 		<xsl:param name="currentStep"/>
+		<xsl:param name="role"/>
 
 		<div class="bartab">
 			<a>
@@ -71,6 +92,7 @@
 					<xsl:attribute name="href">
 						<xsl:call-template name="makeStepLinkURL">
 							<xsl:with-param name="step" select="$linkStep"/>
+							<xsl:with-param name="role" select="$role"/>
 						</xsl:call-template>
 					</xsl:attribute>
 				</xsl:if>

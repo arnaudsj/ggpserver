@@ -37,6 +37,7 @@ import tud.gamecontroller.players.RandomPlayerInfo;
 import tud.gamecontroller.players.RemotePlayerInfo;
 import tud.gamecontroller.term.TermInterface;
 
+
 public abstract class AbstractGameControllerCLIRunner<
 		TermType extends TermInterface,
 		ReasonerStateInfoType> extends AbstractGameControllerRunner<
@@ -85,6 +86,11 @@ public abstract class AbstractGameControllerCLIRunner<
 			gameFile=getFileArg(argv[index], "game file", true); ++index;
 			startClock=getIntArg(argv[index],"startclock"); ++index;
 			playClock=getIntArg(argv[index],"playclock"); ++index;
+			gdlVersion = GDLVersion.v1;
+			if (argv[index].equals("2")) {
+				gdlVersion=GDLVersion.v2;
+			}
+			++index;
 			
 			sightFile = null;
 			playerInfos=new LinkedList<PlayerInfo>();
@@ -111,18 +117,6 @@ public abstract class AbstractGameControllerCLIRunner<
 					}else{
 						missingArgumentsExit(argv[index-1]);
 					}
-				} else if (argv[index].equals("-gdlversion")) {
-					++index;
-					if(index<argv.length){
-						gdlVersion = GDLVersion.v1;
-						if (argv[index].equals("2")) {
-							//System.out.println("Retrieving GDL version 2 from command line");
-							gdlVersion=GDLVersion.v2;
-						}
-						++index;
-					}else{
-						missingArgumentsExit(argv[index-1]);
-					}
 				}else{
 					index=parsePlayerArguments(index, argv);
 				}
@@ -138,7 +132,7 @@ public abstract class AbstractGameControllerCLIRunner<
 		PlayerInfo player=null;
 		if(argv[index].equals("-remote")){
 			++index;
-			if(argv.length>=index+4){
+			if(argv.length>=index+5){
 				int roleindex=getIntArg(argv[index], "roleindex"); ++index;
 				if(roleindex<1){
 					System.err.println("roleindex out of bounds");
@@ -148,7 +142,12 @@ public abstract class AbstractGameControllerCLIRunner<
 				String name=argv[index]; ++index;
 				String host=argv[index]; ++index;
 				int port=getIntArg(argv[index], "port"); ++index;
-				player=new RemotePlayerInfo(roleindex-1, name, host, port);
+				int gdl=getIntArg(argv[index], "gdl"); ++index;
+				if (gdl == 1) {
+					player=new RemotePlayerInfo(roleindex-1, name, host, port, GDLVersion.v1);
+				} else {
+					player=new RemotePlayerInfo(roleindex-1, name, host, port, GDLVersion.v2);
+				}
 			}else{
 				missingArgumentsExit(argv[index-1]);
 			}
@@ -161,7 +160,7 @@ public abstract class AbstractGameControllerCLIRunner<
 					printUsage();
 					System.exit(-1);
 				}
-				player=new LegalPlayerInfo(roleindex-1);
+				player=new LegalPlayerInfo(roleindex-1, gdlVersion);
 			}else{
 				missingArgumentsExit(argv[index-1]);
 			}
@@ -174,7 +173,7 @@ public abstract class AbstractGameControllerCLIRunner<
 					printUsage();
 					System.exit(-1);
 				}
-				player=new RandomPlayerInfo(roleindex-1);
+				player=new RandomPlayerInfo(roleindex-1, gdlVersion);
 			}else{
 				missingArgumentsExit(argv[index-1]);
 			}
@@ -195,8 +194,8 @@ public abstract class AbstractGameControllerCLIRunner<
 	}
 
 	private void printUsage(){
-		System.out.println("usage:\n java -jar gamecontroller.jar MATCHID GAMEFILE STARTCLOCK PLAYCLOCK [ -printxml OUTPUTDIR XSLT ] [-scramble WORDFILE] { -remote ROLEINDEX NAME HOST PORT | -legal ROLEINDEX | -random ROLEINDEX } ...");
-		System.out.println("example:\n java -jar gamecontroller.jar A_Tictactoe_Match tictactoe.gdl 120 30 -remote 2 MyPlayer localhost 4000");
+		System.out.println("usage:\n java -jar gamecontroller.jar MATCHID GAMEFILE STARTCLOCK PLAYCLOCK GDLVERSION [ -printxml OUTPUTDIR XSLT ] [-sightfile SIGHTFILE] [-scramble WORDFILE] { -remote ROLEINDEX NAME HOST PORT GDLVERSION | -legal ROLEINDEX | -random ROLEINDEX } ...");
+		System.out.println("example:\n java -jar gamecontroller.jar A_Tictactoe_Match tictactoe.gdl 120 30 1 -remote 2 MyPlayer localhost 4000 1");
 	}
 
 	private int getIntArg(String arg, String argName){

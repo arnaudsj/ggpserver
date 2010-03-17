@@ -38,15 +38,10 @@ public abstract class AbstractPlayer<TermType extends TermInterface, StateType e
 	
 	protected GDLVersion gdlVersion;
 
-	public AbstractPlayer(String name){
-		this(name, GDLVersion.v1);
-	}
-	
-	public AbstractPlayer(String name, GDLVersion gdlVersion) {
+	public AbstractPlayer(String name) {
 		this.name=name;
 		this.runtime=0;
 		this.lastMessageRuntime=0;
-		this.gdlVersion = gdlVersion;
 	}
 	
 	public void gameStart(MatchInterface<TermType, StateType> match, RoleInterface<TermType> role, ConnectionEstablishedNotifier notifier) {
@@ -79,6 +74,10 @@ public abstract class AbstractPlayer<TermType extends TermInterface, StateType e
 
 	public String getName() {
 		return name;
+	}
+	
+	public GDLVersion getGdlVersion() {
+		return this.gdlVersion;
 	}
 
 	public String toString() {

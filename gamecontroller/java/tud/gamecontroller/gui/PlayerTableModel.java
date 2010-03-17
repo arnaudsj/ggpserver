@@ -21,6 +21,7 @@ package tud.gamecontroller.gui;
 
 import javax.swing.table.AbstractTableModel;
 
+import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.game.impl.Game;
 import tud.gamecontroller.players.LegalPlayerInfo;
 import tud.gamecontroller.players.PlayerInfo;
@@ -179,13 +180,14 @@ public class PlayerTableModel extends AbstractTableModel {
 			this.value = value;
 			fireTableCellUpdated(row, 4);
 		}
+		// TODO: what GDLVersion should we have here?
 		public PlayerInfo getPlayerInfo(){
 			if(type.equals(PlayerType.REMOTE)){
-				return new RemotePlayerInfo(row,host+":"+port,host,port); 
+				return new RemotePlayerInfo(row,host+":"+port,host,port,GDLVersion.v1); 
 			}else if(type.equals(PlayerType.RANDOM)){
-				return new RandomPlayerInfo(row);
+				return new RandomPlayerInfo(row,GDLVersion.v1);
 			}else{
-				return new LegalPlayerInfo(row);
+				return new LegalPlayerInfo(row,GDLVersion.v1);
 			}
 		}
 	}

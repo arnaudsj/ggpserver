@@ -21,7 +21,6 @@ package tud.gamecontroller.players;
 
 import java.util.Vector;
 
-import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.term.TermInterface;
@@ -29,13 +28,9 @@ import tud.gamecontroller.term.TermInterface;
 public class LegalPlayer<
 	TermType extends TermInterface,
 	StateType extends StateInterface<TermType, ? extends StateType>> extends LocalPlayer<TermType, StateType>  {
-
-	public LegalPlayer(String name) {
-		this(name, GDLVersion.v1);
-	}
 	
-	public LegalPlayer(String name, GDLVersion gdlVersion) {
-		super(name, gdlVersion);
+	public LegalPlayer(String name) {
+		super(name);
 	}
 
 	// MODIFIED

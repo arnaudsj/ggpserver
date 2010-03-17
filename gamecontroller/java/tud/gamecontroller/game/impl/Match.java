@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>, Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
 
@@ -19,15 +19,22 @@
 
 package tud.gamecontroller.game.impl;
 
+import java.util.List;
+import java.sql.Timestamp;
+
+import tud.gamecontroller.auxiliary.Pair;
+import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.MatchInterface;
+import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.term.TermInterface;
 
-public class Match<TermType extends TermInterface, ReasonerStateInfoType> implements MatchInterface<TermType, State<TermType, ReasonerStateInfoType>> {
+public abstract class Match<TermType extends TermInterface, ReasonerStateInfoType> implements MatchInterface<TermType, State<TermType, ReasonerStateInfoType>> {
 	private final String matchID;
 	private final GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game;
 	private final int startclock;
 	private final int playclock;
+	
 
 
 	public Match(final String matchID, final GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game, final int startclock, final int playclock) {
@@ -53,6 +60,8 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType> implem
 	public int getPlayclock() {
 		return playclock;
 	}
+	
+	public abstract List<String> getOrderedPlayerNames();
 	
 	@Override
 	public int hashCode() {
@@ -81,4 +90,12 @@ public class Match<TermType extends TermInterface, ReasonerStateInfoType> implem
 			return false;
 		return true;
 	}
+	
+	
+	@Override
+	public String getXMLViewFor(Pair<Timestamp,String> stringState, List<List<String>> moves, RoleInterface<TermType> role, GDLVersion gdlVersion) {
+		return this.getGame().getXMLViewFor(this, stringState, moves, role);
+	}
+	
+	
 }

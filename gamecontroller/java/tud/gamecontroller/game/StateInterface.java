@@ -43,4 +43,6 @@ public interface StateInterface<
 	
 	Collection<? extends FluentInterface<TermType>> getSeesXMLFluents(RoleInterface<TermType> role);
 	
+	public String toString ();
+	
 }

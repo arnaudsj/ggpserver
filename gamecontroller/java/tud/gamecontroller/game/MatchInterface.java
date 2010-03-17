@@ -19,6 +19,12 @@
 
 package tud.gamecontroller.game;
 
+import java.sql.Timestamp;
+import java.util.List;
+
+import tud.gamecontroller.auxiliary.Pair;
+import tud.gamecontroller.GDLVersion;
+
 
 /**
  * The point of this interfaces is not to refer to the actual Player
@@ -39,6 +45,14 @@ public interface MatchInterface<TermType, StateType extends StateInterface<TermT
 	public abstract int getStartclock();
 
 	public abstract int getPlayclock();
+	
+	public abstract List<String> getOrderedPlayerNames();
+	
+	public String getXMLViewFor(
+			Pair<Timestamp,String> stringState,
+			List<List<String>> stringMoves,
+			RoleInterface<TermType> role,
+			GDLVersion gdlVersion);
 	
 	// TODO: This could be extended to include the following methods:
 	//	public abstract Collection<? extends PlayerInfo<TermType>> getPlayerInfos();

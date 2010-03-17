@@ -29,28 +29,28 @@ import tud.gamecontroller.term.TermInterface;
 public class PlayerFactory {
 
 	public static <TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
-		Player<TermType, StateType> createRemotePlayer(RemotePlayerInfo info, MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory, GameScramblerInterface gameScrambler, GDLVersion gdlVersion) {
-		return new RemotePlayer<TermType, StateType>(info.getName(), info.getHost(), info.getPort(), movefactory, gameScrambler, gdlVersion);
+		Player<TermType, StateType> createRemotePlayer(RemotePlayerInfo info, MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory, GameScramblerInterface gameScrambler) {
+		return new RemotePlayer<TermType, StateType>(info.getName(), info.getHost(), info.getPort(), info.getGdlVersion(), movefactory, gameScrambler);
 	}
 	
 	public static <TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
-		Player<TermType, StateType> createRandomPlayer(RandomPlayerInfo info, GDLVersion gdlVersion) {
-		return new RandomPlayer<TermType, StateType>(info.getName(), gdlVersion);
+		Player<TermType, StateType> createRandomPlayer(RandomPlayerInfo info) {
+		return new RandomPlayer<TermType, StateType>(info.getName());
 	}
 	
 	public static <TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
-		Player<TermType, StateType> createLegalPlayer(LegalPlayerInfo info, GDLVersion gdlVersion) {
-		return new LegalPlayer<TermType, StateType>(info.getName(), gdlVersion);
+		Player<TermType, StateType> createLegalPlayer(LegalPlayerInfo info) {
+		return new LegalPlayer<TermType, StateType>(info.getName());
 	}
 	
 	public static <TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
 		Player<TermType, StateType> createPlayer(PlayerInfo info, MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory, GameScramblerInterface gameScrambler, GDLVersion gdlVersion) {
 		if(info instanceof RemotePlayerInfo){
-			return PlayerFactory. <TermType, StateType> createRemotePlayer((RemotePlayerInfo)info, movefactory, gameScrambler, gdlVersion);
+			return PlayerFactory. <TermType, StateType> createRemotePlayer((RemotePlayerInfo)info, movefactory, gameScrambler);
 		}else if(info instanceof RandomPlayerInfo){
-			return PlayerFactory. <TermType, StateType> createRandomPlayer((RandomPlayerInfo)info, gdlVersion);
+			return PlayerFactory. <TermType, StateType> createRandomPlayer((RandomPlayerInfo)info);
 		}else if(info instanceof LegalPlayerInfo){
-			return PlayerFactory. <TermType, StateType> createLegalPlayer((LegalPlayerInfo)info, gdlVersion);
+			return PlayerFactory. <TermType, StateType> createLegalPlayer((LegalPlayerInfo)info);
 		}
 		return null;
 	}

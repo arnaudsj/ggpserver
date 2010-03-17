@@ -10,6 +10,7 @@
 
 	<xsl:template name="makeStepLinkURL">
 		<xsl:param name="step"/> <!-- an integer number >=1 or 'final' -->
+		<xsl:param name="role"/> <!-- the player who sees the game field -->
 		<xsl:choose>
 			<xsl:when test="$step='final'">finalstate.xml</xsl:when>
 			<xsl:otherwise>step_<xsl:value-of select="$step"/>.xml</xsl:otherwise>

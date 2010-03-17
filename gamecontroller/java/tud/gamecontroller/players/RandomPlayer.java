@@ -22,7 +22,6 @@ package tud.gamecontroller.players;
 import java.util.Random;
 import java.util.Vector;
 
-import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.term.TermInterface;
@@ -33,12 +32,8 @@ public class RandomPlayer<
 
 	private Random random;
 	
-	public RandomPlayer(String name){
-		this(name,GDLVersion.v1);
-	}
-	
-	public RandomPlayer(String name, GDLVersion gdlVersion) {
-		super(name, gdlVersion);
+	public RandomPlayer(String name) {
+		super(name);
 		random=new Random();
 	}
 	

@@ -37,12 +37,15 @@ import tud.gamecontroller.game.impl.Fluent;
 import tud.gamecontroller.game.impl.Move;
 import tud.gamecontroller.game.impl.Role;
 import cs227b.teamIago.gameProver.JavaProversGameSimulatorEnhancer;
+import cs227b.teamIago.parser.Parser;
 import cs227b.teamIago.parser.PublicAxiomsWrapper;
 import cs227b.teamIago.parser.Statement;
 import cs227b.teamIago.resolver.Atom;
 import cs227b.teamIago.resolver.Connective;
 import cs227b.teamIago.resolver.ExpList;
+import cs227b.teamIago.resolver.Expression;
 import cs227b.teamIago.resolver.Predicate;
+import cs227b.teamIago.resolver.Theory;
 import cs227b.teamIago.util.GameState;
 
 public class Reasoner implements ReasonerInterface<Term, GameState> {
@@ -52,6 +55,7 @@ public class Reasoner implements ReasonerInterface<Term, GameState> {
 	private String gameDescription;
 	
 	public Reasoner(String gameDescription) {
+		//System.out.println("JavaProver.Reasoner("+gameDescription+")");
 		this.gameDescription=gameDescription;
 		gameSim=new JavaProversGameSimulatorEnhancer(false, true); // MODIFIED: GDL-II-conscious GameSimulator
 		gameSim.ParseDescIntoTheory(gameDescription);
@@ -209,7 +213,8 @@ public class Reasoner implements ReasonerInterface<Term, GameState> {
 		ExpList el = new ExpList();
 		synchronized (gameSim) {
 			gameSim.SetGameState(state);
-			el = gameSim.getSeesXMLFluents(role.getTerm().getExpr());
+			Expression r = role.getTerm().getExpr();
+			el = gameSim.getSeesXMLFluents(r);
 		}
 		
 		Collection<FluentInterface<Term>> fluents = new Vector<FluentInterface<Term>>();
@@ -228,5 +233,25 @@ public class Reasoner implements ReasonerInterface<Term, GameState> {
 		this.gameSim.ParseFileIntoTheory(filename);
 	}
 
+	@Override
+	public GameState getStateFromString (String state) {
+		
+		ExpList el = Parser.parseExpList(state);
+		Expression[] exps = new Expression[el.size()];
+		
+		for (int i = 0; i < el.size(); i++) {
+			Expression e = el.get(i);
+			exps[i] = new Predicate("true", new ExpList( new Expression[] {e} ) );
+		}
+		
+		Theory t = new Theory(true, false);
+		t.setState(new ExpList(exps));
+		GameState gs = t.getState();
+		System.out.println("demarshalled state = "+gs);
+		
+		return gs;
+		
+	}
+	
 
 }

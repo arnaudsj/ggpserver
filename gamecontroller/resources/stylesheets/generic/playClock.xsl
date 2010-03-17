@@ -14,16 +14,18 @@
 	<xsl:template name="playClock">
 
 		<xsl:variable name="currentStep" select="count(/match/history/step)+1"/>
-
+		
 		<script language="JavaScript" type="text/javascript">
 			<xsl:text disable-output-escaping="yes">currentState="</xsl:text>
 				<xsl:call-template name="makeStepLinkURL">
 					<xsl:with-param name="step" select="$currentStep"/>
+					<xsl:with-param name="role" select="/match/sight-of"/>
 				</xsl:call-template>
 			<xsl:text disable-output-escaping="yes">";</xsl:text>
 			<xsl:text disable-output-escaping="yes">nextState="</xsl:text>
 				<xsl:call-template name="makeStepLinkURL">
 					<xsl:with-param name="step" select="$currentStep+1"/>
+					<xsl:with-param name="role" select="/match/sight-of"/>
 				</xsl:call-template>
 			<xsl:text disable-output-escaping="yes">";</xsl:text>
 			

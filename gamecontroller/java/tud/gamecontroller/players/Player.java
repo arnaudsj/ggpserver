@@ -21,6 +21,7 @@ package tud.gamecontroller.players;
 
 import tud.auxiliary.NamedObject;
 import tud.gamecontroller.ConnectionEstablishedNotifier;
+import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.MoveInterface;
@@ -46,4 +47,7 @@ public interface Player<TermType, StateType extends StateInterface<TermType, ? e
 	 * @return the total runtime of the player in milliseconds
 	 */
 	public long getTotalRuntime();
+	
+	public GDLVersion getGdlVersion();
+	
 }

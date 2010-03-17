@@ -19,14 +19,15 @@
 
 package tud.gamecontroller.game.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import tud.gamecontroller.game.GameInterface;
-import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.RoleInterface;
+import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.players.Player;
 import tud.gamecontroller.term.TermInterface;
 
@@ -60,6 +61,15 @@ public class RunnableMatch<TermType extends TermInterface, ReasonerStateInfoType
 		}
 		return orderedPlayers;
 	}
+	
+	@Override
+	public List<String> getOrderedPlayerNames() {
+		ArrayList<String> orderedPlayerNames = new ArrayList<String>();
+		List<? extends Player<?, ?>> orderedPlayerInfos = this.getOrderedPlayers();
+		for (Player<?,?> info: orderedPlayerInfos)
+			orderedPlayerNames.add(info.getName());
+		return orderedPlayerNames;
+	}
 
 	/* (non-Javadoc)
 	 * @see tud.gamecontroller.game.RunnableMatchInterface#getPlayer(RoleType)
@@ -67,4 +77,5 @@ public class RunnableMatch<TermType extends TermInterface, ReasonerStateInfoType
 	public Player<TermType, State<TermType, ReasonerStateInfoType>> getPlayer(RoleInterface<TermType> role) {
 		return players.get(role);
 	}
+	
 }

@@ -23,6 +23,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -30,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import tud.gamecontroller.auxiliary.Pair;
 import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.ReasonerFactory;
 import tud.gamecontroller.XMLGameStateWriter;
@@ -54,19 +56,23 @@ public class Game<
 //	private List<RoleInterface<TermType>> orderedRoles=null;
 	private String stylesheet = null;  // this can remain null (no stylesheet will be used)
 	private String seesXMLRules = null;
+	private String seesRules = null;
 	private String gameDescription = null;
 	private final String kifGameDescription;
 	private final List<? extends RoleInterface<TermType>> roles;
+	private final GDLVersion gdlVersion;
 
-	public Game(File gameFile, ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory) throws IOException {
-		this(gameFile, reasonerFactory, null, null);
+	public Game(File gameFile, ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory, GDLVersion gdlVersion) throws IOException {
+		this(gameFile, reasonerFactory, gdlVersion, null, null);
 	}
 
-	public Game(File gameFile, ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory, String stylesheet) throws IOException {
-		this(gameFile, reasonerFactory, stylesheet, null);
+	public Game(File gameFile, ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory, GDLVersion gdlVersion, String stylesheet) throws IOException {
+		this(gameFile, reasonerFactory, gdlVersion, stylesheet, null);
 	}
 	
-	public Game(File gameFile, ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory, String stylesheet, File sightFile) throws IOException {
+	public Game(File gameFile, ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory, GDLVersion gdlVersion, String stylesheet, File sightFile) throws IOException {
+		
+		this.gdlVersion = gdlVersion;
 		
 		StringBuffer sb = new StringBuffer();
 		BufferedReader br = null;
@@ -144,19 +150,26 @@ public class Game<
 			
 		}
 		
-		this.setDefaultXMLSeesRules();
+		this.setDefaultSeesXMLRules();
+		
+		this.seesRules = "";
+		if (gdlVersion == GDLVersion.v1)
+			this.setDefaultSeesRules(); // TODO: check that there is no "sees" relation in the GDL yet
 		
 	}
 
-	public Game(String gameDescription, String name, ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory) {
-		this(gameDescription, name, reasonerFactory, null, null);
+	public Game(String gameDescription, String name, ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory, GDLVersion gdlVersion) {
+		this(gameDescription, name, reasonerFactory, gdlVersion, null, null);
 	}
 	
-	public Game(String gameDescription, String name, ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory, String stylesheet) {
-		this(gameDescription, name, reasonerFactory, stylesheet, null);
+	public Game(String gameDescription, String name, ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory, GDLVersion gdlVersion, String stylesheet) {
+		this(gameDescription, name, reasonerFactory, gdlVersion, stylesheet, null);
 	}
 	
-	public Game(String gameDescription, String name, ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory, String stylesheet, String seesXMLRules) {
+	public Game(String gameDescription, String name, ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory, GDLVersion gdlVersion, String stylesheet, String seesXMLRules) {
+		
+		this.gdlVersion = gdlVersion;
+		
 		this.name=name;
 		this.reasonerFactory=reasonerFactory;
 		this.gameDescription=gameDescription;
@@ -166,14 +179,25 @@ public class Game<
 		kifGameDescription = reasoner.getKIFGameDescription();
 		
 		this.stylesheet = stylesheet;
-		this.seesXMLRules = seesXMLRules;
 		
-		this.setDefaultXMLSeesRules();
+		this.seesXMLRules = seesXMLRules;
+		this.setDefaultSeesXMLRules();
+		
+		this.seesRules = "";
+		if (gdlVersion == GDLVersion.v1)
+			this.setDefaultSeesRules(); // TODO: check that there is no "sees" relation in the GDL yet
 		
 	}
 	
-	
-	private void setDefaultXMLSeesRules() {
+	private void setDefaultSeesRules() {
+		for (RoleInterface<?> role1: this.getOrderedRoles())
+			for (RoleInterface<?> role2: this.getOrderedRoles())
+				this.seesRules += "(<= (sees "+role1+" (did "+role2+" ?move) )\n"+
+										"(does "+role2+" ?move)\n"+
+										")\n" ;
+	}
+
+	private void setDefaultSeesXMLRules() {
 		
 		if (this.seesXMLRules == null || this.seesXMLRules == "") {
 			/* MODIFIED (ADDED)
@@ -190,7 +214,7 @@ public class Game<
 	
 	public State<TermType, ReasonerStateInfoType> getInitialState() {
 		ReasonerInterface<TermType, ReasonerStateInfoType> reasoner =
-			reasonerFactory.createReasoner(gameDescription+"\n\n"+seesXMLRules, name);
+			reasonerFactory.createReasoner(gameDescription+"\n\n"+seesRules+"\n\n"+seesXMLRules, name);
 		return new State<TermType,ReasonerStateInfoType>(reasoner , reasoner.getInitialState());
 	}
 
@@ -284,23 +308,30 @@ public class Game<
 		buffer.append("]");
 		return buffer.toString();
 	}
-
 	
-	@SuppressWarnings("unchecked")
-	@Override
-	public String getXMLViewFor(
-			Match<?, ?> match,
-			String stringState,
-			List<List<String>> stringMoves,
-			RoleInterface<TermType> role,
-			GDLVersion gdlVersion) {
+	
+	public State<TermType, ReasonerStateInfoType> getStateFromString ( String stringState ) {
 		
 		// let's turn the stringState into a known State
 		ReasonerInterface<TermType, ReasonerStateInfoType> reasoner =
-			this.reasonerFactory.createReasoner(this.gameDescription+"\n\n"+seesXMLRules, "temp_game");
+			this.reasonerFactory.createReasoner(this.gameDescription+"\n\n"+seesRules+"\n\n"+seesXMLRules, "temp_game");
 		
 		ReasonerStateInfoType reasonerState = reasoner.getStateFromString(stringState);
-		State state = new State(reasoner, reasonerState);
+		State<TermType, ReasonerStateInfoType> state = new State<TermType, ReasonerStateInfoType>(reasoner, reasonerState);
+		
+		return state;
+		
+	}
+
+	
+	@Override
+	public String getXMLViewFor(
+			Match<?, ?> match,
+			Pair<Timestamp,String> stringState,
+			List<List<String>> stringMoves,
+			RoleInterface<TermType> role) {
+		
+		State<TermType, ReasonerStateInfoType> state = this.getStateFromString(stringState.getRight());
 		
 		// compute goal values
 		Map<RoleInterface<TermType>,Integer> goalValues = new HashMap<RoleInterface<TermType>,Integer>();
@@ -308,8 +339,8 @@ public class Game<
 		if (state.isTerminal()) {
 			Collection<? extends RoleInterface<TermType>> roles = this.getOrderedRoles();
 			for (RoleInterface<TermType> oneRole: roles) {
-				logger.info(oneRole+" has goal Value "+reasoner.getGoalValue(reasonerState, oneRole));
-				goalValues.put(oneRole, reasoner.getGoalValue(reasonerState, oneRole));
+				logger.info(oneRole+" has goal Value "+state.getGoalValue(oneRole));
+				goalValues.put(oneRole, state.getGoalValue(oneRole));
 			}
 		} else {
 			goalValues = null;
@@ -322,8 +353,18 @@ public class Game<
 				goalValues,
 				this.stylesheet,
 				role,
-				gdlVersion).toString();
+				gdlVersion,
+				stringState.getLeft()
+			).toString();
 		
+	}
+
+	public GDLVersion getGdlVersion() {
+		return gdlVersion;
+	}
+	
+	public String getSeesRules() {
+		return this.seesRules;
 	}
 	
 }

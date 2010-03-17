@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.xml.sax.SAXException;
+
+import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.ReasonerFactory;
 import tud.gamecontroller.exceptions.NoLegalMoveException;
 import tud.gamecontroller.game.GameInterface;
@@ -31,7 +33,7 @@ import tud.gamecontroller.players.Player;
 
 public class RetraceGameControllerRunner {
 
-	public static void retrace(File inputFile, File outputFile, File gameFile) throws IOException, SAXException {
+	public static void retrace(File inputFile, File outputFile, File gameFile, GDLVersion gdlVersion) throws IOException, SAXException {
 		/* create game */
 		ReasonerFactory<Term, GameState> reasonerFactory = new ReasonerFactory<Term, GameState>() {
 			public ReasonerInterface<Term, GameState> createReasoner(String gameDescription, String gameName) {
@@ -39,7 +41,7 @@ public class RetraceGameControllerRunner {
 			}
 		};
 		
-		GameInterface<Term, State<Term, GameState>> game = new Game<Term, GameState>(gameFile, reasonerFactory);
+		GameInterface<Term, State<Term, GameState>> game = new Game<Term, GameState>(gameFile, reasonerFactory, gdlVersion);
 		
 		/* create players */
 		Map<RoleInterface<Term>, Player<Term, State<Term, GameState>>> players = new HashMap<RoleInterface<Term>, Player<Term, State<Term, GameState>>>();
@@ -78,14 +80,14 @@ public class RetraceGameControllerRunner {
 		}
 	}
 	
-	public static void retraceDirs(File inputDir, File outputDir, File gamesDir) throws IOException, SAXException {
+	public static void retraceDirs(File inputDir, File outputDir, File gamesDir, GDLVersion gdlVersion) throws IOException, SAXException {
 		for (File inputFile : inputDir.listFiles()) {
 			String gameName = inputFile.getName().substring(0, inputFile.getName().indexOf("."));
 			
 			File gameFile = new File(gamesDir, gameName + ".lisp");
 			File outputFile = new File(outputDir, gameName + ".trace.xml");
 			
-			retrace(inputFile, outputFile, gameFile);
+			retrace(inputFile, outputFile, gameFile, gdlVersion);
 		}
 	}
 	
@@ -118,7 +120,7 @@ public class RetraceGameControllerRunner {
 				throw new IllegalArgumentException("cannot write output file!");
 			}
 			
-			retrace(inputFile, outputFile, gameFile);
+			retrace(inputFile, outputFile, gameFile, GDLVersion.v1);
 		} catch (IllegalArgumentException ex) {
 			System.err.println("An error occured: " + ex.getMessage());
 			printUsage();

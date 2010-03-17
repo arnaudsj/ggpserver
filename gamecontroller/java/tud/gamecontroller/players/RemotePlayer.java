@@ -60,6 +60,7 @@ public class RemotePlayer<TermType extends TermInterface,
 	private GameScramblerInterface gameScrambler;
 	private Logger logger;
 	
+	
 	// MODIFIED: as we don't have the rule that the first turn is the only one where no moves are sent, we have to manage this with a boolean
 	private boolean firstTurn;
 	
@@ -80,29 +81,40 @@ public class RemotePlayer<TermType extends TermInterface,
 	private static final int CONNECTION_TIMEOUT = 2000;
 	private static final int CONNECTION_TIMEOUT_BONUS = 30000;
 	
-	public RemotePlayer(String name, String host, int port, MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory, GameScramblerInterface gamescrambler) {
-		this(name, host, port, movefactory, gamescrambler, GDLVersion.v1);
-	}
-	
-	public RemotePlayer(String name, String host, int port, MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory, GameScramblerInterface gamescrambler, GDLVersion gdlVersion) {
-		super(name, gdlVersion);
+	public RemotePlayer(String name, String host, int port, GDLVersion gdlVersion, MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory, GameScramblerInterface gamescrambler) {
+		super(name);
 		this.host=host;
 		this.port=port;
 		this.movefactory=movefactory;
 		this.gameScrambler=gamescrambler;
 		this.logger=Logger.getLogger("tud.gamecontroller");
+		this.gdlVersion = gdlVersion; // this is not necessarily the same as the played game's gdlVersion, since a GDLv2 player can play GDLv1 games!
 	}
 	
 	@Override
 	public void gameStart(MatchInterface<TermType, StateType> match, RoleInterface<TermType> role, ConnectionEstablishedNotifier notifier) {
+		
 		super.gameStart(match, role, notifier);
+		
 		this.firstTurn = true;
+		
+		String gameDescription = match.getGame().getKIFGameDescription().toUpperCase();
+		
+		// if this is a Regular GDL game and the player understands GDL-II, add necessary sees(Role,Did(Role2,Move)) ← true(does(Role2,Move))
+		if (match.getGame().getGdlVersion() == GDLVersion.v1 && this.getGdlVersion() == GDLVersion.v2) {
+			//gameDescription += "\n\n";
+			for (RoleInterface<?> eachRole: match.getGame().getOrderedRoles())
+				gameDescription += ( "(<= (sees "+role+" (did "+eachRole+" ?move) )"+
+										"(does "+eachRole+" ?move)"+
+										") " ).toUpperCase();
+		}
+		
 		hostAddress = null; // don't use an old hostAddress for a new match
 		connectionTimeoutBonus = CONNECTION_TIMEOUT_BONUS;
 		String msg="(START "+
 				match.getMatchID()+" "+
 				gameScrambler.scramble(role.getKIFForm()).toUpperCase()+
-				" ("+gameScrambler.scramble(match.getGame().getKIFGameDescription()).toUpperCase()+") "+
+				" ("+gameScrambler.scramble(gameDescription)+") "+
 				match.getStartclock()+" "+match.getPlayclock()+")";
 		notifyStartRunning();
 		String reply=sendMsg(msg, notifier);
@@ -113,7 +125,7 @@ public class RemotePlayer<TermType extends TermInterface,
 	}
 
 	/** MODIFIED
-	 * This is the core of the GDL-II:
+	 * This is the core of GDL-II:
 	 * Instead of sending the actual joint move to the remote players, they only get the computed "sees fluents".
 	 * (and this is the only place where we apply two different behaviors: send the sees fluents in GDL-II games,
 	 * and send the prior moves in regular GDL games)
@@ -128,12 +140,12 @@ public class RemotePlayer<TermType extends TermInterface,
 			msg+="NIL";
 		}else{
 			
-			if (this.gdlVersion == GDLVersion.v1) { // Regular GDL
+			if (this.gdlVersion == GDLVersion.v1) { // Regular GDL player
 				
 				JointMoveInterface<TermType> jointMove = (JointMoveInterface<TermType>) seesFluents;
 				msg+=gameScrambler.scramble(jointMove.getKIFForm()).toUpperCase();
 				
-			} else { // GDL-II
+			} else { // GDL-II player
 				
 				Collection<? extends FluentInterface<TermType>> seesFluents2 =
 					(Collection<? extends FluentInterface<TermType>>) seesFluents;

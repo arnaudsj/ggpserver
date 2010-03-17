@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import tud.gamecontroller.game.FluentInterface;
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MoveInterface;
@@ -66,21 +65,15 @@ public class GameController<
 	private Map<RoleInterface<TermType>, Integer> goalValues=null;
 	private Logger logger;
 	private Collection<GameControllerListener> listeners;
-	private GDLVersion gdlVersion;
-
-	public GameController(RunnableMatchInterface<TermType, State<TermType, ReasonerStateInfoType>> match) {
-		this(match, GDLVersion.v1);
-	}
 	
-	public GameController(RunnableMatchInterface<TermType, State<TermType, ReasonerStateInfoType>> match, GDLVersion gdlVersion) {
+	public GameController(RunnableMatchInterface<TermType, State<TermType, ReasonerStateInfoType>> match) {
 		this.match=match;
 		this.game=match.getGame();
 		this.startclock=match.getStartclock();
 		this.playclock=match.getPlayclock();
 		listeners=new LinkedList<GameControllerListener>();
 		this.logger=Logger.getLogger("tud.gamecontroller");
-		this.gdlVersion = gdlVersion;
-		if(gdlVersion == GDLVersion.v2) {
+		if(this.game.getGdlVersion() == GDLVersion.v2) {
 			logger.info("gdlVersion = II");
 		}
 	}
@@ -113,7 +106,7 @@ public class GameController<
 		int step=1;
 		currentState=game.getInitialState();
 		JointMoveInterface<TermType> priorJointMove=null;
-		logger.info("match:"+match.getMatchID()+", GDL "+gdlVersion);
+		logger.info("match:"+match.getMatchID()+", GDL "+this.game.getGdlVersion());
 		logger.info("game:"+match.getGame().getName());
 		logger.info("starting game with startclock="+startclock+", playclock="+playclock);
 		logger.info("step:"+step);
@@ -192,7 +185,7 @@ public class GameController<
 			
 			Object seesFluents = null;
 			
-			if (this.gdlVersion == GDLVersion.v1) { // Regular GDL
+			if ( match.getPlayer(role).getGdlVersion() == GDLVersion.v1) { // Regular GDL
 				
 				// let's transform our priormoves into seesTerms
 				//System.out.println("priormoves: "+priormoves);

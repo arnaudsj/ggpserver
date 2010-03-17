@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,10 +48,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import tud.auxiliary.NamedObject;
 import tud.gamecontroller.game.FluentInterface;
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.JointMoveInterface;
+import tud.gamecontroller.game.MatchInterface;
+import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.StateInterface;
@@ -59,32 +61,31 @@ import tud.gamecontroller.term.TermInterface;
 
 public class XMLGameStateWriter
 		implements GameControllerListener {
-
+	
+	//private static final Logger logger = Logger.getLogger(Game.class.getName());
+	
 	private String outputDir, matchDir;
 	private List<JointMoveInterface<? extends TermInterface>> moves;
 	private int step;
 	protected RunnableMatchInterface<? extends TermInterface, ?> match;
 	private String stylesheet;
 	
-	// MODIFIED (ADDED) for GDL-II
 	protected RoleInterface<? extends TermInterface> role;
-	protected GDLVersion gdlVersion;
 	
 		
-	public XMLGameStateWriter(String outputDir, String stylesheet, RoleInterface<? extends TermInterface> role, GDLVersion gdlVersion) {
+	public XMLGameStateWriter(String outputDir, String stylesheet, RoleInterface<? extends TermInterface> role) {
 		this.outputDir=outputDir;
 		this.stylesheet=stylesheet;
 		this.moves=new LinkedList<JointMoveInterface<? extends TermInterface>>();
 		this.match=null;
 		this.role = role;
-		this.gdlVersion = gdlVersion;
 	}
 	
 	public void gameStarted(RunnableMatchInterface<? extends TermInterface, ?> match, StateInterface<? extends TermInterface, ?> currentState) {
 		this.match = match;
 		this.step=1;
 		// MODIFIED
-		if (this.gdlVersion == GDLVersion.v1) { // Regular GDL
+		if (this.match.getGame().getGdlVersion() == GDLVersion.v1) { // Regular GDL
 			matchDir=outputDir+File.separator+match.getMatchID();
 		} else { // GDL-II
 			matchDir=outputDir+File.separator+match.getMatchID()+"-"+this.role;
@@ -111,7 +112,7 @@ public class XMLGameStateWriter
 		//System.out.println( ((Game)match.getGame()).getGameDescription() );
 		
 		try {
-			os = createXMLOutputStream(match, currentState, moves, goalValues, stylesheet, this.role, this.gdlVersion);
+			os = createXMLOutputStream(match, currentState, XMLGameStateWriter.getStringMoves(moves), goalValues, stylesheet, this.role, this.match.getGame().getGdlVersion(), null);
 			fileOutputStream = new FileOutputStream(new File(matchDir+File.separator+"step_"+step+".xml"));
 			fileOutputStream.write(os.toByteArray());
 			if(goalValues!=null){ // write the final state twice (once as step_X.xml and once as finalstate.xml)
@@ -140,20 +141,35 @@ public class XMLGameStateWriter
 			}
 		}
 	}
-
+	
+	/**
+	 * 
+	 * @param match
+	 * @param currentState
+	 * @param stringMoves
+	 * @param goalValues
+	 * @param stylesheet
+	 * @param role
+	 * @param gdlVersion
+	 * @param timestamp if null, the current time is set as timestamp for the state (for the standalone GameController). If not null, used as the timestamp (for calls from the server).
+	 * @return
+	 * @throws TransformerFactoryConfigurationError
+	 * @throws IllegalArgumentException
+	 */
 	public static ByteArrayOutputStream createXMLOutputStream(
-			RunnableMatchInterface<? extends TermInterface, ?> match,
+			MatchInterface<? extends TermInterface, ?> match,
 			StateInterface<? extends TermInterface, ?> currentState,
-			List<JointMoveInterface<? extends TermInterface>> moves,
+			List<List<String>> stringMoves,
 			Map<?, Integer> goalValues,
 			String stylesheet,
 			RoleInterface<? extends TermInterface> role,
-			GDLVersion gdlVersion)
+			GDLVersion gdlVersion,
+			Timestamp timestamp)
 			throws TransformerFactoryConfigurationError,
 			IllegalArgumentException {
 		ByteArrayOutputStream os=new ByteArrayOutputStream();
 		try{
-			Document xmldoc=createXML(match, currentState, moves, goalValues, stylesheet, role, gdlVersion);
+			Document xmldoc=createXML(match, currentState, stringMoves, goalValues, stylesheet, role, gdlVersion, timestamp);
 			// Serialization through Transform.
 			DOMSource domSource = new DOMSource(xmldoc);
 			
@@ -188,8 +204,15 @@ public class XMLGameStateWriter
 	 * @return
 	 * @throws ParserConfigurationException
 	 */
-	static public Document createXML(RunnableMatchInterface<? extends TermInterface, ?> match, StateInterface<? extends TermInterface,?> currentState, List<JointMoveInterface<? extends TermInterface>> moves, Map<?, Integer> goalValues, String stylesheet,
-			RoleInterface<? extends TermInterface> role, GDLVersion gdlVersion)
+	static public Document createXML(
+			MatchInterface<? extends TermInterface, ?> match,
+			StateInterface<? extends TermInterface,?> currentState,
+			List<List<String>> stringMoves,
+			Map<?, Integer> goalValues,
+			String stylesheet,
+			RoleInterface<? extends TermInterface> role,
+			GDLVersion gdlVersion,
+			Timestamp timestamp)
 	throws ParserConfigurationException {
 		
 		 Document xmldoc = null;
@@ -201,6 +224,7 @@ public class XMLGameStateWriter
 		 Element e = null;
 		 // Document.
 		 xmldoc = impl.createDocument(null, null, null);
+		 
 		 xmldoc.setXmlVersion("1.0");
 		 if(stylesheet!=null){
 			 Node xsl=xmldoc.createProcessingInstruction("xml-stylesheet","type=\"text/xsl\" href=\""+stylesheet+"\"");
@@ -213,18 +237,38 @@ public class XMLGameStateWriter
 		 e=xmldoc.createElement("match-id");
 		 e.setTextContent(match.getMatchID());
 		 root.appendChild(e);
+		 
+		 // indicate for which player the xml file is meant
+		 String sightOf = ""+role; // avoid role.toString(), because role can be null (just a little trick)
+		 List<? extends RoleInterface<?>> roles = match.getGame().getOrderedRoles();
+		 if (! roles.contains(role) || match.getGame().getGdlVersion() == GDLVersion.v1) {
+			 sightOf = "random";
+		 } else {
+			 sightOf = role.toString();
+		 }
+		 e=xmldoc.createElement("sight-of");
+		 e.setTextContent(sightOf.toUpperCase());
+		 root.appendChild(e);
+		 
+		 
 		 for(GameObjectInterface onerole: match.getGame().getOrderedRoles()){
 			 e=xmldoc.createElement("role");
 			 e.setTextContent(onerole.getPrefixForm());
 			 root.appendChild(e);
 		 }
-		 for(NamedObject p:match.getOrderedPlayers()){
+		 
+		 for(String p:match.getOrderedPlayerNames()){
+			 //logger.info("Adding player "+p.toUpperCase());
 			 e=xmldoc.createElement("player");
-			 e.setTextContent(p.getName().toUpperCase());
+			 e.setTextContent(p.toUpperCase());
 			 root.appendChild(e);
 		 }
 		 e=xmldoc.createElement("timestamp");
-		 e.setTextContent(Long.toString(System.currentTimeMillis()));
+		 if (timestamp == null) { // used for XML files generation (from standalone GameController)
+			 e.setTextContent(Long.toString(System.currentTimeMillis()));
+		 } else { // used for storage in DB (from the ggpserver)
+			 e.setTextContent(Long.toString(timestamp.getTime()));
+		 }
 		 root.appendChild(e);
 		 e=xmldoc.createElement("startclock");
 		 e.setTextContent(Integer.toString(match.getStartclock()));
@@ -235,21 +279,33 @@ public class XMLGameStateWriter
 			 root.appendChild(e);
 		 }
 		 
-		 if (gdlVersion == GDLVersion.v1) { // Regular GDL
-			 root.appendChild(createHistoryElement(xmldoc, moves));
-		 } else { //GDL-II
-			 root.appendChild(createHistoryElement(xmldoc, moves)); // temporary
-			 // do not do anything, we don't want the history to appear
-		 }
+		 root.appendChild(createHistoryElement(xmldoc, stringMoves, role, gdlVersion));
 		 
-		 
+		 //logger.info("goalValues = "+goalValues);
 		 if(goalValues!=null) root.appendChild(createScoresElement(xmldoc, match.getGame(), goalValues));
 		 
 		 root.appendChild(createStateElement(xmldoc, currentState, role, gdlVersion));
 		 
 		 return xmldoc;
 	}
-	
+
+	private static List<List<String>> getStringMoves(
+			List<JointMoveInterface<? extends TermInterface>> moves) {
+		
+		List<List<String>> stringMoves = new LinkedList<List<String>>();
+		
+		for (JointMoveInterface<? extends TermInterface> jointMove: moves) {
+			LinkedList<String> jM = new LinkedList<String>();
+			for (MoveInterface<? extends TermInterface> move: jointMove.getOrderedMoves()) {
+				jM.add(move.getKIFForm());
+			}
+			stringMoves.add(jM);
+		}
+		
+		return stringMoves;
+		
+	}
+
 	@SuppressWarnings("unchecked")
 	private static Node createStateElement(Document xmldoc, StateInterface<? extends TermInterface, ?> currentState,
 			RoleInterface<? extends TermInterface> role, GDLVersion gdlVersion) {
@@ -305,23 +361,44 @@ public class XMLGameStateWriter
 		return scores;
 	}
 
-	private static Element createHistoryElement(Document xmldoc, List<JointMoveInterface<? extends TermInterface>> moves) {
+	private static Element createHistoryElement(
+			Document xmldoc,
+			List<List<String>> moves,
+			RoleInterface<? extends TermInterface> role,
+			GDLVersion gdlVersion) {
 		Element history=xmldoc.createElement("history");
 		int s=1;
-		for(JointMoveInterface<? extends TermInterface> jointMove:moves){
+		
+		//logger.info("createHistoryElement, moves = "+moves);
+		
+		for(List<String> jointMove: moves) {
+			
 			Element step=xmldoc.createElement("step");
 			Element e=xmldoc.createElement("step-number");
 			e.setTextContent(""+s);
 			step.appendChild(e);
-			for(GameObjectInterface move:jointMove.getOrderedMoves()){
-				e=xmldoc.createElement("move");
-				e.setTextContent(move.getPrefixForm());
-				step.appendChild(e);
-			}
-			history.appendChild(step);
 			s++;
+			
+			if (gdlVersion == GDLVersion.v1 || role.getKIFForm().toUpperCase().equals("RANDOM")) { // Regular GDL, or view of the random player (complete information)
+				
+				for(String move: jointMove){
+					e=xmldoc.createElement("move");
+					e.setTextContent(move);
+					step.appendChild(e);
+				}
+				
+			} else { // GDL-II, for players other than random
+				
+				// TODO: what do we want to have in the history, for GDL-II games, instead of the moves history?
+				
+			}
+			
+			history.appendChild(step);
+			
 		}
+		
 		return history;
 	}
+	
 }
 

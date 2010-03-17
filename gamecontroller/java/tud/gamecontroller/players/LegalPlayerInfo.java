@@ -19,10 +19,12 @@
 
 package tud.gamecontroller.players;
 
+import tud.gamecontroller.GDLVersion;
+
 public class LegalPlayerInfo extends LocalPlayerInfo {
 
-	public LegalPlayerInfo(int roleindex) {
-		super(roleindex, "Legal");
+	public LegalPlayerInfo(int roleindex, GDLVersion gdlVersion) {
+		super(roleindex, "Legal", gdlVersion);
 	}
 
 }

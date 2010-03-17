@@ -19,10 +19,12 @@
 
 package tud.gamecontroller.players;
 
+import tud.gamecontroller.GDLVersion;
+
 public class RandomPlayerInfo extends LocalPlayerInfo {
 
-	public RandomPlayerInfo(int roleindex) {
-		super(roleindex, "Random");
+	public RandomPlayerInfo(int roleindex, GDLVersion gdlVersion) {
+		super(roleindex, "Random", gdlVersion);
 	}
 
 }

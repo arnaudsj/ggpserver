@@ -35,6 +35,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
+import tud.gamecontroller.GDLVersion;
+
 public class MatchTraceBuilderTest {
 
     public MatchTraceBuilderTest() {
@@ -67,7 +69,7 @@ public class MatchTraceBuilderTest {
 			File gameFile = new File(gamesDir, gameName + ".lisp");
 			File outputFile = File.createTempFile(gameName, ".trace.xml");
 			
-			RetraceGameControllerRunner.retrace(inputFile, outputFile, gameFile);
+			RetraceGameControllerRunner.retrace(inputFile, outputFile, gameFile, GDLVersion.v1);
 			
 			assertTrue("retrace did not produce identical output: " + inputFile, equalFiles(inputFile, outputFile));
 			assertTrue("could not delete output file", outputFile.delete());

@@ -41,15 +41,10 @@ public abstract class LocalPlayer<TermType extends TermInterface, StateType exte
 	// MODIFIED: in GDL-II, as we don't have the rule that the first turn is the only one where no moves are sent, we have to manage this with a boolean
 	protected boolean firstTurn;
 	protected StatesTracker<TermType, StateType> statesTracker; // TODO: what's that ReasonerStateInfoType (here replaced by '?')
-	
+		
 	
 	public LocalPlayer(String name) {
-		this(name, GDLVersion.v1);
-	}
-	
-	
-	public LocalPlayer(String name, GDLVersion gdlVersion) {
-		super(name, gdlVersion);
+		super(name);
 	}
 	
 	
@@ -61,6 +56,8 @@ public abstract class LocalPlayer<TermType extends TermInterface, StateType exte
 		super.gameStart(match, role, notifier);
 		notifyStartRunning();
 		notifier.connectionEstablished();
+		
+		this.gdlVersion = match.getGame().getGdlVersion();
 		
 		// Regular GDL
 		currentState=match.getGame().getInitialState();

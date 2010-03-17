@@ -19,13 +19,18 @@
 
 package tud.gamecontroller.players;
 
+import tud.gamecontroller.GDLVersion;
+
 public abstract class PlayerInfo {
 	private int roleindex;
 	private String name;
+	
+	private GDLVersion gdlVersion;
 
-	public PlayerInfo(int roleindex, String name) {
+	public PlayerInfo(int roleindex, String name, GDLVersion gdlVersion) {
 		this.roleindex=roleindex;
 		this.name=name;
+		this.setGdlVersion(gdlVersion);
 	}
 
 	public void setRoleindex(int roleindex) {
@@ -70,5 +75,13 @@ public abstract class PlayerInfo {
 		int result = 1;
 		result = PRIME * result + ((name == null) ? 0 : name.hashCode());
 		return result;
+	}
+
+	public void setGdlVersion(GDLVersion gdlVersion) {
+		this.gdlVersion = gdlVersion;
+	}
+
+	public GDLVersion getGdlVersion() {
+		return gdlVersion;
 	}
 }

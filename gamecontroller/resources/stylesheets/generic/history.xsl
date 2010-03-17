@@ -43,6 +43,7 @@
 										<xsl:attribute name="href">
 											<xsl:call-template name="makeStepLinkURL">
 												<xsl:with-param name="step" select="./step-number"/>
+												<xsl:with-param name="role" select="/match/sight-of"/>
 											</xsl:call-template>
 										</xsl:attribute>
 										<xsl:value-of select="./step-number"/>.

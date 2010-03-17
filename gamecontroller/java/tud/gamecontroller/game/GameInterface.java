@@ -19,15 +19,19 @@
 
 package tud.gamecontroller.game;
 
+import java.sql.Timestamp;
 import java.util.List;
 
+import tud.gamecontroller.auxiliary.Pair;
 import tud.auxiliary.NamedObject;
+import tud.gamecontroller.GDLVersion;
+import tud.gamecontroller.game.impl.Match;
 
 public interface GameInterface<
 	TermType,
 	StateType
 	> extends NamedObject{
-
+	
 	public abstract StateType getInitialState();
 
 	public abstract int getNumberOfRoles();
@@ -47,4 +51,13 @@ public interface GameInterface<
 	public abstract String getKIFGameDescription();
 
 	public abstract String getStylesheet();
+	
+	public abstract String getXMLViewFor(
+			Match<?, ?> match,
+			Pair<Timestamp,String> stringState,
+			List<List<String>> stringMoves,
+			RoleInterface<TermType> role);
+	
+	public GDLVersion getGdlVersion();
+	
 }

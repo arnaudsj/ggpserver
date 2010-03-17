@@ -19,17 +19,19 @@
 
 package tud.gamecontroller.players;
 
+import tud.gamecontroller.GDLVersion;
+
 public class RemotePlayerInfo extends PlayerInfo {
 
 	private String host;
 	private int port;
 
-	public RemotePlayerInfo(String name, String host, int port) {
-		this(0, name, host, port);
+	public RemotePlayerInfo(String name, String host, int port, GDLVersion gdlVersion) {
+		this(0, name, host, port, gdlVersion);
 	}
 
-	public RemotePlayerInfo(int roleindex, String name, String host, int port) {
-		super(roleindex, name);
+	public RemotePlayerInfo(int roleindex, String name, String host, int port, GDLVersion gdlVersion) {
+		super(roleindex, name, gdlVersion);
 		this.host=host;
 		this.port=port;
 	}

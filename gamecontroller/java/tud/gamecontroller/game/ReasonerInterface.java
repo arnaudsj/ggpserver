@@ -47,5 +47,7 @@ public interface ReasonerInterface<
 	public Collection<? extends FluentInterface<TermType>> getSeesXMLFluents (ReasonerStateInfoType state, RoleInterface<TermType> role);
 	
 	String getKIFGameDescription();
+	
+	public ReasonerStateInfoType getStateFromString(String state);
 
 }

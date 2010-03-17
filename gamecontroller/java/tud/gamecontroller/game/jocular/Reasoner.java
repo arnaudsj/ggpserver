@@ -224,4 +224,14 @@ public class Reasoner implements ReasonerInterface<Term, ProofContext> {
 	@SuppressWarnings("serial")
 	public class NotImplementedException extends Exception {}
 
+	@Override
+	public ProofContext getStateFromString(String state) {
+		try {
+			throw new NotImplementedException();
+		} catch (NotImplementedException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 }
