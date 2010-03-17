@@ -27,7 +27,7 @@ public class Tests {
 		env.put(Context.INITIAL_CONTEXT_FACTORY,
 				"com.sun.jndi.rmi.registry.RegistryContextFactory");
 		env.put(Context.PROVIDER_URL, "rmi://localhost:1099");
-		InitialContext context = new InitialContext(env);
+		/* InitialContext context = */ new InitialContext(env);
 		
 		Set<Entry<Object, Object>> entrySet = env.entrySet();
 		for (Entry<Object, Object> entry : entrySet) {
