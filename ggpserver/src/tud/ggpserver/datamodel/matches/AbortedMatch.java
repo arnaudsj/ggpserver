@@ -19,11 +19,11 @@
 
 package tud.ggpserver.datamodel.matches;
 
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import tud.gamecontroller.auxiliary.Pair;
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.impl.State;
@@ -36,7 +36,6 @@ import tud.ggpserver.datamodel.dblists.ErrorMessageAccessor;
 import tud.ggpserver.datamodel.dblists.JointMovesAccessor;
 import tud.ggpserver.datamodel.dblists.StaticDBBackedList;
 import tud.ggpserver.datamodel.dblists.StringStateAccessor;
-import tud.gamecontroller.auxiliary.Pair;
 
 public class AbortedMatch<TermType extends TermInterface, ReasonerStateInfoType>
 		extends ServerMatch<TermType, ReasonerStateInfoType> {
@@ -71,9 +70,9 @@ public class AbortedMatch<TermType extends TermInterface, ReasonerStateInfoType>
 	}
 
 	@Override
-	public List<Pair<Timestamp,String>> getStringStates() {
+	public List<Pair<Date,String>> getStringStates() {
 		if (stringStates == null) {
-			stringStates = new StaticDBBackedList<Pair<Timestamp,String>>(new StringStateAccessor(getMatchID(), getDB(), getGame().getStylesheet()), false);
+			stringStates = new StaticDBBackedList<Pair<Date,String>>(new StringStateAccessor(getMatchID(), getDB(), getGame().getStylesheet()), false);
 		}
 		return stringStates;
 	}

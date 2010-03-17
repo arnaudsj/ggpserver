@@ -28,8 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import java.sql.Timestamp;
-
+import tud.gamecontroller.auxiliary.Pair;
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.impl.Match;
@@ -43,7 +42,6 @@ import tud.ggpserver.collectionviews.Mapping;
 import tud.ggpserver.collectionviews.Mappings;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.User;
-import tud.gamecontroller.auxiliary.Pair;
 
 public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateInfoType>
 		extends Match<TermType, ReasonerStateInfoType>{
@@ -86,7 +84,7 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 	/**
 	 * State 0 = initial state, State 1 = state after first joint move, ..., State n = final state
 	 */
-	protected List<Pair<Timestamp,String>> stringStates;
+	protected List<Pair<Date, String>> stringStates = null;
 	
 	protected List<List<String>> jointMovesStrings;
 	
@@ -229,7 +227,7 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 
 	/////////////////////// String states (Pair<String timestamp, String state>)///////////////////////
 	
-	public abstract List<Pair<Timestamp,String>> getStringStates();
+	public abstract List<Pair<Date,String>> getStringStates();
 
 	/////////////////////// error messages ///////////////////////
 	

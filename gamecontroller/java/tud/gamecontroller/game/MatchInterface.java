@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>, Nicolas JEAN <njean42@gmail.com>
+    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+                  2010 Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
 
@@ -19,11 +20,11 @@
 
 package tud.gamecontroller.game;
 
-import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
-import tud.gamecontroller.auxiliary.Pair;
 import tud.gamecontroller.GDLVersion;
+import tud.gamecontroller.auxiliary.Pair;
 
 
 /**
@@ -49,7 +50,7 @@ public interface MatchInterface<TermType, StateType extends StateInterface<TermT
 	public abstract List<String> getOrderedPlayerNames();
 	
 	public String getXMLViewFor(
-			Pair<Timestamp,String> stringState,
+			Pair<Date,String> stringState,
 			List<List<String>> stringMoves,
 			RoleInterface<TermType> role,
 			GDLVersion gdlVersion);

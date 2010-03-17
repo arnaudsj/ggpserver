@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2009-2010 Martin Günther <mintar@gmx.de>, Nicolas JEAN <njean42@gmail.com> 
+    Copyright (C) 2009-2010 Martin Günther <mintar@gmx.de> 
+                  2010 Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GGP Server.
 
@@ -26,12 +27,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import tud.ggpserver.util.Utilities;
 import tud.gamecontroller.game.impl.Game;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
 import tud.ggpserver.datamodel.User;
+import tud.ggpserver.util.Utilities;
 
 public class EditPlayer {
 	private boolean correctlyUpdated = false;

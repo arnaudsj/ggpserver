@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>, Nicolas JEAN <njean42@gmail.com>
+    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+                  2010 Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
 
@@ -23,18 +24,18 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import tud.gamecontroller.auxiliary.Pair;
 import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.ReasonerFactory;
 import tud.gamecontroller.XMLGameStateWriter;
+import tud.gamecontroller.auxiliary.Pair;
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.ReasonerInterface;
@@ -323,11 +324,9 @@ public class Game<
 		
 	}
 
-	
-	@Override
 	public String getXMLViewFor(
 			Match<?, ?> match,
-			Pair<Timestamp,String> stringState,
+			Pair<Date,String> stringState,
 			List<List<String>> stringMoves,
 			RoleInterface<TermType> role) {
 		

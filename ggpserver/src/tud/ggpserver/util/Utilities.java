@@ -1,12 +1,11 @@
 package tud.ggpserver.util;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 import tud.gamecontroller.GDLVersion;
-import tud.ggpserver.scheduler.SchedulerVersion;
-
 import tud.gamecontroller.players.PlayerInfo;
+import tud.ggpserver.scheduler.SchedulerVersion;
 
 public class Utilities {
 	

@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2009-2010 Martin Günther <mintar@gmx.de>, Nicolas JEAN <njean42@gmail.com> 
+    Copyright (C) 2009-2010 Martin Günther <mintar@gmx.de> 
+                  2010 Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GGP Server.
 
@@ -20,17 +21,16 @@
 package tud.ggpserver.formhandlers;
 
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
-import java.sql.Timestamp;
-
 import tud.gamecontroller.GDLVersion;
+import tud.gamecontroller.auxiliary.Pair;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.impl.Game;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.matches.ServerMatch;
-import tud.gamecontroller.auxiliary.Pair;
 
 public class ViewState {
 	
@@ -66,7 +66,7 @@ public class ViewState {
 	public String getXmlState() {
 		
 		int stepNumber = this.stepNumber;
-		List<Pair<Timestamp,String>> stringStates = match.getStringStates();
+		List<Pair<Date,String>> stringStates = match.getStringStates();
 		
 		int numberOfStates = stringStates.size();
 		if(numberOfStates > 0) {

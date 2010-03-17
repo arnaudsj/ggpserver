@@ -20,13 +20,13 @@
 package tud.ggpserver.datamodel.dblists;
 
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
-import java.sql.Timestamp;
 
 import tud.gamecontroller.auxiliary.Pair;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 
-public class StringStateAccessor implements DBAccessor<Pair<Timestamp,String>> {
+public class StringStateAccessor implements DBAccessor<Pair<Date,String>> {
 	private final AbstractDBConnector<?, ?> db;
 	private final String matchID;
 	
@@ -45,13 +45,13 @@ public class StringStateAccessor implements DBAccessor<Pair<Timestamp,String>> {
 	}
 
 
-	public List<Pair<Timestamp,String>> getAllElements() throws SQLException {
+	public List<Pair<Date,String>> getAllElements() throws SQLException {
 		return db.getStringStates(matchID);
 	}
 
-	public Pair<Timestamp,String> getElement(int stepNumber) throws SQLException {
+	public Pair<Date,String> getElement(int stepNumber) throws SQLException {
 		
-		Pair<Timestamp,String> stringState = db.getStringState(matchID, stepNumber + 1);   // stepNumber starts from 0, in DB from 1
+		Pair<Date,String> stringState = db.getStringState(matchID, stepNumber + 1);   // stepNumber starts from 0, in DB from 1
 
 		// this is a hack to show old matches with the right stylesheets
 		// (e.g., if the stylesheet for a game was changed after the match)

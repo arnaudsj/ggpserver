@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>, Nicolas JEAN <njean42@gmail.com>
+    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>
+                  2010 Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
 
@@ -42,7 +43,5 @@ public interface StateInterface<
 	Collection<? extends FluentInterface<TermType>> getSeesFluents(RoleInterface<TermType> role, JointMoveInterface<TermType> jointMove);
 	
 	Collection<? extends FluentInterface<TermType>> getSeesXMLFluents(RoleInterface<TermType> role);
-	
-	public String toString ();
 	
 }

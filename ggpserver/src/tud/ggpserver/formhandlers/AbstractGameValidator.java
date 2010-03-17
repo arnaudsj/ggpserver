@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2009 Martin Günther <mintar@gmx.de>, Nicolas JEAN <njean42@gmail.com>
+    Copyright (C) 2009 Martin Günther <mintar@gmx.de>
+                  2010 Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GGP Server.
 
@@ -20,6 +21,8 @@
 package tud.ggpserver.formhandlers;
 
 
+import static tud.ggpserver.datamodel.DBConnectorFactory.getDBConnector;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
@@ -38,8 +41,6 @@ import tud.gamecontroller.game.javaprover.Term;
 import tud.ggpserver.datamodel.User;
 import cs227b.teamIago.parser.Axioms;
 import cs227b.teamIago.util.GameState;
-
-import static tud.ggpserver.datamodel.DBConnectorFactory.getDBConnector;
 
 public abstract class AbstractGameValidator {
 	/*

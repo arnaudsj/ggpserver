@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import tud.ggpserver.util.Utilities;
 import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.term.TermInterface;
@@ -38,6 +37,7 @@ import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
 import tud.ggpserver.datamodel.matches.FinishedMatch;
 import tud.ggpserver.datamodel.matches.ServerMatch;
+import tud.ggpserver.util.Utilities;
 
 /**
  * Keeps track of errors a player makes and disables players making too many errors. 

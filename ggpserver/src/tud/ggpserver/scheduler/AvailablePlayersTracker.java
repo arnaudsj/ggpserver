@@ -33,7 +33,6 @@ import java.util.logging.Logger;
 import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
-import tud.ggpserver.util.Utilities;
 
 /**
  * Keeps track of active / inactive players and of players currently playing a match.

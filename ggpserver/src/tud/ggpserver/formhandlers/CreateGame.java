@@ -23,8 +23,8 @@ import static tud.ggpserver.datamodel.DBConnectorFactory.getDBConnector;
 
 import java.sql.SQLException;
 
-import tud.ggpserver.util.Utilities;
 import tud.ggpserver.datamodel.DuplicateInstanceException;
+import tud.ggpserver.util.Utilities;
 
 public class CreateGame extends AbstractGameValidator {
 	private boolean correctlyCreated = false;

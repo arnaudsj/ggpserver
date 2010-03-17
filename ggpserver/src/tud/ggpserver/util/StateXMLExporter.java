@@ -22,7 +22,7 @@ package tud.ggpserver.util;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -61,7 +61,7 @@ public class StateXMLExporter {
 		ZipEntry zipEntry=new ZipEntry(matchDir);
 		zip.putNextEntry(zipEntry);
 		String xmlState=null;
-		List<Pair<Timestamp,String>> stringStates = match.getStringStates();
+		List<Pair<Date,String>> stringStates = match.getStringStates();
 		for(int step=0; step<stringStates.size(); step++) {
 			xmlState=stringStates.get(step).getRight(); // TODO: generate XMLStates from StringStates instead!
 			if(xmlState != null)

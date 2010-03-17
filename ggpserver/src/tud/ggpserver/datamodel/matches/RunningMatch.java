@@ -20,7 +20,6 @@
 package tud.ggpserver.datamodel.matches;
 
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -29,9 +28,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import tud.gamecontroller.auxiliary.Pair;
 import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.GameControllerListener;
+import tud.gamecontroller.auxiliary.Pair;
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MoveFactoryInterface;
@@ -173,9 +172,9 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 	}
 
 	@Override
-	public List<Pair<Timestamp,String>> getStringStates() {
+	public List<Pair<Date,String>> getStringStates() {
 		if (stringStates == null) {
-			stringStates = new DynamicDBBackedList<Pair<Timestamp,String>>(new StringStateAccessor(getMatchID(), getDB(), getGame().getStylesheet()), false);
+			stringStates = new DynamicDBBackedList<Pair<Date,String>>(new StringStateAccessor(getMatchID(), getDB(), getGame().getStylesheet()), false);
 		}
 		return stringStates;
 	}

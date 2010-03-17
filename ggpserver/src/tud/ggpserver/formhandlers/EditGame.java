@@ -23,8 +23,8 @@ import static tud.ggpserver.datamodel.DBConnectorFactory.getDBConnector;
 
 import java.sql.SQLException;
 
-import tud.ggpserver.util.Utilities;
 import tud.ggpserver.datamodel.Game;
+import tud.ggpserver.util.Utilities;
 
 public class EditGame extends AbstractGameValidator {
 	private boolean correctlyUpdated = false;

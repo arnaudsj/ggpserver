@@ -27,7 +27,6 @@ import java.util.logging.Logger;
 
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.ConfigOption;
-import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.Game;
 import tud.ggpserver.datamodel.Tournament;
 import tud.ggpserver.scheduler.RoundRobinScheduler;

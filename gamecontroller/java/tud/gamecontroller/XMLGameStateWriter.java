@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>, Nicolas JEAN <njean42@gmail.com>
+    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>
+                  2010 Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
 
@@ -24,8 +25,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -151,7 +152,7 @@ public class XMLGameStateWriter
 	 * @param stylesheet
 	 * @param role
 	 * @param gdlVersion
-	 * @param timestamp if null, the current time is set as timestamp for the state (for the standalone GameController). If not null, used as the timestamp (for calls from the server).
+	 * @param date if null, the current time is set as timestamp for the state (for the standalone GameController). If not null, used as the timestamp (for calls from the server).
 	 * @return
 	 * @throws TransformerFactoryConfigurationError
 	 * @throws IllegalArgumentException
@@ -164,12 +165,12 @@ public class XMLGameStateWriter
 			String stylesheet,
 			RoleInterface<? extends TermInterface> role,
 			GDLVersion gdlVersion,
-			Timestamp timestamp)
+			Date date)
 			throws TransformerFactoryConfigurationError,
 			IllegalArgumentException {
 		ByteArrayOutputStream os=new ByteArrayOutputStream();
 		try{
-			Document xmldoc=createXML(match, currentState, stringMoves, goalValues, stylesheet, role, gdlVersion, timestamp);
+			Document xmldoc=createXML(match, currentState, stringMoves, goalValues, stylesheet, role, gdlVersion, date);
 			// Serialization through Transform.
 			DOMSource domSource = new DOMSource(xmldoc);
 			
@@ -212,7 +213,7 @@ public class XMLGameStateWriter
 			String stylesheet,
 			RoleInterface<? extends TermInterface> role,
 			GDLVersion gdlVersion,
-			Timestamp timestamp)
+			Date date)
 	throws ParserConfigurationException {
 		
 		 Document xmldoc = null;
@@ -264,10 +265,10 @@ public class XMLGameStateWriter
 			 root.appendChild(e);
 		 }
 		 e=xmldoc.createElement("timestamp");
-		 if (timestamp == null) { // used for XML files generation (from standalone GameController)
+		 if (date == null) { // used for XML files generation (from standalone GameController)
 			 e.setTextContent(Long.toString(System.currentTimeMillis()));
 		 } else { // used for storage in DB (from the ggpserver)
-			 e.setTextContent(Long.toString(timestamp.getTime()));
+			 e.setTextContent(Long.toString(date.getTime()));
 		 }
 		 root.appendChild(e);
 		 e=xmldoc.createElement("startclock");

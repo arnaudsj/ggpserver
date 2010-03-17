@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>, Nicolas JEAN <njean42@gmail.com>
+    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+                  2010 Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
 
@@ -19,11 +20,11 @@
 
 package tud.gamecontroller.game.impl;
 
+import java.util.Date;
 import java.util.List;
-import java.sql.Timestamp;
 
-import tud.gamecontroller.auxiliary.Pair;
 import tud.gamecontroller.GDLVersion;
+import tud.gamecontroller.auxiliary.Pair;
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.RoleInterface;
@@ -91,11 +92,8 @@ public abstract class Match<TermType extends TermInterface, ReasonerStateInfoTyp
 		return true;
 	}
 	
-	
-	@Override
-	public String getXMLViewFor(Pair<Timestamp,String> stringState, List<List<String>> moves, RoleInterface<TermType> role, GDLVersion gdlVersion) {
+	public String getXMLViewFor(Pair<Date,String> stringState, List<List<String>> moves, RoleInterface<TermType> role, GDLVersion gdlVersion) {
 		return this.getGame().getXMLViewFor(this, stringState, moves, role);
 	}
-	
 	
 }

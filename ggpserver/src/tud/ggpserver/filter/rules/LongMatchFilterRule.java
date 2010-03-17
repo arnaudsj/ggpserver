@@ -22,6 +22,7 @@ package tud.ggpserver.filter.rules;
 import java.util.List;
 
 import tud.ggpserver.filter.Filter;
+import tud.ggpserver.filter.FilterNode;
 import tud.ggpserver.filter.matcher.Comparison;
 import tud.ggpserver.filter.matcher.LongMatcher;
 import tud.ggpserver.filter.matcher.Matcher;

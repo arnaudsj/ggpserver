@@ -22,8 +22,8 @@ package tud.ggpserver.formhandlers;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
 import java.util.Map;
+
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.players.PlayerInfo;

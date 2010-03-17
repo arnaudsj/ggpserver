@@ -7,10 +7,15 @@ package tud.ggpserver.ratingsystem;
  *
  */
 
-import java.io.*;
-import java.awt.image.*;
-import javax.servlet.*;
-import javax.servlet.http.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import com.keypoint.PngEncoder;
 
 public class ChartViewer extends HttpServlet {

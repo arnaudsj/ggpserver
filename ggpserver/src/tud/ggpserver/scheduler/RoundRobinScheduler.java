@@ -24,8 +24,6 @@ import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import cs227b.teamIago.util.GameState;
 
-import java.util.HashMap;
-
 public class RoundRobinScheduler extends AbstractRoundRobinScheduler<Term, GameState> {
 	
 	private static RoundRobinScheduler instance = null;

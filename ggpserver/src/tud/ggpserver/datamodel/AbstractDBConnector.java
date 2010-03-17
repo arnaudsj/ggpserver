@@ -45,6 +45,7 @@ import javax.sql.DataSource;
 
 import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.ReasonerFactory;
+import tud.gamecontroller.auxiliary.Pair;
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MoveFactoryInterface;
@@ -75,7 +76,6 @@ import tud.ggpserver.scheduler.PlayerStatusListener;
 import tud.ggpserver.scheduler.SchedulerVersion;
 import tud.ggpserver.util.Digester;
 import tud.ggpserver.util.Utilities;
-import tud.gamecontroller.auxiliary.Pair;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 
@@ -1860,12 +1860,12 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return result;
 	}
 
-	public List<Pair<Timestamp,String>> getStringStates(String matchID) throws SQLException {
+	public List<Pair<Date,String>> getStringStates(String matchID) throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
-		List<Pair<Timestamp,String>> result = new LinkedList<Pair<Timestamp,String>>();
+		List<Pair<Date,String>> result = new LinkedList<Pair<Date,String>>();
 
 		try {
 			ps = con.prepareStatement("SELECT `step_number`, `state`, `timestamp` FROM `states` WHERE `match_id` = ? ORDER BY `step_number` ;");
@@ -1875,7 +1875,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			int stepNumber = 1;
 			while (rs.next()) {
 				assert(rs.getInt("step_number") == stepNumber);
-				result.add(new Pair<Timestamp,String>(rs.getTimestamp("timestamp"), rs.getString("state")));
+				result.add(new Pair<Date,String>(rs.getTimestamp("timestamp"), rs.getString("state")));
 				stepNumber++;
 			}
 		} finally { 
@@ -1890,7 +1890,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return result;
 	}
 
-	public Pair<Timestamp,String> getStringState(String matchID, int stepNumber) throws SQLException {
+	public Pair<Date,String> getStringState(String matchID, int stepNumber) throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -1904,7 +1904,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			rs = ps.executeQuery();
 			
 			if (rs.next()) {
-				return new Pair<Timestamp,String>(rs.getTimestamp("timestamp"), rs.getString("state"));
+				return new Pair<Date,String>(rs.getTimestamp("timestamp"), rs.getString("state"));
 			} else {
 				throw new SQLException("XML state not found!");
 			}

@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>, Nicolas JEAN <njean42@gmail.com>
+    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>
+                  2010 Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
 
@@ -233,8 +234,7 @@ public class Reasoner implements ReasonerInterface<Term, GameState> {
 		this.gameSim.ParseFileIntoTheory(filename);
 	}
 
-	@Override
-	public GameState getStateFromString (String state) {
+	public GameState getStateFromString(String state) {
 		
 		ExpList el = Parser.parseExpList(state);
 		Expression[] exps = new Expression[el.size()];

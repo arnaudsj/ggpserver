@@ -20,7 +20,6 @@
 package tud.ggpserver.filter.matcher;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 import tud.ggpserver.filter.htmlform.DropDownMenu;
 import tud.ggpserver.filter.htmlform.HtmlForm;

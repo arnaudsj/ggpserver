@@ -55,6 +55,13 @@
 	<jsp:directive.include file="/inc/pager_title.jsp" />
 	<%-- the filtered list of matches --%> 
 	<jsp:directive.include file="/inc/match_table.jsp" />
+
+	<c:url value="/public/show_filter.jsp" var="statisticsURL">
+		<c:param name="filterId" value="${editMatchFilter.filterId}"/>
+		<c:param name="showFilter" value="${editMatchFilter.showFilter}"/>
+		<c:param name="applyFilter" value="${editMatchFilter.applyFilter}"/>
+	</c:url>
+	<a href="${statisticsURL}">View statistics for these matches.</a>
 </c:if>
 
 <jsp:directive.include file="/inc/footer.jsp" />

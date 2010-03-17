@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>, Nicolas JEAN <njean42@gmail.com>
+    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>
+                  2010 Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
 
@@ -198,7 +199,6 @@ public class Reasoner implements ReasonerInterface<Term, ProofContext> {
 		return parser.getSymbolTable();
 	}
 
-	@Override
 	public Collection<? extends FluentInterface<Term>> getSeesFluents(
 			ProofContext state, RoleInterface<Term> role,
 			JointMoveInterface<Term> jointMove) {
@@ -210,7 +210,6 @@ public class Reasoner implements ReasonerInterface<Term, ProofContext> {
 		return null;
 	}
 
-	@Override
 	public Collection<? extends FluentInterface<Term>> getSeesXMLFluents(
 			ProofContext state, RoleInterface<Term> role) {
 		try {
@@ -224,7 +223,6 @@ public class Reasoner implements ReasonerInterface<Term, ProofContext> {
 	@SuppressWarnings("serial")
 	public class NotImplementedException extends Exception {}
 
-	@Override
 	public ProofContext getStateFromString(String state) {
 		try {
 			throw new NotImplementedException();

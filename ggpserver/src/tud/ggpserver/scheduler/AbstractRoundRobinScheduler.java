@@ -1,5 +1,7 @@
 /*
-    Copyright (C) 2009-2010 Martin Günther <mintar@gmx.de>, Stephan Schiffel <stephan.schiffel@gmx.de>, Nicolas JEAN <njean42@gmail.com>
+    Copyright (C) 2009 Martin Günther <mintar@gmx.de>
+                  2009-2010 Stephan Schiffel <stephan.schiffel@gmx.de>
+                  2010 Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GGP Server.
 
