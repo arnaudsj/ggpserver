@@ -235,6 +235,10 @@ dt {
 	font-weight: bold;
 }
 
+span.heading
+{
+    font-weight:        bold;
+}
 
 div#content table
 {

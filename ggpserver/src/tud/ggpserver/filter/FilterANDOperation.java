@@ -21,17 +21,26 @@
 package tud.ggpserver.filter;
 
 import java.util.Collection;
+import java.util.List;
 
-import tud.ggpserver.util.IdPool;
 import tud.ggpserver.datamodel.MatchInfo;
+import tud.ggpserver.util.IdPool;
 
 public class FilterANDOperation extends FilterOperation{
 
-	protected FilterANDOperation(IdPool<FilterNode> ids, Filter filter) {
-		this(ids, filter, null);
+	public FilterANDOperation(Filter filter) {
+		this(filter, null);
 	}
-	protected FilterANDOperation(IdPool<FilterNode> ids, Filter filter, Collection<FilterNode> successors) {
-		super(ids, FilterType.And, filter, successors);
+	public FilterANDOperation(Filter filter, Collection<FilterNode> successors) {
+		super(FilterType.And, filter, successors);
+	}
+	/**
+	 * Using this constructor will leave the filter field of FilterNode null which may cause NullPointerExceptions.
+	 * Therefore, it is protected and only used in the class Filter. 
+	 * @param ids
+	 */
+	protected FilterANDOperation(IdPool<FilterNode> ids) {
+		super(ids, FilterType.And, null, null);
 	}
 
 	@Override
@@ -41,5 +50,21 @@ public class FilterANDOperation extends FilterOperation{
 				return false;
 		}
 		return true;
+	}
+
+	@Override
+	public boolean prepareMatchInfosStatement(String matchTableName, String matchPlayerTableName, StringBuilder where, List<Object> parameters) {
+		boolean equivalent = true;
+		if (getSuccessors().size() == 1) {
+			equivalent &= getSuccessors().get(0).prepareMatchInfosStatement(matchTableName, matchPlayerTableName, where, parameters);
+		} else {
+			where.append(" (TRUE");
+			for(FilterNode n:getSuccessors()) {
+				where.append(" AND");
+				equivalent &= n.prepareMatchInfosStatement(matchTableName, matchPlayerTableName, where, parameters);
+			}
+			where.append(" )");
+		}
+		return equivalent;
 	}
 }

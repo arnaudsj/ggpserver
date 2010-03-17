@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+    Copyright (C) 2010 Stephan Schiffel <stephan.schiffel@gmx.de> 
 
     This file is part of GGP Server.
 
@@ -22,20 +22,17 @@ package tud.ggpserver.formhandlers;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
-import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
-import tud.gamecontroller.players.PlayerInfo;
-import tud.ggpserver.datamodel.AbstractDBConnector;
-import tud.ggpserver.datamodel.DBConnectorFactory;
-import tud.ggpserver.datamodel.Tournament;
-import tud.ggpserver.datamodel.statistics.GameStatisticsChartCreator;
-import tud.ggpserver.datamodel.statistics.TournamentStatistics;
+import tud.ggpserver.datamodel.statistics.StatisticsChartCreator;
+import tud.ggpserver.filter.Filter;
 
-public class ViewTournamentChart {
+public class ViewStatistics {
 	
 	private HttpSession session;
+
+	private Filter filter;
 
 	private String tournamentID;
 	
@@ -48,6 +45,18 @@ public class ViewTournamentChart {
 	
 	private double smoothingFactor = 0.1;
 	
+	public void setFilter(Filter filter) {
+		this.filter = filter;
+	}
+
+	public Filter getFilter() {
+		return filter;
+	}
+
+	public long getFilterId() {
+		return filter.getId();
+	}
+
 	public String getTournamentID() {
 		return tournamentID;
 	}
@@ -77,23 +86,24 @@ public class ViewTournamentChart {
 	}
 
 	public ImageInfo getChart() throws SQLException, UnsupportedEncodingException, IOException {
-		if (imageInfo  == null) {
-			GameStatisticsChartCreator chartCreator = new GameStatisticsChartCreator(session, null, tournamentID, null, null, minMatchNumber, smoothingFactor);
-			imageInfo = new ImageInfo(chartCreator.getImageID(), chartCreator.getImageMap(), chartCreator.getImageMapID());
+		if (imageInfo == null) {
+			StatisticsChartCreator chartCreator = new StatisticsChartCreator(session, null, filter, -1, minMatchNumber, smoothingFactor);
+			imageInfo = new ImageInfo(chartCreator.getImageID(), chartCreator.getImageMap(), chartCreator.getImageMapID(), chartCreator.getNumberOfMatches());
 		}
 		return imageInfo;
 	}
-
 
 	public class ImageInfo {
 		private String imageID;
 		private String imageMap;
 		private String imageMapID;
+		private long numberOfMatches;
 		
-		public ImageInfo(String imageID, String imageMap, String imageMapID) {
+		public ImageInfo(String imageID, String imageMap, String imageMapID, long numberOfMatches) {
 			this.imageID = imageID;
 			this.imageMap = imageMap;
-			this.imageMapID = imageMapID; 
+			this.imageMapID = imageMapID;
+			this.numberOfMatches = numberOfMatches;
 		}
 
 		public String getImageID() {
@@ -106,6 +116,10 @@ public class ViewTournamentChart {
 		
 		public String getImageMapID() {
 			return imageMapID;
+		}
+
+		public long getNumberOfMatches() {
+			return numberOfMatches;
 		}
 	}
 

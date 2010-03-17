@@ -19,20 +19,42 @@
 
 package tud.ggpserver.filter.rules;
 
+import java.util.List;
+
 import tud.ggpserver.filter.Filter;
-import tud.ggpserver.filter.FilterNode;
+import tud.ggpserver.filter.matcher.Comparison;
 import tud.ggpserver.filter.matcher.LongMatcher;
 import tud.ggpserver.filter.matcher.Matcher;
-import tud.ggpserver.util.IdPool;
 
-public abstract class LongMatchFilterRule extends MatchFilterRule<Long>{
+public abstract class LongMatchFilterRule extends MatchFilterRule<Comparison, Long>{
 	
-	public LongMatchFilterRule(IdPool<FilterNode> ids, FilterType type, Filter filter) {
-		super(ids, type, filter);
+	public LongMatchFilterRule(FilterType type, Filter filter) {
+		this(type, filter, Comparison.Equal, null);
+	}
+	public LongMatchFilterRule(FilterType type, Filter filter, Comparison comparison, Long pattern) {
+		super(type, filter, comparison, pattern);
 	}
 
 	@Override
-	public Matcher<Long> createMatcher() {
-		return new LongMatcher(String.valueOf(getID()));
+	public Matcher<Comparison, Long> createMatcher(Comparison comparison, Long pattern) {
+		return new LongMatcher(String.valueOf(getId()), comparison, pattern);
 	}
+
+	/**
+	 * @see FilterNode.prepareMatchInfosStatement
+	 * @param tableColumnName
+	 * @param where
+	 * @param parameters
+	 * @return
+	 */
+	public boolean prepareMatchInfosStatement(String tableColumnName, StringBuilder where, List<Object> parameters) {
+		if (getMatcher().getPattern() != null) {
+			where.append(" ").append(tableColumnName)
+				.append(getMatcher().getComparison().getSQLOperator())
+				.append("?");
+			parameters.add(getMatcher().getPattern());
+		}
+		return true;
+	}
+
 }

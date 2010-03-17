@@ -20,24 +20,72 @@
 package tud.ggpserver.filter.matcher;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import tud.ggpserver.filter.htmlform.DropDownMenu;
 import tud.ggpserver.filter.htmlform.HtmlForm;
 import tud.ggpserver.filter.htmlform.TextBox;
 import tud.ggpserver.filter.htmlform.DropDownMenu.Option;
 
-public abstract class Matcher<T> extends HtmlForm {
+public abstract class Matcher<ComparisonType, PatternType> extends HtmlForm {
 
-	protected DropDownMenu comparisonMenu;
-	protected TextBox patternTextBox;
+	private ComparisonType comparison = null;
+	private PatternType pattern = null;
 
-	public Matcher(String id) {
+	public Matcher(String id, ComparisonType comparison, PatternType pattern) {
 		super(id);
-		
-		comparisonMenu = createMenu();
-		patternTextBox = createTextBox();
+		setComparison(comparison);
+		setPattern(pattern);
+	}
 
-		initMatcher();
+	public ComparisonType getComparison() {
+		return comparison;
+	}
+
+	public boolean setComparison(ComparisonType comparison) {
+		if(comparison==this.comparison || (comparison!=null && comparison.equals(this.comparison)))
+			return false;
+		this.comparison = comparison;
+		return true;
+	}
+
+	/**
+	 * called upon update of the comparison
+	 * 
+	 * The method should check if the comparison is correct, setting error messages using addErrorMessage(String msg) if necessary.
+	 */
+	public abstract boolean setComparisonFromString(String comparison);
+
+	/**
+	 * Override this method to change the string representation of the comparison in case ComparisonType.toString() does not do the right thing.
+	 */
+	public String getStringForComparison() {
+		return comparison.toString();
+	}
+
+	public PatternType getPattern() {
+		return pattern;
+	}
+
+	public boolean setPattern(PatternType pattern) {
+		if(pattern==this.pattern || (pattern!=null && pattern.equals(this.pattern)))
+			return false;
+		this.pattern = pattern;
+		return true;
+	}
+
+	/**
+	 * called upon update of the pattern
+	 * 
+	 * The method should check if the pattern is correct, setting error messages using addErrorMessage(String msg) if necessary.
+	 */
+	public abstract boolean setPatternFromString(String pattern);
+
+	/**
+	 * Override this method to change the string representation of the pattern in case PatternType.toString() does not do the right thing.
+	 */
+	public String getStringForPattern() {
+		return pattern.toString();
 	}
 
 	/**
@@ -47,7 +95,7 @@ public abstract class Matcher<T> extends HtmlForm {
 	 */
 	protected DropDownMenu createMenu() {
 		List<Option> options = getOptions();
-		return new DropDownMenu(getId(), options, options.get(0).value);
+		return new DropDownMenu(getId(), options, getStringForComparison());
 	}
 
 	/**
@@ -55,21 +103,19 @@ public abstract class Matcher<T> extends HtmlForm {
 	 * @return the initial TextBox
 	 */
 	protected TextBox createTextBox() {
-		return new TextBox(getId());
+		String patternString = "*";
+		if(pattern!=null)
+			patternString = getStringForPattern();
+		return new TextBox(getId(), patternString);
 	}
 
 	public abstract List<Option> getOptions();
 
-	/**
-	 * called upon update of the value of the comparisonMenu or the patternTextBox
-	 * 
-	 * The method should check of the pattern is correct, setting error messages using addErrorMessage(String msg) if necessary.
-	 */
-	protected abstract void initMatcher();
-
 	@Override
 	public String getHtml() {
 		StringBuilder sb = new StringBuilder();
+		DropDownMenu comparisonMenu = createMenu();
+		TextBox patternTextBox = createTextBox();
 		sb.append(comparisonMenu.getHtml()).append(patternTextBox.getHtml()).append(getErrorHtml());
 		return sb.toString();
 	}
@@ -77,31 +123,17 @@ public abstract class Matcher<T> extends HtmlForm {
 	public boolean update(String comparison, String pattern) {
 		resetErrorMessage();
 		boolean changed = false;
-		if (!comparisonMenu.getSelectedValue().equals(comparison)) {
-			comparisonMenu.setSelectedValue(comparison);
+		if(setComparisonFromString(comparison))
 			changed = true;
-		};
-		
-		if (!patternTextBox.getValue().equals(pattern)) {
-			patternTextBox.setValue(pattern);
+		if(setPatternFromString(pattern))
 			changed = true;
-		}
-		if(changed){
-			initMatcher();
-		}
 		return changed;
 	}
 	
-	public void setPattern(String pattern) {
-		resetErrorMessage();
-		patternTextBox.setValue(pattern);
-		initMatcher();
-	}
-	
-	public abstract boolean isMatching(T t);
+	public abstract boolean isMatching(PatternType t);
 
 	@Override
 	public String toString() {
-		return comparisonMenu.getSelectedValue()+" "+patternTextBox.getValue();
+		return comparison+" "+pattern;
 	}
 }

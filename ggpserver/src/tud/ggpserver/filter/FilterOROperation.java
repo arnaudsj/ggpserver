@@ -21,17 +21,17 @@
 package tud.ggpserver.filter;
 
 import java.util.Collection;
+import java.util.List;
 
 import tud.ggpserver.datamodel.MatchInfo;
-import tud.ggpserver.util.IdPool;
 
 public class FilterOROperation extends FilterOperation{
 
-	protected FilterOROperation(IdPool<FilterNode> ids, Filter filter) {
-		this(ids, filter, null);
+	public FilterOROperation(Filter filter) {
+		this(filter, null);
 	}
-	protected FilterOROperation(IdPool<FilterNode> ids, Filter filter, Collection<FilterNode> successors) {
-		super(ids, FilterType.Or, filter, successors);
+	public FilterOROperation(Filter filter, Collection<FilterNode> successors) {
+		super(FilterType.Or, filter, successors);
 	}
 	
 	@Override
@@ -43,4 +43,21 @@ public class FilterOROperation extends FilterOperation{
 		
 		return false;
 	}
+
+	@Override
+	public boolean prepareMatchInfosStatement(String matchTableName, String matchPlayerTableName, StringBuilder where, List<Object> parameters) {
+		boolean equivalent = true;
+		if (getSuccessors().size() == 1) {
+			equivalent &= getSuccessors().get(0).prepareMatchInfosStatement(matchTableName, matchPlayerTableName, where, parameters);
+		} else {
+			where.append(" (FALSE");
+			for(FilterNode n:getSuccessors()) {
+				where.append(" OR");
+				equivalent &= n.prepareMatchInfosStatement(matchTableName, matchPlayerTableName, where, parameters);
+			}
+			where.append(" )");
+		}
+		return equivalent;
+	}
+
 }

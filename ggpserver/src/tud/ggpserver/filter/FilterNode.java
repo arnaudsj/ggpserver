@@ -33,7 +33,7 @@ import tud.ggpserver.util.IdPool;
 
 public abstract class FilterNode implements IDItem {
 	public static enum FilterType {
-		And("AND"), Or("OR"), Game("game"), RoleNumber("#roles"), PlayClock("play clock"), Player("player"), StartClock("start clock"), StartTime("start time"), Status("status"), Tournament("tournament");
+		And("AND"), Or("OR"), Game("game"), RoleNumber("#roles"), PlayClock("play clock"), Player("player"), Owner("owner"), StartClock("start clock"), StartTime("start time"), Status("status"), Tournament("tournament");
 		private String name;
 		private FilterType(String name) {
 			this.name = name;
@@ -45,7 +45,7 @@ public abstract class FilterNode implements IDItem {
 
 	private static final String deleteString = "delete";
 
-	protected IdPool<FilterNode> ids;
+	private IdPool<FilterNode> ids;
 
 	protected Filter filter;
 
@@ -56,13 +56,17 @@ public abstract class FilterNode implements IDItem {
 
 	private FilterType type;
 	
+	protected FilterNode(FilterType type, Filter filter) {
+		this(filter.getIdPool(), type, filter);
+	}
+
 	protected FilterNode(IdPool<FilterNode> ids, FilterType type, Filter filter) {
 		super();
-		this.ids = ids;
 		this.type = type;
+		this.ids = ids;
 		this.filter = filter;
 		id = ids.getNewId(this);
-		menu = new DropDownMenu(String.valueOf(getID()), getMenuOptions());
+		menu = new DropDownMenu(String.valueOf(getId()), getMenuOptions());
 		menu.setSelectedValue(type.toString());
 		menu.setSubmitOnChange(true);
 	}
@@ -79,6 +83,10 @@ public abstract class FilterNode implements IDItem {
 			options.add(new Option(type.getName(), type.toString()));
 		}
 		return options;
+	}
+
+	public IdPool<FilterNode> getIdPool() {
+		return ids;
 	}
 
 	public FilterType getType() {
@@ -123,7 +131,7 @@ public abstract class FilterNode implements IDItem {
 				parent.removeSuccessor(this);
 			} else {
 				FilterType newFilterType = FilterType.valueOf(menuSelection);
-				FilterNode newNode = FilterFactory.createFilterNode(newFilterType, ids, filter);
+				FilterNode newNode = FilterFactory.createFilterNode(newFilterType, filter);
 				parent.replaceSuccessor(this, newNode);
 				if(newNode instanceof FilterOperation) {
 					if(this instanceof FilterOperation) {
@@ -158,12 +166,12 @@ public abstract class FilterNode implements IDItem {
 	}
 
 	@Override
-	public long getID() {
+	public long getId() {
 		return id;
 	}
 
 	@Override
-	public void setID(long id) {
+	public void setId(long id) {
 		this.id=id;
 	}
 
@@ -178,5 +186,19 @@ public abstract class FilterNode implements IDItem {
 	
 	public Filter getFilter() {
 		return filter;
+	}
+	
+	/**
+	 * The method should try to add some conditions to the where part of a select statement such that the returned records are matched by the filter.
+	 * The default implementation does nothing.
+	 * @param matchTableName
+	 * @param matchPlayerTableName
+	 * @param where
+	 * @param parameters
+	 * @return true, if the added conditions are equivalent to the FilterNodes isMatching method. 
+	 */
+	public boolean prepareMatchInfosStatement(String matchTableName, String matchPlayerTableName, StringBuilder where, List<Object> parameters) {
+		where.append(" TRUE");
+		return false;
 	}
 }

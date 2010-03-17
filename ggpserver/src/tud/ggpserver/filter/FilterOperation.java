@@ -40,6 +40,10 @@ public abstract class FilterOperation extends FilterNode{
 
 	protected DropDownMenu newNodeMenu;
 	
+	protected FilterOperation(FilterType type, Filter filter, Collection<FilterNode> successors) {
+		this(filter.getIdPool(), type, filter, successors);
+	}
+
 	protected FilterOperation(IdPool<FilterNode> ids, FilterType type, Filter filter, Collection<FilterNode> successors) {
 		super(ids, type, filter);
 		if(successors!=null){
@@ -47,7 +51,7 @@ public abstract class FilterOperation extends FilterNode{
 		}
 		List<Option> options = getTypeOptions();
 		options.add(0, NEW_NODE_OPTION);
-		newNodeMenu = new DropDownMenu(String.valueOf(getID()), options);
+		newNodeMenu = new DropDownMenu(String.valueOf(getId()), options);
 		newNodeMenu.setSubmitOnChange(true);
 	}
 
@@ -148,7 +152,7 @@ public abstract class FilterOperation extends FilterNode{
 				return false;
 			} else {
 				FilterType newFilterType = FilterType.valueOf(menuSelection);
-				FilterNode newNode = FilterFactory.createFilterNode(newFilterType, ids, filter);
+				FilterNode newNode = FilterFactory.createFilterNode(newFilterType, filter);
 				addSuccessor(newNode);
 				return true;
 			}
@@ -159,7 +163,7 @@ public abstract class FilterOperation extends FilterNode{
 
 	@Override
 	public String toString() {
-		String s="FilterOperation[id:"+getID()+", type:"+getType()+", successors:[";
+		String s="FilterOperation[id:"+getId()+", type:"+getType()+", successors:[";
 		for(FilterNode n:successors) {
 			s += n.toString()+", ";
 		}

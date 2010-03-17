@@ -20,25 +20,43 @@
 
 package tud.ggpserver.filter.rules;
 
+import java.util.List;
+
 import tud.ggpserver.filter.Filter;
-import tud.ggpserver.filter.FilterNode;
 import tud.ggpserver.filter.matcher.Matcher;
 import tud.ggpserver.filter.matcher.StringMatcher;
-import tud.ggpserver.util.IdPool;
 
-public abstract class StringMatchFilterRule extends MatchFilterRule<String>{
+public abstract class StringMatchFilterRule extends MatchFilterRule<Boolean, String>{
 	
-	public StringMatchFilterRule(IdPool<FilterNode> ids, FilterType type, Filter filter) {
-		super(ids, type, filter);
+	public StringMatchFilterRule(FilterType type, Filter filter, boolean isMatch, String pattern) {
+		super(type, filter, isMatch, pattern);
 	}
 	
 	@Override
-	public Matcher<String> createMatcher() {
-		return new StringMatcher(String.valueOf(getID()));
+	public Matcher<Boolean, String> createMatcher(Boolean isMatch, String pattern) {
+		return new StringMatcher(String.valueOf(getId()), isMatch, pattern);
 	}
 
 	public boolean patternMatches(String s) {
 		return ((StringMatcher)matcher).patternMatches(s);
+	}
+
+	/**
+	 * @see FilterNode.prepareMatchInfosStatement
+	 * @param tableColumnName
+	 * @param where
+	 * @param parameters
+	 * @return
+	 */
+	public boolean prepareMatchInfosStatement(String tableColumnName, StringBuilder where, List<Object> parameters) {
+		where.append(" ").append(tableColumnName);
+		if (!getMatcher().getComparison())
+			where.append(" NOT");
+		where.append(" LIKE ?");
+		String pattern = getMatcher().getPattern();
+		String sqlPattern = pattern.replace("%", "\\%").replace("_", "\\_").replace('*', '%').replace('?', '_');
+		parameters.add(sqlPattern);
+		return true;
 	}
 
 }

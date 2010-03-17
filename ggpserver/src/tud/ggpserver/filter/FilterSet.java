@@ -19,11 +19,11 @@
 
 package tud.ggpserver.filter;
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.logging.Logger;
+import java.util.List;
 
 import tud.ggpserver.util.IdPool;
 
@@ -31,22 +31,32 @@ public class FilterSet {
 
 	private HashMap<Long, Filter> filters;
 	
+	private List<Filter> sortedFilters = null;
+	
 	private IdPool<FilterNode> ids;
 	
-	private static final Logger logger = Logger.getLogger(FilterSet.class.getName());
+	// private static final Logger logger = Logger.getLogger(FilterSet.class.getName());
+	
+	private int nextFilterNumber = 1;
 
 	public FilterSet() {
 		ids = new IdPool<FilterNode>();
 		filters = new HashMap<Long, Filter>();
-		addNewFilter();
+		addFilter(new MatchAllFilter(ids));
 	}
 
 	public synchronized Filter addNewFilter() {
-		Filter f = new Filter(ids);
-		filters.put(f.getID(), f);
+		Filter f = new Filter(ids, "filter "+nextFilterNumber);
+		nextFilterNumber++;
+		addFilter(f);
 		return f;
 	}
-	
+
+	protected synchronized void addFilter(Filter f) {
+		sortedFilters = null;
+		filters.put(f.getId(), f);
+	}
+
 	public synchronized Filter getFilter(long id) {
 		return filters.get(id);
 	}
@@ -56,6 +66,7 @@ public class FilterSet {
 	}
 	
 	public synchronized void deleteFilter(long id) {
+		sortedFilters = null;
 		Filter f = filters.remove(id);
 		f.dispose();
 		if (filters.isEmpty()) {
@@ -68,14 +79,17 @@ public class FilterSet {
 	 * @param id
 	 * @param values
 	 */
-	public synchronized void update(long id, String[] values) {
-		logger.info("update("+id+","+Arrays.toString(values)+")");
+	public synchronized boolean update(long id, String[] values) {
+		// logger.info("update("+id+","+Arrays.toString(values)+")");
+		boolean changed = false;
 		FilterNode node = ids.getItem(id);
 		if (node!=null) { // if it is null it got probably deleted
 			if (node.update(values)) {
 				node.getFilter().resetUserData();
+				changed = true;
 			}
 		}
+		return changed;
 	}
 
 	@Override
@@ -88,8 +102,24 @@ public class FilterSet {
 		return s;
 	}
 
-	public Collection<Long> getFilterIDs() {
-		return Collections.unmodifiableSet(filters.keySet());
+	public List<Filter> getFilters() {
+		if (sortedFilters == null) {
+			List<Filter> filterList = new ArrayList<Filter>(filters.values());
+			Collections.sort(filterList, new FilterComparator());
+			sortedFilters = Collections.unmodifiableList(filterList);	
+		}
+		return sortedFilters;
 	}
 
+	public final class FilterComparator implements Comparator<Filter> {
+		@Override
+		public int compare(Filter o1, Filter o2) {
+			if (o1.getId()<o2.getId())
+				return -1;
+			else if(o1.getId()>o2.getId())
+				return 1;
+			else
+				return 0;
+		}
+	}
 }

@@ -63,7 +63,6 @@ public class EditTournament extends ShowMatches {
 	
 	private String errorString = "No error";
 
-	@SuppressWarnings("unchecked")
 	public List<? extends Game<?, ?>> getGames() throws SQLException {
 		return db.getAllEnabledGames();
 	}
@@ -265,7 +264,6 @@ public class EditTournament extends ShowMatches {
 		return correctlyPerformed;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public List<PlayerInfo> getEnabledPlayerInfos() throws SQLException {
 		List<PlayerInfo> result = new LinkedList<PlayerInfo>();
 		result.add(new RandomPlayerInfo(-1));
@@ -275,7 +273,6 @@ public class EditTournament extends ShowMatches {
 		return result;
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<PlayerInfoForEditTournament> getPlayerInfos() throws SQLException {
 		if(playerInfos == null) {
 			playerInfos = new LinkedList<PlayerInfoForEditTournament>();

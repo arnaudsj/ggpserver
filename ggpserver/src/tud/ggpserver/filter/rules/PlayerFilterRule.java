@@ -24,10 +24,9 @@ import org.apache.commons.lang.StringEscapeUtils;
 
 import tud.ggpserver.datamodel.MatchInfo;
 import tud.ggpserver.filter.Filter;
-import tud.ggpserver.filter.FilterNode;
+import tud.ggpserver.filter.matcher.Comparison;
 import tud.ggpserver.filter.matcher.LongMatcher;
 import tud.ggpserver.filter.matcher.StringMatcher;
-import tud.ggpserver.util.IdPool;
 import tud.ggpserver.util.PlayerInfo;
 
 public class PlayerFilterRule extends FilterRule{
@@ -36,11 +35,10 @@ public class PlayerFilterRule extends FilterRule{
 	private LongMatcher roleMatcher;  
 	private StringMatcher playerMatcher;
 	
-	public PlayerFilterRule(IdPool<FilterNode> ids, Filter filter) {
-		super(ids, FilterType.Player, filter);
-		roleMatcher = new LongMatcher(String.valueOf(getID()), 1, 100);
-		roleMatcher.setPattern("*");
-		playerMatcher = new StringMatcher(String.valueOf(getID()));
+	public PlayerFilterRule(Filter filter) {
+		super(FilterType.Player, filter);
+		roleMatcher = new LongMatcher(String.valueOf(getId()), Comparison.Equal, null, 1, 100);
+		playerMatcher = new StringMatcher(String.valueOf(getId()), true, "*");
 	}
 
 	@Override
@@ -82,6 +80,6 @@ public class PlayerFilterRule extends FilterRule{
 
 	@Override
 	public String toString() {
-		return "FilterRule[id:"+getID()+", player at role "+roleMatcher.toString()+" "+playerMatcher.toString()+"]";
+		return "FilterRule[id:"+getId()+", player at role "+roleMatcher.toString()+" "+playerMatcher.toString()+"]";
 	}
 }

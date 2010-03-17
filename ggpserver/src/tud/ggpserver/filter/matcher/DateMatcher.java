@@ -24,39 +24,38 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import tud.ggpserver.filter.htmlform.DropDownMenu;
-
 public class DateMatcher extends ComparableMatcher<Date> {
 
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss z", Locale.US);
 
 	public DateMatcher(String id) {
-		super(id);
-		setPattern(dateFormat.format(new Date()));
+		this(id, Comparison.SmallerEqual, new Date());
+	}
+	public DateMatcher(String id, Comparison comparison, Date date) {
+		super(id, comparison, date);
 	}
 	
-	@Override
-	protected DropDownMenu createMenu() {
-		DropDownMenu menu = super.createMenu();
-		menu.setSelectedValue(Comparison.SmallerEqual.toString());
-		return menu;
+	public DateFormat getDateFormat() {
+		return dateFormat;
 	}
 
 	@Override
-	protected Date parsePattern(String pattern) throws IllegalArgumentException {
+	public boolean setPatternFromString(String pattern) {
 		Date d = null;
 		try{
 			d = dateFormat.parse(pattern);
 		} catch(Exception ex) {
 			d = null;
 		}
-		if(d == null) {
-			throw new IllegalArgumentException("Invalid date format! (use e.g., \""+dateFormat.format(new Date())+"\")");
+		if(d != null) {
+			return setPattern(d);
+		} else {
+			addErrorMessage("Invalid date format! (use e.g., \""+dateFormat.format(new Date())+"\")");
+			return false;
 		}
-		return d;
 	}
-
-	public DateFormat getDateFormat() {
-		return dateFormat;
+	@Override
+	public String getStringForPattern() {
+		return dateFormat.format(getPattern());
 	}
 }

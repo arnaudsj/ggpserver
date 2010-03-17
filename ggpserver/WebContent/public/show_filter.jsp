@@ -23,51 +23,37 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <jsp:useBean id="pager" class="tud.ggpserver.formhandlers.ShowMatchFilter" scope="page"/>
-<%
-   if (session.getAttribute("filterset") == null) {
-      session.setAttribute("filterset", pager.getFilterSet());      
-   } else {
-      pager.setFilterSet((tud.ggpserver.filter.FilterSet)session.getAttribute("filterset"));
-   }
-%>
-<%-- it is necessary to set the filter before setting the filterID and page number, because computing the number of pages depends on the filter --%>
-<c:catch>
-	<jsp:setProperty name="pager" property="filterID"/>
-	<jsp:setProperty name="pager" property="showMatches"/>
-	<jsp:setProperty name="pager" property="page"/>
-</c:catch>
 
-<c:set var="title">Match Filter</c:set>
+<jsp:directive.include file="/inc/set_match_filter_params.jsp" />
+
+<c:choose>
+	<c:when test="${editMatchFilter.applyFilter}">
+		<jsp:setProperty name="pager" property="filter" value="${editMatchFilter.filter}"/>
+		<%-- it is necessary to set the page number after the filter, because computing the number of pages depends on the filter --%>
+		<jsp:setProperty name="pager" property="page"/>
+		<c:set var="title">Matches filtered with &quot;${editMatchFilter.filter.name}&quot;</c:set>
+		<c:if test="${pager.numberOfPages > 1}">
+			<c:set var="title">
+				${title} (${pager.page}/${pager.numberOfPages})
+			</c:set>
+		</c:if>
+	</c:when>
+	<c:otherwise>
+		<c:set var="title">Filtered Matches</c:set>
+	</c:otherwise>
+</c:choose>	
 <jsp:directive.include file="/inc/header.jsp" />
 
-<form name="form" action="process_save_filter.jsp" method="post">
-	<%-- default submit button (is used on ENTER) --%>
-	<input type="submit" name="save_filter" value="save filter" style="position: absolute; left:-999px; top:-999px; height:0; width:0;" />
-	<%-- select the filter --%> 
-	<select name="filterID" onchange="form.submit()">
-		<c:forEach var="id" items="${pager.filterIDs}" varStatus="lineInfo">
-			<c:choose>
-				<c:when test="${id == pager.filterID}">
-					<option value="${id}" selected=\"selected\">filter ${lineInfo.count}</option>
-				</c:when>
-				<c:otherwise>
-					<option value="${id}">filter ${lineInfo.count}</option>
-				</c:otherwise>
-			</c:choose>
-		</c:forEach>
-	</select>
-	<input type="submit" name="delete_filter" value="delete" />
-	<input type="submit" name="add_new_filter" value="add new" />
+<%-- show the filter/filter set --%> 
+<c:url value="/public/show_filter.jsp" var="pageURL" />
+<jsp:setProperty name="editMatchFilter" property="keepParam" value="page"/>
+<jsp:directive.include file="/inc/edit_match_filter.jsp" />
 
-	<%-- show the selected filter for editing --%> 
-	${pager.filterHtml}
-	
-	<%-- submit name must not be "submit" --%>
-	<input type="submit" name="show_matches" value="Show matches" />
-</form>
- 
 <%-- show the filtered list of matches --%> 
-<c:if test="${pager.showMatches}">
+<c:if test="${editMatchFilter.applyFilter}">
+	<%-- pager title --%>
+	<jsp:directive.include file="/inc/pager_title.jsp" />
+	<%-- the filtered list of matches --%> 
 	<jsp:directive.include file="/inc/match_table.jsp" />
 </c:if>
 

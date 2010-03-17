@@ -25,37 +25,41 @@ import java.util.List;
 import tud.ggpserver.datamodel.MatchInfo;
 import tud.ggpserver.datamodel.matches.ServerMatch;
 import tud.ggpserver.filter.Filter;
-import tud.ggpserver.filter.FilterNode;
 import tud.ggpserver.filter.htmlform.DropDownMenu;
 import tud.ggpserver.filter.htmlform.DropDownMenu.Option;
-import tud.ggpserver.util.IdPool;
 
 public class StatusFilterRule extends FilterRule{
 	
-	private DropDownMenu statusMenu;
+	private String status;
 	
-	public StatusFilterRule(IdPool<FilterNode> ids, Filter filter) {
-		super(ids, FilterType.Status, filter);
-		List<Option> options = Arrays.asList(
-				new Option(ServerMatch.STATUS_NEW),
-				new Option(ServerMatch.STATUS_SCHEDULED),
-				new Option(ServerMatch.STATUS_RUNNING),
-				new Option(ServerMatch.STATUS_FINISHED),
-				new Option(ServerMatch.STATUS_ABORTED));
-		statusMenu = new DropDownMenu(String.valueOf(getID()), options);
+	public StatusFilterRule(Filter filter) {
+		this(filter, ServerMatch.STATUS_FINISHED);
 	}
 	
+	public StatusFilterRule(Filter filter, String status) {
+		super(FilterType.Status, filter);
+		this.status = status;
+	}
+	
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
 	@Override
 	public boolean isMatching(MatchInfo matchInfo) {
-		return matchInfo.getStatus().equals(statusMenu.getSelectedValue());
+		return matchInfo.getStatus().equals(status);
 	}
 
 	@Override
 	public boolean update(String[] values) {
 		if(super.update(values)) // type has changed
 			return true;
-		if (values.length>=2 && !statusMenu.getSelectedValue().equals(values[1])) {
-			statusMenu.setSelectedValue(values[1]);
+		if (values.length>=2 && !status.equals(values[1])) {
+			status=values[1];
 			return true;
 		}
 		return false;
@@ -63,6 +67,20 @@ public class StatusFilterRule extends FilterRule{
 	
 	@Override
 	public String getHtml() {
+		List<Option> options = Arrays.asList(
+				new Option(ServerMatch.STATUS_NEW),
+				new Option(ServerMatch.STATUS_SCHEDULED),
+				new Option(ServerMatch.STATUS_RUNNING),
+				new Option(ServerMatch.STATUS_FINISHED),
+				new Option(ServerMatch.STATUS_ABORTED));
+		DropDownMenu statusMenu = new DropDownMenu(String.valueOf(getId()), options, status);
 		return super.getHtml()+statusMenu.getHtml();
+	}
+
+	@Override
+	public boolean prepareMatchInfosStatement(String matchTableName, String matchPlayerTableName, StringBuilder where, List<Object> parameters) {
+		where.append(" ").append(matchTableName).append('.').append("`status`").append("= ?");
+		parameters.add(status);
+		return true;
 	}
 }

@@ -19,20 +19,34 @@
 
 package tud.ggpserver.filter.rules;
 
+import java.util.Date;
+import java.util.List;
+
 import tud.ggpserver.datamodel.MatchInfo;
 import tud.ggpserver.filter.Filter;
-import tud.ggpserver.filter.FilterNode;
-import tud.ggpserver.util.IdPool;
+import tud.ggpserver.filter.matcher.Comparison;
 
 public class StartTimeFilterRule extends DateMatchFilterRule{
 	
-	public StartTimeFilterRule(IdPool<FilterNode> ids, Filter filter) {
-		super(ids, FilterType.StartTime, filter);
+	public StartTimeFilterRule(Filter filter) {
+		super(FilterType.StartTime, filter);
+	}
+	public StartTimeFilterRule(Filter filter, Comparison comparison, Date pattern) {
+		super(FilterType.StartTime, filter, comparison, pattern);
 	}
 	
 	@Override
 	public boolean isMatching(MatchInfo matchInfo) {
 		return isMatching(matchInfo.getStartTime());
+	}
+
+	@Override
+	public boolean prepareMatchInfosStatement(String matchTableName, String matchPlayerTableName, StringBuilder where, List<Object> parameters) {
+		where.append(" ").append(matchTableName).append('.').append("`start_time`")
+			.append(getMatcher().getComparison().getSQLOperator())
+			.append("?");
+		parameters.add(getMatcher().getPattern());
+		return true;
 	}
 
 }

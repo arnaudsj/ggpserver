@@ -19,26 +19,35 @@
 
 package tud.ggpserver.filter.rules;
 
+import java.util.List;
+
 import tud.ggpserver.datamodel.MatchInfo;
 import tud.ggpserver.filter.Filter;
-import tud.ggpserver.filter.FilterNode;
+import tud.ggpserver.filter.matcher.Comparison;
 import tud.ggpserver.filter.matcher.LongMatcher;
 import tud.ggpserver.filter.matcher.Matcher;
-import tud.ggpserver.util.IdPool;
 
 public class PlayClockFilterRule extends LongMatchFilterRule{
 	
-	public PlayClockFilterRule(IdPool<FilterNode> ids, Filter filter) {
-		super(ids, FilterType.PlayClock, filter);
+	public PlayClockFilterRule(Filter filter) {
+		super(FilterType.PlayClock, filter);
+	}
+	public PlayClockFilterRule(Filter filter, Comparison comparison, Long pattern) {
+		super(FilterType.StartClock, filter, comparison, pattern);
 	}
 	
 	@Override
-	public Matcher<Long> createMatcher() {
-		return new LongMatcher(String.valueOf(getID()),0,Long.MAX_VALUE);
+	public Matcher<Comparison, Long> createMatcher(Comparison comparison, Long pattern) {
+		return new LongMatcher(String.valueOf(getId()),comparison,pattern,0,Long.MAX_VALUE);
 	}
 
 	@Override
 	public boolean isMatching(MatchInfo matchInfo) {
 		return isMatching(matchInfo.getPlayclock().longValue());
+	}
+
+	@Override
+	public boolean prepareMatchInfosStatement(String matchTableName, String matchPlayerTableName, StringBuilder where, List<Object> parameters) {
+		return prepareMatchInfosStatement(matchTableName+".`start_clock`", where, parameters);
 	}
 }

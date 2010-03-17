@@ -20,15 +20,18 @@
 
 package tud.ggpserver.filter.rules;
 
+import java.util.List;
+
 import tud.ggpserver.datamodel.MatchInfo;
 import tud.ggpserver.filter.Filter;
-import tud.ggpserver.filter.FilterNode;
-import tud.ggpserver.util.IdPool;
 
 public class GameFilterRule extends StringMatchFilterRule{
 	
-	public GameFilterRule(IdPool<FilterNode> ids, Filter filter) {
-		super(ids, FilterType.Game, filter);
+	public GameFilterRule(Filter filter) {
+		this(filter, true, "*");
+	}
+	public GameFilterRule(Filter filter, boolean isMatch, String pattern) {
+		super(FilterType.Game, filter, true, pattern);
 	}
 	
 	@Override
@@ -38,7 +41,12 @@ public class GameFilterRule extends StringMatchFilterRule{
 
 	@Override
 	public String toString() {
-		return "FilterRule[id:"+getID()+", game matches "+super.toString()+"]";
+		return "FilterRule[id:"+getId()+", game matches "+super.toString()+"]";
+	}
+
+	@Override
+	public boolean prepareMatchInfosStatement(String matchTableName, String matchPlayerTableName, StringBuilder where, List<Object> parameters) {
+		return prepareMatchInfosStatement(matchTableName+".`game`", where, parameters);
 	}
 
 }

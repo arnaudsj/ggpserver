@@ -21,24 +21,27 @@ package tud.ggpserver.filter.rules;
 
 import tud.ggpserver.datamodel.MatchInfo;
 import tud.ggpserver.filter.Filter;
-import tud.ggpserver.filter.FilterNode;
+import tud.ggpserver.filter.matcher.Comparison;
 import tud.ggpserver.filter.matcher.LongMatcher;
 import tud.ggpserver.filter.matcher.Matcher;
-import tud.ggpserver.util.IdPool;
 
 public class RoleNumberFilterRule extends LongMatchFilterRule{
 	
-	public RoleNumberFilterRule(IdPool<FilterNode> ids, Filter filter) {
-		super(ids, FilterType.RoleNumber, filter);
+	public RoleNumberFilterRule(Filter filter) {
+		super(FilterType.RoleNumber, filter);
+	}
+	public RoleNumberFilterRule(Filter filter, Comparison comparison, Long pattern) {
+		super(FilterType.RoleNumber, filter, comparison, pattern);
 	}
 	
 	@Override
-	public Matcher<Long> createMatcher() {
-		return new LongMatcher(String.valueOf(getID()),1,100);
+	public Matcher<Comparison, Long> createMatcher(Comparison comparison, Long pattern) {
+		return new LongMatcher(String.valueOf(getId()),comparison,pattern,0,Long.MAX_VALUE);
 	}
 
 	@Override
 	public boolean isMatching(MatchInfo matchInfo) {
 		return isMatching(matchInfo.getNumberOfRoles().longValue());
 	}
+
 }

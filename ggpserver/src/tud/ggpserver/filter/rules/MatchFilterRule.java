@@ -20,20 +20,22 @@
 package tud.ggpserver.filter.rules;
 
 import tud.ggpserver.filter.Filter;
-import tud.ggpserver.filter.FilterNode;
 import tud.ggpserver.filter.matcher.Matcher;
-import tud.ggpserver.util.IdPool;
 
-public abstract class MatchFilterRule<T> extends FilterRule{
+public abstract class MatchFilterRule<ComparisonType, PatternType> extends FilterRule{
 	
-	protected Matcher<T> matcher;
+	protected Matcher<ComparisonType, PatternType> matcher;
 
-	public MatchFilterRule(IdPool<FilterNode> ids, FilterType type, Filter filter) {
-		super(ids, type, filter);
-		this.matcher = createMatcher();
+	public MatchFilterRule(FilterType type, Filter filter, ComparisonType comparison, PatternType pattern) {
+		super(type, filter);
+		this.matcher = createMatcher(comparison, pattern);
 	}
 	
-	public abstract Matcher<T> createMatcher();
+	public abstract Matcher<ComparisonType, PatternType> createMatcher(ComparisonType comparison, PatternType pattern);
+	
+	public Matcher<ComparisonType, PatternType> getMatcher() {
+		return matcher;
+	}
 	
 	@Override
 	public boolean update(String[] values) {
@@ -51,7 +53,7 @@ public abstract class MatchFilterRule<T> extends FilterRule{
 		return super.getHtml() + matcher.getHtml();
 	}
 	
-	public boolean isMatching(T t) {
+	public boolean isMatching(PatternType t) {
 		return matcher.isMatching(t);
 	}
 	

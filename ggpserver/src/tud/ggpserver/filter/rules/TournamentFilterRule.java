@@ -19,19 +19,27 @@
 
 package tud.ggpserver.filter.rules;
 
+import java.util.List;
+
 import tud.ggpserver.datamodel.MatchInfo;
 import tud.ggpserver.filter.Filter;
-import tud.ggpserver.filter.FilterNode;
-import tud.ggpserver.util.IdPool;
 
 public class TournamentFilterRule extends StringMatchFilterRule{
 	
-	public TournamentFilterRule(IdPool<FilterNode> ids, Filter filter) {
-		super(ids, FilterType.Tournament, filter);
+	public TournamentFilterRule(Filter filter) {
+		this(filter, true, "*");
+	}
+	public TournamentFilterRule(Filter filter, boolean isMatch, String pattern) {
+		super(FilterType.Tournament, filter, true, pattern);
 	}
 	
 	@Override
 	public boolean isMatching(MatchInfo matchInfo) {
 		return isMatching(matchInfo.getTournament());
+	}
+
+	@Override
+	public boolean prepareMatchInfosStatement(String matchTableName, String matchPlayerTableName, StringBuilder where, List<Object> parameters) {
+		return prepareMatchInfosStatement(matchTableName+".`tournament_id`", where, parameters);
 	}
 }

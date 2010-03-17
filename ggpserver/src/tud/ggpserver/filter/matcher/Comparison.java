@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2010 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2010 Stephan Schiffel <stephan.schiffel@gmx.de> 
 
     This file is part of GGP Server.
 
@@ -16,9 +16,23 @@
     You should have received a copy of the GNU General Public License
     along with GGP Server.  If not, see <http://www.gnu.org/licenses/>.
 */
-package tud.ggpserver.util;
 
-public interface IDItem {
-	public void setId(long id);
-	public long getId();
+package tud.ggpserver.filter.matcher;
+
+public enum Comparison {
+	Equal("="), NotEqual("!="), Greater(">"), GreaterEqual(">="), Smaller("<"), SmallerEqual("<=");
+	private String name;
+	private Comparison(String name) {
+		this.name = name;
+	}
+	public String getName(){
+		return name;
+	}
+	/**
+	 * must return a valid SQL comparison operator
+	 * @return
+	 */
+	public String getSQLOperator() {
+		return name; // at the moment all names happen to be valid comparison operators
+	}
 }

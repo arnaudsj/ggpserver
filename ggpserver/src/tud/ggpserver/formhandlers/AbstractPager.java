@@ -152,7 +152,8 @@ public abstract class AbstractPager {
 	 */
 	public void setPage(int page) throws SQLException {
 		if (page < 1 || page > getNumberOfPages()) {
-			throw new IllegalArgumentException("Page number < 1 or > number of pages.");
+			page = getNumberOfPages();
+			// throw new IllegalArgumentException("Page number < 1 or > number of pages.");
 		}
 		this.setStartRow(calcStartRowFromPage(page));
 	}

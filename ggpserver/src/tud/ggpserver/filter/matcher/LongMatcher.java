@@ -19,46 +19,61 @@
 
 package tud.ggpserver.filter.matcher;
 
+import tud.ggpserver.filter.htmlform.TextBox;
+
 public class LongMatcher extends ComparableMatcher<Long> {
 
 	private long minValue, maxValue;
 	
 	public LongMatcher(String id) {
-		this(id, Long.MIN_VALUE, Long.MAX_VALUE);
+		this(id, Comparison.Equal, null, Long.MIN_VALUE, Long.MAX_VALUE);
 	}
 
-	public LongMatcher(String id, long min, long max) {
-		super(id);
+	public LongMatcher(String id, Comparison comparison, Long pattern) {
+		this(id, comparison, pattern, Long.MIN_VALUE, Long.MAX_VALUE);
+	}
+
+	public LongMatcher(String id, Comparison comparison, Long pattern, long min, long max) {
+		super(id, comparison, pattern);
 		this.minValue = min;
 		this.maxValue = max;
+		// long initialValue = Math.min(Math.max(0, minValue), maxValue);
+	}
+
+	@Override
+	protected TextBox createTextBox() {
+		TextBox patternTextBox = super.createTextBox();
 		int maxLength = -1;
 		maxLength = (int)Math.ceil(
 							Math.log10(
-									Math.max(Math.abs(min), Math.abs(max))
+									Math.max(Math.abs(minValue), Math.abs(maxValue))
 							) + 1);
-		if (min<0) {
+		if (minValue<0) {
 			maxLength++;
 		}
 		if(maxLength>-1) {
 			patternTextBox.setMaxLength(maxLength);
 		}
-		long initialValue = Math.min(Math.max(0, minValue), maxValue);
-		setPattern(String.valueOf(initialValue));
+		return patternTextBox;
 	}
 
 	@Override
-	protected Long parsePattern(String pattern) throws IllegalArgumentException {
-		Long l = null;
-		try {
-			l = Long.valueOf(pattern);
-			
-		} catch (NumberFormatException ex) {
-			throw new IllegalArgumentException("Pattern is not a valid integer!");
+	public boolean setPatternFromString(String pattern) {
+		if(pattern.equals("*")) {
+			return setPattern(null);
+		} else {
+			try {
+				Long l = null;
+				l = Long.valueOf(pattern);
+				if (l<minValue || l>maxValue) {
+					addErrorMessage("Number out of range ["+minValue+", "+maxValue+"]!");
+				} else {
+					return setPattern(l);
+				}
+			} catch (NumberFormatException ex) {
+				addErrorMessage("Pattern is neither '*' nor a valid integer!");
+			}
 		}
-		if (l<minValue || l>maxValue) {
-			throw new IllegalArgumentException("Number out of range ["+minValue+", "+maxValue+"]!");
-		}
-		return l;
+		return false;
 	}
-
 }

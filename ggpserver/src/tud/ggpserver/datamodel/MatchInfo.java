@@ -35,9 +35,11 @@ public class MatchInfo {
 	private String status;
 	private String tournament;
 	private Integer numberOfRoles = 0;
+	private double weight;
+	private String ownerName;
 	
 	public MatchInfo(String matchID, String gameName, Integer startClock,
-			Integer playClock, Date startTime, String status, String tournament) {
+			Integer playClock, Date startTime, String status, String tournament, double weight, String ownerName) {
 		super();
 		this.matchID = matchID;
 		this.gameName = gameName;
@@ -47,6 +49,8 @@ public class MatchInfo {
 		this.status = status;
 		players = new ArrayList<PlayerInfo>();
 		this.tournament = tournament;
+		this.weight = weight;
+		this.ownerName = ownerName;
 	}
 	
 	public void addPlayer(PlayerInfo player) {
@@ -96,6 +100,14 @@ public class MatchInfo {
 		return tournament;
 	}
 	
+	public double getWeight() {
+		return weight;
+	}
+
+	public String getOwnerName() {
+		return ownerName;
+	}
+
 	public String toString() {
 		return "MatchInfo[match:"+matchID+", game:"+gameName+", tournament:"+tournament+", status:"+status+"]";
 	}

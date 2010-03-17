@@ -1,5 +1,5 @@
-/*
-    Copyright (C) 2010 Stephan Schiffel <stephan.schiffel@gmx.de>
+<%--
+    Copyright (C) 2010 Stephan Schiffel (stephan.schiffel@gmx.de)
 
     This file is part of GGP Server.
 
@@ -15,10 +15,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GGP Server.  If not, see <http://www.gnu.org/licenses/>.
-*/
-package tud.ggpserver.util;
-
-public interface IDItem {
-	public void setId(long id);
-	public long getId();
-}
+--%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<jsp:directive.include file="set_match_filter_params.jsp" />
+<jsp:directive.include file="edit_match_filter.jsp" />

@@ -50,6 +50,10 @@ public class FilteredCollection<T> extends AbstractCollection<T> {
 		return new FilteredIterator(decorated.iterator());
 	}
 
+	/**
+	 * Avoid calling this method if possible, it iterates over the whole Collection.
+	 * @return the number of elements in the collection
+	 */
 	@Override
 	public int size() {
 		if ( size == -1 ) {

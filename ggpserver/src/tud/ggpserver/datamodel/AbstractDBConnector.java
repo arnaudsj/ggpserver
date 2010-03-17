@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
-                  2009 Stephan Schiffel <stephan.schiffel@gmx.de>
+                  2009-2010 Stephan Schiffel <stephan.schiffel@gmx.de>
+                  2010 Peter Steinke <peter.steinke@inf.tu-dresden.de>
 
     This file is part of GGP Server.
 
@@ -68,8 +69,10 @@ import tud.ggpserver.datamodel.statistics.GameRoleStatistics;
 import tud.ggpserver.datamodel.statistics.GameStatistics;
 import tud.ggpserver.datamodel.statistics.PerformanceInformation;
 import tud.ggpserver.datamodel.statistics.TournamentStatistics;
+import tud.ggpserver.filter.Filter;
 import tud.ggpserver.scheduler.PlayerStatusListener;
 import tud.ggpserver.util.Digester;
+import tud.ggpserver.util.Pair;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 
@@ -1034,28 +1037,96 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return result;
 	}
 	
+	/**
+	 * @return an SQL statement to return the MatchInfos of all matches that the filter will match
+	 * 
+	 * prepareMatchInfosStatement may actually return a PreparedStatement that returns more MatchInfos than the filter matches,
+	 * because only parts of the filter are taken into account.
+	 */
+	private Pair<PreparedStatement, Boolean> prepareMatchInfosStatement(Connection con, Filter matchFilter) throws SQLException, InternalError {
+		PreparedStatement ps = null;
+		boolean equivalentToFilter;
+		// ps = con.prepareStatement("SELECT m.match_id, player, roleindex, goal_value, game, start_clock, play_clock, start_time, status, tournament_id FROM match_players AS mp JOIN matches AS m ON mp.match_id = m.match_id ORDER BY m.start_time ASC, m.match_id ASC;");
+
+		// initialize statement and parameters
+		String select =  "SELECT `m`.`match_id`, `m`.`game`, `m`.`start_clock`, `m`.`play_clock`, `m`.`start_time`, `m`.`status`, `m`.`tournament_id`, `m`.`weight`, `m`.`owner`, `mp`.`player`, `mp`.`roleindex`, `mp`.`goal_value`";
+		String from = "FROM `match_players` AS `mp` JOIN `matches` AS `m` ON `mp`.`match_id` = `m`.`match_id`";
+		StringBuilder where = new StringBuilder("WHERE");
+		String orderBy = "ORDER BY `m`.`start_time` ASC, `m`.`match_id` ASC";
+
+		List<Object> parameters = new LinkedList<Object>();
+
+		// add specific filters
+		if (matchFilter != null) {
+			equivalentToFilter = matchFilter.prepareMatchInfosStatement("m", "mp", where, parameters);
+		} else {
+			where.append(" TRUE");
+			equivalentToFilter = true;
+		}
+		
+		// prepare statement, fill in parameters
+		logger.info(select + " " + from + " " + where + " " + orderBy + ";");
+		ps = con.prepareStatement(select + " " + from + " " + where + " " + orderBy + ";");
+
+		for (int i = 0; i < parameters.size(); i++) {
+			Object parameter = parameters.get(i);
+			if (parameter instanceof Long) {
+				ps.setLong(i + 1, (Long) parameter);
+			} else if (parameter instanceof Integer) {
+				ps.setInt(i + 1, (Integer) parameter);
+			} else if (parameter instanceof Double) {
+				ps.setDouble(i + 1, (Double) parameter);
+			} else if (parameter instanceof Date) {
+				ps.setTimestamp(i + 1, new java.sql.Timestamp(((Date)parameter).getTime()));
+			} else if (parameter instanceof String) {
+				ps.setString(i + 1, (String) parameter);
+			} else {
+				throw new InternalError("unknown parameter type: " + parameter.getClass().getCanonicalName());
+			}
+		}
+		return new Pair<PreparedStatement, Boolean>(ps, equivalentToFilter);
+	}
+
+	/**
+	 * 
+	 * @return a list of MatchInfos for all matches in the database
+	 * @throws SQLException
+	 */
 	public List<MatchInfo> getMatchInfos() throws SQLException {
+		return getMatchInfos(null).getLeft();
+	}
+	
+	/**
+	 * 
+	 * @return a pair with a list of MatchInfos for all matches in the database and a boolean that is true iff matchFilter.isMatching will return true for every match in the list  
+	 * @throws SQLException
+	 */
+	public Pair<List<MatchInfo>, Boolean> getMatchInfos(Filter matchFilter) throws SQLException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-
-		List<MatchInfo> result = new ArrayList<MatchInfo>();
+		Pair<PreparedStatement, Boolean> psResult;
+		Pair<List<MatchInfo>, Boolean> result = null;
+		
+		List<MatchInfo> resultList = new LinkedList<MatchInfo>();
 		MatchInfo currentMatchInfo = null;
 		try {
 			con = getConnection();
-			ps = con.prepareStatement("SELECT m.match_id, player, roleindex, goal_value, game, start_clock, play_clock, start_time, status, tournament_id FROM match_players AS mp JOIN matches AS m ON mp.match_id = m.match_id ORDER BY m.start_time ASC, m.match_id ASC;");
+			psResult = prepareMatchInfosStatement(con, matchFilter);
+			ps = psResult.getLeft();
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				String matchID = rs.getString("m.match_id");
 				if (currentMatchInfo == null || !matchID.equals(currentMatchInfo.getMatchID())) {
 					// new match
-					if (currentMatchInfo != null) result.add(currentMatchInfo);
-					currentMatchInfo = new MatchInfo(matchID, rs.getString("game"), rs.getInt("start_clock"), rs.getInt("play_clock"), new Date(rs.getDate("start_time").getTime()), rs.getString("status"), rs.getString("tournament_id"));
+					if (currentMatchInfo != null) resultList.add(currentMatchInfo);
+					currentMatchInfo = new MatchInfo(matchID, rs.getString("game"), rs.getInt("start_clock"), rs.getInt("play_clock"), new Date(rs.getDate("start_time").getTime()), rs.getString("status"), rs.getString("tournament_id"), rs.getDouble("weight"), rs.getString("owner"));
 				}
 				currentMatchInfo.addPlayer(rs.getString("player"), rs.getInt("roleindex"), rs.getInt("goal_value"));
 			}
 			// add last match to result
-			if (currentMatchInfo != null) result.add(currentMatchInfo);
+			if (currentMatchInfo != null) resultList.add(currentMatchInfo);
+			result = new Pair<List<MatchInfo>, Boolean>(resultList, psResult.getRight());
 		} finally { 
 			if (con != null)
 				try {con.close();} catch (SQLException e) {}
@@ -1064,10 +1135,8 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			if (rs != null)
 				try {rs.close();} catch (SQLException e) {}
 		} 
-
 		return result;
 	}
-	
 
 	public int getRowCountMatches(String playerName, String gameName, String tournamentID, String owner, String status, boolean excludeNew) throws SQLException {
 		Connection con = getConnection();
@@ -1183,7 +1252,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			
 			String setStartTime = "";
 			if(status.equals(ServerMatch.STATUS_RUNNING)) {
-				setStartTime = ", `start_time` = CURRENT_TIMESTAMP";				
+				setStartTime = ", `start_time` = CURRENT_TIMESTAMP";
 			}
 			ps = con.prepareStatement("UPDATE `ggpserver`.`matches` SET `status` = ? " + setStartTime + " WHERE `matches`.`match_id` = ? LIMIT 1 ;");
 			ps.setString(1, status);

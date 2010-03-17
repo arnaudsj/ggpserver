@@ -43,7 +43,7 @@ public class IdPool<T extends IDItem> {
 	public long getNewId(T item) {
 		long id = getNewId();
 		addItem(item, id);
-		item.setID(id);
+		item.setId(id);
 		return id;
 	}
 

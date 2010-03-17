@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2009-2010 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GGP Server.
 
@@ -28,10 +28,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.ref.SoftReference;
 import java.net.URLEncoder;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
@@ -60,35 +57,14 @@ import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.time.Week;
 import org.jfree.data.time.Year;
 
-import tud.gamecontroller.game.RoleInterface;
-import tud.ggpserver.datamodel.AbstractDBConnector;
-import tud.ggpserver.datamodel.DBConnectorFactory;
-import tud.ggpserver.datamodel.Game;
 import tud.ggpserver.datamodel.MatchInfo;
 import tud.ggpserver.datamodel.matches.ServerMatch;
+import tud.ggpserver.filter.Filter;
 import tud.ggpserver.util.PlayerInfo;
 
 import com.keypoint.PngEncoder;
 
-public class GameStatisticsChartCreator {
-
-	public static class Pair<T1, T2> {
-		private T1 left;
-		private T2 right;
-
-		public Pair(T1 a, T2 b) {
-			this.left = a;
-			this.right = b;
-		}
-		
-		public T1 getLeft() {
-			return left;
-		}
-
-		public T2 getRight() {
-			return right;
-		}
-	}
+public class StatisticsChartCreator {
 
 	private static class RunningAverage {
 				
@@ -140,66 +116,69 @@ public class GameStatisticsChartCreator {
 		}
 
 	}
+	
+	private class ChartInfo {
+		public ChartInfo(JFreeChart chart, long numberOfMatches) {
+			this.chart = chart;
+			this.numberOfMatches = numberOfMatches;
+		}
+		public JFreeChart chart;
+		public long numberOfMatches;
+	}
 
-	private static final Logger logger = Logger.getLogger(GameStatisticsChartCreator.class.getName());
-	private String imageID;
-	private String tournamentID;
-	private Game<?,?> game;
-	private String gameName = null;
-	private RoleInterface<?> role;
+	private static final Logger logger = Logger.getLogger(StatisticsChartCreator.class.getName());
 	private HttpSession session;
-	private JFreeChart chart = null;
-	private ChartRenderingInfo chartRenderingInfo = null;
-	private BufferedImage chartImage = null;
-	private Map<String, RunningAverage> playerScores = null;
+	private String imageID;
+	private int roleIndex;
+	private Filter matchFilter;
 	private long minNumberOfMatchesForShowingPlayer;
 	private double smoothingFactor;
 
-	public GameStatisticsChartCreator(HttpSession session, Game<?,?> game, RoleInterface<?> role, long minNumberOfMatchesForShowingPlayer) {
-		this(session, null, null, game, role, minNumberOfMatchesForShowingPlayer, 0.1);
-	}
+	private ChartInfo chartInfo = null;
+	private ChartRenderingInfo chartRenderingInfo = null;
+	private BufferedImage chartImage = null;
+	private Map<String, RunningAverage> playerScores = null;
 
-	public GameStatisticsChartCreator(HttpSession session, String imageID, String tournamentID, Game<?,?> game, RoleInterface<?> role, long minNumberOfMatchesForShowingPlayer, double smoothingFactor) {
+	public StatisticsChartCreator(HttpSession session, String imageID, Filter matchFilter, int roleIndex, long minNumberOfMatchesForShowingPlayer, double smoothingFactor) {
 		this.session = session;
-		this.tournamentID = tournamentID;
-		this.game = game;
-		this.role = role;
+		this.imageID = imageID;
+		this.matchFilter = matchFilter;
+		this.roleIndex = roleIndex;
 		this.minNumberOfMatchesForShowingPlayer = minNumberOfMatchesForShowingPlayer;
 		this.smoothingFactor = smoothingFactor;
+		initImageID(imageID);
+	}
 
-		if(game != null) {
-			this.gameName = game.getName();
-		}
+	private void initImageID(String imageID) {
 		if(imageID != null) {
-			this.imageID = imageID;
-			chart = getCachedChart(imageID);
+			chartInfo = getCachedChart(imageID);
 		}
-		if(chart == null) {
+		if(chartInfo == null) {
 			this.imageID = makeImageID();
-			chart = getCachedChart(this.imageID);
+			chartInfo = getCachedChart(this.imageID);
 		}
 	}
-	
+
 	private String makeImageID() {
 		StringBuilder sb = new StringBuilder("img");
-		if(tournamentID!=null)
-			sb.append("_t:").append(tournamentID);
-		if(game!=null)
-			sb.append("_g:").append(game.getName());
-		if(role!=null)
-			sb.append("_r:").append(role.getKIFForm().toLowerCase());
+		sb.append("_filter:").append(matchFilter.toString());
+//		if(tournamentID!=null)
+//			sb.append("_t:").append(tournamentID);
+//		if(gameName!=null)
+//			sb.append("_g:").append(gameName);
+//		if(role!=null)
+//			sb.append("_r:").append(role.getKIFForm().toLowerCase());
 		if(minNumberOfMatchesForShowingPlayer!=0)
 			sb.append("_m:").append(minNumberOfMatchesForShowingPlayer);
 		if(smoothingFactor!=0.1)
 			sb.append("_sF:").append(smoothingFactor);
-		sb.append("_").append(System.currentTimeMillis() % (1000*60*60)); // the chart is good for one hour
+		sb.append("_").append(System.currentTimeMillis() / (1000*60*60)); // the chart is good for one hour
 		// TODO: really cache the chart for some period starting at the current time 
 		return sb.toString();
 	}
 
 	public void makeChart() throws SQLException {
-		if (chart == null) {
-			AbstractDBConnector<?, ?> db = DBConnectorFactory.getDBConnector();
+		if (chartInfo == null) {
 			
 			// make chart title
 			String chartTitle = null;
@@ -212,22 +191,16 @@ public class GameStatisticsChartCreator {
 //				chartTitle += " in " + tournamentID;
 
 			// make the chart
-			
-			List<MatchInfo> matchInfos = db.getMatchInfos();
+			List<MatchInfo> matchInfos = matchFilter.getMatchInfos();
 			logger.info("processing "+matchInfos.size()+" matches");
-			int roleIndex = -1;
-			if (game != null && role != null) {
-				roleIndex = game.getOrderedRoles().indexOf(role);
-			}
-			chart = makeChart(matchInfos, chartTitle, roleIndex);
-			
+			chartInfo = makeChart(matchInfos, chartTitle);
 			// save chart
-			session.setAttribute("gameStatisticsChart_"+imageID, new SoftReference<JFreeChart>(chart));
+			session.setAttribute("gameStatisticsChart_"+imageID, new SoftReference<ChartInfo>(chartInfo));
 		}
 		
 		if(chartImage == null) {
 			chartRenderingInfo = new ChartRenderingInfo();  
-			chartImage = chart.createBufferedImage(640, 400, chartRenderingInfo);
+			chartImage = chartInfo.chart.createBufferedImage(640, 400, chartRenderingInfo);
 		}
 	}
 
@@ -256,10 +229,10 @@ public class GameStatisticsChartCreator {
 	}
 
 	@SuppressWarnings("unchecked")
-	private JFreeChart getCachedChart(String imageID) {
-		JFreeChart chart = null;
+	private ChartInfo getCachedChart(String imageID) {
+		ChartInfo chart = null;
 		if (imageID != null) {
-			SoftReference<JFreeChart> ref = (SoftReference<JFreeChart>)session.getAttribute("gameStatisticsChart_"+imageID);
+			SoftReference<ChartInfo> ref = (SoftReference<ChartInfo>)session.getAttribute("gameStatisticsChart_"+imageID);
 			if (ref != null)
 				chart = ref.get();
 				if(chart != null)
@@ -269,7 +242,7 @@ public class GameStatisticsChartCreator {
 		return chart;
 	}
 
-	private JFreeChart makeChart(List<MatchInfo> matchInfos, String title, int roleIndex) throws SQLException {
+	private ChartInfo makeChart(List<MatchInfo> matchInfos, String title) throws SQLException {
 		// decide which time period to use
 		Class<? extends RegularTimePeriod> timePeriodClass = getTimePeriodClass(matchInfos);
 
@@ -287,15 +260,10 @@ public class GameStatisticsChartCreator {
 		((XYPlot)chart.getPlot()).setRangeGridlinePaint(Color.DARK_GRAY);
 		RegularTimePeriod currentPeriod = null;
 		playerScores = new HashMap<String, RunningAverage>();
-		
+		long numberOfMatches = 0;
 		// fill in data
 		for(MatchInfo match:matchInfos){
-			if(	isGoodMatch(match)
-				&&
-				(game == null || match.getGameName().equals(game.getName()))
-				&&
-				(tournamentID == null || match.getTournament().equals(tournamentID))
-				) {
+			if( match.getStatus().equals(ServerMatch.STATUS_FINISHED) ) {
 				RegularTimePeriod matchPeriod = RegularTimePeriod.createInstance(timePeriodClass, match.getStartTime(), TimeZone.getDefault());
 				if(currentPeriod == null || !matchPeriod.equals(currentPeriod)) {
 					// logger.info("new period:" + matchDate);
@@ -305,8 +273,10 @@ public class GameStatisticsChartCreator {
 					currentPeriod = matchPeriod;
 				}
 				// logger.info("add goal values of match: " + match.getMatchID());
+				boolean countMatch = false;
 				for(PlayerInfo playerInfo:match.getPlayers()) {
 					if (roleIndex == -1 || roleIndex == playerInfo.getRoleindex()) {
+						countMatch = true;
 						String playerName = playerInfo.getPlayerName();
 						RunningAverage runningAverage = playerScores.get(playerName);
 						if(runningAverage == null){
@@ -316,19 +286,13 @@ public class GameStatisticsChartCreator {
 						runningAverage.addValue(playerInfo.getGoalValue().doubleValue());
 					}
 				}
-			}else if(!isGoodMatch(match)){
-				logger.info("ignore match (not isGoodMatch): " + match);
-			}else if(!(game == null || match.getGameName().equals(game.getName()))){
-				logger.info("ignore match (not right game): " + match + " != " + game.getName());
-			}else if(!(tournamentID == null || match.getTournament().equals(tournamentID))){
-				logger.info("ignore match (not right tournament): " + match +" != " + tournamentID);
+				numberOfMatches += (countMatch ? 1 : 0);
 			}
 		}
 
 		if( currentPeriod != null) // otherwise there is no data
 			addData(dataset, currentPeriod, true);
-		
-		return chart;
+		return new ChartInfo(chart, numberOfMatches);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -379,20 +343,6 @@ public class GameStatisticsChartCreator {
 		}
 	}
 
-	private boolean isGoodMatch(MatchInfo match) {
-		if(match.getStatus().equals(ServerMatch.STATUS_FINISHED))
-			return true;
-		// TODO: filtering out matches with illegal moves is a good idea, but we have to do it in the tables in view_game_statitics.jsp as well
-//		for(List<GameControllerErrorMessage> errorMessages:match.getErrorMessages()) {
-//			for(GameControllerErrorMessage msg:errorMessages){
-//				if(GameControllerErrorMessage.ILLEGAL_MOVE.equals(msg.getType())) {
-//					return false;
-//				}
-//			}
-//		}
-		return false;
-	}
-
 	private void addData(TimeSeriesCollection dataset, RegularTimePeriod timePeriod, boolean finalPeriod) {
 		// logger.info("add points to graph:" + startOfPeriod);
 
@@ -424,6 +374,10 @@ public class GameStatisticsChartCreator {
 
 	public String getImageID() {
 		return imageID;
+	}
+
+	public long getNumberOfMatches() {
+		return (chartInfo!=null ? chartInfo.numberOfMatches : 0);
 	}
 
 }

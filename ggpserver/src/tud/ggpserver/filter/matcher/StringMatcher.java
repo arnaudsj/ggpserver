@@ -24,18 +24,17 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import tud.ggpserver.filter.htmlform.TextBox;
 import tud.ggpserver.filter.htmlform.DropDownMenu.Option;
 
-public class StringMatcher extends Matcher<String> {
+public class StringMatcher extends Matcher<Boolean, String> {
 
 	private static final String IS = "is"; 
 	private static final String ISNOT = "is not"; 
 
-	protected Pattern pattern;
+	protected Pattern regExpPattern = null;
 
-	public StringMatcher(String id) {
-		super(id);
+	public StringMatcher(String id, boolean isMatch, String pattern) {
+		super(id, isMatch, pattern);
 	}
 
 	@Override
@@ -43,33 +42,63 @@ public class StringMatcher extends Matcher<String> {
 		return Arrays.asList(new Option(IS), new Option(ISNOT));
 	}
 	
-	@Override
-	public TextBox createTextBox() {
-		return new TextBox(getId(), "*");
-	}
-
-	@Override
 	protected void initMatcher() {
 		String patternString;
-		patternString = patternTextBox.getValue().replace('?', '.');
+		patternString = getPattern().replace('?', '.');
 		patternString = patternString.replace("*", ".*");
 		try {
-			pattern = Pattern.compile(patternString);
+			regExpPattern = Pattern.compile(patternString);
 		} catch(PatternSyntaxException ex) {
 			addErrorMessage("invalid pattern: \""+ patternString.substring(Math.max(ex.getIndex()-2,0), Math.min(ex.getIndex()+2, patternString.length())) + "\"");
 		}
+		// Logger.getLogger(StringMatcher.class.getName()).info("initMatcher: " + regExpPattern);
 	}
 
+	@Override
+	public boolean setPattern(String pattern) {
+		boolean changed = super.setPattern(pattern);
+		if(changed || regExpPattern == null) {
+			initMatcher();
+		}
+		return changed;
+		
+	}
+	
 	public boolean isMatching(String s) {
-		return (!patternMatches(s)) ^ comparisonMenu.getSelectedValue().equals(IS); // (matches && "is") || (!matches && !"is")   
+		return (!patternMatches(s)) ^ getComparison(); // (matches && "is") || (!matches && !"is")   
 	}
 
 	public boolean patternMatches(String s) {
-		return pattern.matcher(s).matches();
+		// Logger.getLogger(StringMatcher.class.getName()).info("regExp: \"" + regExpPattern+ "\", s:\"" + s + "\"");
+		return s!=null && regExpPattern.matcher(s).matches();
 	}
 
 	public boolean shouldMatch() {
-		return comparisonMenu.getSelectedValue().equals("is");
+		return getComparison();
 	}
 
+	@Override
+	public boolean setComparisonFromString(String comparison) {
+		if (comparison.equals(IS)) {
+			return setComparison(true);
+		} else if(comparison.equals(ISNOT)) {
+			return setComparison(false);
+		} else {
+			addErrorMessage("invalid comparison: \""+comparison+"\"");
+			return false;
+		}
+	}
+
+	@Override
+	public boolean setPatternFromString(String pattern) {
+		return setPattern(pattern);
+	}
+
+	@Override
+	public String getStringForComparison() {
+		if(getComparison())
+			return IS;
+		else
+			return ISNOT;
+	}
 }

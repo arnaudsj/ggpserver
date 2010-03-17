@@ -19,22 +19,27 @@
 
 package tud.ggpserver.filter.rules;
 
-import java.util.Date;
+import java.util.List;
 
+import tud.ggpserver.datamodel.MatchInfo;
 import tud.ggpserver.filter.Filter;
-import tud.ggpserver.filter.matcher.Comparison;
-import tud.ggpserver.filter.matcher.DateMatcher;
 
-public abstract class DateMatchFilterRule extends MatchFilterRule<Comparison, Date>{
+public class OwnerFilterRule extends StringMatchFilterRule{
 	
-	public DateMatchFilterRule(FilterType type, Filter filter) {
-		super(type, filter, Comparison.SmallerEqual, new Date());
+	public OwnerFilterRule(Filter filter) {
+		this(filter, true, "*");
 	}
-	public DateMatchFilterRule(FilterType type, Filter filter, Comparison comparison, Date pattern) {
-		super(type, filter, comparison, pattern);
+	public OwnerFilterRule(Filter filter, boolean isMatch, String pattern) {
+		super(FilterType.Owner, filter, true, pattern);
 	}
 	
-	public DateMatcher createMatcher(Comparison comparison, Date pattern) {
-		return new DateMatcher(String.valueOf(getId()), comparison, pattern);
+	@Override
+	public boolean isMatching(MatchInfo matchInfo) {
+		return isMatching(matchInfo.getOwnerName());
+	}
+
+	@Override
+	public boolean prepareMatchInfosStatement(String matchTableName, String matchPlayerTableName, StringBuilder where, List<Object> parameters) {
+		return prepareMatchInfosStatement(matchTableName+".`owner`", where, parameters);
 	}
 }

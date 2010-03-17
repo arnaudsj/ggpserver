@@ -24,23 +24,10 @@ import java.util.List;
 
 import tud.ggpserver.filter.htmlform.DropDownMenu.Option;
 
-public abstract class ComparableMatcher<T extends Comparable<T>> extends Matcher<T> {
+public abstract class ComparableMatcher<T extends Comparable<T>> extends Matcher<Comparison, T> {
 
-	public static enum Comparison {
-		Equal("="), NotEqual("!="), Greater(">"), GreaterEqual(">="), Smaller("<"), SmallerEqual("<=");
-		private String name;
-		private Comparison(String name) {
-			this.name = name;
-		}
-		public String getName(){
-			return name;
-		}
-	};
-
-	protected T pattern;
-
-	public ComparableMatcher(String id) {
-		super(id);
+	public ComparableMatcher(String id, Comparison comparison, T pattern) {
+		super(id, comparison, pattern);
 	}
 
 	@Override
@@ -52,31 +39,11 @@ public abstract class ComparableMatcher<T extends Comparable<T>> extends Matcher
 		return options;
 	}
 
-	/**
-	 * 
-	 * @param pattern string
-	 * @return Object of type T
-	 */
-	protected abstract T parsePattern(String pattern) throws IllegalArgumentException;
-	
-	@Override
-	protected void initMatcher() {
-		if (patternTextBox.getValue().equals("*")) {
-			pattern = null; 
-		} else {
-			try{
-				pattern = parsePattern(patternTextBox.getValue());
-			} catch(IllegalArgumentException ex) {
-				pattern = null;
-				addErrorMessage(ex.getMessage());
-			}
-		}
-	}
-
 	public boolean isMatching(T t) {
-		if (patternTextBox.getValue().equals("*")) return true;
-		if (pattern == null || t == null) return false;
-		switch(Comparison.valueOf(comparisonMenu.getSelectedValue())){
+		T pattern = getPattern();
+		if (pattern == null) return true; // pattern == null means "*"
+		if (t == null) return false;
+		switch(getComparison()){
 			case Equal: return t.compareTo(pattern) == 0;
 			case NotEqual: return t.compareTo(pattern) != 0;
 			case Greater: return t.compareTo(pattern) > 0;
@@ -88,8 +55,13 @@ public abstract class ComparableMatcher<T extends Comparable<T>> extends Matcher
 	}
 
 	@Override
-	public String toString() {
-		return comparisonMenu.getSelectedValue()+" "+pattern;
+	public boolean setComparisonFromString(String comparison) {
+		try {
+			return setComparison(Comparison.valueOf(comparison));
+		} catch (IllegalArgumentException ex) {
+			addErrorMessage(ex.getMessage());
+		}
+		return false;
 	}
 
 }

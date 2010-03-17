@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2009-2010 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GGP Server.
 
@@ -22,7 +22,7 @@ package tud.ggpserver.formhandlers;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,12 +34,14 @@ import tud.ggpserver.datamodel.Game;
 import tud.ggpserver.datamodel.statistics.GamePlayerStatistics;
 import tud.ggpserver.datamodel.statistics.GameRoleStatistics;
 import tud.ggpserver.datamodel.statistics.GameStatistics;
-import tud.ggpserver.datamodel.statistics.GameStatisticsChartCreator;
+import tud.ggpserver.datamodel.statistics.StatisticsChartCreator;
+import tud.ggpserver.filter.Filter;
+import tud.ggpserver.webapp.GameStatisticsChartViewer;
 
 public class ViewGameStatistics {
 	private String gameName = "";
 	private Game<?, ?> game = null;
-	private LinkedList<ImageInfo> charts;
+	private List<ImageInfo> charts;
 	private HttpSession session;
 	private GameStatistics<?, ?> gameStatistics = null;
 	
@@ -81,11 +83,9 @@ public class ViewGameStatistics {
 
 	public List<ImageInfo> getChartsForRoles() throws SQLException, UnsupportedEncodingException, IOException{
 		if(charts == null) {
-			charts = new LinkedList<ImageInfo>();
-			int roleIndex = 0;
-			for(RoleInterface<?> role:getGame().getOrderedRoles()) {
-				charts.add(getChart(roleIndex, role));
-				roleIndex++;
+			charts = new ArrayList<ImageInfo>(game.getNumberOfRoles());
+			for(int roleIndex=0; roleIndex<game.getNumberOfRoles(); roleIndex++) {
+				charts.add(getChart(roleIndex));
 			}
 		}
 		return charts;
@@ -95,8 +95,9 @@ public class ViewGameStatistics {
 		this.session = session;
 	}
 	
-	private ImageInfo getChart(int roleIndex, RoleInterface<?> role) throws SQLException, UnsupportedEncodingException, IOException {
-		GameStatisticsChartCreator chartCreator = new GameStatisticsChartCreator(session, getGame(), role, 10);
+	private ImageInfo getChart(int roleIndex) throws SQLException, UnsupportedEncodingException, IOException {
+		Filter filter = GameStatisticsChartViewer.createFilter(null, gameName);
+		StatisticsChartCreator chartCreator = new StatisticsChartCreator(session, null, filter, roleIndex, 10, 0.1);
 		return new ImageInfo(chartCreator.getImageID(), chartCreator.getImageMap(), chartCreator.getImageMapID(), roleIndex);
 	}
 
