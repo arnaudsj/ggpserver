@@ -1,11 +1,12 @@
 package tud.ggpserver.util;
 
-import static tud.ggpserver.datamodel.DBConnectorFactory.getDBConnector;
-
 import java.io.IOException;
 import java.io.StringReader;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 import javax.naming.NamingException;
 import javax.xml.parsers.DocumentBuilder;
@@ -19,6 +20,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import tud.gamecontroller.auxiliary.Pair;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.tests.RoundRobinSchedulerTest;
 
@@ -27,101 +29,132 @@ public class XMLStatesToRawStates {
 	
 	public static final String dtd = "<!DOCTYPE match SYSTEM \"http://games.stanford.edu/gamemaster/xml/viewmatch.dtd\">";
 	
+	public static DocumentBuilder builder;
 	
-	public static String xmlStateToRawState (String xml) throws ParserConfigurationException, SAXException, IOException {
+	public static Pair<String, Long> xmlStateToRawState(String xml) throws ParserConfigurationException, SAXException, IOException {
 		
 		xml = xml.replace(dtd, "").replaceAll("\n", " ");
-		
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder = factory.newDocumentBuilder();
-		
 		try {
-			Document xmldoc = builder.parse(new InputSource(new StringReader(xml)));
+			StringReader stringReader = new StringReader(xml);
+			InputSource inputSource = new InputSource(stringReader);
+			Document xmldoc = builder.parse(inputSource);
 			
 			NodeList nodes = xmldoc.getElementsByTagName("fact");
-			String result = "(";
+			StringBuilder result = new StringBuilder("(");
+			boolean needSpace = false;
 			for (int i = 0; i < nodes.getLength(); i++) {
 				Node node = nodes.item(i);
-				result += getText(node);
+				needSpace = getText(needSpace, node, result);
 			}
 			
-			return result+")";
+			result.append(")");
+			nodes = xmldoc.getElementsByTagName("timestamp");
+			Long timestamp = null;
+			if(nodes.getLength()>0){
+				String timestampString = nodes.item(0).getTextContent().trim();
+				timestamp = Long.valueOf(timestampString);
+			}
+			stringReader.close();
+			return new Pair<String, Long>(result.toString(), timestamp);
 		}
 		catch (SAXParseException saxpe) { // probably, this state is already a raw state
-//			System.out.println("Already raw(1): "+xml);
+			//System.out.println("  Already raw? "+xml);
 			return null;
 		}
 		
 	}
 	
 	
-	public static String getText (Node n) {
+	public static boolean getText(boolean needSpace, Node n, StringBuilder result) {
 		
 //		System.out.println(n.getClass().getCanonicalName() + ":" + n);
 		
 		if(n.getNodeName().equals("fact") || n.getNodeName().equals("prop-f") || n.getNodeName().equals("arg") ) {
-			
 			if (! n.hasChildNodes() || n.getChildNodes().getLength() == 1) {
 //				System.out.println("<"+n.getTextContent().trim()+">");
-				return n.getTextContent().trim();
+				String s = n.getTextContent().trim();
+				if(s.isEmpty())
+					return needSpace;
+				else {
+					if(needSpace)
+						result.append(' ');
+					result.append(s);
+					return true;
+				}
 			} else {
 //				System.out.println("\thas children");
-				String str = "(";
+				result.append('(');
+				needSpace = false;
 				NodeList children = n.getChildNodes();
-				boolean firstNonEmpty = true;
 				for (int i = 0; i < children.getLength(); i++) {
-					String childString = getText(children.item(i));
-					if (!childString.equals("")) {
-						if (firstNonEmpty) {
-							firstNonEmpty = false;
-						}else{
-							str += " ";
-						}
-						str += childString;
-					}
+					needSpace = getText(needSpace, children.item(i), result);
 				}
-				return str+")";
+				result.append(')');
+				return false;
 			}
-			
 		} else {
-			
-			return "";
-			
+			return needSpace;
 		}
 		
 	}
 	
 	
-	public static void xmlStatesToRawStates () throws SQLException, ParserConfigurationException, SAXException, IOException, NamingException {
+	public static void xmlStatesToRawStates() throws SQLException, ParserConfigurationException, SAXException, IOException, NamingException {
+		
+		builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		
 		RoundRobinSchedulerTest.setupJNDI();
-		AbstractDBConnector<?, ?> db = getDBConnector();
 		
-		ResultSet rs = db.getAllStates();
-		//int c = 0;
-		while (rs.next()) {
-			
-//			System.out.print("State "+(++c)+"/???, ["+rs.getString("match_id")+"; "+rs.getInt("step_number")+"]: ");
-			String xmlState = rs.getString("state");
-			
-			String rawState = null;
-			
-			if (xmlState.charAt(0) != '(') {
-				rawState = xmlStateToRawState(xmlState);
-			} else {
-//				System.out.println("Already raw(0): "+xmlState);
+		final long startAt = 950000; // TODO: reset to 0
+		
+		final long stepSize = 50000;
+		boolean noResult = false;
+		Connection con = AbstractDBConnector.getConnection();
+		PreparedStatement ps = con.prepareStatement(
+				"SELECT `match_id` , `step_number` , `state`, `timestamp` " +
+				"FROM `states` " +
+				"LIMIT ? , " + stepSize + " ; ", 
+				ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
+		for(long firstStateIndex = startAt ; !noResult ; firstStateIndex+=stepSize) {
+			System.out.println("\nprocessing states " + firstStateIndex + " - " + (firstStateIndex+stepSize-1));
+			ps.setLong(1, firstStateIndex);
+			ResultSet rs = ps.executeQuery();
+			//int c = 0;
+			noResult = true;
+			int i = 0;
+			while (rs.next()) {
+				noResult = false;
+	//			System.out.print("State "+(++c)+"/???, ["+rs.getString("match_id")+"; "+rs.getInt("step_number")+"]: ");
+				String xmlState = rs.getString("state");
+				
+				Pair<String, Long> rawState = null;
+				
+				if (xmlState.charAt(0) != '(') {
+					rawState = xmlStateToRawState(xmlState);
+					if(i % 1000 == 0) { System.out.println("."); }
+					i++;
+				} else {
+					//System.out.println("  Already raw(0): "+xmlState);
+					System.out.print("-"); System.out.flush();
+				}
+				
+				if (rawState != null) {
+	//				System.out.println(xmlState);
+//					System.out.println("  " + rawState.getLeft());
+					rs.updateString("state", rawState.getLeft());
+					if(rawState.getRight()!=null){
+						rs.updateTimestamp("timestamp", new Timestamp(rawState.getRight()));
+					}
+					// System.out.println(rawState.getLeft());
+					rs.updateRow();
+				}
 			}
-			
-			if (rawState != null) {
-//				System.out.println(xmlState);
-				System.out.println(rawState+"\n");
-				rs.updateString("state", rawState);
-				rs.updateRow();
-			}
-			//System.exit(0);
-			
+			rs.close();
 		}
-		rs.close();
+		ps.close();
+		con.close();
+		System.out.println("\ndone.");
+		System.exit(0);
 	}
 	
 	

@@ -2112,7 +2112,8 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		playerStatusListeners.add(listener);
 	}
 	
-	private static Connection getConnection() throws SQLException {
+	// TODO: make that private
+	public static Connection getConnection() throws SQLException {
 		if (datasource == null) {
 			try {
 				datasource = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/ggpserver");
@@ -2456,19 +2457,6 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 
 	public User getAdminUser() throws SQLException {
 		return getUser("admin");
-	}
-	
-	public ResultSet getAllStates () throws SQLException {
-		
-		Connection con = getConnection();
-		PreparedStatement ps = con.prepareStatement(
-				"SELECT `match_id` , `step_number` , `state` " +
-				"FROM `states` ", ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-		
-		ResultSet rs = ps.executeQuery();
-		
-		return rs;
-		
 	}
 
 }

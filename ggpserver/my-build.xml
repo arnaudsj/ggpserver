@@ -113,6 +113,12 @@
             <classpath refid="ggpserver.classpath"/>
         </junit>
     </target>
+    <target depends="build" name="XMLStatesToRawStates">
+        <java classname="tud.ggpserver.util.XMLStatesToRawStates" failonerror="true" fork="yes">
+            <classpath refid="ggpserver.classpath"/>
+        	<jvmarg value="-Xmx1024M"/>
+        </java>
+    </target>
     <target name="GameControllerServerRunnerTest">
         <mkdir dir="${junit.output.dir}"/>
         <junit fork="yes" printsummary="withOutAndErr">
