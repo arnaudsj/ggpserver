@@ -2112,8 +2112,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		playerStatusListeners.add(listener);
 	}
 	
-	// TODO: make that private
-	public static Connection getConnection() throws SQLException {
+	private static Connection getConnection() throws SQLException {
 		if (datasource == null) {
 			try {
 				datasource = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/ggpserver");

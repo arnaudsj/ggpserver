@@ -25,6 +25,7 @@ import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.tests.RoundRobinSchedulerTest;
 
 
+@SuppressWarnings("unused")
 public class XMLStatesToRawStates {
 	
 	public static final String dtd = "<!DOCTYPE match SYSTEM \"http://games.stanford.edu/gamemaster/xml/viewmatch.dtd\">";
@@ -99,17 +100,22 @@ public class XMLStatesToRawStates {
 	}
 	
 	
+	@SuppressWarnings("null")
 	public static void xmlStatesToRawStates() throws SQLException, ParserConfigurationException, SAXException, IOException, NamingException {
 		
 		builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		
 		RoundRobinSchedulerTest.setupJNDI();
 		
-		final long startAt = 950000; // TODO: reset to 0
+		final long startAt = 0;
 		
 		final long stepSize = 50000;
 		boolean noResult = false;
-		Connection con = AbstractDBConnector.getConnection();
+
+		// In order to use that code you have to make AbstractDBConnector.getConnection() public.
+		// It is private to prevent inconsistent states in normal operation.
+		Connection con = /* AbstractDBConnector.getConnection() */ null;
+		
 		PreparedStatement ps = con.prepareStatement(
 				"SELECT `match_id` , `step_number` , `state`, `timestamp` " +
 				"FROM `states` " +
