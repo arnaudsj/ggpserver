@@ -53,6 +53,7 @@
 	<ul>
 		<li>You can now define arbitrary filters for the matches you want to see. For the filtered matches you can view a chart showing the performance of the players over time.</li>
 		<li>Support for GDL with incomplete information (GDL-II/GDL v2) and non-determinism was added. However, you need a GDL-II compliant player to play GDL-II games. &quot;Normal&quot; GDL games and players will still work as before. Please wait for our paper which will explain all the details about GDL-II.</li>
+		<li>A few changes under the hood should make the creation of style sheets for the visualization easier.</li>
 	</ul>
 
 <h1 class="notopborder">Sourceforge project</h1>
