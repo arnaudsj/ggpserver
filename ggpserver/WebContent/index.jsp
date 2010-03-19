@@ -51,10 +51,8 @@
 
 <h1 class="notopborder">Recent changes</h1>
 	<ul>
-		<li>Users can now create/start matches manually.</li>
-		<li>Users can now create own tournaments.</li>
-		<li>You can choose if your players takes part in automatic round-robin tournament.</li>
-		<li>You can choose if your players may be used in matches created by users.</li>
+		<li>You can now define arbitrary filters for the matches you want to see. For the filtered matches you can view a chart showing the performance of the players over time.</li>
+		<li>Support for GDL with incomplete information (GDL-II/GDL v2) and non-determinism was added. However, you need a GDL-II compliant player to play GDL-II games. &quot;Normal&quot; GDL games and players will still work as before. Please wait for our paper which will explain all the details about GDL-II.</li>
 	</ul>
 
 <h1 class="notopborder">Sourceforge project</h1>
