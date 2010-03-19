@@ -73,8 +73,8 @@
 			<th>
 				<table>
 					<tbody>
-					<tr><td> players </td></tr>
 					<tr><td> roles </td></tr>
+					<tr><td> players </td></tr>
 					<c:if test="${match.orderedGoalValues != null}">
 						 <tr><td> scores </td></tr>
 					</c:if>
@@ -83,10 +83,22 @@
 			</th>
 			<td>
 				<table>
-					<tbody>
+					<thead>
 					<tr>
-						<c:forEach var="playerinfo"	items="${match.orderedPlayerInfos}">
+						<c:forEach var="role" items="${match.orderedPlayerRoles}">
 							<th>
+								<c:out value="${role}"/>
+							</th>
+						</c:forEach>
+						<c:if test="${match.weight != 1.0}">
+							<td></td>
+						</c:if> 
+					</tr>
+					</thead>
+					<tbody>
+					<tr class="even">
+						<c:forEach var="playerinfo"	items="${match.orderedPlayerInfos}">
+							<td>
 								<c:url value="view_player.jsp" var="playerURL">
 									<c:param name="name" value="${playerinfo.name}" />
 								</c:url>
@@ -101,18 +113,11 @@
 									</c:otherwise>
 								</c:choose>
 								</a>
-							</th>
+							</td>
 						</c:forEach>
 						<c:if test="${match.weight != 1.0}">
 							<td></td>
 						</c:if> 
-					</tr>
-					<tr class="even">
-						<c:forEach var="role" items="${match.orderedPlayerRoles}">
-							<td>
-								<c:out value="${role}"/>
-							</td>
-						</c:forEach>
 					</tr>
 					<c:if test="${match.orderedGoalValues != null}">
 						<tr class="even">
