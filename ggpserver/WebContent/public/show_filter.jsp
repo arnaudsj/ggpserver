@@ -56,12 +56,14 @@
 	<%-- the filtered list of matches --%> 
 	<jsp:directive.include file="/inc/match_table.jsp" />
 
-	<c:url value="/public/show_filter.jsp" var="statisticsURL">
-		<c:param name="filterId" value="${editMatchFilter.filterId}"/>
-		<c:param name="showFilter" value="${editMatchFilter.showFilter}"/>
-		<c:param name="applyFilter" value="${editMatchFilter.applyFilter}"/>
-	</c:url>
-	<a href="${statisticsURL}">View statistics for these matches.</a>
+	<p>
+		<c:url value="/public/view_statistics.jsp" var="statisticsURL">
+			<c:param name="filterId" value="${editMatchFilter.filterId}"/>
+			<c:param name="showFilter" value="${editMatchFilter.showFilter}"/>
+			<c:param name="applyFilter" value="${editMatchFilter.applyFilter}"/>
+		</c:url>
+		<a href="${statisticsURL}">View statistics for these matches.</a>
+	</p>
 </c:if>
 
 <jsp:directive.include file="/inc/footer.jsp" />
