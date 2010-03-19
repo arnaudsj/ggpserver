@@ -33,8 +33,8 @@ public class CreateGame extends AbstractGameValidator {
 	public void create() throws SQLException {
 		assert(isValid());
 		try {
-			String sendSeesXMLRules = getSeesXMLRules();
-			if(sendSeesXMLRules.equals(Game.DEFAULT_SEES_XML_RULES))
+			String sendSeesXMLRules = getSeesXMLRules().trim();
+			if(sendSeesXMLRules.isEmpty() || sendSeesXMLRules.equals(Game.DEFAULT_SEES_XML_RULES.trim()))
 				sendSeesXMLRules=null;
 			getDBConnector().createGame(
 					getGameDescription(), getGameName(), getStylesheet(),

@@ -31,8 +31,8 @@ public class EditGame extends AbstractGameValidator {
 	
 	public void updateGame() throws SQLException {
 		assert(isValid());
-		String sendSeesXMLRules = getSeesXMLRules();
-		if(sendSeesXMLRules.equals(Game.DEFAULT_SEES_XML_RULES))
+		String sendSeesXMLRules = getSeesXMLRules().trim();
+		if(sendSeesXMLRules.isEmpty() || sendSeesXMLRules.equals(Game.DEFAULT_SEES_XML_RULES.trim()))
 			sendSeesXMLRules=null;
 		getDBConnector().updateGameInfo(getGameName(), getGameDescription(), getStylesheet(), sendSeesXMLRules, getEnabled(), Utilities.gdlVersion(getGdlVersion()));
 		correctlyUpdated = true;
