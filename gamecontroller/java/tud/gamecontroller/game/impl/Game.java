@@ -55,7 +55,7 @@ public class Game<
 	private final List<? extends RoleInterface<TermType>> roles;
 	private final GDLVersion gdlVersion;
 	
-	public static final String DEFAULT_SEES_XML_RULES = "(<= (sees_xml random ?t) (true ?t) )\n(<= (sees_xml ?p ?t) (role ?p) (distinct ?p random) (true ?t))\n";
+	public static final String DEFAULT_SEES_XML_RULES = "(<= (sees_xml random ?t) (true ?t))\n(<= (sees_xml ?p ?t) (role ?p) (distinct ?p random) (true ?t))\n";
 	public static final String DEFAULT_SEES_RULES = "(<= (sees ?p (did ?p2 ?m)) (role ?p) (does ?p2 ?m) )\n";
 
 	public Game(File gameFile, ReasonerFactoryInterface<TermType, ReasonerStateInfoType> reasonerFactory, GDLVersion gdlVersion) throws IOException {
