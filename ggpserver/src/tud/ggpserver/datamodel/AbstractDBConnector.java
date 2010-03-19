@@ -44,7 +44,7 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import tud.gamecontroller.GDLVersion;
-import tud.gamecontroller.ReasonerFactory;
+import tud.gamecontroller.ReasonerFactoryInterface;
 import tud.gamecontroller.auxiliary.Pair;
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.JointMoveInterface;
@@ -107,11 +107,11 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	
 	private Collection<PlayerStatusListener> playerStatusListeners = new ArrayList<PlayerStatusListener>();
 
-	private final ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory;
+	private final ReasonerFactoryInterface<TermType, ReasonerStateInfoType> reasonerFactoryInterface;
 
 	
-	public AbstractDBConnector(final ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory) {
-		this.reasonerFactory = reasonerFactory;
+	public AbstractDBConnector(final ReasonerFactoryInterface<TermType, ReasonerStateInfoType> reasonerFactory) {
+		this.reasonerFactoryInterface = reasonerFactory;
 	}
 
 	protected abstract MoveFactoryInterface<? extends MoveInterface<TermType>> getMoveFactory();
@@ -312,7 +312,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 
 		logger.info("Creating new game: " + name); //$NON-NLS-1$
 		
-		return new Game<TermType, ReasonerStateInfoType>(gameDescription, name, reasonerFactory, gdlVersion, stylesheet, seesXMLRules, enabled, creator);
+		return new Game<TermType, ReasonerStateInfoType>(gameDescription, name, reasonerFactoryInterface, gdlVersion, stylesheet, seesXMLRules, enabled, creator);
 		
 	}
 
@@ -344,7 +344,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				User creator = getUser(creatorName);
 				
 				// logger.info("Returning new game: " + name); //$NON-NLS-1$
-				result = new Game<TermType, ReasonerStateInfoType>(gameDescription, name, reasonerFactory, gdlVersion, stylesheet, seesXMLRules, enabled, creator);
+				result = new Game<TermType, ReasonerStateInfoType>(gameDescription, name, reasonerFactoryInterface, gdlVersion, stylesheet, seesXMLRules, enabled, creator);
 				
 			}
 			

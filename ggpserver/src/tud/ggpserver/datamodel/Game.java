@@ -21,7 +21,7 @@
 package tud.ggpserver.datamodel;
 
 import tud.gamecontroller.GDLVersion;
-import tud.gamecontroller.ReasonerFactory;
+import tud.gamecontroller.ReasonerFactoryInterface;
 import tud.gamecontroller.term.TermInterface;
 
 public class Game<TermType extends TermInterface, ReasonerStateInfoType>
@@ -32,7 +32,7 @@ public class Game<TermType extends TermInterface, ReasonerStateInfoType>
 	private User creator;
 	
 	public Game(String gameDescription, String name,
-			ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory,
+			ReasonerFactoryInterface<TermType, ReasonerStateInfoType> reasonerFactory,
 			GDLVersion gdlVersion,
 			String stylesheet,
 			String seesXMLRules,

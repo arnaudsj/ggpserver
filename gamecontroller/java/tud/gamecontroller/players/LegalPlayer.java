@@ -20,8 +20,9 @@
 
 package tud.gamecontroller.players;
 
-import java.util.Vector;
+import java.util.Collection;
 
+import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.term.TermInterface;
@@ -30,13 +31,13 @@ public class LegalPlayer<
 	TermType extends TermInterface,
 	StateType extends StateInterface<TermType, ? extends StateType>> extends LocalPlayer<TermType, StateType>  {
 	
-	public LegalPlayer(String name) {
-		super(name);
+	public LegalPlayer(String name, GDLVersion gdlVersion) {
+		super(name, gdlVersion);
 	}
 
 	// MODIFIED
 	public MoveInterface<TermType> getNextMove() {
-		Vector<MoveInterface<TermType>> legalMoves = super.getLegalMoves();
-		return legalMoves.get(0);
+		Collection<? extends MoveInterface<TermType>> legalMoves = getLegalMoves();
+		return legalMoves.iterator().next();
 	}
 }

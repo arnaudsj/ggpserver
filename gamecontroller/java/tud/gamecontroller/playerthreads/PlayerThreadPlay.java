@@ -46,7 +46,7 @@ public class PlayerThreadPlay<
 		return move;
 	}
 	public void run(){
-		move=player.gamePlay(this.seesFluents, this);
+		move=player.gamePlay(seesFluents, this);
 	}
 	
 	@Override

@@ -1,7 +1,22 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+    Copyright (C) 2009 Martin Günther <mintar@gmx.de>
+                  2010 Stephan Schiffel <stephan.schiffel@gmx.de>
+
+    This file is part of GameController.
+
+    GameController is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    GameController is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GameController.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 package tud.gamecontroller.traces;
 
@@ -16,17 +31,15 @@ import java.util.logging.Logger;
 import org.xml.sax.SAXException;
 
 import tud.gamecontroller.GDLVersion;
-import tud.gamecontroller.ReasonerFactory;
 import tud.gamecontroller.exceptions.NoLegalMoveException;
 import tud.gamecontroller.game.GameInterface;
-import tud.gamecontroller.game.ReasonerInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.impl.Game;
 import tud.gamecontroller.game.impl.RunnableMatch;
 import tud.gamecontroller.game.impl.State;
 import tud.gamecontroller.game.javaprover.JavaProverGameController;
-import tud.gamecontroller.game.javaprover.Reasoner;
+import tud.gamecontroller.game.javaprover.ReasonerFactory;
 import tud.gamecontroller.game.javaprover.Term;
 import tud.gamecontroller.players.MovelistPlayer;
 import tud.gamecontroller.players.Player;
@@ -35,13 +48,7 @@ public class RetraceGameControllerRunner {
 
 	public static void retrace(File inputFile, File outputFile, File gameFile, GDLVersion gdlVersion) throws IOException, SAXException {
 		/* create game */
-		ReasonerFactory<Term, GameState> reasonerFactory = new ReasonerFactory<Term, GameState>() {
-			public ReasonerInterface<Term, GameState> createReasoner(String gameDescription, String gameName) {
-				return new Reasoner(gameDescription);
-			}
-		};
-		
-		GameInterface<Term, State<Term, GameState>> game = new Game<Term, GameState>(gameFile, reasonerFactory, gdlVersion);
+		GameInterface<Term, State<Term, GameState>> game = new Game<Term, GameState>(gameFile, new ReasonerFactory(), gdlVersion);
 		
 		/* create players */
 		Map<RoleInterface<Term>, Player<Term, State<Term, GameState>>> players = new HashMap<RoleInterface<Term>, Player<Term, State<Term, GameState>>>();

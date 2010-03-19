@@ -49,7 +49,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import tud.gamecontroller.game.FluentInterface;
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MatchInterface;
@@ -86,7 +85,7 @@ public class XMLGameStateWriter
 		this.match = match;
 		this.step=1;
 		// MODIFIED
-		if (this.match.getGame().getGdlVersion() == GDLVersion.v1) { // Regular GDL
+		if (role == null || this.match.getGame().getGdlVersion() == GDLVersion.v1) { // Regular GDL
 			matchDir=outputDir+File.separator+match.getMatchID();
 		} else { // GDL-II
 			matchDir=outputDir+File.separator+match.getMatchID()+"-"+this.role;
@@ -113,7 +112,7 @@ public class XMLGameStateWriter
 		//System.out.println( ((Game)match.getGame()).getGameDescription() );
 		
 		try {
-			os = createXMLOutputStream(match, currentState, XMLGameStateWriter.getStringMoves(moves), goalValues, stylesheet, this.role, this.match.getGame().getGdlVersion(), null);
+			os = createXMLOutputStream(match, currentState, XMLGameStateWriter.getStringMoves(moves), goalValues, stylesheet, role, null);
 			fileOutputStream = new FileOutputStream(new File(matchDir+File.separator+"step_"+step+".xml"));
 			fileOutputStream.write(os.toByteArray());
 			if(goalValues!=null){ // write the final state twice (once as step_X.xml and once as finalstate.xml)
@@ -150,7 +149,7 @@ public class XMLGameStateWriter
 	 * @param stringMoves
 	 * @param goalValues
 	 * @param stylesheet
-	 * @param role
+	 * @param role the role from which perspective the xml view should be generated
 	 * @param gdlVersion
 	 * @param date if null, the current time is set as timestamp for the state (for the standalone GameController). If not null, used as the timestamp (for calls from the server).
 	 * @return
@@ -164,13 +163,12 @@ public class XMLGameStateWriter
 			Map<?, Integer> goalValues,
 			String stylesheet,
 			RoleInterface<? extends TermInterface> role,
-			GDLVersion gdlVersion,
 			Date date)
 			throws TransformerFactoryConfigurationError,
 			IllegalArgumentException {
 		ByteArrayOutputStream os=new ByteArrayOutputStream();
 		try{
-			Document xmldoc=createXML(match, currentState, stringMoves, goalValues, stylesheet, role, gdlVersion, date);
+			Document xmldoc=createXML(match, currentState, stringMoves, goalValues, stylesheet, role, date);
 			// Serialization through Transform.
 			DOMSource domSource = new DOMSource(xmldoc);
 			
@@ -194,25 +192,23 @@ public class XMLGameStateWriter
 
 	/**
 	 * 
-	 * @param <T> the term-type used for fluents and moves 
-	 * @param <S> the state-type used for currentState
-	 * @param <PlayerType>
 	 * @param match the match the currentState is from
 	 * @param currentState the state to be transformed to XML
-	 * @param moves the list of joint moves executed so far
+	 * @param stringMoves the joint moves executed so far as strings
 	 * @param goalValues a list of goal values for the players or null if this is not a terminal state
 	 * @param stylesheet URL of a style sheet or null
-	 * @return
+	 * @param role the role from which perspective the xml view should be generated
+	 * @param the time, when the currentState was generated
+	 * @return an xml document
 	 * @throws ParserConfigurationException
 	 */
-	static public Document createXML(
+	private static Document createXML(
 			MatchInterface<? extends TermInterface, ?> match,
 			StateInterface<? extends TermInterface,?> currentState,
 			List<List<String>> stringMoves,
 			Map<?, Integer> goalValues,
 			String stylesheet,
 			RoleInterface<? extends TermInterface> role,
-			GDLVersion gdlVersion,
 			Date date)
 	throws ParserConfigurationException {
 		
@@ -240,21 +236,16 @@ public class XMLGameStateWriter
 		 root.appendChild(e);
 		 
 		 // indicate for which player the xml file is meant
-		 String sightOf = ""+role; // avoid role.toString(), because role can be null (just a little trick)
-		 List<? extends RoleInterface<?>> roles = match.getGame().getOrderedRoles();
-		 if (! roles.contains(role) || match.getGame().getGdlVersion() == GDLVersion.v1) {
-			 sightOf = "random";
-		 } else {
-			 sightOf = role.toString();
-		 }
+		 GameInterface<?, ?> game = match.getGame();
+		 GDLVersion gdlVersion = game.getGdlVersion();
 		 e=xmldoc.createElement("sight-of");
-		 e.setTextContent(sightOf.toUpperCase());
+		 e.setTextContent(role.getKIFForm().toUpperCase());
 		 root.appendChild(e);
 		 
 		 
-		 for(GameObjectInterface onerole: match.getGame().getOrderedRoles()){
+		 for(GameObjectInterface oneRole: match.getGame().getOrderedRoles()){
 			 e=xmldoc.createElement("role");
-			 e.setTextContent(onerole.getPrefixForm());
+			 e.setTextContent(oneRole.getPrefixForm());
 			 root.appendChild(e);
 		 }
 		 
@@ -279,22 +270,19 @@ public class XMLGameStateWriter
 			 e.setTextContent(Integer.toString(match.getPlayclock()));
 			 root.appendChild(e);
 		 }
-		 
+		 // role.getKIFForm().toUpperCase().equals("RANDOM")
 		 root.appendChild(createHistoryElement(xmldoc, stringMoves, role, gdlVersion));
 		 
 		 //logger.info("goalValues = "+goalValues);
 		 if(goalValues!=null) root.appendChild(createScoresElement(xmldoc, match.getGame(), goalValues));
 		 
-		 root.appendChild(createStateElement(xmldoc, currentState, role, gdlVersion));
+		 root.appendChild(createStateElement(xmldoc, currentState, role));
 		 
 		 return xmldoc;
 	}
 
-	private static List<List<String>> getStringMoves(
-			List<JointMoveInterface<? extends TermInterface>> moves) {
-		
+	private static List<List<String>> getStringMoves(List<JointMoveInterface<? extends TermInterface>> moves) {
 		List<List<String>> stringMoves = new LinkedList<List<String>>();
-		
 		for (JointMoveInterface<? extends TermInterface> jointMove: moves) {
 			LinkedList<String> jM = new LinkedList<String>();
 			for (MoveInterface<? extends TermInterface> move: jointMove.getOrderedMoves()) {
@@ -302,30 +290,15 @@ public class XMLGameStateWriter
 			}
 			stringMoves.add(jM);
 		}
-		
 		return stringMoves;
-		
 	}
 
 	@SuppressWarnings("unchecked")
-	private static Node createStateElement(Document xmldoc, StateInterface<? extends TermInterface, ?> currentState,
-			RoleInterface<? extends TermInterface> role, GDLVersion gdlVersion) {
+	private static Node createStateElement(Document xmldoc, StateInterface<? extends TermInterface, ?> currentState, RoleInterface<? extends TermInterface> role) {
 		Element state=xmldoc.createElement("state");
-		
-		// MODIFIED
-		Collection<? extends FluentInterface<? extends TermInterface>> fluents = null;
-		if (gdlVersion == GDLVersion.v1) { // Regular GDL
-			
-			fluents = currentState.getFluents();
-			
-		} else { // GDL-II
-			
-			fluents = currentState.getSeesXMLFluents( (RoleInterface) role);
-			
-		}
-		
-		for(FluentInterface<? extends TermInterface> f:fluents) {
-			state.appendChild(createTermElement(xmldoc, "fact", f.getTerm()));
+		Collection<? extends TermInterface> terms = currentState.getSeesXMLTerms( (RoleInterface) role);
+		for(TermInterface t:terms) {
+			state.appendChild(createTermElement(xmldoc, "fact", t));
 		}
 		return state;
 	}
@@ -369,35 +342,24 @@ public class XMLGameStateWriter
 			GDLVersion gdlVersion) {
 		Element history=xmldoc.createElement("history");
 		int s=1;
-		
 		//logger.info("createHistoryElement, moves = "+moves);
-		
 		for(List<String> jointMove: moves) {
-			
 			Element step=xmldoc.createElement("step");
 			Element e=xmldoc.createElement("step-number");
 			e.setTextContent(""+s);
 			step.appendChild(e);
 			s++;
-			
-			if (gdlVersion == GDLVersion.v1 || role.getKIFForm().toUpperCase().equals("RANDOM")) { // Regular GDL, or view of the random player (complete information)
-				
+			if (gdlVersion == GDLVersion.v1 || role.isNature()) { // Regular GDL, or view of the random player (complete information)
 				for(String move: jointMove){
 					e=xmldoc.createElement("move");
 					e.setTextContent(move);
 					step.appendChild(e);
 				}
-				
 			} else { // GDL-II, for players other than random
-				
 				// TODO: what do we want to have in the history, for GDL-II games, instead of the moves history?
-				
 			}
-			
 			history.appendChild(step);
-			
 		}
-		
 		return history;
 	}
 	

@@ -21,11 +21,9 @@
 package tud.gamecontroller.players;
 
 import java.util.Collection;
-import java.util.Vector;
 
 import tud.gamecontroller.ConnectionEstablishedNotifier;
 import tud.gamecontroller.GDLVersion;
-import tud.gamecontroller.game.FluentInterface;
 import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.MoveInterface;
@@ -36,44 +34,29 @@ import tud.gamecontroller.term.TermInterface;
 public abstract class LocalPlayer<TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
 		extends AbstractPlayer<TermType, StateType> {
 	
-	// for regular GDL only
-	protected StateInterface<TermType, ?> currentState=null;
+	// for GDL-I
+	protected StateInterface<TermType, ?> currentState = null;
+	// for GDL-II
+	protected StatesTracker<TermType, StateType> statesTracker = null;
 	
-	// MODIFIED: in GDL-II, as we don't have the rule that the first turn is the only one where no moves are sent, we have to manage this with a boolean
-	protected boolean firstTurn;
-	protected StatesTracker<TermType, StateType> statesTracker; // TODO: what's that ReasonerStateInfoType (here replaced by '?')
-		
+	private boolean firstTurn;
 	
-	public LocalPlayer(String name) {
-		super(name);
+	public LocalPlayer(String name, GDLVersion gdlVersion) {
+		super(name, gdlVersion);
 	}
 	
-	
-	
-	@SuppressWarnings("unchecked")
 	@Override
 	public void gameStart(MatchInterface<TermType, StateType> match, RoleInterface<TermType> role, ConnectionEstablishedNotifier notifier) {
-		
 		super.gameStart(match, role, notifier);
 		notifyStartRunning();
 		notifier.connectionEstablished();
-		
-		this.gdlVersion = match.getGame().getGdlVersion();
-		
-		// Regular GDL
-		currentState=match.getGame().getInitialState();
-		
-		// GDL-II
-		this.firstTurn = true; // MODIFIED
-		
-		// StateType extends StateInterface<TermType, ? extends StateType>
-		this.statesTracker = new StatesTracker (
-			match.getGame(),
-			match.getGame().getInitialState(),
-			role );
-		
+		this.firstTurn = true;
+		if(getGdlVersion() == GDLVersion.v1) {
+			currentState = match.getGame().getInitialState();
+		} else {
+			statesTracker = new StatesTracker<TermType, StateType>(match.getGame(), match.getGame().getInitialState(), role);
+		}
 		notifyStopRunning();
-		
 	}
 	
 	/*
@@ -82,59 +65,37 @@ public abstract class LocalPlayer<TermType extends TermInterface, StateType exte
 	 * - or with GDL-II, a "Collection<? extends FluentInterface<TermType>>" object that really are SeesTerms
 	 */
 	@SuppressWarnings("unchecked")
-	public MoveInterface<TermType> gamePlay(Object seesFluents, ConnectionEstablishedNotifier notifier) {
-		
+	public MoveInterface<TermType> gamePlay(Object seesTerms, ConnectionEstablishedNotifier notifier) {
 		notifyStartRunning();
 		notifier.connectionEstablished();
-		
-		if(this.firstTurn) { // MODIFIED
+		if(this.firstTurn) {
 			this.firstTurn = false;
-		} else { // calculate the successor(s) of current state(s)
-			
-			if (this.gdlVersion == GDLVersion.v1) { // Regular GDL
-				
-				JointMoveInterface<TermType> jointMove = (JointMoveInterface<TermType>) seesFluents;
+		} else {
+			// calculate the successor(s) of current state(s)
+			if (getGdlVersion() == GDLVersion.v1) { // Regular GDL
+				JointMoveInterface<TermType> jointMove = (JointMoveInterface<TermType>) seesTerms;
 				currentState = currentState.getSuccessor(jointMove);
-				
 			} else { // GDL-II
-				
-				try {
-					this.statesTracker.statesUpdate( (Collection<FluentInterface<TermType>>) seesFluents );
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				
+				statesTracker.statesUpdate((Collection<TermType>) seesTerms);
 			}
 			
 		}
 		MoveInterface<TermType> move = getNextMove();
-		
 		notifyStopRunning();
 		return move;
 	}
 	
-	
-	protected Vector<MoveInterface<TermType>> getLegalMoves () {
-		
-		Vector<MoveInterface<TermType>> legalMoves = null;
-		
-		if (this.gdlVersion == GDLVersion.v1) { // Regular GDL
-			
-			legalMoves = new Vector<MoveInterface<TermType>>( currentState.getLegalMoves(role) );
-			
+	protected Collection<? extends MoveInterface<TermType>> getLegalMoves() {
+		Collection<? extends MoveInterface<TermType>> legalMoves = null;
+		if (getGdlVersion() == GDLVersion.v1) { // Regular GDL
+			legalMoves = currentState.getLegalMoves(role);
 		} else { // GDL-II
-			
-			legalMoves = new Vector<MoveInterface<TermType>>(this.statesTracker.computeLegalMoves());
-			
+			legalMoves = statesTracker.computeLegalMoves();
 		}
-		
 		return legalMoves;
-		
 	}
 	
-	
 	protected abstract MoveInterface<TermType> getNextMove();
-	
 	
 	public String toString(){
 		return "local("+getName()+")";

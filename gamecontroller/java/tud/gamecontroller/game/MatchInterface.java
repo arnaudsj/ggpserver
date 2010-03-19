@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>
                   2010 Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
@@ -20,12 +20,7 @@
 
 package tud.gamecontroller.game;
 
-import java.util.Date;
 import java.util.List;
-
-import tud.gamecontroller.GDLVersion;
-import tud.gamecontroller.auxiliary.Pair;
-
 
 /**
  * The point of this interfaces is not to refer to the actual Player
@@ -48,12 +43,6 @@ public interface MatchInterface<TermType, StateType extends StateInterface<TermT
 	public abstract int getPlayclock();
 	
 	public abstract List<String> getOrderedPlayerNames();
-	
-	public String getXMLViewFor(
-			Pair<Date,String> stringState,
-			List<List<String>> stringMoves,
-			RoleInterface<TermType> role,
-			GDLVersion gdlVersion);
 	
 	// TODO: This could be extended to include the following methods:
 	//	public abstract Collection<? extends PlayerInfo<TermType>> getPlayerInfos();

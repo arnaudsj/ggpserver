@@ -25,5 +25,9 @@ import tud.gamecontroller.term.GameObjectInterface;
  * two roles should be equal if they have the same name 
  */
 public interface RoleInterface<TermType> extends GameObjectInterface{
+	public static final String NATURE_ROLE_NAME = "random";
+
 	TermType getTerm();
+
+	boolean isNature();
 }

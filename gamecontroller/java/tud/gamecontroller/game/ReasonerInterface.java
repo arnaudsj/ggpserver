@@ -43,12 +43,11 @@ public interface ReasonerInterface<
 
 	Collection<? extends FluentInterface<TermType>> getFluents(ReasonerStateInfoType state);
 	
-	public Collection<? extends FluentInterface<TermType>> getSeesFluents (ReasonerStateInfoType state, RoleInterface<TermType> role, JointMoveInterface<TermType> jointMove);
+	public Collection<TermType> getSeesTerms(ReasonerStateInfoType state, RoleInterface<TermType> role, JointMoveInterface<TermType> jointMove);
 	
-	public Collection<? extends FluentInterface<TermType>> getSeesXMLFluents (ReasonerStateInfoType state, RoleInterface<TermType> role);
+	public Collection<TermType> getSeesXMLTerms(ReasonerStateInfoType state, RoleInterface<TermType> role);
 	
 	String getKIFGameDescription();
 	
 	public ReasonerStateInfoType getStateFromString(String state);
-
 }

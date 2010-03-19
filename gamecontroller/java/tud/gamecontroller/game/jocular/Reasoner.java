@@ -47,6 +47,7 @@ import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.ReasonerInterface;
 import tud.gamecontroller.game.RoleInterface;
+import tud.gamecontroller.game.impl.Fluent;
 import tud.gamecontroller.game.impl.Move;
 import tud.gamecontroller.game.impl.Role;
 
@@ -56,7 +57,6 @@ public class Reasoner implements ReasonerInterface<Term, ProofContext> {
 
 	private Fact queryTerminal;
 	private Fact queryNext;
-	@SuppressWarnings("unused")
 	private Fact queryTrue;
 	private Fact queryInit;
 	private RelationNameProcessor trueProcessor;
@@ -161,21 +161,12 @@ public class Reasoner implements ReasonerInterface<Term, ProofContext> {
 	 */
 	public synchronized Collection<? extends FluentInterface<Term>> getFluents(ProofContext state) {
 		
-		try {
-			throw new NotImplementedException();
-		} catch (NotImplementedException e) {
-			e.printStackTrace();
-		}
-		
-		/*Collection<FluentInterface<Term>> fluents=new LinkedList<FluentInterface<Term>>();
+		Collection<FluentInterface<Term>> fluents=new LinkedList<FluentInterface<Term>>();
         Iterable<GroundFact> trues = stanfordlogicReasoner.getAllAnswers(queryTrue,state);
         for (GroundFact init : trues) {
         	fluents.add(new Fluent<Term>(new Term(parser.getSymbolTable(), init.getTerm(0))));
         }
-		return fluents;*/
-		
-		return null;
-		
+		return fluents;
 	}
 
 	/* (non-Javadoc)
@@ -199,37 +190,19 @@ public class Reasoner implements ReasonerInterface<Term, ProofContext> {
 		return parser.getSymbolTable();
 	}
 
-	public Collection<? extends FluentInterface<Term>> getSeesFluents(
+	public synchronized Collection<Term> getSeesTerms(
 			ProofContext state, RoleInterface<Term> role,
 			JointMoveInterface<Term> jointMove) {
-		try {
-			throw new NotImplementedException();
-		} catch (NotImplementedException e) {
-			e.printStackTrace();
-		}
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
-	public Collection<? extends FluentInterface<Term>> getSeesXMLFluents(
+	public synchronized Collection<Term> getSeesXMLTerms(
 			ProofContext state, RoleInterface<Term> role) {
-		try {
-			throw new NotImplementedException();
-		} catch (NotImplementedException e) {
-			e.printStackTrace();
-		}
-		return null;
+		throw new UnsupportedOperationException();
 	}
-	
-	@SuppressWarnings("serial")
-	public class NotImplementedException extends Exception {}
 
 	public ProofContext getStateFromString(String state) {
-		try {
-			throw new NotImplementedException();
-		} catch (NotImplementedException e) {
-			e.printStackTrace();
-		}
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 }

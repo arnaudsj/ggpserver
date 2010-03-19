@@ -36,12 +36,12 @@ public class PlayerFactory {
 	
 	public static <TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
 		Player<TermType, StateType> createRandomPlayer(RandomPlayerInfo info) {
-		return new RandomPlayer<TermType, StateType>(info.getName());
+		return new RandomPlayer<TermType, StateType>(info.getName(), info.getGdlVersion());
 	}
 	
 	public static <TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
 		Player<TermType, StateType> createLegalPlayer(LegalPlayerInfo info) {
-		return new LegalPlayer<TermType, StateType>(info.getName());
+		return new LegalPlayer<TermType, StateType>(info.getName(), info.getGdlVersion());
 	}
 	
 	public static <TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>

@@ -71,19 +71,15 @@
 		</tr>
 		<tr>
 			<th>
-				<table><tbody>
-				<tr><td>
-					players
-				</td></tr>
-				<tr><td>
-					roles
-				</td></tr>
-				<c:if test="${match.orderedGoalValues != null}">
-					 <tr><td>
-						scores
-					</td></tr>
-				</c:if>
-				</tbody></table>
+				<table>
+					<tbody>
+					<tr><td> players </td></tr>
+					<tr><td> roles </td></tr>
+					<c:if test="${match.orderedGoalValues != null}">
+						 <tr><td> scores </td></tr>
+					</c:if>
+					</tbody>
+				</table>
 			</th>
 			<td>
 				<table>
@@ -196,18 +192,16 @@
 			<th>
 				<div style="align: center;">
 					<c:out value="${role}"/>
-					<c:choose>
-						<c:when test="${viewMatch.gdlVersion == 2}">
-							<c:url value="view_state.jsp" var="stateURL">
-								<c:param name="matchID" value="${match.matchID}" />
-								<c:param name="stepNumber" value="1" />
-								<c:param name="role" value="${role}" />
-							</c:url>
-							<a href='<c:out value="${stateURL}" />'>
-								<span class="view" title="View initial state from ${role}'s sight"></span></a>
-							</a>
-						</c:when>
-					</c:choose>
+					<c:if test="${viewMatch.gdlVersion == 2}">
+						<c:url value="view_state.jsp" var="stateURL">
+							<c:param name="matchID" value="${match.matchID}" />
+							<c:param name="stepNumber" value="1" />
+							<c:param name="role" value="${role}" />
+						</c:url>
+						<a href='<c:out value="${stateURL}" />'>
+							<span class="view" title="View initial state from ${role}'s perspective"></span></a>
+						</a>
+					</c:if>
 				</div>
 			</th>
 		</c:forEach>
@@ -229,9 +223,6 @@
 				</c:otherwise>
 			</c:choose>
 			<tr class="${rowClass}">
-				
-				<%--			<td><c:out value="${stepNumber}" /></td>--%>
-				
 				<td>
 					<c:url value="view_state.jsp" var="stateURL">
 						<c:param name="matchID" value="${match.matchID}" />

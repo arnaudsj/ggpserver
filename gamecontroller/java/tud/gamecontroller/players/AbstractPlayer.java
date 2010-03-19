@@ -36,12 +36,13 @@ public abstract class AbstractPlayer<TermType extends TermInterface, StateType e
 	private long startRunningTime;
 	private long lastMessageRuntime;
 	
-	protected GDLVersion gdlVersion;
+	private GDLVersion gdlVersion = null;
 
-	public AbstractPlayer(String name) {
-		this.name=name;
-		this.runtime=0;
-		this.lastMessageRuntime=0;
+	public AbstractPlayer(String name, GDLVersion gdlVersion) {
+		this.name = name;
+		this.runtime = 0;
+		this.lastMessageRuntime = 0;
+		this.gdlVersion = gdlVersion;
 	}
 	
 	public void gameStart(MatchInterface<TermType, StateType> match, RoleInterface<TermType> role, ConnectionEstablishedNotifier notifier) {

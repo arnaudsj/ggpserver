@@ -40,8 +40,12 @@ public interface StateInterface<
 
 	Collection<? extends FluentInterface<TermType>> getFluents();
 	
-	Collection<? extends FluentInterface<TermType>> getSeesFluents(RoleInterface<TermType> role, JointMoveInterface<TermType> jointMove);
+	Collection<TermType> getSeesTerms(RoleInterface<TermType> role, JointMoveInterface<TermType> jointMove);
 	
-	Collection<? extends FluentInterface<TermType>> getSeesXMLFluents(RoleInterface<TermType> role);
-	
+	Collection<TermType> getSeesXMLTerms(RoleInterface<TermType> role);
+
+	/**
+	 * returns the list of fluents as a string in infix KIF notation
+	 */
+	public String toString();
 }

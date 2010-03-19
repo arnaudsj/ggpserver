@@ -28,7 +28,7 @@ import java.util.logging.Logger;
 
 import tud.gamecontroller.AbstractGameControllerRunner;
 import tud.gamecontroller.GDLVersion;
-import tud.gamecontroller.ReasonerFactory;
+import tud.gamecontroller.ReasonerFactoryInterface;
 import tud.gamecontroller.game.impl.Game;
 import tud.gamecontroller.logging.PlainTextLogFormatter;
 import tud.gamecontroller.logging.UnbufferedStreamHandler;
@@ -55,7 +55,7 @@ public abstract class AbstractGameControllerCLIRunner<
 	private File scrambleWordList=null;
 	private Collection<PlayerInfo> playerInfos=null;
 	
-	public AbstractGameControllerCLIRunner(ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory, GDLVersion gdlVersion){
+	public AbstractGameControllerCLIRunner(ReasonerFactoryInterface<TermType, ReasonerStateInfoType> reasonerFactory, GDLVersion gdlVersion){
 		super(reasonerFactory, gdlVersion);
 		Logger logger=getLogger();
 		logger.setUseParentHandlers(false);
@@ -145,6 +145,11 @@ public abstract class AbstractGameControllerCLIRunner<
 				int port=getIntArg(argv[index], "port"); ++index;
 				int gdl=getIntArg(argv[index], "gdl"); ++index;
 				if (gdl == 1) {
+					if (gdlVersion != GDLVersion.v1) {
+						System.err.println("GDL-I players not allowed in GDL-II game");
+						printUsage();
+						System.exit(-1);
+					}
 					player=new RemotePlayerInfo(roleindex-1, name, host, port, GDLVersion.v1);
 				} else {
 					player=new RemotePlayerInfo(roleindex-1, name, host, port, GDLVersion.v2);
@@ -161,7 +166,7 @@ public abstract class AbstractGameControllerCLIRunner<
 					printUsage();
 					System.exit(-1);
 				}
-				player=new LegalPlayerInfo(roleindex-1, gdlVersion);
+				player=new LegalPlayerInfo(roleindex-1, gdlVersion); // use GDL version of the game for the legal player too
 			}else{
 				missingArgumentsExit(argv[index-1]);
 			}
@@ -174,7 +179,7 @@ public abstract class AbstractGameControllerCLIRunner<
 					printUsage();
 					System.exit(-1);
 				}
-				player=new RandomPlayerInfo(roleindex-1, gdlVersion);
+				player=new RandomPlayerInfo(roleindex-1, gdlVersion); // use GDL version of the game for the random player too
 			}else{
 				missingArgumentsExit(argv[index-1]);
 			}

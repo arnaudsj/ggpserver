@@ -32,6 +32,7 @@ import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.impl.Game;
+import tud.gamecontroller.game.impl.MoveFactory;
 import tud.gamecontroller.game.impl.RunnableMatch;
 import tud.gamecontroller.game.impl.State;
 import tud.gamecontroller.players.Player;
@@ -47,7 +48,7 @@ public abstract class AbstractGameControllerRunner<
 		TermType extends TermInterface,
 		ReasonerStateInfoType> {
 	
-	private final ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory;
+	private final ReasonerFactoryInterface<TermType, ReasonerStateInfoType> reasonerFactoryInterface;
 
 	private GameController<
 		TermType,
@@ -56,9 +57,9 @@ public abstract class AbstractGameControllerRunner<
 	
 	protected GDLVersion gdlVersion;
 	
-	public AbstractGameControllerRunner(final ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory, GDLVersion gdlVersion) {
+	public AbstractGameControllerRunner(final ReasonerFactoryInterface<TermType, ReasonerStateInfoType> reasonerFactory, GDLVersion gdlVersion) {
 		super();
-		this.reasonerFactory = reasonerFactory;
+		this.reasonerFactoryInterface = reasonerFactory;
 		this.gdlVersion = gdlVersion;
 	}
 
@@ -103,7 +104,7 @@ public abstract class AbstractGameControllerRunner<
 
 	private Map<RoleInterface<TermType>,Player<TermType, State<TermType, ReasonerStateInfoType>>> createPlayers(Game<TermType, ReasonerStateInfoType> game, GameScramblerInterface gameScrambler) {
 		Map<RoleInterface<TermType>,Player<TermType, State<TermType, ReasonerStateInfoType>>> players=new HashMap<RoleInterface<TermType>,Player<TermType, State<TermType, ReasonerStateInfoType>>>();
-		MoveFactoryInterface<? extends MoveInterface<TermType>> moveFactory=getMoveFactory();
+		MoveFactoryInterface<? extends MoveInterface<TermType>> moveFactory = new MoveFactory<TermType>(reasonerFactoryInterface.getTermFactory());
 		for(PlayerInfo playerInfo:getPlayerInfos()){
 			RoleInterface<TermType> role=game.getRole(playerInfo.getRoleindex());
 			players.put(role, PlayerFactory. <TermType, State<TermType, ReasonerStateInfoType>> createPlayer(playerInfo, moveFactory, gameScrambler, game.getGdlVersion()));
@@ -118,8 +119,6 @@ public abstract class AbstractGameControllerRunner<
 	}
 
 	protected abstract Collection<PlayerInfo> getPlayerInfos();
-
-	protected abstract MoveFactoryInterface<? extends MoveInterface<TermType>> getMoveFactory();
 
 	protected abstract Game<TermType, ReasonerStateInfoType> getGame();
 
@@ -148,9 +147,9 @@ public abstract class AbstractGameControllerRunner<
 		try{
 			String sightFile = getSightFile();
 			if (sightFile != null) {
-				game = new Game<TermType, ReasonerStateInfoType>(gameFile, reasonerFactory, gdlVersion, getStyleSheet(), new File(getSightFile()));
+				game = new Game<TermType, ReasonerStateInfoType>(gameFile, reasonerFactoryInterface, gdlVersion, getStyleSheet(), new File(getSightFile()));
 			} else {
-				game = new Game<TermType, ReasonerStateInfoType>(gameFile, reasonerFactory, gdlVersion, getStyleSheet());
+				game = new Game<TermType, ReasonerStateInfoType>(gameFile, reasonerFactoryInterface, gdlVersion, getStyleSheet());
 			}
 		} catch (IOException e){
 			System.out.println(e);
@@ -160,7 +159,7 @@ public abstract class AbstractGameControllerRunner<
 	}
 
 	protected Game<TermType, ReasonerStateInfoType> createGame(String gameDescription, String name) throws IOException{
-		return new Game<TermType, ReasonerStateInfoType>(gameDescription, name, reasonerFactory, gdlVersion, getStyleSheet(), getSightFile());
+		return new Game<TermType, ReasonerStateInfoType>(gameDescription, name, reasonerFactoryInterface, gdlVersion, getStyleSheet(), getSightFile());
 	}
 
 	public GameController<

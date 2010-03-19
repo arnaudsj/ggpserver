@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2009-2010 Martin Günther <mintar@gmx.de> 
                   2010 Nicolas JEAN <njean42@gmail.com>
+                  2010 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GGP Server.
 
@@ -23,20 +24,25 @@ package tud.ggpserver.formhandlers;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import tud.gamecontroller.GDLVersion;
+import tud.gamecontroller.XMLGameStateWriter;
 import tud.gamecontroller.auxiliary.Pair;
+import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.RoleInterface;
+import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.game.impl.Game;
+import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.matches.ServerMatch;
 
 public class ViewState {
 	
 	private int stepNumber = -1;
-	private ServerMatch<?, ?> match;
-	private String roleName = "";
+	private ServerMatch<? extends TermInterface, ?> match;
+	private String roleName = null;
 	
 	private static final Logger logger = Logger.getLogger(Game.class.getName());
 	
@@ -53,15 +59,9 @@ public class ViewState {
 	}
 	
 	public void setRole(String roleName) {
-		logger.info("setRole("+roleName+")");
 		this.roleName = roleName;
 	}
 	
-	/* MODIFIED
-	 * With GDL-II, we have to store, for each game state a representation of the state
-	 * This is because we want to retrieve this representation and be able to easily load it into a reasoner,
-	 * 	which will allow us to easily compute what this or that player sees from the game state.
-	 */
 	@SuppressWarnings("unchecked")
 	public String getXmlState() {
 		
@@ -74,32 +74,17 @@ public class ViewState {
 				// return the last/final state
 				stepNumber = numberOfStates;
 			}
+			Pair<Date,String> stringState = stringStates.get(stepNumber-1);
 			
+			GameInterface game = match.getGame();
+			RoleInterface role = null;
+
 			// compute Role object from role name
-			this.roleName = ""+this.roleName; // little trick, just in case roleName is null 
-			RoleInterface<?> role = null;
-			List<? extends RoleInterface<?>> roles = match.getGame().getOrderedRoles();
-			for (RoleInterface<?> roletp: roles) {
-				if (roletp.toString().toUpperCase().equals(this.roleName.toUpperCase())) {
-					role = roletp;
-					logger.info("Displaying view of player "+role);
-					break;
-				}
+			if (roleName != null) {
+				role = game.getRoleByName(roleName);
 			}
-			// if no role name was given, display the state from random point's of view
 			if (role == null) {
-				for (RoleInterface<?> roletp: roles) {
-					if (roletp.toString().toUpperCase().equals("RANDOM")) {
-						role = roletp;
-						logger.info("Requested player wasn't found, display view of the RANDOM player");
-						break;
-					}
-				}
-			}
-			// and finally, if random wasn't part of the game, let's choose the first player
-			if (role == null) {
-				role = roles.get(0);
-				logger.info("Requested player wasn't found, and RANDOM isn't part of the game, displaying view of first player "+role);
+				role = game.getNatureRole();
 			}
 			
 			// get history of moves
@@ -113,11 +98,29 @@ public class ViewState {
 			GDLVersion gdlVersion = match.getGame().getGdlVersion();
 			logger.info("gdlVersion = "+gdlVersion);
 			
-			return match.getXMLViewFor(
-					stringStates.get(stepNumber - 1),
-					stringMoves,
-					(RoleInterface) role,
-					gdlVersion);
+			StateInterface state = match.getGame().getStateFromString(stringState.getRight());
+			
+			// get goal values
+			Map<? extends RoleInterface, Integer> goalValues = null;
+			if (state.isTerminal()) {
+				goalValues = match.getGoalValues();
+			}
+			
+			return XMLGameStateWriter.createXMLOutputStream(
+					match,
+					state,
+					stringMoves, // moves...
+					goalValues,
+					match.getGame().getStylesheet(),
+					role,
+					stringState.getLeft()
+				).toString();
+
+//			return match.getXMLViewFor(
+//					stringStates.get(stepNumber - 1),
+//					stringMoves,
+//					(RoleInterface) role,
+//					gdlVersion);
 		} else {
 			// this can only happen if the initial state wasn't created yet
 			return "match " + match.getMatchID() + " has no state!"; 

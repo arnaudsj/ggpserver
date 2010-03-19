@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2010 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GameController.
 
@@ -19,22 +19,18 @@
 
 package tud.gamecontroller.game.javaprover;
 
-import java.io.File;
-
-import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.ReasonerFactoryInterface;
+import tud.gamecontroller.game.ReasonerInterface;
 import tud.gamecontroller.term.TermFactoryInterface;
 import cs227b.teamIago.util.GameState;
 
-public class GameControllerGuiRunner extends
-		tud.gamecontroller.gui.AbstractGameControllerGuiRunner<Term, GameState> {
-
-	public GameControllerGuiRunner(File gameFile, ReasonerFactoryInterface<Term, GameState> reasonerFactory, GDLVersion gdlVersion) {
-		super(gameFile, reasonerFactory, gdlVersion);
+public final class ReasonerFactory implements
+		ReasonerFactoryInterface<Term, GameState> {
+	public ReasonerInterface<Term, GameState> createReasoner(String gameDescription, String gameName) {
+		return new Reasoner(gameDescription);
 	}
 
-	@Override
-	protected TermFactoryInterface<Term> getTermFactory() {
+	public TermFactoryInterface<Term> getTermFactory() {
 		return new TermFactory();
 	}
 }

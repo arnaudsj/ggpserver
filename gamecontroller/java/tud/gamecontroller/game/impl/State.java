@@ -70,26 +70,36 @@ public class State<TermType extends TermInterface, ReasonerStateInfoType>
 		return reasoner.getFluents(stateInformation);
 	}
 	
-	/** MODIFIED (ADDED)
-	 * get the sees fluents to send to players
+	/**
+	 * get the sees terms to send to players
 	 */
-	public Collection<? extends FluentInterface<TermType>> getSeesFluents (RoleInterface<TermType> role, JointMoveInterface<TermType> jointMove) {
-		return reasoner.getSeesFluents(	stateInformation, role, jointMove);
+	public Collection<TermType> getSeesTerms(RoleInterface<TermType> role, JointMoveInterface<TermType> jointMove) {
+		return reasoner.getSeesTerms(stateInformation, role, jointMove);
 	}
 	
-	/** MODIFIED (ADDED)
-	 * get the sees fluents to send to players
+	/**
+	 * get the sees terms to put in the XML for the state
 	 */
-	public Collection<? extends FluentInterface<TermType>> getSeesXMLFluents (RoleInterface<TermType> role) {
-		return reasoner.getSeesXMLFluents(	stateInformation, role);
+	public Collection<TermType> getSeesXMLTerms(RoleInterface<TermType> role) {
+		return reasoner.getSeesXMLTerms(stateInformation, role);
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
-	public boolean equals (Object o) {
-		return this.stateInformation.equals( ((State<TermType, ReasonerStateInfoType>)o).stateInformation );
+	public boolean equals(Object o) {
+		if (o instanceof State)
+			return stateInformation.equals(((State<?, ?>)o).stateInformation);
+		// TODO: change hash-function according to the following definition
+//		else if (o instanceof StateInterface<?, ?>) {
+//			HashSet<?> fluents1 = new HashSet<FluentInterface<?>>(((StateInterface<?, ?>)o).getFluents());
+//			HashSet<?> fluents2 = new HashSet<FluentInterface<?>>(getFluents());
+//			return fluents1.equals(fluents2);
+//		}
+		return false;
 	}
 	
+	/**
+	 * returns the list of fluents as a string in infix KIF notation
+	 */
 	public String toString(){
 		StringBuilder sb=new StringBuilder();
 		sb.append('(');

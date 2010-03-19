@@ -22,6 +22,7 @@ package tud.gamecontroller.game.javaprover;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -82,13 +83,7 @@ public class Reasoner implements ReasonerInterface<Term, GameState> {
 	}
 
 	public GameState getSuccessorState(GameState state, JointMoveInterface<Term> jointMove) {
-		ExpList movesList=new ExpList();
-		for(Entry<? extends RoleInterface<Term>, ? extends MoveInterface<Term>> entry:jointMove.entrySet()){
-			ExpList doesArgs=new ExpList();
-			doesArgs.add(entry.getKey().getTerm().getExpr());
-			doesArgs.add(entry.getValue().getTerm().getExpr());
-			movesList.add(new Predicate(new Atom("DOES"), doesArgs));
-		}
+		ExpList movesList = getMovesListForJointMove(jointMove);
 		synchronized (gameSim) {
 			gameSim.SetGameState(state);
 			gameSim.SimulateStep(movesList);
@@ -96,6 +91,18 @@ public class Reasoner implements ReasonerInterface<Term, GameState> {
 		}
 	}
 
+	private static ExpList getMovesListForJointMove(JointMoveInterface<Term> jointMove) {
+		ExpList movesList=new ExpList();
+		assert(jointMove!=null);
+		for(Entry<? extends RoleInterface<Term>, ? extends MoveInterface<Term>> entry:jointMove.entrySet()){
+			ExpList doesArgs=new ExpList();
+			doesArgs.add(entry.getKey().getTerm().getExpr());
+			doesArgs.add(entry.getValue().getTerm().getExpr());
+			movesList.add(new Predicate(new Atom("DOES"), doesArgs));
+		}
+		return movesList;
+	}
+	
 	public boolean isLegal(GameState state, RoleInterface<Term> role, MoveInterface<Term> move) {
 		synchronized (gameSim) {
 			gameSim.SetGameState(state);
@@ -126,12 +133,15 @@ public class Reasoner implements ReasonerInterface<Term, GameState> {
 			gameSim.SetGameState(state);
 			exprlist=gameSim.GetLegalMoves(role.getTerm().getExpr());
 		}
-		Collection<MoveInterface<Term>> moveslist=new LinkedList<MoveInterface<Term>>();
+		Collection<MoveInterface<Term>> moveslist;
 		if (exprlist == null) {
-			System.out.println(role+" has no legal move!");
-		}
-		for(int i=0;i<exprlist.size();i++){
-			moveslist.add(new Move<Term>(new Term(((Connective)exprlist.get(i)).getOperands().get(1))));
+			Logger.getLogger(Reasoner.class.getCanonicalName()).warning(role+" has no legal move!");
+			moveslist = Collections.emptyList();
+		} else {
+			moveslist = new ArrayList<MoveInterface<Term>>(exprlist.size());
+			for(int i=0;i<exprlist.size();i++){
+				moveslist.add(new Move<Term>(new Term(((Connective)exprlist.get(i)).getOperands().get(1))));
+			}
 		}
 		return moveslist;
 	}
@@ -168,90 +178,57 @@ public class Reasoner implements ReasonerInterface<Term, GameState> {
 		return fluents;
 	}
 	
-	
-	// MODIFIED (ADDED)
-	public Collection<? extends FluentInterface<Term>> getSeesFluents( GameState state, RoleInterface<Term> role, JointMoveInterface<Term> jointMove) {
-		
-		ExpList movesList=new ExpList();
-		if (jointMove != null) {
-			for(Entry<? extends RoleInterface<Term>, ? extends MoveInterface<Term>> entry:jointMove.entrySet()){
-				ExpList doesArgs=new ExpList();
-				doesArgs.add(entry.getKey().getTerm().getExpr());
-				doesArgs.add(entry.getValue().getTerm().getExpr());
-				movesList.add(new Predicate(new Atom("DOES"), doesArgs));
-			}
-		}
-		ExpList el = new ExpList();
+	public Collection<Term> getSeesTerms(GameState state, RoleInterface<Term> role, JointMoveInterface<Term> jointMove) {
+		ExpList movesList = getMovesListForJointMove(jointMove);
+		ExpList el = null;
 		synchronized (gameSim) {
 			gameSim.SetGameState(state);
-			el = gameSim.getSeesFluents(role.getTerm().getExpr(), movesList);
+			el = gameSim.getSeesTerms(role.getTerm().getExpr(), movesList);
 		}
-		
-		Collection<FluentInterface<Term>> fluents = new Vector<FluentInterface<Term>>();
-		if (el == null) return fluents;
-		
-		for(int i=0;i<el.size();i++) {
-			Predicate true_expr=(Predicate)el.get(i);
-			fluents.add(new Fluent<Term>(new Term(true_expr.getOperands().get(0))));
+		Collection<Term> terms;
+		if (el != null) {
+			terms = new Vector<Term>(el.size());
+			for(int i=0;i<el.size();i++) {
+				terms.add(new Term(el.get(i)));
+			}
+		} else {
+			terms = Collections.emptyList();
 		}
-		return fluents;
-		
+		return terms;
 	}
 	
-	
-	// MODIFIED (ADDED)
-	public Collection<? extends FluentInterface<Term>> getSeesXMLFluents( GameState state, RoleInterface<Term> role) {
-		
-		/*ExpList movesList=new ExpList();
-		if (jointMove != null) {
-			for(Entry<? extends RoleInterface<Term>, ? extends MoveInterface<Term>> entry:jointMove.entrySet()){
-				ExpList doesArgs=new ExpList();
-				doesArgs.add(entry.getKey().getTerm().getExpr());
-				doesArgs.add(entry.getValue().getTerm().getExpr());
-				movesList.add(new Predicate(new Atom("DOES"), doesArgs));
-			}
-		}*/
-		ExpList el = new ExpList();
+	public Collection<Term> getSeesXMLTerms(GameState state, RoleInterface<Term> role) {
+		ExpList el = null;
 		synchronized (gameSim) {
 			gameSim.SetGameState(state);
 			Expression r = role.getTerm().getExpr();
-			el = gameSim.getSeesXMLFluents(r);
+			el = gameSim.getSeesXMLTerms(r);
 		}
-		
-		Collection<FluentInterface<Term>> fluents = new Vector<FluentInterface<Term>>();
-		if (el == null) return fluents;
-		
-		for(int i=0;i<el.size();i++) {
-			Predicate true_expr=(Predicate)el.get(i);
-			fluents.add(new Fluent<Term>(new Term(true_expr.getOperands().get(0))));
+		Collection<Term> terms;
+		if (el != null) {
+			terms = new Vector<Term>(el.size());
+			for(int i=0;i<el.size();i++) {
+				terms.add(new Term(el.get(i)));
+			}
+		} else {
+			terms = Collections.emptyList();
 		}
-		return fluents;
-		
+		return terms;
 	}
 	
-	
-	public void addRulesFromFile (String filename) {
-		this.gameSim.ParseFileIntoTheory(filename);
-	}
-
 	public GameState getStateFromString(String state) {
-		
+		// get list of fluents
 		ExpList el = Parser.parseExpList(state);
+		// surround with (true ...)
 		Expression[] exps = new Expression[el.size()];
-		
 		for (int i = 0; i < el.size(); i++) {
 			Expression e = el.get(i);
-			exps[i] = new Predicate("true", new ExpList( new Expression[] {e} ) );
+			exps[i] = new Predicate("true", new Expression[] {e});
 		}
-		
+		// add to theory and extract the GameState
 		Theory t = new Theory(true, false);
 		t.setState(new ExpList(exps));
 		GameState gs = t.getState();
-		System.out.println("demarshalled state = "+gs);
-		
 		return gs;
-		
 	}
-	
-
 }

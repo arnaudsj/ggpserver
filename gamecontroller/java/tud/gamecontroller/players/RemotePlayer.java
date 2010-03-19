@@ -32,20 +32,19 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import tud.gamecontroller.ConnectionEstablishedNotifier;
 import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.auxiliary.InvalidKIFException;
-import tud.gamecontroller.game.FluentInterface;
 import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.MoveFactoryInterface;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.StateInterface;
+import tud.gamecontroller.game.impl.Game;
 import tud.gamecontroller.logging.ErrorMessageListener;
 import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.scrambling.GameScramblerInterface;
@@ -60,10 +59,8 @@ public class RemotePlayer<TermType extends TermInterface,
 	private MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory;
 	private GameScramblerInterface gameScrambler;
 	private Logger logger;
-	
-	
-	// MODIFIED: as we don't have the rule that the first turn is the only one where no moves are sent, we have to manage this with a boolean
-	private boolean firstTurn;
+	protected boolean firstTurn;
+
 	
 	/**
 	 * the idea to handle connection timeouts by Sam Schreiber <schreib@cs.stanford.edu>:
@@ -83,31 +80,23 @@ public class RemotePlayer<TermType extends TermInterface,
 	private static final int CONNECTION_TIMEOUT_BONUS = 30000;
 	
 	public RemotePlayer(String name, String host, int port, GDLVersion gdlVersion, MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory, GameScramblerInterface gamescrambler) {
-		super(name);
+		super(name, gdlVersion);
 		this.host=host;
 		this.port=port;
 		this.movefactory=movefactory;
 		this.gameScrambler=gamescrambler;
 		this.logger=Logger.getLogger("tud.gamecontroller");
-		this.gdlVersion = gdlVersion; // this is not necessarily the same as the played game's gdlVersion, since a GDLv2 player can play GDLv1 games!
 	}
 	
 	@Override
 	public void gameStart(MatchInterface<TermType, StateType> match, RoleInterface<TermType> role, ConnectionEstablishedNotifier notifier) {
 		
 		super.gameStart(match, role, notifier);
-		
 		this.firstTurn = true;
-		
-		String gameDescription = match.getGame().getKIFGameDescription().toUpperCase();
-		
+		String gameDescription = match.getGame().getKIFGameDescription();
 		// if this is a Regular GDL game and the player understands GDL-II, add necessary sees(Role,Did(Role2,Move)) ← true(does(Role2,Move))
 		if (match.getGame().getGdlVersion() == GDLVersion.v1 && this.getGdlVersion() == GDLVersion.v2) {
-			//gameDescription += "\n\n";
-			for (RoleInterface<?> eachRole: match.getGame().getOrderedRoles())
-				gameDescription += ( "(<= (sees "+role+" (did "+eachRole+" ?move) )"+
-										"(does "+eachRole+" ?move)"+
-										") " ).toUpperCase();
+			gameDescription += Game.DEFAULT_SEES_RULES;
 		}
 		
 		hostAddress = null; // don't use an old hostAddress for a new match
@@ -115,7 +104,7 @@ public class RemotePlayer<TermType extends TermInterface,
 		String msg="(START "+
 				match.getMatchID()+" "+
 				gameScrambler.scramble(role.getKIFForm()).toUpperCase()+
-				" ("+gameScrambler.scramble(gameDescription)+") "+
+				" ("+gameScrambler.scramble(gameDescription).toUpperCase()+") "+
 				match.getStartclock()+" "+match.getPlayclock()+")";
 		notifyStartRunning();
 		String reply=sendMsg(msg, notifier);
@@ -125,14 +114,14 @@ public class RemotePlayer<TermType extends TermInterface,
 			
 	}
 
-	/** MODIFIED
+	/**
 	 * This is the core of GDL-II:
-	 * Instead of sending the actual joint move to the remote players, they only get the computed "sees fluents".
-	 * (and this is the only place where we apply two different behaviors: send the sees fluents in GDL-II games,
+	 * Instead of sending the actual joint move to the remote players, they only get the computed "sees terms".
+	 * (and this is the only place where we apply two different behaviors: send the sees terms in GDL-II games,
 	 * and send the prior moves in regular GDL games)
 	 */
 	@SuppressWarnings("unchecked")
-	public MoveInterface<TermType> gamePlay(Object seesFluents, ConnectionEstablishedNotifier notifier) {
+	public MoveInterface<TermType> gamePlay(Object seesTerms, ConnectionEstablishedNotifier notifier) {
 		MoveInterface<TermType> move=null;
 		String msg="(PLAY "+match.getMatchID()+" ";
 		
@@ -141,27 +130,16 @@ public class RemotePlayer<TermType extends TermInterface,
 			msg+="NIL";
 		}else{
 			
-			if (this.gdlVersion == GDLVersion.v1) { // Regular GDL player
-				
-				JointMoveInterface<TermType> jointMove = (JointMoveInterface<TermType>) seesFluents;
-				msg+=gameScrambler.scramble(jointMove.getKIFForm()).toUpperCase();
-				
+			if (getGdlVersion() == GDLVersion.v1) { // GDL-I player
+				JointMoveInterface<TermType> jointMove = (JointMoveInterface<TermType>) seesTerms;
+				msg += gameScrambler.scramble(jointMove.getKIFForm()).toUpperCase();
 			} else { // GDL-II player
-				
-				Collection<? extends FluentInterface<TermType>> seesFluents2 =
-					(Collection<? extends FluentInterface<TermType>>) seesFluents;
-				
-				// MODIFIED ↓↓
 				// Let's send the seesTerms (or jointMove transformed into seesTerms) to each player via the PLAY message
-				// TODO: scramble this part of the message
 				msg += "(";
-				Iterator<? extends FluentInterface<TermType>> itF = seesFluents2.iterator();
-				while(itF.hasNext()) {
-					FluentInterface<TermType> fluent = itF.next();
-					msg += fluent.getKIFForm() + " ";
+				for (TermType t:(Collection<TermType>) seesTerms) {
+					msg += gameScrambler.scramble(t.getKIFForm()).toUpperCase() + " ";
 				}
 				msg += ")";
-
 			}
 			
 		}

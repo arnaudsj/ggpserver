@@ -20,45 +20,51 @@
 
 package tud.gamecontroller.game;
 
-import java.util.Date;
 import java.util.List;
 
-import tud.gamecontroller.auxiliary.Pair;
 import tud.auxiliary.NamedObject;
 import tud.gamecontroller.GDLVersion;
-import tud.gamecontroller.game.impl.Match;
 
 public interface GameInterface<
 	TermType,
 	StateType
 	> extends NamedObject{
 	
-	public abstract StateType getInitialState();
+	public StateType getInitialState();
 
-	public abstract int getNumberOfRoles();
+	public int getNumberOfRoles();
 
 	/**
 	 * 
 	 * @param roleindex index of the role of the game (0&lt;=roleindex&lt;getNumberOfRoles())
 	 * @return the roleindex-th role
 	 */
-	public abstract RoleInterface<TermType> getRole(int roleindex);
+	public RoleInterface<TermType> getRole(int roleindex);
 	
-	public abstract List<? extends RoleInterface<TermType>> getOrderedRoles();
+	public List<? extends RoleInterface<TermType>> getOrderedRoles();
 
 	/**
 	 * @return the GDL game description in infix KIF format without comments and linebreaks
 	 */
-	public abstract String getKIFGameDescription();
+	public String getKIFGameDescription();
 
-	public abstract String getStylesheet();
-	
-	public abstract String getXMLViewFor(
-			Match<?, ?> match,
-			Pair<Date,String> stringState,
-			List<List<String>> stringMoves,
-			RoleInterface<TermType> role);
+	public String getStylesheet();
 	
 	public GDLVersion getGdlVersion();
 	
+	/**
+	 * This method is more or less the inverse of StateInterface.toString() it parses the given String and returns a state of the game.
+	 * @param stringState a string containing a list of fluents in infix KIF notation e.g., "((step 1) (cell 1 1 b) ... (control xplayer))"
+	 * @return the state object
+	 */
+	public StateType getStateFromString(String stringState);
+
+	/**
+	 * returns the role that plays the nature (i.e., the role named "random")
+	 * 
+	 * This role may not actually be a role of the game (e.g., if there is no random role). 
+	 */
+	public RoleInterface<TermType> getNatureRole();
+
+	public RoleInterface<TermType> getRoleByName(String roleName);
 }

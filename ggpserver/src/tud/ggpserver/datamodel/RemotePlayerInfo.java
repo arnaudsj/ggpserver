@@ -48,7 +48,6 @@ public class RemotePlayerInfo extends tud.gamecontroller.players.RemotePlayerInf
 		this.status = status;
 		this.availableForRoundRobinMatches = availableForRoundRobinMatches;
 		this.availableForManualMatches = availableForManualMatches;
-		this.setGdlVersion(gdlVersion);
 	}
 
 	/**

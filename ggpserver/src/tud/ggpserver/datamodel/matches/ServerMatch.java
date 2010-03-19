@@ -164,9 +164,9 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 	
 	public List<String> getOrderedPlayerNames() {
 		ArrayList<String> orderedPlayerNames = new ArrayList<String>();
-		List<? extends PlayerInfo> orderedPlayerInfos = this.getOrderedPlayerInfos();
-		for (PlayerInfo info: orderedPlayerInfos)
+		for (PlayerInfo info: getOrderedPlayerInfos()) {
 			orderedPlayerNames.add(info.getName());
+		}
 		return orderedPlayerNames;
 	}
 

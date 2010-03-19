@@ -178,42 +178,23 @@ public class GameController<
 		Collection<PlayerThreadPlay<TermType, State<TermType, ReasonerStateInfoType>>> playerthreads = new LinkedList<PlayerThreadPlay<TermType, State<TermType, ReasonerStateInfoType>>>();
 		
 		for(RoleInterface<TermType> role:game.getOrderedRoles()){
-			/** MODIFIED
+			/*
 			 * Here is the only point at which the difference between regular GDL and GDL-II is made:
 			 * - if we play a regular GDL game, we will send the moves as seesFluents;
 			 * - and if on the contrary we play a GDL-II game, we will derive the seesFluents from the game description, and send them. 
 			 */
-			
-			Object seesFluents = null;
-			
-			if ( match.getPlayer(role).getGdlVersion() == GDLVersion.v1) { // Regular GDL
-				
-				// let's transform our priormoves into seesTerms
-				//System.out.println("priormoves: "+priormoves);
-				if (priormoves != null) {
-					
-					/* LinkedList<FluentInterface<TermType>> seesFluents2 = new LinkedList<FluentInterface<TermType>>();
-					
-					for (MoveInterface<TermType> move: priormoves.getOrderedMoves())
-						seesFluents2.add( (FluentInterface<TermType>) new SeesTerm<TermType>(move.getTerm()) );
-					
-					seesFluents = seesFluents2;
-					*/
-					
-					seesFluents = priormoves;
-					
+			Player<TermType, State<TermType, ReasonerStateInfoType>> player = match.getPlayer(role);
+			Object seesTerms = null;
+			if (priormoves != null) { // not the first play message
+				if ( player.getGdlVersion() == GDLVersion.v1) { // GDL-I
+					seesTerms = priormoves;
+				} else { // GDL-II
+					// retrieve seesTerms, and send them in the PLAY messages
+					seesTerms = priorState.getSeesTerms(role, priormoves);
+					logger.info("seesTerms("+role+") = " + seesTerms);
 				}
-				
-			} else { // GDL-II
-				
-				// retrieve seesTerms, and send them in the PLAY messages
-				seesFluents = priorState.getSeesFluents(role, priormoves);
-				logger.info("GameController.gamePlay,   seesFluents (player "+role+") = "+seesFluents);
-
 			}
-			
-			playerthreads.add(new PlayerThreadPlay<TermType, State<TermType, ReasonerStateInfoType>>(role, match.getPlayer(role), match, seesFluents, playclock*1000+EXTRA_DEADLINE_TIME));
-			
+			playerthreads.add(new PlayerThreadPlay<TermType, State<TermType, ReasonerStateInfoType>>(role, player, match, seesTerms, playclock*1000+EXTRA_DEADLINE_TIME));
 		}
 		
 		logger.info("Sending play messages ...");

@@ -20,9 +20,10 @@
 
 package tud.gamecontroller.players;
 
+import java.util.ArrayList;
 import java.util.Random;
-import java.util.Vector;
 
+import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.term.TermInterface;
@@ -33,19 +34,15 @@ public class RandomPlayer<
 
 	private Random random;
 	
-	public RandomPlayer(String name) {
-		super(name);
+	public RandomPlayer(String name, GDLVersion gdlVersion) {
+		super(name, gdlVersion);
 		random=new Random();
 	}
 	
-	// MODIFIED
 	public MoveInterface<TermType> getNextMove() {
-		
-		// does the work of getting either legal moves the regular GDL way, or the GDL-II way
-		Vector<MoveInterface<TermType>> legalMoves = super.getLegalMoves();
-		
+		// does the work of getting either legal moves the GDL-I way, or the GDL-II way
+		ArrayList<MoveInterface<TermType>> legalMoves = new ArrayList<MoveInterface<TermType>>(getLegalMoves());
 		int i=random.nextInt(legalMoves.size());
-		return (MoveInterface<TermType>) legalMoves.get(i);
-		
+		return legalMoves.get(i);
 	}
 }

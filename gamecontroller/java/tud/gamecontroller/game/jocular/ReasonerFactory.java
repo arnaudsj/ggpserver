@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2010 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GameController.
 
@@ -17,24 +17,21 @@
     along with GameController.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package tud.gamecontroller.game.javaprover;
+package tud.gamecontroller.game.jocular;
 
-import java.io.File;
-
-import tud.gamecontroller.GDLVersion;
+import stanfordlogic.gdl.Parser;
+import stanfordlogic.prover.ProofContext;
 import tud.gamecontroller.ReasonerFactoryInterface;
+import tud.gamecontroller.game.ReasonerInterface;
 import tud.gamecontroller.term.TermFactoryInterface;
-import cs227b.teamIago.util.GameState;
 
-public class GameControllerGuiRunner extends
-		tud.gamecontroller.gui.AbstractGameControllerGuiRunner<Term, GameState> {
-
-	public GameControllerGuiRunner(File gameFile, ReasonerFactoryInterface<Term, GameState> reasonerFactory, GDLVersion gdlVersion) {
-		super(gameFile, reasonerFactory, gdlVersion);
+public final class ReasonerFactory implements ReasonerFactoryInterface<Term, ProofContext> {
+	public ReasonerInterface<Term, ProofContext> createReasoner(String gameDescription, String gameName) {
+		return new Reasoner(gameDescription, new Parser());
 	}
 
-	@Override
-	protected TermFactoryInterface<Term> getTermFactory() {
-		return new TermFactory();
+	public TermFactoryInterface<Term> getTermFactory() {
+		throw new UnsupportedOperationException();
+		// problem is that the TermFactory and the Reasoner have to use the same Parser
 	}
 }

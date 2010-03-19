@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>
                   2010 Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
@@ -23,21 +23,11 @@ package tud.gamecontroller.gui;
 import java.io.File;
 
 import tud.gamecontroller.GDLVersion;
-import tud.gamecontroller.ReasonerFactory;
-import tud.gamecontroller.game.ReasonerInterface;
-import tud.gamecontroller.game.javaprover.Reasoner;
-import tud.gamecontroller.game.javaprover.Term;
-import cs227b.teamIago.util.GameState;
+import tud.gamecontroller.game.javaprover.ReasonerFactory;
 
 public class GameControllerGuiRunnerFactory {
 
 	public static AbstractGameControllerGuiRunner<?, ?> createGameControllerGuiRunner(File gameFile, GDLVersion gdlVersion){
-		ReasonerFactory<Term, GameState> reasonerFactory = new ReasonerFactory<Term, GameState>() {
-			public ReasonerInterface<Term, GameState> createReasoner(String gameDescription, String gameName) {
-				return new Reasoner(gameDescription);
-			}
-		};
-		
-		return new tud.gamecontroller.game.javaprover.GameControllerGuiRunner(gameFile, reasonerFactory, gdlVersion);
+		return new tud.gamecontroller.game.javaprover.GameControllerGuiRunner(gameFile, new ReasonerFactory(), gdlVersion);
 	}
 }

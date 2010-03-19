@@ -291,11 +291,12 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		List<PlayerInfo> allPlayerInfos = new LinkedList<PlayerInfo>(players);
 		int numberOfRoles = game.getNumberOfRoles();
 		
-		// add enough random players so that the players are divisible among the matches without remainder 
+		// add enough random players so that the players are dividable among the matches without remainder 
 		int numberOfSurplusPlayers = allPlayerInfos.size() % numberOfRoles;		
 		if (numberOfSurplusPlayers > 0) {
 			int numberOfRandomPlayers = numberOfRoles - numberOfSurplusPlayers;
 			for (int i = 0; i < numberOfRandomPlayers; i++) {
+				// use the GDL version of the game for the Random player
 				allPlayerInfos.add(new RandomPlayerInfo(-1, game.getGdlVersion()));
 			}
 		}

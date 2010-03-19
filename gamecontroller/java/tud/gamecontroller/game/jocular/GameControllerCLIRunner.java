@@ -22,35 +22,21 @@ package tud.gamecontroller.game.jocular;
 import stanfordlogic.gdl.Parser;
 import stanfordlogic.prover.ProofContext;
 import tud.gamecontroller.GDLVersion;
-import tud.gamecontroller.ReasonerFactory;
+import tud.gamecontroller.ReasonerFactoryInterface;
 import tud.gamecontroller.cli.AbstractGameControllerCLIRunner;
-import tud.gamecontroller.game.MoveFactoryInterface;
-import tud.gamecontroller.game.ReasonerInterface;
-import tud.gamecontroller.game.impl.Move;
 
-public class GameControllerCLIRunner
-		extends AbstractGameControllerCLIRunner<Term, ProofContext>{
+public class GameControllerCLIRunner extends AbstractGameControllerCLIRunner<Term, ProofContext>{
 	@SuppressWarnings("unused")
 	private Parser parser; 
 	
-	public GameControllerCLIRunner(ReasonerFactory<Term, ProofContext> reasonerFactory, GDLVersion gdlVersion){
+	public GameControllerCLIRunner(ReasonerFactoryInterface<Term, ProofContext> reasonerFactory, GDLVersion gdlVersion){
 		super(reasonerFactory, gdlVersion);
 		this.parser=new Parser();
 	}
 	
 	public static void main(String[] args) {
-		ReasonerFactory<Term, ProofContext> reasonerFactory = new ReasonerFactory<Term, ProofContext>() {
-			public ReasonerInterface<Term, ProofContext> createReasoner(String gameDescription, String gameName) {
-				return new Reasoner(gameDescription, new Parser());
-			}
-		};
+		ReasonerFactoryInterface<Term, ProofContext> reasonerFactory = new ReasonerFactory();
 		GameControllerCLIRunner gcRunner=new GameControllerCLIRunner(reasonerFactory, GDLVersion.v1);
 		gcRunner.runFromCommandLine(args);
-	}
-
-	@Override
-	protected MoveFactoryInterface<Move<Term>> getMoveFactory() {
-		//return new MoveFactory<Term>(new TermFactory(parser));
-		return null;
 	}
 }

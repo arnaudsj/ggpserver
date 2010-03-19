@@ -30,15 +30,14 @@ import java.util.Map;
 import org.apache.commons.collections.map.ReferenceMap;
 
 import tud.gamecontroller.GDLVersion;
-import tud.gamecontroller.ReasonerFactory;
+import tud.gamecontroller.ReasonerFactoryInterface;
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.MoveFactoryInterface;
-import tud.gamecontroller.game.ReasonerInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.impl.Move;
 import tud.gamecontroller.game.impl.MoveFactory;
 import tud.gamecontroller.game.impl.State;
-import tud.gamecontroller.game.javaprover.Reasoner;
+import tud.gamecontroller.game.javaprover.ReasonerFactory;
 import tud.gamecontroller.game.javaprover.Term;
 import tud.gamecontroller.game.javaprover.TermFactory;
 import tud.gamecontroller.players.PlayerInfo;
@@ -92,7 +91,7 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	@SuppressWarnings("unchecked")
 	private Map<String, TournamentStatistics<Term, GameState>> tournamentStatistics = new ReferenceMap(SOFT, SOFT, false);
 
-	private DBConnector(ReasonerFactory<Term, GameState> reasonerFactory) {
+	private DBConnector(ReasonerFactoryInterface<Term, GameState> reasonerFactory) {
 		super(reasonerFactory);
 	}
 
@@ -101,14 +100,8 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 	 * Will be synchronized on DBConnector.class .
 	 */
 	public static synchronized DBConnector getInstance() {
-		ReasonerFactory<Term, GameState> reasonerFactory = new ReasonerFactory<Term, GameState>() {
-			public ReasonerInterface<Term, GameState> createReasoner(String gameDescription, String gameName) {
-				return new Reasoner(gameDescription);
-			}
-		};
-		
 		if (instance == null) {
-			instance = new DBConnector(reasonerFactory);
+			instance = new DBConnector(new ReasonerFactory());
 		}
 		return instance;
 	}

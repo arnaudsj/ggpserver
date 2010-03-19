@@ -37,61 +37,43 @@ public class JavaProversGameSimulatorEnhancer extends GameSimulator {
 	protected static final Atom aSees = new Atom("sees");
 	protected static final Atom aSeesXML = new Atom("sees_xml");
 	
-	
 	public JavaProversGameSimulatorEnhancer(boolean wantDebugPrintouts, boolean useOpt) {
-		
 		super(wantDebugPrintouts, useOpt);
-		
 	}
 	
-	
 	/**
-	 * this calculates the sees fluents to send to "player", given that the previous moves are "moves"
+	 * this calculates the sees terms to send to "player", given that the previous moves are "moves"
 	 * "moves" is useful because does(Player,Action) may appear in the "sees" relation's body
 	 * 		(like the next relation)
 	 */
-	public ExpList getSeesFluents(Expression player, ExpList moves) {
-		
+	public ExpList getSeesTerms(Expression player, ExpList moves) {
+		ExpList el = null;
 		theoryObj.add(moves);
-		
-		ExpList roleVar = new ExpList();
-		roleVar.add(player);
-		roleVar.add(vX);
+		ExpList seesArgs = new ExpList();
+		seesArgs.add(player);
+		seesArgs.add(vX);
 		try {
-			ExpList el = theoryObj.finds(pTrue, new Predicate(aSees,roleVar)); // TODO: pTrue→vX (get rid of the true() surrounding seesTerms)
-//			System.out.println("\nGameSimulator.getVeiledFluents(state="+theoryObj.getState()+", moves = "+moves+")");
-//			System.out.println("\t →→→ el = "+el);
-			return el;
+			el = theoryObj.finds(vX, new Predicate(aSees,seesArgs));
 		} catch (InterruptedException e) {
 			wasInterrupted = true;
-			return null;
 		}
-		
+		return el;
 	}
 	
-	
 	/**
-	 * this calculates the sees fluents to send to "player", given that the previous moves are "moves"
-	 * "moves" is useful because does(Player,Action) may appear in the "sees" relation's body
-	 * 		(like the next relation)
+	 * this calculates the sees terms to put in the XML file for the visualization
 	 */
-	public ExpList getSeesXMLFluents(Expression player) {
-		
-		//theoryObj.add(moves);
-		
-		ExpList roleVar = new ExpList();
-		roleVar.add(player);
-		roleVar.add(vX);
+	public ExpList getSeesXMLTerms(Expression player) {
+		ExpList el = null;
+		ExpList seesArgs = new ExpList();
+		seesArgs.add(player);
+		seesArgs.add(vX);
 		try {
-			ExpList el = theoryObj.finds(pTrue, new Predicate(aSeesXML,roleVar)); // TODO: pTrue→vX (get rid of the true() surrounding seesTerms)
-//			System.out.println("\nGameSimulator.getVeiledFluents(state="+theoryObj.getState()+", moves = "+moves+")");
-//			System.out.println("\t →→→ el = "+el);
-			return el;
+			el = theoryObj.finds(vX, new Predicate(aSeesXML,seesArgs));
 		} catch (InterruptedException e) {
 			wasInterrupted = true;
-			return null;
 		}
-		
+		return el;
 	}
 	
 }

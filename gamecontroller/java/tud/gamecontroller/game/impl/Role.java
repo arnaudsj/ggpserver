@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GameController.
 
@@ -27,6 +27,10 @@ public class Role<T extends TermInterface> extends TermDelegator<T> implements R
 
 	public Role(T term) {
 		super(term);
+	}
+
+	public boolean isNature() {
+		return getKIFForm().toLowerCase().equals(NATURE_ROLE_NAME);
 	}
 
 }

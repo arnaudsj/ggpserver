@@ -25,11 +25,8 @@ import java.util.Collection;
 
 import tud.gamecontroller.AbstractGameControllerRunner;
 import tud.gamecontroller.GDLVersion;
-import tud.gamecontroller.ReasonerFactory;
-import tud.gamecontroller.game.MoveFactoryInterface;
-import tud.gamecontroller.game.MoveInterface;
+import tud.gamecontroller.ReasonerFactoryInterface;
 import tud.gamecontroller.game.impl.Game;
-import tud.gamecontroller.game.impl.MoveFactory;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.term.TermFactoryInterface;
 import tud.gamecontroller.term.TermInterface;
@@ -49,7 +46,7 @@ public abstract class AbstractGameControllerGuiRunner<
 	private Collection<PlayerInfo> playerInfos=null;
 	private GameControllerFrame<TermType,ReasonerStateInfoType> frame=null;
 	
-	public AbstractGameControllerGuiRunner(File gameFile, ReasonerFactory<TermType, ReasonerStateInfoType> reasonerFactory, GDLVersion gdlVersion) {
+	public AbstractGameControllerGuiRunner(File gameFile, ReasonerFactoryInterface<TermType, ReasonerStateInfoType> reasonerFactory, GDLVersion gdlVersion) {
 		super(reasonerFactory, gdlVersion);
 		this.gameFile=gameFile;
 	}
@@ -67,11 +64,6 @@ public abstract class AbstractGameControllerGuiRunner<
 	@Override
 	protected String getMatchID() {
 		return matchID;
-	}
-
-	@Override
-	protected MoveFactoryInterface<? extends MoveInterface<TermType>> getMoveFactory() {
-		return new MoveFactory<TermType>(getTermFactory());
 	}
 
 	protected abstract TermFactoryInterface<TermType> getTermFactory();
