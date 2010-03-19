@@ -21,7 +21,6 @@ package tud.gamecontroller.players;
 
 import tud.gamecontroller.ConnectionEstablishedNotifier;
 import tud.gamecontroller.GDLVersion;
-import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.StateInterface;
@@ -52,7 +51,7 @@ public abstract class AbstractPlayer<TermType extends TermInterface, StateType e
 		this.lastMessageRuntime=0;
 	}
 
-	public void gameStop(JointMoveInterface<TermType> jointMove, ConnectionEstablishedNotifier notifier) {
+	public void gameStop(Object seesTerms, ConnectionEstablishedNotifier notifier) {
 		notifier.connectionEstablished();
 	}
 

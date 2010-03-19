@@ -114,37 +114,9 @@ public class RemotePlayer<TermType extends TermInterface,
 			
 	}
 
-	/**
-	 * This is the core of GDL-II:
-	 * Instead of sending the actual joint move to the remote players, they only get the computed "sees terms".
-	 * (and this is the only place where we apply two different behaviors: send the sees terms in GDL-II games,
-	 * and send the prior moves in regular GDL games)
-	 */
-	@SuppressWarnings("unchecked")
 	public MoveInterface<TermType> gamePlay(Object seesTerms, ConnectionEstablishedNotifier notifier) {
 		MoveInterface<TermType> move=null;
-		String msg="(PLAY "+match.getMatchID()+" ";
-		
-		if (this.firstTurn) {
-			this.firstTurn = false;
-			msg+="NIL";
-		}else{
-			
-			if (getGdlVersion() == GDLVersion.v1) { // GDL-I player
-				JointMoveInterface<TermType> jointMove = (JointMoveInterface<TermType>) seesTerms;
-				msg += gameScrambler.scramble(jointMove.getKIFForm()).toUpperCase();
-			} else { // GDL-II player
-				// Let's send the seesTerms (or jointMove transformed into seesTerms) to each player via the PLAY message
-				msg += "(";
-				for (TermType t:(Collection<TermType>) seesTerms) {
-					msg += gameScrambler.scramble(t.getKIFForm()).toUpperCase() + " ";
-				}
-				msg += ")";
-			}
-			
-		}
-		
-		msg+=")";
+		String msg = constructPlayOrStopMessage("PLAY", seesTerms);
 		String reply, descrambledReply;
 		notifyStartRunning();
 		reply=sendMsg(msg, notifier);
@@ -168,18 +140,42 @@ public class RemotePlayer<TermType extends TermInterface,
 	}
 
 	@Override
-	public void gameStop(JointMoveInterface<TermType> jointMove, ConnectionEstablishedNotifier notifier) {
-		String msg="(STOP "+match.getMatchID()+" ";
-		if(jointMove==null){
-			msg+="NIL";
-		}else{
-			msg+=gameScrambler.scramble(jointMove.getKIFForm()).toUpperCase();
-		}
-		msg+=")";
+	public void gameStop(Object seesTerms, ConnectionEstablishedNotifier notifier) {
+		String msg = constructPlayOrStopMessage("STOP", seesTerms);
 		//notifyStartRunning(); // don't count time for the stop message
 		/*String reply=*/ sendMsg(msg, notifier);
 		//notifyStopRunning();
 		//logger.info("reply from "+this.getName()+": "+reply+ " after "+getLastMessageRuntime()+"ms");
+	}
+
+	/**
+	 * This is the core of GDL-II:
+	 * Instead of sending the actual joint move to the remote players, they only get the computed "sees terms".
+	 * (and this is the only place where we apply two different behaviors: send the sees terms in GDL-II games,
+	 * and send the prior moves in regular GDL games)
+	 */
+	@SuppressWarnings("unchecked")
+	private String constructPlayOrStopMessage(String messageType, Object seesTerms) {
+		StringBuilder msg = new StringBuilder("(");
+		msg.append(messageType).append(" ").append(match.getMatchID()).append(" ");
+		if (this.firstTurn) {
+			this.firstTurn = false;
+			msg.append("NIL");
+		}else{
+			if (getGdlVersion() == GDLVersion.v1) { // GDL-I player
+				JointMoveInterface<TermType> jointMove = (JointMoveInterface<TermType>) seesTerms;
+				msg.append(gameScrambler.scramble(jointMove.getKIFForm()).toUpperCase());
+			} else { // GDL-II player
+				// Let's send the seesTerms (or jointMove transformed into seesTerms) to each player via the PLAY message
+				msg.append("(");
+				for (TermType t:(Collection<TermType>) seesTerms) {
+					msg.append(gameScrambler.scramble(t.getKIFForm()).toUpperCase()).append(" ");
+				}
+				msg.append(")");
+			}
+		}
+		msg.append(")");
+		return msg.toString();
 	}
 
 	private String sendMsg(String msg, ConnectionEstablishedNotifier notifier) {

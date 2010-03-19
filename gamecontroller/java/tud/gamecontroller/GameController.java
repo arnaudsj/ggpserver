@@ -106,6 +106,7 @@ public class GameController<
 	public void runGame() throws InterruptedException {
 		int step=1;
 		currentState=game.getInitialState();
+		State<TermType, ReasonerStateInfoType> priorState = currentState;
 		JointMoveInterface<TermType> priorJointMove=null;
 		logger.info("match:"+match.getMatchID()+", GDL "+this.game.getGdlVersion());
 		logger.info("game:"+match.getGame().getName());
@@ -117,6 +118,7 @@ public class GameController<
 		while(!currentState.isTerminal()){
 			Thread.sleep(DELAY_BEFORE_NEXT_MESSAGE);
 			JointMoveInterface<TermType> jointMove = gamePlay(step, priorJointMove, currentState);
+			priorState=currentState; 
 			currentState=currentState.getSuccessor(jointMove);
 			fireGameStep(jointMove, currentState);
 			priorJointMove=jointMove;
@@ -134,7 +136,7 @@ public class GameController<
 		}
 
 		fireGameStop(currentState, goalValues);
-		gameStop(priorJointMove);
+		gameStop(priorJointMove, priorState);
 
 		String runtimeMsg="runtimes (in ms): ";
 		for(RoleInterface<TermType> role:game.getOrderedRoles()){
@@ -172,28 +174,14 @@ public class GameController<
 		runThreads(playerthreads, Level.WARNING);
 	}
 
-	private JointMoveInterface<TermType> gamePlay(int step, JointMoveInterface<TermType> priormoves, State<TermType, ReasonerStateInfoType> priorState) throws InterruptedException {
+	private JointMoveInterface<TermType> gamePlay(int step, JointMoveInterface<TermType> priorJointMove, State<TermType, ReasonerStateInfoType> priorState) throws InterruptedException {
 		
 		JointMoveInterface<TermType> jointMove = new JointMove<TermType>(game.getOrderedRoles());
 		Collection<PlayerThreadPlay<TermType, State<TermType, ReasonerStateInfoType>>> playerthreads = new LinkedList<PlayerThreadPlay<TermType, State<TermType, ReasonerStateInfoType>>>();
 		
 		for(RoleInterface<TermType> role:game.getOrderedRoles()){
-			/*
-			 * Here is the only point at which the difference between regular GDL and GDL-II is made:
-			 * - if we play a regular GDL game, we will send the moves as seesFluents;
-			 * - and if on the contrary we play a GDL-II game, we will derive the seesFluents from the game description, and send them. 
-			 */
 			Player<TermType, State<TermType, ReasonerStateInfoType>> player = match.getPlayer(role);
-			Object seesTerms = null;
-			if (priormoves != null) { // not the first play message
-				if ( player.getGdlVersion() == GDLVersion.v1) { // GDL-I
-					seesTerms = priormoves;
-				} else { // GDL-II
-					// retrieve seesTerms, and send them in the PLAY messages
-					seesTerms = priorState.getSeesTerms(role, priormoves);
-					logger.info("seesTerms("+role+") = " + seesTerms);
-				}
-			}
+			Object seesTerms = getSeesTermsForRole(role, player, priorState, priorJointMove);
 			playerthreads.add(new PlayerThreadPlay<TermType, State<TermType, ReasonerStateInfoType>>(role, player, match, seesTerms, playclock*1000+EXTRA_DEADLINE_TIME));
 		}
 		
@@ -219,10 +207,34 @@ public class GameController<
 		return jointMove;
 	}
 
-	private void gameStop(JointMoveInterface<TermType> priorJointMove) throws InterruptedException {
+	private Object getSeesTermsForRole(RoleInterface<TermType> role,
+			Player<TermType, State<TermType, ReasonerStateInfoType>> player,
+			State<TermType, ReasonerStateInfoType> priorState,
+			JointMoveInterface<TermType> priormoves) {
+		/*
+		 * Here is the only point at which the difference between regular GDL and GDL-II is made:
+		 * - if we play a regular GDL game, we will send the moves as seesTerms;
+		 * - and if on the contrary we play a GDL-II game, we will derive the seesTerms from the game description, and send them. 
+		 */
+		Object seesTerms = null;
+		if (priormoves != null) { // not the first play message
+			if ( player.getGdlVersion() == GDLVersion.v1) { // GDL-I
+				seesTerms = priormoves;
+			} else { // GDL-II
+				// retrieve seesTerms, and send them in the PLAY/STOP messages
+				seesTerms = priorState.getSeesTerms(role, priormoves);
+				logger.info("seesTerms("+role+") = " + seesTerms);
+			}
+		}
+		return seesTerms;
+	}
+
+	private void gameStop(JointMoveInterface<TermType> priorJointMove, State<TermType, ReasonerStateInfoType> priorState) throws InterruptedException {
 		Collection<PlayerThreadStop<TermType, State<TermType, ReasonerStateInfoType>>> playerthreads=new LinkedList<PlayerThreadStop<TermType, State<TermType, ReasonerStateInfoType>>>();
 		for(RoleInterface<TermType> role:game.getOrderedRoles()){
-			playerthreads.add(new PlayerThreadStop<TermType, State<TermType, ReasonerStateInfoType>>(role, match.getPlayer(role), match, priorJointMove, playclock*1000+EXTRA_DEADLINE_TIME));
+			Player<TermType, State<TermType, ReasonerStateInfoType>> player = match.getPlayer(role);
+			Object seesTerms = getSeesTermsForRole(role, player, priorState, priorJointMove);
+			playerthreads.add(new PlayerThreadStop<TermType, State<TermType, ReasonerStateInfoType>>(role, player, match, seesTerms, playclock*1000+EXTRA_DEADLINE_TIME));
 		}
 		logger.info("Sending stop messages ...");
 		runThreads(playerthreads, Level.WARNING);

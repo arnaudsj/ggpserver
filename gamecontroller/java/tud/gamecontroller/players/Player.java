@@ -23,7 +23,6 @@ package tud.gamecontroller.players;
 import tud.auxiliary.NamedObject;
 import tud.gamecontroller.ConnectionEstablishedNotifier;
 import tud.gamecontroller.GDLVersion;
-import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
@@ -40,9 +39,9 @@ public interface Player<TermType, StateType extends StateInterface<TermType, ? e
 	 * 			- sees(player1, move(player2, moveX)) <- does(player2, moveX)
 	 * 			- and likewise for every other pair of players
 	 */
-	public MoveInterface<TermType> gamePlay(Object seesFluents, ConnectionEstablishedNotifier notifier); // MODIFIED
+	public MoveInterface<TermType> gamePlay(Object seesFluents, ConnectionEstablishedNotifier notifier);
 	
-	public void gameStop(JointMoveInterface<TermType> jointMove, ConnectionEstablishedNotifier notifier);
+	public void gameStop(Object seesTerms, ConnectionEstablishedNotifier notifier);
 	/**
 	 * 
 	 * @return the total runtime of the player in milliseconds

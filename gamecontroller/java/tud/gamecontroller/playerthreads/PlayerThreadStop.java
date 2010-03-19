@@ -19,7 +19,6 @@
 
 package tud.gamecontroller.playerthreads;
 
-import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.StateInterface;
@@ -31,14 +30,14 @@ public class PlayerThreadStop<
 		StateType extends StateInterface<TermType, ? extends StateType>
 		> extends AbstractPlayerThread<TermType, StateType> {
 
-	private JointMoveInterface<TermType> priormoves;
+	private Object seesTerms;
 	
-	public PlayerThreadStop(RoleInterface<TermType> role, Player<TermType, StateType> player, MatchInterface<TermType, StateType> match, JointMoveInterface<TermType> priormoves, long deadline){
+	public PlayerThreadStop(RoleInterface<TermType> role, Player<TermType, StateType> player, MatchInterface<TermType, StateType> match, Object seesTerms, long deadline){
 		super("StopMessageThread("+player.getName()+","+match.getMatchID()+")",role, player, match, deadline);
-		this.priormoves=priormoves;
+		this.seesTerms=seesTerms;
 	}
 	public void run(){
-		player.gameStop(priormoves, this);
+		player.gameStop(seesTerms, this);
 	}
 	
 	@Override
@@ -53,8 +52,8 @@ public class PlayerThreadStop<
 		buffer.append(player);
 		buffer.append(" role: ");
 		buffer.append(role);
-		buffer.append(" priormoves: ");
-		buffer.append(priormoves);
+		buffer.append(" seesTerms: ");
+		buffer.append(seesTerms);
 		buffer.append("]");
 		return buffer.toString();
 	}

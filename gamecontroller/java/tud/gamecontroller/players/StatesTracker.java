@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
+import java.util.logging.Logger;
 
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.JointMoveInterface;
@@ -55,18 +56,17 @@ public class StatesTracker<TermType extends TermInterface, StateType extends Sta
 		Set<StateType> nextPossibleStates = new HashSet<StateType>();
 		for (StateType state: currentPossibleStates) {
 			for (JointMoveInterface<TermType> jointMove: computeJointMoves(state)) {
-				StateType newState = state.getSuccessor(jointMove);
-				if (!nextPossibleStates.contains(newState) && isPossible(newState, jointMove, seesTerms)) {
+				if (isPossible(state, jointMove, seesTerms)) {
+					StateType newState = state.getSuccessor(jointMove);
 					nextPossibleStates.add(newState);
 				}
 			}
 		}
 		currentPossibleStates = nextPossibleStates;
-//		System.out.println("oneStatesTracker.statesUpdate(...) for "
-//				+ role + ", "
-//				+ currentPossibleStates.size()
-//				+ " currentPossibleStates = "
-//				+ currentPossibleStates);
+		Logger.getLogger(StatesTracker.class.getName()).info(
+				"statesUpdate for \"" + role + "\" seeing " + seesTerms
+				+ " with " + currentPossibleStates.size() + " currentPossibleStates yields "
+				+ currentPossibleStates.size() + " nextPossibleStates");
 		return Collections.unmodifiableCollection(currentPossibleStates);
 	}
 	
@@ -78,9 +78,9 @@ public class StatesTracker<TermType extends TermInterface, StateType extends Sta
 		//System.out.println("\nThere are "+nbJointMoves+" possible JointMoves.");
 		Vector<JointMoveInterface<TermType>> legalJointMoves = new Vector<JointMoveInterface<TermType>>(nbJointMoves);
 		for (int i = 0; i < nbJointMoves; i++)
-			legalJointMoves.add(new JointMove<TermType>( this.game.getOrderedRoles() ));
+			legalJointMoves.add(new JointMove<TermType>( game.getOrderedRoles() ));
 		
-		for(RoleInterface<TermType> role: this.game.getOrderedRoles()) {
+		for(RoleInterface<TermType> role: game.getOrderedRoles()) {
 			//System.out.println("\nFilling JointMoves with move of "+role);
 			Collection<? extends MoveInterface<TermType>> legalMoves = state.getLegalMoves(role);
 			int nbLm = legalMoves.size();
@@ -115,7 +115,7 @@ public class StatesTracker<TermType extends TermInterface, StateType extends Sta
 			Collection<? extends MoveInterface<TermType>> stateLegalMoves = state.getLegalMoves(role);
 			//System.out.println( "stateLegalMoves = "+stateLegalMoves );
 			if (legalMoves == null) {
-				legalMoves = stateLegalMoves;
+				legalMoves = new HashSet<MoveInterface<TermType>>(stateLegalMoves);
 			} else {
 				legalMoves.retainAll(stateLegalMoves);
 			}
