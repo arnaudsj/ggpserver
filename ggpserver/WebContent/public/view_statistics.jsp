@@ -56,7 +56,7 @@
 		<br/>
 		The chart shows the <a href="http://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average" target="_blank">exponential moving average</a> of
 		the scores of each player with a smoothing factor of ${viewStatistics.smoothingFactor}.
-		Only players with at least ${viewStatistics.minMatchNumber} matches in the tournament are shown. The data is composed of the scores of ${chartInfo.numberOfMatches} matches.
+		Only players that played at least ${viewStatistics.minMatchNumber} matches of the selected matches are shown. The data is composed of the scores of ${chartInfo.numberOfMatches} matches.
 	</p>
 	<p>
 		<form action="view_statistics.jsp" method="get">
