@@ -10,9 +10,9 @@
 		<style type="text/css" media="all">
 			div.zhadu_board {
 				position:relative;
-				width:301px;
-				height:551px;
-				padding:  0px;
+				width: 301px;
+				height: 551px;
+				padding: 0px;
 			}
 			div.zhadu_piece {
 				position: absolute;
