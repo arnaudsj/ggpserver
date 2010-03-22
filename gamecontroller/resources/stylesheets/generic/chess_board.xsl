@@ -12,6 +12,33 @@
 	  	* background ("light" or "dark" according to the position and if the board is checkered)
 -->
 
+<!--
+ // TODO: use this for the multiple boards
+ 
+<xsl:key name="by-artist" match="cd" use="artist"/>
+
+<xsl:template match="/catalog">
+  <html>
+  <body>
+    <h2>My CD Collection</h2>
+	
+    <xsl:for-each select="cd">
+      <xsl:if test="generate-id(.) = generate-id(key('by-artist', artist)[1])">
+	artist: <xsl:value-of select="artist"/>
+        <br/>
+	  <xsl:for-each select="key('by-artist', artist)">
+	    title: <xsl:value-of select="title"/>
+            <br/>
+	  </xsl:for-each>
+      </xsl:if>
+    </xsl:for-each>
+
+  </body>
+  </html>
+</xsl:template>
+-->
+
+
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 	<xsl:import href="board.xsl"/>
@@ -21,6 +48,8 @@
 		print_all_chess_boards prints a chessboard for all detected board fluents.
 		At the moment ternary fluents with a name CELL* are considered as boards.
 	-->
+	
+	<xsl:key name="by-fluent" match="fact" use="prop-f"/>
 	
 	<xsl:template name="print_all_chess_boards">
 		<xsl:param name="Width">?</xsl:param> <!-- the number of cells per row, if "?" try to detect the width automatically -->
@@ -42,8 +71,10 @@
 		
 		<xsl:for-each select="fact">
 			<xsl:sort select="prop-f"/>
-			<!--<xsl:value-of select="prop-f"/> - <xsl:value-of select="preceding-sibling::fact[1]/prop-f"/><br/>-->
-			<xsl:if test="not(prop-f = preceding-sibling::fact[1]/prop-f)">
+			<xsl:if test="generate-id(.) = generate-id(key('by-fluent', prop-f)[1])">
+				<xsl:comment>
+					fluent: (<xsl:value-of select="prop-f"/> <xsl:for-each select="arg"> <xsl:value-of select="."/> </xsl:for-each>)
+				</xsl:comment>
 				<xsl:if test="starts-with(prop-f, 'CELL') and count(arg)=3">
 					<xsl:variable name="CellFluentName" select="prop-f"/>
 					<xsl:for-each select="..">
