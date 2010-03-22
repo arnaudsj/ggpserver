@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>
                   2010 Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
@@ -24,7 +24,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
 
 import tud.gamecontroller.GDLVersion;
@@ -121,11 +121,7 @@ public class Game<
 					sb.append(line + "\n"); // artificial EOLN marker
 				}
 				seesXMLRulesFromFile = sb.toString();
-			}
-			catch (IOException ioe) {
-				
-			}
-			finally {
+			} finally {
 				if (br != null) {
 					br.close();
 				}
@@ -169,8 +165,7 @@ public class Game<
 	
 	private void setSeesXMLRules(String seesXMLRules) {
 		if (seesXMLRules == null) {
-			/* MODIFIED (ADDED)
-			 * We don't have a sightFile, or the file was not found
+			/* We don't have a sightFile, or the file was not found
 			 * -> let's add the default sees_xml(..) rule for each player
 			 */
 			this.seesXMLRules = DEFAULT_SEES_XML_RULES;
@@ -195,14 +190,7 @@ public class Game<
 	}
 
 	public List<? extends RoleInterface<TermType>> getOrderedRoles(){
-//		if(orderedRoles==null){
-//			orderedRoles=new LinkedList<RoleInterface<TermType>>();
-//			for(int i=0;i<getNumberOfRoles();i++){
-//				orderedRoles.add(getRole(i));
-//			}
-//		}
-//		return orderedRoles;
-		return new LinkedList<RoleInterface<TermType>>(roles);
+		return Collections.unmodifiableList(roles);
 	}
 
 	public int getNumberOfRoles() {
@@ -254,11 +242,11 @@ public class Game<
 	}
 
 	public String getStylesheet() {
-		return stylesheet ;
+		return stylesheet;
 	}
 	
 	public String getSeesXMLRules() {
-		return seesXMLRules ;
+		return seesXMLRules;
 	}
 
 	@Override
@@ -298,7 +286,7 @@ public class Game<
 	}
 	
 	public String getSeesRules() {
-		return this.seesRules;
+		return seesRules;
 	}
 
 	public RoleInterface<TermType> getNatureRole() {

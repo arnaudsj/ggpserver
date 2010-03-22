@@ -150,7 +150,6 @@ public class XMLGameStateWriter
 	 * @param goalValues
 	 * @param stylesheet
 	 * @param role the role from which perspective the xml view should be generated
-	 * @param gdlVersion
 	 * @param date if null, the current time is set as timestamp for the state (for the standalone GameController). If not null, used as the timestamp (for calls from the server).
 	 * @return
 	 * @throws TransformerFactoryConfigurationError

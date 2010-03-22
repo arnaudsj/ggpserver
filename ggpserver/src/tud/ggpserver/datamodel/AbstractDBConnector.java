@@ -506,7 +506,6 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			
 			if (rs.next()) {
 				Game<TermType, ReasonerStateInfoType> game = getGame(rs.getString("game"));
-				logger.info("got game");
 				int startclock = rs.getInt("start_clock");
 				int playclock = rs.getInt("play_clock");
 				Timestamp startTime = rs.getTimestamp("start_time");
@@ -516,7 +515,6 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				double weight = rs.getDouble("weight");
 				User owner = getUser(rs.getString("owner"));
 				
-				logger.info("matchId = "+matchID);
 				ps_roles = con.prepareStatement("SELECT `player` , `roleindex` , `goal_value` FROM `match_players` WHERE `match_id` = ? ;");
 				ps_roles.setString(1, matchID);
 
@@ -527,21 +525,12 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				
 				while (rs_roles.next()) {
 					int roleindex = rs_roles.getInt("roleindex");
-					logger.info("roleindex = "+roleindex);
-					logger.info(""+game);
-					logger.info(""+game.getOrderedRoles());
 					RoleInterface<TermType> role = game.getOrderedRoles().get(roleindex);
-					logger.info("role = "+role);
 					PlayerInfo playerInfo = getPlayerInfo(rs_roles.getString("player"));
 					playerInfo.setRoleindex(roleindex);
-						
 					rolesToPlayerInfos.put(role, playerInfo);
 					goalValues.put(role, rs_roles.getInt("goal_value"));
 				}				
-
-//				List<List<GameControllerErrorMessage>> errorMessages = getErrorMessages(matchID, getNumberOfXMLStates(matchID));
-//				List<List<String>> jointMovesStrings = getJointMovesStrings(matchID);
-				
 				if (status.equals(ServerMatch.STATUS_NEW)) {
 					result = new NewMatch<TermType, ReasonerStateInfoType>(
 							matchID, game, startclock, playclock,

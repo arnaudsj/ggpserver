@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009 Stephan Schiffel <stephan.schiffel@gmx.de> 
+    Copyright (C) 2009-2010 Stephan Schiffel <stephan.schiffel@gmx.de> 
 
     This file is part of GGP Server.
 
@@ -25,17 +25,22 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import tud.gamecontroller.XMLGameStateWriter;
 import tud.gamecontroller.auxiliary.Pair;
+import tud.gamecontroller.game.GameInterface;
+import tud.gamecontroller.game.RoleInterface;
+import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.players.PlayerInfo;
+import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.Tournament;
 import tud.ggpserver.datamodel.matches.ServerMatch;
 import tud.ggpserver.datamodel.statistics.TournamentStatistics;
-
 
 /**
  * This class can be used to export an xml file for each step of a match like created by GameController for
@@ -63,15 +68,15 @@ public class StateXMLExporter {
 		String xmlState=null;
 		List<Pair<Date,String>> stringStates = match.getStringStates();
 		for(int step=0; step<stringStates.size(); step++) {
-			xmlState=stringStates.get(step).getRight(); // TODO: generate XMLStates from StringStates instead!
+			xmlState = getStepXML(match, stringStates, step+1, RoleInterface.NATURE_ROLE_NAME);
 			if(xmlState != null)
 				exportStepXML(xmlState, "step_"+(step+1), zip, matchDir);
-			
 		}
+		// export the final state twice, once as "step_N.xml" and once as "finalstate.xml" 
 		if(xmlState != null)
 			exportStepXML(xmlState, "finalstate", zip, matchDir);
 	}
-
+	
 	/**
 	 * exports the xml states files for all matches in tournament
 	 * @see exportXML(Match match, File directory)
@@ -87,12 +92,71 @@ public class StateXMLExporter {
 		// TODO: export stylesheets
 	}
 
+	/**
+	 * 
+	 * @param match
+	 * @param stringStates
+	 * @param stepNumber
+	 * @param roleName from whose perspective you want to get the XML 
+	 * @return the xml for the specified state of the match
+	 */
+	public static <TermType extends TermInterface, ReasonerStateInfoType> 
+	String getStepXML(ServerMatch<TermType, ReasonerStateInfoType> match, List<Pair<Date, String>> stringStates, int stepNumber, String roleName) { 
+		int numberOfStates = stringStates.size();
+		if(numberOfStates > 0) {
+			if (stepNumber < 1 || stepNumber > numberOfStates) {
+				// return the last/final state
+				stepNumber = numberOfStates;
+			}
+			Pair<Date,String> stringState = stringStates.get(stepNumber-1);
+			GameInterface<TermType, ? extends StateInterface<TermType, ?>> game = match.getGame();
+			RoleInterface<TermType> role = null;
+
+			// compute Role object from role name
+			if (roleName != null) {
+				role = game.getRoleByName(roleName);
+			}
+			if (role == null) {
+				role = game.getNatureRole();
+			}
+			
+			// get history of moves
+			List<List<String>> stringMoves = match.getJointMovesStrings();
+			if (stringMoves.size() > 0) {
+				stringMoves = stringMoves.subList(0, stepNumber-1);
+			}
+			
+			// get state object from string representation
+			StateInterface<TermType, ?> state = match.getGame().getStateFromString(stringState.getRight());
+			
+			// get goal values
+			Map<? extends RoleInterface<TermType>, Integer> goalValues = null;
+			if (state.isTerminal()) {
+				goalValues = match.getGoalValues();
+			}
+			
+			return XMLGameStateWriter.createXMLOutputStream(
+					match,
+					state,
+					stringMoves,
+					goalValues,
+					match.getGame().getStylesheet(),
+					role,
+					stringState.getLeft()
+				).toString();
+		} else {
+			// this can only happen if the initial state wasn't created yet
+			return "match " + match.getMatchID() + " has no state!"; 
+		}
+	}
+	
 	public static void exportStepXML(String xml, String step, ZipOutputStream zip, String directory) throws IOException {
 		ZipEntry zipEntry=new ZipEntry(directory+step+".xml");
 		zip.putNextEntry(zipEntry);
 		// this is a hack to make the xml files work with the gamecontroller stylesheets (different paths)
 		xml=xml.replace("<?xml-stylesheet type=\"text/xsl\" href=\"../stylesheets/", "<?xml-stylesheet type=\"text/xsl\" href=\"../../stylesheets/");
 		zip.write(xml.getBytes(Charset.forName("UTF-8")));
+	
 	}
 
 	private static void exportTournamentHTML(Tournament<?, ?> tournament, ZipOutputStream zip, String directory) throws SQLException, IOException {

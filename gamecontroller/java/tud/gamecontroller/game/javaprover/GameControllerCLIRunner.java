@@ -19,20 +19,19 @@
 
 package tud.gamecontroller.game.javaprover;
 
-import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.ReasonerFactoryInterface;
 import tud.gamecontroller.cli.AbstractGameControllerCLIRunner;
 import cs227b.teamIago.util.GameState;
 
 public class GameControllerCLIRunner extends AbstractGameControllerCLIRunner<Term, GameState> {
 
-	public GameControllerCLIRunner(ReasonerFactoryInterface<Term, GameState> reasonerFactory, GDLVersion gdlVersion) {
-		super(reasonerFactory, gdlVersion);
+	public GameControllerCLIRunner(ReasonerFactoryInterface<Term, GameState> reasonerFactory) {
+		super(reasonerFactory);
 	}
 
 	public static void main(String[] args) {
 		ReasonerFactoryInterface<Term, GameState> reasonerFactory = new ReasonerFactory();
-		GameControllerCLIRunner gcRunner=new GameControllerCLIRunner(reasonerFactory, GDLVersion.v1);
+		GameControllerCLIRunner gcRunner=new GameControllerCLIRunner(reasonerFactory);
 		gcRunner.runFromCommandLine(args);
 	}
 

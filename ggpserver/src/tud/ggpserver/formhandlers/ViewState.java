@@ -24,29 +24,17 @@ package tud.ggpserver.formhandlers;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
-
-import tud.gamecontroller.GDLVersion;
-import tud.gamecontroller.XMLGameStateWriter;
 import tud.gamecontroller.auxiliary.Pair;
-import tud.gamecontroller.game.GameInterface;
-import tud.gamecontroller.game.RoleInterface;
-import tud.gamecontroller.game.StateInterface;
-import tud.gamecontroller.game.impl.Game;
-import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.matches.ServerMatch;
+import tud.ggpserver.util.StateXMLExporter;
 
 public class ViewState {
 	
 	private int stepNumber = -1;
-	private ServerMatch<? extends TermInterface, ?> match;
+	private ServerMatch<?, ?> match;
 	private String roleName = null;
 	
-	private static final Logger logger = Logger.getLogger(Game.class.getName());
-	
-
 	public void setMatchID(String matchID) throws SQLException {
 		match = DBConnectorFactory.getDBConnector().getMatch(matchID);
 		if (match == null) {
@@ -62,68 +50,9 @@ public class ViewState {
 		this.roleName = roleName;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public String getXmlState() {
-		
 		int stepNumber = this.stepNumber;
 		List<Pair<Date,String>> stringStates = match.getStringStates();
-		
-		int numberOfStates = stringStates.size();
-		if(numberOfStates > 0) {
-			if (stepNumber < 1 || stepNumber > numberOfStates) {
-				// return the last/final state
-				stepNumber = numberOfStates;
-			}
-			Pair<Date,String> stringState = stringStates.get(stepNumber-1);
-			
-			GameInterface game = match.getGame();
-			RoleInterface role = null;
-
-			// compute Role object from role name
-			if (roleName != null) {
-				role = game.getRoleByName(roleName);
-			}
-			if (role == null) {
-				role = game.getNatureRole();
-			}
-			
-			// get history of moves
-			List<List<String>> stringMoves = match.getJointMovesStrings();
-			logger.info("stringMoves = "+stringMoves);
-			//while (stringMoves.size() > stepNumber) {
-			if (stringMoves.size() > 0)
-				stringMoves = stringMoves.subList(0, stepNumber-1);
-			//}
-			
-			GDLVersion gdlVersion = match.getGame().getGdlVersion();
-			logger.info("gdlVersion = "+gdlVersion);
-			
-			StateInterface state = match.getGame().getStateFromString(stringState.getRight());
-			
-			// get goal values
-			Map<? extends RoleInterface, Integer> goalValues = null;
-			if (state.isTerminal()) {
-				goalValues = match.getGoalValues();
-			}
-			
-			return XMLGameStateWriter.createXMLOutputStream(
-					match,
-					state,
-					stringMoves, // moves...
-					goalValues,
-					match.getGame().getStylesheet(),
-					role,
-					stringState.getLeft()
-				).toString();
-
-//			return match.getXMLViewFor(
-//					stringStates.get(stepNumber - 1),
-//					stringMoves,
-//					(RoleInterface) role,
-//					gdlVersion);
-		} else {
-			// this can only happen if the initial state wasn't created yet
-			return "match " + match.getMatchID() + " has no state!"; 
-		}
+		return StateXMLExporter.getStepXML(match, stringStates, stepNumber, roleName);
 	}
 }

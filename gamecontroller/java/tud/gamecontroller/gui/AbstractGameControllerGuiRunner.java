@@ -24,7 +24,6 @@ import java.io.File;
 import java.util.Collection;
 
 import tud.gamecontroller.AbstractGameControllerRunner;
-import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.ReasonerFactoryInterface;
 import tud.gamecontroller.game.impl.Game;
 import tud.gamecontroller.players.PlayerInfo;
@@ -46,8 +45,8 @@ public abstract class AbstractGameControllerGuiRunner<
 	private Collection<PlayerInfo> playerInfos=null;
 	private GameControllerFrame<TermType,ReasonerStateInfoType> frame=null;
 	
-	public AbstractGameControllerGuiRunner(File gameFile, ReasonerFactoryInterface<TermType, ReasonerStateInfoType> reasonerFactory, GDLVersion gdlVersion) {
-		super(reasonerFactory, gdlVersion);
+	public AbstractGameControllerGuiRunner(File gameFile, ReasonerFactoryInterface<TermType, ReasonerStateInfoType> reasonerFactory) {
+		super(reasonerFactory);
 		this.gameFile=gameFile;
 	}
 

@@ -55,8 +55,8 @@ public abstract class AbstractGameControllerCLIRunner<
 	private File scrambleWordList=null;
 	private Collection<PlayerInfo> playerInfos=null;
 	
-	public AbstractGameControllerCLIRunner(ReasonerFactoryInterface<TermType, ReasonerStateInfoType> reasonerFactory, GDLVersion gdlVersion){
-		super(reasonerFactory, gdlVersion);
+	public AbstractGameControllerCLIRunner(ReasonerFactoryInterface<TermType, ReasonerStateInfoType> reasonerFactory){
+		super(reasonerFactory);
 		Logger logger=getLogger();
 		logger.setUseParentHandlers(false);
 		logger.addHandler(new UnbufferedStreamHandler(System.out, new PlainTextLogFormatter()));
@@ -82,16 +82,22 @@ public abstract class AbstractGameControllerCLIRunner<
 
 	private void parseCommandLine(String argv[]){
 		int index=0;
-		if(argv.length>=4){
+		if(argv.length>=5){
 			matchID=argv[index]; ++index;
 			gameFile=getFileArg(argv[index], "game file", true); ++index;
 			startClock=getIntArg(argv[index],"startclock"); ++index;
 			playClock=getIntArg(argv[index],"playclock"); ++index;
-			gdlVersion = GDLVersion.v1;
-			if (argv[index].equals("2")) {
-				gdlVersion=GDLVersion.v2;
-			}
+			int gdlVersionInt = getIntArg(argv[index],"gdl version");
 			++index;
+			if(gdlVersionInt == 1) {
+				setGdlVersion(GDLVersion.v1); 
+			} else if(gdlVersionInt == 2) {
+				setGdlVersion(GDLVersion.v2);
+			} else {
+				System.err.println("gdl version \""+argv[index]+"\" not recognized");
+				printUsage();
+				System.exit(-1);
+			}
 			
 			sightFile = null;
 			playerInfos=new LinkedList<PlayerInfo>();
@@ -145,7 +151,7 @@ public abstract class AbstractGameControllerCLIRunner<
 				int port=getIntArg(argv[index], "port"); ++index;
 				int gdl=getIntArg(argv[index], "gdl"); ++index;
 				if (gdl == 1) {
-					if (gdlVersion != GDLVersion.v1) {
+					if (getGdlVersion() != GDLVersion.v1) {
 						System.err.println("GDL-I players not allowed in GDL-II game");
 						printUsage();
 						System.exit(-1);
@@ -166,7 +172,7 @@ public abstract class AbstractGameControllerCLIRunner<
 					printUsage();
 					System.exit(-1);
 				}
-				player=new LegalPlayerInfo(roleindex-1, gdlVersion); // use GDL version of the game for the legal player too
+				player=new LegalPlayerInfo(roleindex-1, getGdlVersion()); // use GDL version of the game for the legal player too
 			}else{
 				missingArgumentsExit(argv[index-1]);
 			}
@@ -179,7 +185,7 @@ public abstract class AbstractGameControllerCLIRunner<
 					printUsage();
 					System.exit(-1);
 				}
-				player=new RandomPlayerInfo(roleindex-1, gdlVersion); // use GDL version of the game for the random player too
+				player=new RandomPlayerInfo(roleindex-1, getGdlVersion()); // use GDL version of the game for the random player too
 			}else{
 				missingArgumentsExit(argv[index-1]);
 			}

@@ -55,12 +55,11 @@ public abstract class AbstractGameControllerRunner<
 		ReasonerStateInfoType
 		> gameController=null;
 	
-	protected GDLVersion gdlVersion;
+	private GDLVersion gdlVersion = null;
 	
-	public AbstractGameControllerRunner(final ReasonerFactoryInterface<TermType, ReasonerStateInfoType> reasonerFactory, GDLVersion gdlVersion) {
+	public AbstractGameControllerRunner(final ReasonerFactoryInterface<TermType, ReasonerStateInfoType> reasonerFactory) {
 		super();
 		this.reasonerFactoryInterface = reasonerFactory;
-		this.gdlVersion = gdlVersion;
 	}
 
 	public Logger getLogger(){
@@ -107,12 +106,12 @@ public abstract class AbstractGameControllerRunner<
 		MoveFactoryInterface<? extends MoveInterface<TermType>> moveFactory = new MoveFactory<TermType>(reasonerFactoryInterface.getTermFactory());
 		for(PlayerInfo playerInfo:getPlayerInfos()){
 			RoleInterface<TermType> role=game.getRole(playerInfo.getRoleindex());
-			players.put(role, PlayerFactory. <TermType, State<TermType, ReasonerStateInfoType>> createPlayer(playerInfo, moveFactory, gameScrambler, game.getGdlVersion()));
+			players.put(role, PlayerFactory. <TermType, State<TermType, ReasonerStateInfoType>> createPlayer(playerInfo, moveFactory, gameScrambler));
 		}
 		// make sure that we have a player for each role (fill up with random players)
 		for(int i=0; i<game.getNumberOfRoles(); i++){
 			if(!players.containsKey(game.getRole(i))){
-				players.put(game.getRole(i), PlayerFactory. <TermType, State<TermType, ReasonerStateInfoType>> createRandomPlayer(new RandomPlayerInfo(i, gdlVersion)));
+				players.put(game.getRole(i), PlayerFactory. <TermType, State<TermType, ReasonerStateInfoType>> createRandomPlayer(new RandomPlayerInfo(i, game.getGdlVersion())));
 			}
 		}
 		return players;
@@ -141,6 +140,14 @@ public abstract class AbstractGameControllerRunner<
 	protected abstract int getPlayClock();
 
 	protected abstract int getStartClock();
+
+	public GDLVersion getGdlVersion() {
+		return gdlVersion;
+	}
+
+	public void setGdlVersion(GDLVersion gdlVersion) {
+		this.gdlVersion = gdlVersion;
+	}
 
 	protected Game<TermType, ReasonerStateInfoType> createGame(File gameFile){
 		Game<TermType, ReasonerStateInfoType> game = null;

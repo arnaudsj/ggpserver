@@ -108,14 +108,13 @@ public class GameControllerApp {
 					if(event.getActionCommand().equals(JFileChooser.APPROVE_SELECTION)){
 						
 						GDLVersion gdlVersion = GDLVersion.v1;
-						if ( ((String) jGDLVersionComboBox.getSelectedItem()) == "GDL-II") {
+						if ( "GDL-II".equals(jGDLVersionComboBox.getSelectedItem()) ) {
 							gdlVersion = GDLVersion.v2;
 						}
 						
-						GameControllerGuiRunnerFactory.createGameControllerGuiRunner(
-								jFileChooser.getSelectedFile(),
-								gdlVersion
-							).runGui();
+						AbstractGameControllerGuiRunner<?, ?> gameControllerRunner = GameControllerGuiRunnerFactory.createGameControllerGuiRunner(jFileChooser.getSelectedFile());
+						gameControllerRunner.setGdlVersion(gdlVersion);
+						gameControllerRunner.runGui();
 					}else{
 						jFrame.dispose();
 					}

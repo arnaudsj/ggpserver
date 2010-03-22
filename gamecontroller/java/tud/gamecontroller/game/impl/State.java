@@ -86,17 +86,22 @@ public class State<TermType extends TermInterface, ReasonerStateInfoType>
 	
 	@Override
 	public boolean equals(Object o) {
-		if (o instanceof State)
-			return stateInformation.equals(((State<?, ?>)o).stateInformation);
-		// TODO: change hash-function according to the following definition
-//		else if (o instanceof StateInterface<?, ?>) {
-//			HashSet<?> fluents1 = new HashSet<FluentInterface<?>>(((StateInterface<?, ?>)o).getFluents());
-//			HashSet<?> fluents2 = new HashSet<FluentInterface<?>>(getFluents());
-//			return fluents1.equals(fluents2);
-//		}
+		if (o instanceof StateInterface<?, ?>) {
+			Collection<?> fluents1 = getFluents();
+			Collection<?> fluents2 = ((StateInterface<?, ?>)o).getFluents();
+			return fluents1.size()==fluents2.size() && fluents1.containsAll(fluents2);
+		}
 		return false;
 	}
-	
+
+	@Override
+	public int hashCode() {
+		int hashCode = 31;
+		for (FluentInterface<TermType> f:getFluents())
+			hashCode += f.hashCode();
+		return hashCode;
+	}
+
 	/**
 	 * returns the list of fluents as a string in infix KIF notation
 	 */
@@ -105,7 +110,12 @@ public class State<TermType extends TermInterface, ReasonerStateInfoType>
 		sb.append('(');
 		for(GameObjectInterface f:getFluents()){
 			sb.append(f.getKIFForm());
-			sb.append(" ");
+			if(sb.charAt(sb.length()-1) != ')') {
+				sb.append(' ');
+			}
+		}
+		if(sb.charAt(sb.length()-1) == ' ') {
+			sb.deleteCharAt(sb.length()-1);
 		}
 		sb.append(')');
 		return sb.toString();

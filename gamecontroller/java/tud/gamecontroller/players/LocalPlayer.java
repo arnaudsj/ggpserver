@@ -21,6 +21,7 @@
 package tud.gamecontroller.players;
 
 import java.util.Collection;
+import java.util.logging.Logger;
 
 import tud.gamecontroller.ConnectionEstablishedNotifier;
 import tud.gamecontroller.GDLVersion;
@@ -51,7 +52,10 @@ public abstract class LocalPlayer<TermType extends TermInterface, StateType exte
 		notifyStartRunning();
 		notifier.connectionEstablished();
 		this.firstTurn = true;
-		setGdlVersion(match.getGame().getGdlVersion());
+		if( getGdlVersion()!=match.getGame().getGdlVersion() ) {
+			Logger.getLogger(LocalPlayer.class.getName()).warning("GDL versions of player and game do not match!");
+			setGdlVersion(match.getGame().getGdlVersion());
+		}
 		if(getGdlVersion() == GDLVersion.v1) {
 			currentState = match.getGame().getInitialState();
 		} else {

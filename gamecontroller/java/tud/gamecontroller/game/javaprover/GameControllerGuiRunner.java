@@ -21,7 +21,6 @@ package tud.gamecontroller.game.javaprover;
 
 import java.io.File;
 
-import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.ReasonerFactoryInterface;
 import tud.gamecontroller.term.TermFactoryInterface;
 import cs227b.teamIago.util.GameState;
@@ -29,8 +28,8 @@ import cs227b.teamIago.util.GameState;
 public class GameControllerGuiRunner extends
 		tud.gamecontroller.gui.AbstractGameControllerGuiRunner<Term, GameState> {
 
-	public GameControllerGuiRunner(File gameFile, ReasonerFactoryInterface<Term, GameState> reasonerFactory, GDLVersion gdlVersion) {
-		super(gameFile, reasonerFactory, gdlVersion);
+	public GameControllerGuiRunner(File gameFile, ReasonerFactoryInterface<Term, GameState> reasonerFactory) {
+		super(gameFile, reasonerFactory);
 	}
 
 	@Override

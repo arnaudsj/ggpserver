@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.GameControllerListener;
 import tud.gamecontroller.auxiliary.Pair;
 import tud.gamecontroller.game.GameInterface;
@@ -97,27 +96,6 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 	 */
 	private int stepNumber = 0;
 	
-	private GDLVersion gdlVersion;
-	
-	
-	public RunningMatch(
-			String matchID,
-			GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game,
-			int startclock,
-			int playclock,
-			Map<? extends RoleInterface<TermType>, ? extends PlayerInfo> rolesToPlayerInfos,
-			Date startTime,
-			boolean scrambled,
-			String tournamentID,
-			double weight,
-			User owner,
-			AbstractDBConnector<TermType, ReasonerStateInfoType> db,
-			MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory,
-			GameScramblerInterface gameScrambler) {
-		this(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, scrambled, tournamentID, weight, owner, db, movefactory, gameScrambler, GDLVersion.v1);
-	}
-	
-
 	public RunningMatch(
 			String matchID,
 			GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game,
@@ -130,12 +108,10 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 			double weight,
 			User owner, AbstractDBConnector<TermType, ReasonerStateInfoType> db,
 			MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory,
-			GameScramblerInterface gameScrambler,
-			GDLVersion gdlVersion) {
+			GameScramblerInterface gameScrambler) {
 		super(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, scrambled, tournamentID, weight, owner, db);
 		this.moveFactory = movefactory;
 		this.gameScrambler = gameScrambler;
-		this.gdlVersion = gdlVersion;
 	}
 	
 	/**
@@ -225,7 +201,7 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 		for (RoleInterface<TermType> role : getGame().getOrderedRoles()) {
 			PlayerInfo playerInfo = getRolesToPlayerInfos().get(role);
 			
-			Player<TermType, State<TermType, ReasonerStateInfoType>> player = PlayerFactory.<TermType, State<TermType, ReasonerStateInfoType>> createPlayer(playerInfo, moveFactory, gameScrambler, gdlVersion);
+			Player<TermType, State<TermType, ReasonerStateInfoType>> player = PlayerFactory.<TermType, State<TermType, ReasonerStateInfoType>> createPlayer(playerInfo, moveFactory, gameScrambler);
 			players.put(role, player);
 		}
 	}

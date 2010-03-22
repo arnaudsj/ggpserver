@@ -21,7 +21,6 @@ package tud.gamecontroller.game.jocular;
 
 import stanfordlogic.gdl.Parser;
 import stanfordlogic.prover.ProofContext;
-import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.ReasonerFactoryInterface;
 import tud.gamecontroller.cli.AbstractGameControllerCLIRunner;
 
@@ -29,14 +28,14 @@ public class GameControllerCLIRunner extends AbstractGameControllerCLIRunner<Ter
 	@SuppressWarnings("unused")
 	private Parser parser; 
 	
-	public GameControllerCLIRunner(ReasonerFactoryInterface<Term, ProofContext> reasonerFactory, GDLVersion gdlVersion){
-		super(reasonerFactory, gdlVersion);
+	public GameControllerCLIRunner(ReasonerFactoryInterface<Term, ProofContext> reasonerFactory){
+		super(reasonerFactory);
 		this.parser=new Parser();
 	}
 	
 	public static void main(String[] args) {
 		ReasonerFactoryInterface<Term, ProofContext> reasonerFactory = new ReasonerFactory();
-		GameControllerCLIRunner gcRunner=new GameControllerCLIRunner(reasonerFactory, GDLVersion.v1);
+		GameControllerCLIRunner gcRunner=new GameControllerCLIRunner(reasonerFactory);
 		gcRunner.runFromCommandLine(args);
 	}
 }

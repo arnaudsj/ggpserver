@@ -80,7 +80,7 @@ public abstract class AbstractPlayer<TermType extends TermInterface, StateType e
 		return this.gdlVersion;
 	}
 
-	public void setGdlVersion(GDLVersion gdlVersion) {
+	protected void setGdlVersion(GDLVersion gdlVersion) {
 		this.gdlVersion = gdlVersion;
 	}
 

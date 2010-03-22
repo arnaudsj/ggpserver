@@ -22,12 +22,11 @@ package tud.gamecontroller.gui;
 
 import java.io.File;
 
-import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.game.javaprover.ReasonerFactory;
 
 public class GameControllerGuiRunnerFactory {
 
-	public static AbstractGameControllerGuiRunner<?, ?> createGameControllerGuiRunner(File gameFile, GDLVersion gdlVersion){
-		return new tud.gamecontroller.game.javaprover.GameControllerGuiRunner(gameFile, new ReasonerFactory(), gdlVersion);
+	public static AbstractGameControllerGuiRunner<?, ?> createGameControllerGuiRunner(File gameFile){
+		return new tud.gamecontroller.game.javaprover.GameControllerGuiRunner(gameFile, new ReasonerFactory());
 	}
 }

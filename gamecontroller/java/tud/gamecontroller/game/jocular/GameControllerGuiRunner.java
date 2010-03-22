@@ -23,7 +23,6 @@ import java.io.File;
 
 import stanfordlogic.gdl.Parser;
 import stanfordlogic.prover.ProofContext;
-import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.ReasonerFactoryInterface;
 import tud.gamecontroller.term.TermFactoryInterface;
 
@@ -32,8 +31,8 @@ public class GameControllerGuiRunner extends
 
 	private Parser parser; 
 	
-	public GameControllerGuiRunner(File gameFile, ReasonerFactoryInterface<Term, ProofContext> reasonerFactory, GDLVersion gdlVersion) {
-		super(gameFile, reasonerFactory, gdlVersion);
+	public GameControllerGuiRunner(File gameFile, ReasonerFactoryInterface<Term, ProofContext> reasonerFactory) {
+		super(gameFile, reasonerFactory);
 		this.parser=new Parser();
 	}
 

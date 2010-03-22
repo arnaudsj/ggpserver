@@ -22,6 +22,7 @@ package tud.ggpserver.datamodel.matches;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -159,7 +160,7 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 	}
 
 	public Map<? extends RoleInterface<?>, ? extends PlayerInfo> getRolesToPlayerInfos() {
-		return new HashMap<RoleInterface<?>, PlayerInfo>(rolesToPlayerInfos);
+		return Collections.unmodifiableMap(rolesToPlayerInfos);
 	}
 	
 	public List<String> getOrderedPlayerNames() {
