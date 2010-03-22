@@ -51,6 +51,7 @@ public abstract class LocalPlayer<TermType extends TermInterface, StateType exte
 		notifyStartRunning();
 		notifier.connectionEstablished();
 		this.firstTurn = true;
+		setGdlVersion(match.getGame().getGdlVersion());
 		if(getGdlVersion() == GDLVersion.v1) {
 			currentState = match.getGame().getInitialState();
 		} else {

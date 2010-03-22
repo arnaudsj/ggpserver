@@ -62,11 +62,11 @@ public class StatesTracker<TermType extends TermInterface, StateType extends Sta
 				}
 			}
 		}
-		currentPossibleStates = nextPossibleStates;
 		Logger.getLogger(StatesTracker.class.getName()).info(
 				"statesUpdate for \"" + role + "\" seeing " + seesTerms
 				+ " with " + currentPossibleStates.size() + " currentPossibleStates yields "
-				+ currentPossibleStates.size() + " nextPossibleStates");
+				+ nextPossibleStates.size() + " nextPossibleStates");
+		currentPossibleStates = nextPossibleStates;
 		return Collections.unmodifiableCollection(currentPossibleStates);
 	}
 	
