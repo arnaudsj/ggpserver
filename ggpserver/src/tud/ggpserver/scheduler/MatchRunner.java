@@ -85,7 +85,7 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 	/**
 	 * the threads of the currently running matches 
 	 */
-	private final Map<String, Thread> matchThreads;
+	private final Map<String, MatchThread<TermType,ReasonerStateInfoType>> matchThreads;
 
 	private AvailablePlayersTracker<TermType, ReasonerStateInfoType> availablePlayersTracker;
 
@@ -98,7 +98,7 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 		// scheduledMatches must be synchronized because it is also accessed from the runMatches thread
 		scheduledMatches = Collections.synchronizedMap(new LinkedHashMap<String, ScheduledMatch<TermType, ReasonerStateInfoType>>());
 		// and matchThreads map
-		matchThreads = Collections.synchronizedMap(new HashMap<String, Thread>());
+		matchThreads = Collections.synchronizedMap(new HashMap<String, MatchThread<TermType,ReasonerStateInfoType>>());
 	}
 
 	/**
@@ -158,7 +158,12 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 			}
 		}
 	}
-
+	
+	public RunningMatch<TermType, ReasonerStateInfoType> getRunningMatch (String matchID) {
+		if (!matchThreads.containsKey(matchID)) return null;
+		return matchThreads.get(matchID).getMatch();
+	}
+	
 	/**
 	 * the main loop
 	 * @throws SQLException
@@ -239,7 +244,7 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 				availablePlayersTracker.notifyStartPlaying(p.getName());
 			}
 		}
-		Thread thread = new Thread("runSingleMatch("+match.getMatchID()+")") {
+		MatchThread<TermType, ReasonerStateInfoType> thread = new MatchThread<TermType, ReasonerStateInfoType>("runSingleMatch("+match.getMatchID()+")", match) {
 			@Override
 			public void run(){
 				runSingleMatch(match);

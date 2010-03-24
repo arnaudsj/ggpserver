@@ -64,6 +64,7 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 
 	private final MoveFactoryInterface<? extends MoveInterface<TermType>> moveFactory;
 	private GameScramblerInterface gameScrambler;
+	private Date readyTime;
 
 	/**
 	 * JointMove 0 = joint move leading from initial state to State 1.
@@ -167,9 +168,7 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 
 	@Override
 	public List<? extends Player<TermType, State<TermType, ReasonerStateInfoType>>> getOrderedPlayers() {
-		if (players == null) {
-			initPlayers();
-		}
+		initPlayers();
 		if (orderedPlayers == null) {
 			orderedPlayers = new LinkedList<Player<TermType, State<TermType, ReasonerStateInfoType>>>();
 			for (RoleInterface<TermType> role : getGame().getOrderedRoles()) {
@@ -181,28 +180,28 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 
 	@Override
 	public Player<TermType, State<TermType, ReasonerStateInfoType>> getPlayer(RoleInterface<TermType> role) {
-		if (players == null) {
-			initPlayers();
-		}
+		initPlayers();
 		return players.get(role);
 	}
 
 	@Override
 	public Collection<? extends Player<TermType, State<TermType, ReasonerStateInfoType>>> getPlayers() {
-		if (players == null) {
-			initPlayers();
-		}
+		initPlayers();
 		return players.values();
 	}
 	
-	private void initPlayers() {
-		players = new HashMap<RoleInterface<TermType>, Player<TermType, State<TermType, ReasonerStateInfoType>>>();
-		
-		for (RoleInterface<TermType> role : getGame().getOrderedRoles()) {
-			PlayerInfo playerInfo = getRolesToPlayerInfos().get(role);
+	private synchronized void initPlayers() {
+		logger.info(Integer.toHexString(System.identityHashCode(this))+"-initPlayers()");
+		if (players == null) {
+			logger.info(Integer.toHexString(System.identityHashCode(this))+"-players == null !");
+			players = new HashMap<RoleInterface<TermType>, Player<TermType, State<TermType, ReasonerStateInfoType>>>();
 			
-			Player<TermType, State<TermType, ReasonerStateInfoType>> player = PlayerFactory.<TermType, State<TermType, ReasonerStateInfoType>> createPlayer(playerInfo, moveFactory, gameScrambler);
-			players.put(role, player);
+			for (RoleInterface<TermType> role : getGame().getOrderedRoles()) {
+				PlayerInfo playerInfo = getRolesToPlayerInfos().get(role);
+				
+				Player<TermType, State<TermType, ReasonerStateInfoType>> player = PlayerFactory.<TermType, State<TermType, ReasonerStateInfoType>> createPlayer(playerInfo, moveFactory, gameScrambler);
+				players.put(role, player);
+			}
 		}
 	}
 	
@@ -331,5 +330,13 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 		} catch (DuplicateInstanceException e) {
 			logger.severe("StateInterface<? extends TermInterface,?>, Map<? extends RoleInterface<?>,Integer> - exception: " + e); //$NON-NLS-1$
 		}
+	}
+	
+	public void setReadyTime(Date readyTime) {
+		this.readyTime = readyTime;
+	}
+	
+	public Date getReadyTime() {
+		return readyTime;
 	}
 }

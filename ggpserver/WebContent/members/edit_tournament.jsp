@@ -93,7 +93,7 @@
 			    	<th>weight</th>
 			    </c:if>
 			    <th>errors</th>
-			    <th colspan="4">actions</th>
+			    <th colspan="5">actions</th>
 			</tr>
 		    </thead>
 		    <tbody>
@@ -182,6 +182,19 @@
 										<c:out value="${playerinfo.name}" />
 									</option>
 							    </c:forEach>
+							    
+							    <!-- have the possibility to choose oneself as player -->
+							    <c:choose>
+								    <c:when test='${pager.userName == selectedplayerinfo.name}'>
+								    	<c:set var="playerSelected">selected="selected"</c:set>
+								    </c:when>
+								    <c:otherwise>
+								    	<c:set var="playerSelected"/>
+								    </c:otherwise>
+								</c:choose>
+						    	<option value="${pager.userName}" ${playerSelected} style="font-weight:bold;">
+									<c:out value="${pager.userName}" />
+								</option>
 							</select>
 					    </c:when>
 					    <c:otherwise>
@@ -316,6 +329,22 @@
 				    </c:url>
 				    <a href='<c:out value="${cloneURL}" />'><div class="clone" title="clone match"><span>clone</span></div></a>
 				</td>
+				
+				<%-- action "play" [all] --%>
+				<td class="nopadding">
+					<c:forEach var="playerinfo" items="${match.orderedPlayerInfos}">
+						<c:choose>
+							<c:when test="${ playerinfo.name == pager.userName && match.status == 'running' }">
+							    <c:url value="/members/play.jsp" var="playURL">
+							    	<c:param name="matchID" value="${match.matchID}" />
+									<c:param name="userName" value="${pager.userName}" />
+							    </c:url>
+							    <a href='<c:out value="${playURL}" />'><div class="play" title="play match!"><span>play</span></div></a>
+							</c:when>
+					    </c:choose>
+					</c:forEach>
+				</td>
+				
 			    </tr>
 			</c:forEach>
 			
@@ -330,7 +359,7 @@
 			</c:choose>
 			<tr class="${rowClass}">
 				<c:choose>
-					<c:when test="${pager.goalEditable}">
+					<c:when test="${pager.goalEditable}"> ii
 					    <td colspan="13">
 					</c:when>
 					<c:otherwise>

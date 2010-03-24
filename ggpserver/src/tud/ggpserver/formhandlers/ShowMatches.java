@@ -68,7 +68,7 @@ public class ShowMatches extends AbstractPager {
 	
 	public List<? extends ServerMatch<?, ?>> getMatches() throws SQLException {
 		if (matches == null) {
-			logger.info(""+getStartRow()+", "+getNumDisplayedRows()+", "+playerName+", "+gameName+", "+tournamentID+", "+owner+", "+status+", "+excludeNewMatches());
+			//logger.info(""+getStartRow()+", "+getNumDisplayedRows()+", "+playerName+", "+gameName+", "+tournamentID+", "+owner+", "+status+", "+excludeNewMatches());
 			matches = db.getMatches(getStartRow(), getNumDisplayedRows(), playerName, gameName, tournamentID, owner, status, excludeNewMatches());
 		}
 		return matches;

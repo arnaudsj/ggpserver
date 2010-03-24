@@ -157,7 +157,7 @@ public class EditTournament extends ShowMatches {
 			if (!(match instanceof NewMatch)) {
 				errorString = "match '" + match.getMatchID() + "' is not new (status: '" + match.getStatus() + "')";
 			}else if (checkMatchOwner()) {
-				// check that all players are active
+				// check that all players are active and TODO: compatible gdl
 				
 				// There might still be a race condition such that a match is scheduled but never run (e.g., if a player goes offline
 				// right after this check), but we avoid most cases here. 
@@ -172,7 +172,6 @@ public class EditTournament extends ShowMatches {
 							errorString = "start match is invalid: "+remotePlayerInfo.getName()+" is not available and not owned by "+user.getUserName();
 							break;
 						}
-						// TODO: compatible gdl
 					}
 				}
 			}
@@ -331,6 +330,10 @@ public class EditTournament extends ShowMatches {
 		user = getDBConnector().getUser(userName);
 		if (!user.isAdmin())
 			super.setOwner(user.getUserName()); // normal users should only see their own matches for editing
+	}
+	
+	public String getUserName() {
+		return user.getUserName();
 	}
 	
 	public boolean isGoalEditable() {

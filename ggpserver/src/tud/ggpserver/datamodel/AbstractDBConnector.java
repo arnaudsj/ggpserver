@@ -53,6 +53,7 @@ import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.impl.State;
 import tud.gamecontroller.logging.GameControllerErrorMessage;
+import tud.gamecontroller.players.HumanPlayerInfo;
 import tud.gamecontroller.players.LegalPlayerInfo;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.players.RandomPlayerInfo;
@@ -122,6 +123,11 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	}
 	
 	public User createUser(String userName, String password, String emailAddress) throws DuplicateInstanceException, SQLException {
+		
+		if (isPlayer(userName)) {
+			throw new DuplicateInstanceException("A player is already registered with name \""+userName+"\", please choose another login.");
+		}
+		
 		Connection con = getConnection(); 
 		PreparedStatement ps = null;
 		
@@ -154,6 +160,26 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 
 		logger.info("Creating new user: " + userName); //$NON-NLS-1$
 		return new User(userName, emailAddress, defaultRoleNames);
+	}
+
+	private boolean isPlayer(String playerName) throws SQLException {
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+		
+		boolean res = false;
+		
+		try {
+			ps = con.prepareStatement(" SELECT * FROM `players` WHERE `name` = ?");
+			ps.setString(1, playerName);
+			if (ps.executeQuery().next())
+				res = true;
+		} finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+		}
+		return res;
 	}
 
 	public User getUser(String userName) throws SQLException {
@@ -204,6 +230,10 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	public RemotePlayerInfo createPlayerInfo(String name, String host,
 			int port, User owner, String status, GDLVersion gdlVersion)
 			throws DuplicateInstanceException, SQLException {
+		
+		if (isUser(name)) {
+			throw new DuplicateInstanceException("\""+name+"\" is already used as login by a user, please choose a different name for your player.");
+		}
 		
 		assert(!name.equals(PLAYER_LEGAL));
 		assert(!name.equals(PLAYER_RANDOM));
@@ -258,17 +288,30 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
-		RemotePlayerInfo result = null;
+		PlayerInfo result = null;
 		
-		try { 
+		try {
 			
 			ps = con.prepareStatement("SELECT `host` , `port` , `owner` , `status`, `plays_round_robin`, `plays_manual`, `gdl_version` FROM `players` WHERE `name` = ? ;");
 			ps.setString(1, name);
 			rs = ps.executeQuery();
 			
 			if (rs.next()) {
+				
 				// logger.info("Returning new RemotePlayerInfo: " + name); //$NON-NLS-1$
 				result = new RemotePlayerInfo(name, rs.getString("host"), rs.getInt("port"), getUser(rs.getString("owner")), rs.getString("status"), rs.getBoolean("plays_round_robin"), rs.getBoolean("plays_manual"), Utilities.gdlVersion(rs.getInt("gdl_version")));
+				
+			} else {
+				// the given name does not correspond to any RemotePlayer, it should be a human player
+				
+				ps = con.prepareStatement("SELECT `user_name` FROM `users` WHERE `user_name` = ? ;");
+				ps.setString(1, name);
+				rs = ps.executeQuery();
+				
+				if (rs.next()) {
+					result = new HumanPlayerInfo(0, name);
+				}
+				
 			}
 		} finally { 
 			if (con != null)
@@ -329,7 +372,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		try {
 			ps = con.prepareStatement("SELECT `gamedescription`, `stylesheet`, `xml_view`, `enabled`, `creator`, `gdl_version` FROM `games` WHERE `name` = ? ;");
 			ps.setString(1, name);
-			logger.info(ps.toString());
+			//logger.info(ps.toString());
 			rs = ps.executeQuery();
 			
 			if (rs.next()) {
@@ -846,7 +889,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			
 			rs = ps.executeQuery();
 			
-			logger.info(ps.toString());
+//			logger.info(ps.toString());
 			
 			while (rs.next()) {
 				result.add(getGame(rs.getString("name")));
@@ -1051,7 +1094,6 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			int startRow, int numDisplayedRows, String playerName,
 			String gameName, String tournamentID, String owner, String status, boolean excludeNew)
 			throws SQLException {
-		// 0, 30, null, null, manual_matches, nicoulas, null, true
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -1135,7 +1177,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		}
 		
 		// prepare statement, fill in parameters
-		logger.info(select + " " + from + " " + where + " " + orderBy + ";");
+		//logger.info(select + " " + from + " " + where + " " + orderBy + ";");
 		ps = con.prepareStatement(select + " " + from + " " + where + " " + orderBy + ";");
 
 		for (int i = 0; i < parameters.size(); i++) {
@@ -1299,7 +1341,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		parameters.add(numDisplayedRows);
 		
 		// prepare statement, fill in parameters
-		logger.info(select + " " + from + " " + where + " " + orderBy + " " + limit + ";");
+		//logger.info(select + " " + from + " " + where + " " + orderBy + " " + limit + ";");
 		ps = con.prepareStatement(select + " " + from + " " + where + " " + orderBy + " " + limit + ";");
 		for (int i = 0; i < parameters.size(); i++) {
 			Object parameter = parameters.get(i);
@@ -1601,11 +1643,16 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	 * @param stepNumber counting starts from 1
 	 */
 	public void addErrorMessage(String matchID, int stepNumber, GameControllerErrorMessage errorMessage) throws SQLException {
+		
+		if (errorMessage.getType() == GameControllerErrorMessage.TIMEOUT && isUser(errorMessage.getPlayerName())) {
+			return; // we ignore timeout from HumanPlayers
+		}
+		
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 
 		assert (stepNumber > 0);
-
+		
 		try {
 			ps = con.prepareStatement("INSERT INTO `errormessages` (`match_id` , `step_number`, `type`, `message`, `player`) VALUES (?, ?, ?, ?, ?);");
 			ps.setString(1, matchID);
@@ -1625,6 +1672,26 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			if (ps != null)
 				try {ps.close();} catch (SQLException e) {}
 		} 
+	}
+	
+	private boolean isUser (String player) throws SQLException {
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+		
+		boolean res = false;
+		
+		try {
+			ps = con.prepareStatement(" SELECT * FROM `users` WHERE `user_name` = ?");
+			ps.setString(1, player);
+			if (ps.executeQuery().next())
+				res = true;
+		} finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+		}
+		return res;
 	}
 
 	/**

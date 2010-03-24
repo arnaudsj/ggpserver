@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Collection;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -68,7 +69,7 @@ public class StateXMLExporter {
 		String xmlState=null;
 		List<Pair<Date,String>> stringStates = match.getStringStates();
 		for(int step=0; step<stringStates.size(); step++) {
-			xmlState = getStepXML(match, stringStates, step+1, RoleInterface.NATURE_ROLE_NAME);
+			xmlState = getStepXML(match, stringStates, step+1, RoleInterface.NATURE_ROLE_NAME, false, false, null, null, null);
 			if(xmlState != null)
 				exportStepXML(xmlState, "step_"+(step+1), zip, matchDir);
 		}
@@ -101,7 +102,7 @@ public class StateXMLExporter {
 	 * @return the xml for the specified state of the match
 	 */
 	public static <TermType extends TermInterface, ReasonerStateInfoType> 
-	String getStepXML(ServerMatch<TermType, ReasonerStateInfoType> match, List<Pair<Date, String>> stringStates, int stepNumber, String roleName) { 
+	String getStepXML(ServerMatch<TermType, ReasonerStateInfoType> match, List<Pair<Date, String>> stringStates, int stepNumber, String roleName, boolean playing, boolean ready, Collection<String> legalMoves, String chosenMove, Boolean confirmed) { 
 		int numberOfStates = stringStates.size();
 		if(numberOfStates > 0) {
 			if (stepNumber < 1 || stepNumber > numberOfStates) {
@@ -142,7 +143,12 @@ public class StateXMLExporter {
 					goalValues,
 					match.getGame().getStylesheet(),
 					role,
-					stringState.getLeft()
+					stringState.getLeft(),
+					playing,
+					ready,
+					legalMoves,
+					chosenMove,
+					confirmed
 				).toString();
 		} else {
 			// this can only happen if the initial state wasn't created yet

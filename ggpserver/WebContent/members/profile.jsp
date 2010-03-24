@@ -1,5 +1,5 @@
 <%--
-    Copyright (C) 2009 Martin Günther (mintar@gmx.de)
+    Copyright (C) 2009-2010 Martin Günther (mintar@gmx.de), Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GGP Server.
 
@@ -180,6 +180,24 @@
 			</tr>
 		</tbody>
 	</table>
+
+
+<h1>You are currently playing:</h1>
+	
+	<ul>
+	<c:forEach var="matchID" items="${profile.myMatchesID}">
+		<li>
+			<c:url value="/members/play.jsp" var="playURL">
+				<c:param name="matchID" value="${matchID}"/>
+		    </c:url>							
+		    
+		    <a href='<c:out value="${playURL}"/>'>
+		    	<div class="play" title="play"></div>
+		    	play <c:out value="${matchID}"/>
+		    </a>
+		</li>
+	</c:forEach>
+	</ul>
 
 <h1>Hints</h1>
 <ul>

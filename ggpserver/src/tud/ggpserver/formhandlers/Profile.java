@@ -26,14 +26,20 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
+import tud.gamecontroller.game.MatchInterface;
+import tud.ggpserver.collectionviews.ListIteratorView;
 import tud.ggpserver.datamodel.AbstractDBConnector;
+import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
 import tud.ggpserver.datamodel.Tournament;
 import tud.ggpserver.datamodel.User;
+import tud.ggpserver.datamodel.matches.ServerMatch;
+import tud.ggpserver.scheduler.MatchRunner;
 
 public class Profile {
+	protected final AbstractDBConnector<?, ?> db = DBConnectorFactory.getDBConnector();
 	private User user = null;
-
+	
 	public String getUserName() {
 		if (user == null) {
 			throw new IllegalStateException("user not set!");
@@ -57,6 +63,13 @@ public class Profile {
 		if(!user.equals(db.getAdminUser()))
 			tournaments.add(0, db.getTournament(Tournament.MANUAL_TOURNAMENT_ID));
 		return tournaments;
-
+	}
+	
+	public List<String> getMyMatchesID () throws SQLException {
+		List<? extends ServerMatch<?,?>> matches = db.getMatches(0, 100, user.getUserName(), null, null, null, ServerMatch.STATUS_RUNNING, true);
+		List<String> res = new LinkedList<String>();
+		for (MatchInterface<?,?> match: matches)
+			res.add(match.getMatchID());
+		return res;
 	}
 }

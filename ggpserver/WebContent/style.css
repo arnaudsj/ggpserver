@@ -403,6 +403,20 @@ div.div_filter {
   visibility:          hidden;
 }
 
+/* action: play a match */
+.play {
+  background: url(icons/other/24-play.png) no-repeat;
+  display:             inline-block;
+  height:              24px;
+  width:               24px;
+}
+.play span {
+  visibility:          hidden;
+}
+.play a span {
+  visibility:          hidden;
+}
+
 /* errors in match */
 .errors {
   background: url(icons/other/16-warning_icon.png) no-repeat;
