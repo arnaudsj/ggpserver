@@ -44,6 +44,11 @@ public class PlayerFactory {
 	}
 	
 	public static <TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
+		Player<TermType, StateType> createHumanPlayer(HumanPlayerInfo info) {
+		return new HumanPlayer<TermType, StateType>(info.getName());
+	}
+	
+	public static <TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
 		Player<TermType, StateType> createPlayer(PlayerInfo info, MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory, GameScramblerInterface gameScrambler) {
 		if(info instanceof RemotePlayerInfo){
 			return PlayerFactory. <TermType, StateType> createRemotePlayer((RemotePlayerInfo)info, movefactory, gameScrambler);
@@ -51,6 +56,8 @@ public class PlayerFactory {
 			return PlayerFactory. <TermType, StateType> createRandomPlayer((RandomPlayerInfo)info);
 		}else if(info instanceof LegalPlayerInfo){
 			return PlayerFactory. <TermType, StateType> createLegalPlayer((LegalPlayerInfo)info);
+		}else if(info instanceof HumanPlayerInfo){
+			return PlayerFactory. <TermType, StateType> createHumanPlayer((HumanPlayerInfo)info);
 		}
 		return null;
 	}

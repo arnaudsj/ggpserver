@@ -21,6 +21,7 @@
 package tud.gamecontroller.game;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import tud.gamecontroller.players.Player;
@@ -38,5 +39,8 @@ public interface RunnableMatchInterface<TermType, StateType extends StateInterfa
 	List<? extends Player<TermType, StateType>> getOrderedPlayers();
 
 	Player<TermType, StateType> getPlayer(RoleInterface<TermType> role);
+	
+	public void setReadyTime(Date readyTime);
+	public Date getReadyTime();
 
 }

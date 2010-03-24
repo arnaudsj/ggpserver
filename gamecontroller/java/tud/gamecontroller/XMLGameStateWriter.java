@@ -112,7 +112,7 @@ public class XMLGameStateWriter
 		//System.out.println( ((Game)match.getGame()).getGameDescription() );
 		
 		try {
-			os = createXMLOutputStream(match, currentState, XMLGameStateWriter.getStringMoves(moves), goalValues, stylesheet, role, null);
+			os = createXMLOutputStream(match, currentState, XMLGameStateWriter.getStringMoves(moves), goalValues, stylesheet, role, null, false, false, null, null, null);
 			fileOutputStream = new FileOutputStream(new File(matchDir+File.separator+"step_"+step+".xml"));
 			fileOutputStream.write(os.toByteArray());
 			if(goalValues!=null){ // write the final state twice (once as step_X.xml and once as finalstate.xml)
@@ -151,6 +151,7 @@ public class XMLGameStateWriter
 	 * @param stylesheet
 	 * @param role the role from which perspective the xml view should be generated
 	 * @param date if null, the current time is set as timestamp for the state (for the standalone GameController). If not null, used as the timestamp (for calls from the server).
+	 * @param legalMoves if null, no additional <legalmoves> tag is added (for the standalone GameController), otherwise, legalMoves are listed in this tag (for calls from the server).
 	 * @return
 	 * @throws TransformerFactoryConfigurationError
 	 * @throws IllegalArgumentException
@@ -162,12 +163,17 @@ public class XMLGameStateWriter
 			Map<?, Integer> goalValues,
 			String stylesheet,
 			RoleInterface<? extends TermInterface> role,
-			Date date)
+			Date date,
+			boolean playing,
+			boolean ready,
+			Collection<String> legalMoves,
+			String chosenMove,
+			Boolean confirmed)
 			throws TransformerFactoryConfigurationError,
 			IllegalArgumentException {
 		ByteArrayOutputStream os=new ByteArrayOutputStream();
 		try{
-			Document xmldoc=createXML(match, currentState, stringMoves, goalValues, stylesheet, role, date);
+			Document xmldoc=createXML(match, currentState, stringMoves, goalValues, stylesheet, role, date, playing, ready, legalMoves, chosenMove, confirmed);
 			// Serialization through Transform.
 			DOMSource domSource = new DOMSource(xmldoc);
 			
@@ -201,6 +207,7 @@ public class XMLGameStateWriter
 	 * @return an xml document
 	 * @throws ParserConfigurationException
 	 */
+	@SuppressWarnings("unchecked")
 	private static Document createXML(
 			MatchInterface<? extends TermInterface, ?> match,
 			StateInterface<? extends TermInterface,?> currentState,
@@ -208,7 +215,12 @@ public class XMLGameStateWriter
 			Map<?, Integer> goalValues,
 			String stylesheet,
 			RoleInterface<? extends TermInterface> role,
-			Date date)
+			Date date,
+			boolean playing,
+			boolean ready,
+			Collection<String> legalMoves,
+			String chosenMove,
+			Boolean confirmed)
 	throws ParserConfigurationException {
 		
 		 Document xmldoc = null;
@@ -277,9 +289,20 @@ public class XMLGameStateWriter
 		 
 		 root.appendChild(createStateElement(xmldoc, currentState, role));
 		 
+		 if (match instanceof RunnableMatchInterface) {
+			 Date readyTime = ((RunnableMatchInterface)match).getReadyTime();
+			 if (playing) {
+				 if (ready) {
+					 root.appendChild(createReadyTime(xmldoc, readyTime));
+				 }
+				 root.appendChild(createLegalMoves(xmldoc, legalMoves));
+				 root.appendChild(createChosenMove(xmldoc, chosenMove, confirmed));
+			 }
+		 }
+		 
 		 return xmldoc;
 	}
-
+	
 	private static List<List<String>> getStringMoves(List<JointMoveInterface<? extends TermInterface>> moves) {
 		List<List<String>> stringMoves = new LinkedList<List<String>>();
 		for (JointMoveInterface<? extends TermInterface> jointMove: moves) {
@@ -360,6 +383,47 @@ public class XMLGameStateWriter
 			history.appendChild(step);
 		}
 		return history;
+	}
+	
+	private static Node createReadyTime(Document xmldoc, Date readyTime) {
+		Element r = xmldoc.createElement("ready");
+		if (readyTime != null) {
+			Element t = xmldoc.createElement("timestamp");
+			t.setTextContent(Long.toString(readyTime.getTime()));
+			r.appendChild(t);
+		}
+		return r;
+	}
+	
+	private static Node createLegalMoves(Document xmldoc, Collection<String> legalMoves) {
+		Element moves = xmldoc.createElement("legalmoves");
+		int n=0;
+		if (legalMoves != null) {
+			for(String legalMove: legalMoves) {
+				Element move=xmldoc.createElement("move");
+				Element e=xmldoc.createElement("move-number");
+				e.setTextContent(""+n);
+				move.appendChild(e);
+				Element e2=xmldoc.createElement("move-value");
+				e2.setTextContent(legalMove);
+				move.appendChild(e2);
+				moves.appendChild(move);
+				n++;
+			}
+		}
+		return moves;
+	}
+	
+	private static Node createChosenMove(Document xmldoc, String chosenMove, Boolean confirmed) {
+		Element move=xmldoc.createElement("chosenmove");
+		Element e=xmldoc.createElement("move-value");
+		e.setTextContent(""+chosenMove);
+		move.appendChild(e);
+		if (confirmed != null && confirmed) {
+			Element e2=xmldoc.createElement("confirmed");
+			move.appendChild(e2);
+		}
+		return move;
 	}
 	
 }

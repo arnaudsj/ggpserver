@@ -30,6 +30,8 @@ import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.StateInterface;
+import tud.gamecontroller.logging.GameControllerErrorMessage;
+import tud.gamecontroller.playerthreads.MoveMemory;
 import tud.gamecontroller.term.TermInterface;
 
 public abstract class LocalPlayer<TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
@@ -40,7 +42,7 @@ public abstract class LocalPlayer<TermType extends TermInterface, StateType exte
 	// for GDL-II
 	protected StatesTracker<TermType, StateType> statesTracker = null;
 	
-	private boolean firstTurn;
+	protected boolean firstTurn;
 	
 	public LocalPlayer(String name, GDLVersion gdlVersion) {
 		super(name, gdlVersion);
@@ -61,8 +63,22 @@ public abstract class LocalPlayer<TermType extends TermInterface, StateType exte
 		} else {
 			statesTracker = new StatesTracker<TermType, StateType>(match.getGame(), match.getGame().getInitialState(), role);
 		}
+		try {
+			waitForReady();
+		} catch (InterruptedException e) {
+			String message = "error: "+this.getName()+" has not answered \"ready\", maybe he or she is not in front of the computer... ("+e.getMessage()+")";
+			logErrorMessage(GameControllerErrorMessage.NOREADY, message);
+			if (this instanceof HumanPlayer) {
+				((HumanPlayer<?, ?>) this).setReady();
+			}
+		}
 		notifyStopRunning();
 	}
+	
+	/*
+	 * Override this methods if a given LocalPlayer really has to wait for something before he, she or it is ready (useful for HumanPlayer)
+	 */
+	protected void waitForReady() throws InterruptedException {}
 	
 	/*
 	 * @param seesFluents is either:
@@ -70,9 +86,9 @@ public abstract class LocalPlayer<TermType extends TermInterface, StateType exte
 	 * - or with GDL-II, a "Collection<? extends FluentInterface<TermType>>" object that really are SeesTerms
 	 */
 	@SuppressWarnings("unchecked")
-	public MoveInterface<TermType> gamePlay(Object seesTerms, ConnectionEstablishedNotifier notifier) {
+	public MoveInterface<TermType> gamePlay(Object seesTerms, MoveMemory<TermType> moveMemory) {
 		notifyStartRunning();
-		notifier.connectionEstablished();
+		moveMemory.connectionEstablished();
 		if(this.firstTurn) {
 			this.firstTurn = false;
 		} else {
@@ -90,7 +106,7 @@ public abstract class LocalPlayer<TermType extends TermInterface, StateType exte
 		return move;
 	}
 	
-	protected Collection<? extends MoveInterface<TermType>> getLegalMoves() {
+	public Collection<? extends MoveInterface<TermType>> getLegalMoves() {
 		Collection<? extends MoveInterface<TermType>> legalMoves = null;
 		if (getGdlVersion() == GDLVersion.v1) { // Regular GDL
 			legalMoves = currentState.getLegalMoves(role);

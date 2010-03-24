@@ -26,6 +26,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Date;
 
 import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.ReasonerFactoryInterface;
@@ -268,7 +269,6 @@ public class Game<
 		buffer.append("]");
 		return buffer.toString();
 	}
-	
 	
 	public State<TermType, ReasonerStateInfoType> getStateFromString(String stringState) {
 		// let's turn the stringState into a known State

@@ -19,18 +19,23 @@
 
 package tud.gamecontroller.players;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import tud.gamecontroller.ConnectionEstablishedNotifier;
 import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.StateInterface;
+import tud.gamecontroller.logging.ErrorMessageListener;
+import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.term.TermInterface;
 
 public abstract class AbstractPlayer<TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>> implements Player<TermType, StateType> {
 
 	protected MatchInterface<TermType, ?> match=null;
 	protected RoleInterface<TermType> role=null;
-	private String name;
+	protected String name;
 	private long runtime;
 	private long startRunningTime;
 	private long lastMessageRuntime;
@@ -53,6 +58,14 @@ public abstract class AbstractPlayer<TermType extends TermInterface, StateType e
 
 	public void gameStop(Object seesTerms, ConnectionEstablishedNotifier notifier) {
 		notifier.connectionEstablished();
+	}
+	
+	protected void logErrorMessage(String type, String message) {
+		GameControllerErrorMessage errorMessage = new GameControllerErrorMessage(type, message, this.getName());
+		if (match instanceof ErrorMessageListener) {
+			((ErrorMessageListener<?, ?>) match).notifyErrorMessage(errorMessage);
+		}
+		Logger.getLogger(AbstractPlayer.class.getName()).log(Level.SEVERE, message, errorMessage);
 	}
 
 	public long getTotalRuntime() {

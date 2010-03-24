@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Date;
 
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.JointMoveInterface;
@@ -172,6 +173,8 @@ public class GameController<
 		}
 		logger.info("Sending start messages ...");
 		runThreads(playerthreads, Level.WARNING);
+		match.setReadyTime(new Date(System.currentTimeMillis()));
+		logger.info("time after gameStart's runThreads: "+new Date(System.currentTimeMillis()));
 	}
 
 	private JointMoveInterface<TermType> gamePlay(int step, JointMoveInterface<TermType> priorJointMove, State<TermType, ReasonerStateInfoType> priorState) throws InterruptedException {

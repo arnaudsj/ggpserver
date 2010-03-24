@@ -22,6 +22,7 @@ package tud.gamecontroller.playerthreads;
 // import java.util.logging.Logger;
 
 import tud.gamecontroller.ConnectionEstablishedNotifier;
+import tud.gamecontroller.auxiliary.ChangeableBoolean;
 import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.StateInterface;
@@ -118,22 +119,6 @@ public abstract class AbstractPlayerThread<
 		synchronized (connectionEstablished) {
 			connectionEstablished.setTrue();
 			connectionEstablished.notifyAll();
-		}
-	}
-
-	private class ChangeableBoolean{
-		private boolean value;
-		public ChangeableBoolean(boolean value){
-			this.value=value;
-		}
-		public void setTrue(){
-			this.value=true;
-		}
-		public void setFalse(){
-			this.value=false;
-		}
-		public boolean isTrue(){
-			return value;
 		}
 	}
 	

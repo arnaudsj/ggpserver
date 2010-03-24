@@ -14,7 +14,7 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-	<xsl:import href="sitespecific.xsl"/> <!-- $stylesheetURL and makeStepLinkURL template -->
+	<xsl:import href="sitespecific.xsl"/> <!-- $stylesheetURL, makeStepLinkURL and makePlayLinkURL template -->
 	
 	<xsl:import href="title.xsl"/>
 	<xsl:import href="header.xsl"/>
@@ -23,9 +23,10 @@
 	<xsl:import href="playerInfo.xsl"/>
 	<xsl:import href="playClock.xsl"/>
 	<xsl:import href="state.xsl"/>
+	<xsl:import href="legalMoves.xsl"/>
 
 	<xsl:template name="main" match="/">
-
+		
 		<html>
 
 			<head>
@@ -36,8 +37,9 @@
 			</head>
 
 			<body>
-				<xsl:call-template name="header"/>
-
+				
+				<xsl:call-template name="header" />
+				
 				<table>
 					<tr>
 						<td style="padding: 10px; vertical-align: top;">
@@ -48,12 +50,17 @@
 							</xsl:for-each>
 						</td>
 						<td style="padding: 10px; vertical-align: top;">
-							<xsl:call-template name="playClock"/>
+							<xsl:call-template name="playClock" />
 							<!--<br/>-->
 							<xsl:call-template name="playerInfo"/>
 							<!--<br/>-->
 							<xsl:call-template name="history"/>
 						</td>
+						
+						<td style="padding: 10px; vertical-align: top;">
+							<xsl:call-template name="legalMoves"/>
+						</td>
+						
 					</tr>
 				</table>
 				

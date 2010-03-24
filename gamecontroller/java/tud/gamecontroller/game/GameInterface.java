@@ -21,6 +21,7 @@
 package tud.gamecontroller.game;
 
 import java.util.List;
+import java.util.Date;
 
 import tud.auxiliary.NamedObject;
 import tud.gamecontroller.GDLVersion;

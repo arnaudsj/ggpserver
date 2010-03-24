@@ -30,11 +30,12 @@ import tud.gamecontroller.term.TermInterface;
 public class PlayerThreadPlay<
 		TermType extends TermInterface,
 		StateType extends StateInterface<TermType, ? extends StateType>
-		> extends AbstractPlayerThread<TermType, StateType> {
+		> extends AbstractPlayerThread<TermType, StateType>
+		implements MoveMemory<TermType> {
 
-	private MoveInterface<TermType> move;
+	protected MoveInterface<TermType> move;
 	//private JointMoveInterface<TermType> priormoves; // we don't want any jointMove here anymore (in regular GDL games, it is contained in the seesTerms) 
-	private Object seesFluents; //MODIFIED
+	protected Object seesFluents; //MODIFIED
 	
 	public PlayerThreadPlay(RoleInterface<TermType> role, Player<TermType, StateType> player, MatchInterface<TermType, StateType> match, Object seesFluents, long deadline){
 		super("PlayMessageThread("+player.getName()+","+match.getMatchID()+")", role, player, match, deadline);
@@ -45,8 +46,17 @@ public class PlayerThreadPlay<
 	public MoveInterface<TermType> getMove() {
 		return move;
 	}
+	public void setMove (MoveInterface<TermType> move) {
+		this.move = move;
+	}
 	public void run(){
-		move=player.gamePlay(seesFluents, this);
+		MoveInterface<TermType> definitiveMove = player.gamePlay(this.seesFluents, this);
+		if (definitiveMove == null) {
+			// the player.gamePlay method has been interrupted, let our move be the move that was chosen last (= this.move)
+		} else {
+			// the player.gamePlay returned a move value (the player confirmed hies or her move), let's consider definitiveMove as the move we want to return
+			move = definitiveMove;
+		}
 	}
 	
 	@Override

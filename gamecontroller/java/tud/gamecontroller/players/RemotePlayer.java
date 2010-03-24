@@ -47,6 +47,7 @@ import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.game.impl.Game;
 import tud.gamecontroller.logging.ErrorMessageListener;
 import tud.gamecontroller.logging.GameControllerErrorMessage;
+import tud.gamecontroller.playerthreads.MoveMemory;
 import tud.gamecontroller.scrambling.GameScramblerInterface;
 import tud.gamecontroller.term.TermInterface;
 
@@ -114,12 +115,12 @@ public class RemotePlayer<TermType extends TermInterface,
 			
 	}
 
-	public MoveInterface<TermType> gamePlay(Object seesTerms, ConnectionEstablishedNotifier notifier) {
+	public MoveInterface<TermType> gamePlay(Object seesTerms, MoveMemory<TermType> moveMemory) {
 		MoveInterface<TermType> move=null;
 		String msg = constructPlayOrStopMessage("PLAY", seesTerms);
 		String reply, descrambledReply;
 		notifyStartRunning();
-		reply=sendMsg(msg, notifier);
+		reply=sendMsg(msg, moveMemory);
 		notifyStopRunning();
 		logger.info("reply from "+this.getName()+": "+reply+ " after "+getLastMessageRuntime()+"ms");
 		if(reply!=null){
@@ -253,15 +254,6 @@ public class RemotePlayer<TermType extends TermInterface,
 			notifier.connectionEstablished();
 		}
 		return reply;
-	}
-
-
-	private void logErrorMessage(String type, String message) {
-		GameControllerErrorMessage errorMessage = new GameControllerErrorMessage(type, message, this.getName());
-		if (match instanceof ErrorMessageListener) {
-			((ErrorMessageListener<?, ?>) match).notifyErrorMessage(errorMessage);
-		}
-		logger.log(Level.SEVERE, message, errorMessage);
 	}
 
 	@Override

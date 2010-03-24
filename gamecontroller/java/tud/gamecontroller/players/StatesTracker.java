@@ -42,6 +42,8 @@ import tud.gamecontroller.term.TermInterface;
  */
 public class StatesTracker<TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>> {
 	
+	protected static final Logger logger = Logger.getLogger(StatesTracker.class.getName());
+	
 	protected GameInterface<TermType, StateType> game;
 	protected Collection<StateType> currentPossibleStates;
 	protected RoleInterface<TermType> role;
@@ -50,6 +52,7 @@ public class StatesTracker<TermType extends TermInterface, StateType extends Sta
 		this.game = game;
 		this.currentPossibleStates = Collections.singleton(initialState);
 		this.role = role;
+		logger.info("StatesTracker()");
 	}
 	
 	public Collection<StateType> statesUpdate(Collection<TermType> seesTerms) {
@@ -62,7 +65,7 @@ public class StatesTracker<TermType extends TermInterface, StateType extends Sta
 				}
 			}
 		}
-		Logger.getLogger(StatesTracker.class.getName()).info(
+		logger.info(
 				"statesUpdate for \"" + role + "\" seeing " + seesTerms
 				+ " with " + currentPossibleStates.size() + " currentPossibleStates yields "
 				+ nextPossibleStates.size() + " nextPossibleStates");
@@ -124,6 +127,5 @@ public class StatesTracker<TermType extends TermInterface, StateType extends Sta
 		// System.out.println( "oneStatesTracker.legalMoves() for "+this.role+"("+legalMoves.size()+") = "+legalMoves );
 		return legalMoves;
 	}
-	
 	
 }

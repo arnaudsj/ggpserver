@@ -12,7 +12,13 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	<xsl:template name="playClock">
-
+		
+		<xsl:variable name="playing">
+			<xsl:choose>
+				<xsl:when test="count(/match/legalmoves) = 1">1</xsl:when>
+				<xsl:otherwise>0</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
 		<xsl:variable name="currentStep" select="count(/match/history/step)+1"/>
 		
 		<script language="JavaScript" type="text/javascript">
@@ -27,6 +33,10 @@
 					<xsl:with-param name="step" select="$currentStep+1"/>
 					<xsl:with-param name="role" select="/match/sight-of"/>
 				</xsl:call-template>
+			<xsl:text disable-output-escaping="yes">";</xsl:text>
+			
+			<xsl:text disable-output-escaping="yes">playing="</xsl:text>
+			<xsl:value-of select="$playing" />
 			<xsl:text disable-output-escaping="yes">";</xsl:text>
 			
 			<![CDATA[
@@ -76,20 +86,33 @@
 					}
 					function shownextstep()
 					{
-						document.location.replace(nextState);
+						if (playing == 0) {
+							document.location.replace(nextState);
+						} else {
+							document.location.reload();
+						}
 					}
 				// -->
 			]]>
-
+			
 			<xsl:choose>
-				<!-- Case: no history found ie. the game hasn't started) -->
+				<!-- Case: no history found ie. the game hasn't started -->
 				<xsl:when test="$currentStep=1">
 					<xsl:text disable-output-escaping="yes">document.body.setAttribute('onLoad', 'clock( </xsl:text>
-					<xsl:value-of select="/match/startclock"/>
-					<xsl:text disable-output-escaping="yes">+</xsl:text>
-					<xsl:value-of select="/match/playclock"/>
-					<xsl:text disable-output-escaping="yes">, </xsl:text>
-					<xsl:value-of select="/match/timestamp"/>
+						<xsl:choose>
+							<xsl:when test="not(/match/ready/timestamp)">
+								<xsl:value-of select="/match/startclock"/>
+								<!--  <xsl:text disable-output-escaping="yes">+</xsl:text>
+								<xsl:value-of select="/match/playclock"/>  -->
+								<xsl:text disable-output-escaping="yes">, </xsl:text>
+								<xsl:value-of select="/match/timestamp"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="/match/playclock"/>
+								<xsl:text disable-output-escaping="yes">, </xsl:text>
+								<xsl:value-of select="/match/ready/timestamp"/>
+							</xsl:otherwise>
+						</xsl:choose>
 					<xsl:text disable-output-escaping="yes">)');</xsl:text>
 				</xsl:when>
 
@@ -115,7 +138,7 @@
 
 			<span class="heading">
 				<xsl:choose>
-					<xsl:when test="$currentStep=1">Start Clock:</xsl:when>
+					<xsl:when test="$currentStep=1 and not(/match/ready/timestamp)">Start Clock:</xsl:when>
 					<xsl:otherwise>Play Clock:</xsl:otherwise>
 				</xsl:choose>
 			</span>

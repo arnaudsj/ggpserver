@@ -10,6 +10,13 @@
 
 	<xsl:template name="header">
 		
+		<xsl:variable name="playing">
+			<xsl:choose>
+				<xsl:when test="count(/match/legalmoves) = 1">1</xsl:when>
+				<xsl:otherwise>0</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
 		<div class="header" id="header">
 			<xsl:variable name="currentStep" select="count(/match/history/step)+1"/>
 			<xsl:variable name="role" select="/match/sight-of"/>
@@ -28,42 +35,54 @@
 				</xsl:otherwise>
 			</xsl:choose>
 			
+			<xsl:choose>
+				<xsl:when test="$playing = 0">
+					
+					<xsl:call-template name="make_tab">
+						<xsl:with-param name="which">initial</xsl:with-param>
+						<xsl:with-param name="currentStep" select="$currentStep"/>
+						<xsl:with-param name="role" select="$role"/>
+					</xsl:call-template>
+					<xsl:call-template name="make_tab">
+						<xsl:with-param name="which">previous</xsl:with-param>
+						<xsl:with-param name="currentStep" select="$currentStep"/>
+						<xsl:with-param name="role" select="$role"/>
+					</xsl:call-template>
+					<xsl:call-template name="make_tab">
+						<xsl:with-param name="which">next</xsl:with-param>
+						<xsl:with-param name="currentStep" select="$currentStep"/>
+						<xsl:with-param name="role" select="$role"/>
+					</xsl:call-template>
+					<xsl:call-template name="make_tab">
+						<xsl:with-param name="which">final</xsl:with-param>
+						<xsl:with-param name="currentStep" select="$currentStep"/>
+						<xsl:with-param name="role" select="$role"/>
+					</xsl:call-template>
+					
+				</xsl:when>
+			</xsl:choose>
 			
-			<xsl:call-template name="make_tab">
-				<xsl:with-param name="which">initial</xsl:with-param>
-				<xsl:with-param name="currentStep" select="$currentStep"/>
-				<xsl:with-param name="role" select="$role"/>
-			</xsl:call-template>
-			<xsl:call-template name="make_tab">
-				<xsl:with-param name="which">previous</xsl:with-param>
-				<xsl:with-param name="currentStep" select="$currentStep"/>
-				<xsl:with-param name="role" select="$role"/>
-			</xsl:call-template>
-			<xsl:call-template name="make_tab">
-				<xsl:with-param name="which">next</xsl:with-param>
-				<xsl:with-param name="currentStep" select="$currentStep"/>
-				<xsl:with-param name="role" select="$role"/>
-			</xsl:call-template>
-			<xsl:call-template name="make_tab">
-				<xsl:with-param name="which">final</xsl:with-param>
-				<xsl:with-param name="currentStep" select="$currentStep"/>
-				<xsl:with-param name="role" select="$role"/>
-			</xsl:call-template>
 			<div class="underline" style="clear:left;"/>
+			
 		</div>
-		<script language="JavaScript" type="text/javascript">
-			// &lt;!--
-			<![CDATA[
-					// replace links by javascript
-					var link_ids = new Array("navigation_initial", "navigation_previous", "navigation_next", "navigation_final");
-					for(i=0; i<link_ids.length; i++) {
-						if(document.links[link_ids[i]] != null) {
-							document.links[link_ids[i]].href = 'javascript:location.replace("' + document.links[link_ids[i]].href + '")';
-						}
-					}
-			]]>
-			// --&gt;
-		</script>
+		
+		<xsl:choose>
+			<xsl:when test="$playing = 0">
+				<script language="JavaScript" type="text/javascript">
+					// &lt;!--
+					<![CDATA[
+							// replace links by javascript
+							var link_ids = new Array("navigation_initial", "navigation_previous", "navigation_next", "navigation_final");
+							for(i=0; i<link_ids.length; i++) {
+								if(document.links[link_ids[i]] != null) {
+									document.links[link_ids[i]].href = 'javascript:location.replace("' + document.links[link_ids[i]].href + '")';
+								}
+							}
+					]]>
+					// --&gt;
+				</script>
+			</xsl:when>
+		</xsl:choose>
 		
 	</xsl:template>
 
