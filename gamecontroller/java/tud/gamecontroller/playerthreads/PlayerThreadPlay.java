@@ -20,7 +20,7 @@
 
 package tud.gamecontroller.playerthreads;
 
-import tud.gamecontroller.game.MatchInterface;
+import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.StateInterface;
@@ -34,14 +34,12 @@ public class PlayerThreadPlay<
 		implements MoveMemory<TermType> {
 
 	protected MoveInterface<TermType> move;
-	//private JointMoveInterface<TermType> priormoves; // we don't want any jointMove here anymore (in regular GDL games, it is contained in the seesTerms) 
-	protected Object seesFluents; //MODIFIED
+	protected Object seesTerms;
 	
-	public PlayerThreadPlay(RoleInterface<TermType> role, Player<TermType, StateType> player, MatchInterface<TermType, StateType> match, Object seesFluents, long deadline){
+	public PlayerThreadPlay(RoleInterface<TermType> role, Player<TermType, StateType> player, RunnableMatchInterface<TermType, StateType> match, Object seesTerms, long deadline){
 		super("PlayMessageThread("+player.getName()+","+match.getMatchID()+")", role, player, match, deadline);
-		//this.priormoves=priormoves;
 		this.move=null;
-		this.seesFluents = seesFluents; // MODIFIED (ADDED)
+		this.seesTerms = seesTerms;
 	}
 	public MoveInterface<TermType> getMove() {
 		return move;
@@ -49,12 +47,12 @@ public class PlayerThreadPlay<
 	public void setMove (MoveInterface<TermType> move) {
 		this.move = move;
 	}
-	public void run(){
-		MoveInterface<TermType> definitiveMove = player.gamePlay(this.seesFluents, this);
+	public void doRun(){
+		MoveInterface<TermType> definitiveMove = player.gamePlay(seesTerms, this);
 		if (definitiveMove == null) {
 			// the player.gamePlay method has been interrupted, let our move be the move that was chosen last (= this.move)
 		} else {
-			// the player.gamePlay returned a move value (the player confirmed hies or her move), let's consider definitiveMove as the move we want to return
+			// the player.gamePlay returned a move value (the player confirmed his or her move), let's consider definitiveMove as the move we want to return
 			move = definitiveMove;
 		}
 	}
@@ -74,7 +72,7 @@ public class PlayerThreadPlay<
 		//buffer.append(" priormoves: ");
 		//buffer.append(priormoves);
 		buffer.append(" seesFluents: ");
-		buffer.append(seesFluents);
+		buffer.append(seesTerms);
 		buffer.append(" move: ");
 		buffer.append(move);
 		buffer.append("]");

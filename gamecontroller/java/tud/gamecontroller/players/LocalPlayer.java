@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 import tud.gamecontroller.ConnectionEstablishedNotifier;
 import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.game.JointMoveInterface;
-import tud.gamecontroller.game.MatchInterface;
+import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.StateInterface;
@@ -49,7 +49,7 @@ public abstract class LocalPlayer<TermType extends TermInterface, StateType exte
 	}
 	
 	@Override
-	public void gameStart(MatchInterface<TermType, StateType> match, RoleInterface<TermType> role, ConnectionEstablishedNotifier notifier) {
+	public void gameStart(RunnableMatchInterface<TermType, StateType> match, RoleInterface<TermType> role, ConnectionEstablishedNotifier notifier) {
 		super.gameStart(match, role, notifier);
 		notifyStartRunning();
 		notifier.connectionEstablished();

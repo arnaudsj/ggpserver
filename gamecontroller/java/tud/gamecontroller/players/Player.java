@@ -23,15 +23,15 @@ package tud.gamecontroller.players;
 import tud.auxiliary.NamedObject;
 import tud.gamecontroller.ConnectionEstablishedNotifier;
 import tud.gamecontroller.GDLVersion;
-import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
+import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.playerthreads.MoveMemory;
 
 public interface Player<TermType, StateType extends StateInterface<TermType, ? extends StateType>> extends NamedObject{
 	
-	public void gameStart(MatchInterface<TermType, StateType> match, RoleInterface<TermType> role, ConnectionEstablishedNotifier notifier);
+	public void gameStart(RunnableMatchInterface<TermType, StateType> match, RoleInterface<TermType> role, ConnectionEstablishedNotifier notifier);
 	
 	/* MODIFIED: we don't use a jointMove any more, rather the seesTerms
 	 * - in GDL-II, they are just sent in place of the moves;

@@ -27,12 +27,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import tud.gamecontroller.game.MoveFactoryInterface;
-import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.impl.Game;
-import tud.gamecontroller.game.impl.MoveFactory;
 import tud.gamecontroller.game.impl.RunnableMatch;
 import tud.gamecontroller.game.impl.State;
 import tud.gamecontroller.players.Player;
@@ -103,10 +100,9 @@ public abstract class AbstractGameControllerRunner<
 
 	private Map<RoleInterface<TermType>,Player<TermType, State<TermType, ReasonerStateInfoType>>> createPlayers(Game<TermType, ReasonerStateInfoType> game, GameScramblerInterface gameScrambler) {
 		Map<RoleInterface<TermType>,Player<TermType, State<TermType, ReasonerStateInfoType>>> players=new HashMap<RoleInterface<TermType>,Player<TermType, State<TermType, ReasonerStateInfoType>>>();
-		MoveFactoryInterface<? extends MoveInterface<TermType>> moveFactory = new MoveFactory<TermType>(reasonerFactoryInterface.getTermFactory());
 		for(PlayerInfo playerInfo:getPlayerInfos()){
 			RoleInterface<TermType> role=game.getRole(playerInfo.getRoleindex());
-			players.put(role, PlayerFactory. <TermType, State<TermType, ReasonerStateInfoType>> createPlayer(playerInfo, moveFactory, gameScrambler));
+			players.put(role, PlayerFactory. <TermType, State<TermType, ReasonerStateInfoType>> createPlayer(playerInfo, gameScrambler));
 		}
 		// make sure that we have a player for each role (fill up with random players)
 		for(int i=0; i<game.getNumberOfRoles(); i++){

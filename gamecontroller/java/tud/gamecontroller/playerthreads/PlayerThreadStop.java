@@ -19,7 +19,7 @@
 
 package tud.gamecontroller.playerthreads;
 
-import tud.gamecontroller.game.MatchInterface;
+import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.players.Player;
@@ -32,11 +32,11 @@ public class PlayerThreadStop<
 
 	private Object seesTerms;
 	
-	public PlayerThreadStop(RoleInterface<TermType> role, Player<TermType, StateType> player, MatchInterface<TermType, StateType> match, Object seesTerms, long deadline){
+	public PlayerThreadStop(RoleInterface<TermType> role, Player<TermType, StateType> player, RunnableMatchInterface<TermType, StateType> match, Object seesTerms, long deadline){
 		super("StopMessageThread("+player.getName()+","+match.getMatchID()+")",role, player, match, deadline);
 		this.seesTerms=seesTerms;
 	}
-	public void run(){
+	public void doRun(){
 		player.gameStop(seesTerms, this);
 	}
 	

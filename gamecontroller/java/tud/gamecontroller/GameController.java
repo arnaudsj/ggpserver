@@ -21,12 +21,12 @@
 package tud.gamecontroller;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Date;
 
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.JointMoveInterface;
@@ -35,7 +35,6 @@ import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.impl.JointMove;
 import tud.gamecontroller.game.impl.State;
-import tud.gamecontroller.logging.ErrorMessageListener;
 import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.Player;
 import tud.gamecontroller.playerthreads.AbstractPlayerThread;
@@ -157,9 +156,7 @@ public class GameController<
 			if(!t.waitUntilDeadline()){
 				String message = "player "+t.getPlayer()+" timed out!";
 				GameControllerErrorMessage errorMessage = new GameControllerErrorMessage(GameControllerErrorMessage.TIMEOUT, message, t.getPlayer().getName());
-				if (match instanceof ErrorMessageListener) {
-					((ErrorMessageListener<?, ?>) match).notifyErrorMessage(errorMessage);
-				}
+				match.notifyErrorMessage(errorMessage);
 				logger.log(loglevel, message, errorMessage);
 			}
 		}
@@ -197,11 +194,17 @@ public class GameController<
 				Player<TermType, State<TermType, ReasonerStateInfoType>> player = match.getPlayer(role);
 				String message = "Illegal move \""+move+"\" from "+player+ " in step "+step;
 				GameControllerErrorMessage errorMessage = new GameControllerErrorMessage(GameControllerErrorMessage.ILLEGAL_MOVE, message, player.getName());
-				if (match instanceof ErrorMessageListener) {
-					((ErrorMessageListener<?, ?>) match).notifyErrorMessage(errorMessage);
+				match.notifyErrorMessage(errorMessage);
+				logger.log(Level.SEVERE, message, errorMessage);
+				move = currentState.getLegalMove(role);
+				if (move == null) {
+					message = "no legal move for "+role+" in step "+step+", state: "+currentState.toString();
+					errorMessage = new GameControllerErrorMessage(GameControllerErrorMessage.GAME_ERROR, message);
+					match.notifyErrorMessage(errorMessage);
+					throw new RuntimeException("GameController stopped because: "+message);
 				}
 				logger.log(Level.SEVERE, message, errorMessage);
-				jointMove.put(role,currentState.getLegalMove(role));
+				jointMove.put(role,move);
 			}else{
 				jointMove.put(role,move);
 			}

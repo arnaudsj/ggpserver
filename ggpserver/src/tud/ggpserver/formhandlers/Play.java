@@ -102,15 +102,10 @@ public class Play {
 		} else if (i == -1) {
 			this.player.confirm(forStepNumber);
 		} else {
-			Iterator<? extends MoveInterface<?>> it = this.player.getLegalMoves().iterator();
-			int c=0;
-			while (it.hasNext()) {
-				MoveInterface<?> m = it.next();
-				if (i == c) {
-					move = m;
-					break;
-				}
-				++c;
+			try {
+				move = player.getLegalMoves().get(i);
+			} catch (IndexOutOfBoundsException ex) {
+				move = null;
 			}
 			//logger.info("Play, setChosenMove("+move+")");
 			if (move != null)

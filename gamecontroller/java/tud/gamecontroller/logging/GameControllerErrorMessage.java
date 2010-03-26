@@ -26,10 +26,11 @@ public class GameControllerErrorMessage {
 	public static final String PARSING_ERROR = "parsing_error";
 	public static final String UNKNOWN_HOST = "unknown_host";
 	public static final String IO_ERROR = "io_error";
+	public static final String GAME_ERROR = "game_error";
 	public static final String NOREADY = "no \"ready\" ack from HumanPlayer";
-	
 	public static final String ABORTED = "aborted";
 	public static final String PLAYER_DISABLED = "player_disabled";
+	public static final String INTERNAL_ERROR = "internal";
 	
 	private static final int MAX_TYPE_LENGTH = 40;
 	private static final int MAX_MESSAGE_LENGTH = 255;

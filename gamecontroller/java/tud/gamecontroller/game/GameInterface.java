@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2008,2010 Stephan Schiffel <stephan.schiffel@gmx.de>
                   2010 Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
@@ -21,10 +21,10 @@
 package tud.gamecontroller.game;
 
 import java.util.List;
-import java.util.Date;
 
 import tud.auxiliary.NamedObject;
 import tud.gamecontroller.GDLVersion;
+import tud.gamecontroller.auxiliary.InvalidKIFException;
 
 public interface GameInterface<
 	TermType,
@@ -58,7 +58,7 @@ public interface GameInterface<
 	 * @param stringState a string containing a list of fluents in infix KIF notation e.g., "((step 1) (cell 1 1 b) ... (control xplayer))"
 	 * @return the state object
 	 */
-	public StateType getStateFromString(String stringState);
+	public StateType getStateFromString(String stringState) throws InvalidKIFException;
 
 	/**
 	 * returns the role that plays the nature (i.e., the role named "random")
@@ -68,4 +68,6 @@ public interface GameInterface<
 	public RoleInterface<TermType> getNatureRole();
 
 	public RoleInterface<TermType> getRoleByName(String roleName);
+
+	public TermType getTermFromString(String kifTermString) throws InvalidKIFException;
 }

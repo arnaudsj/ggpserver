@@ -20,8 +20,6 @@
 
 package tud.gamecontroller.players;
 
-import tud.gamecontroller.game.MoveFactoryInterface;
-import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.scrambling.GameScramblerInterface;
 import tud.gamecontroller.term.TermInterface;
@@ -29,8 +27,8 @@ import tud.gamecontroller.term.TermInterface;
 public class PlayerFactory {
 
 	public static <TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
-		Player<TermType, StateType> createRemotePlayer(RemotePlayerInfo info, MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory, GameScramblerInterface gameScrambler) {
-		return new RemotePlayer<TermType, StateType>(info.getName(), info.getHost(), info.getPort(), info.getGdlVersion(), movefactory, gameScrambler);
+		Player<TermType, StateType> createRemotePlayer(RemotePlayerInfo info, GameScramblerInterface gameScrambler) {
+		return new RemotePlayer<TermType, StateType>(info.getName(), info.getHost(), info.getPort(), info.getGdlVersion(), gameScrambler);
 	}
 	
 	public static <TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
@@ -49,9 +47,9 @@ public class PlayerFactory {
 	}
 	
 	public static <TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
-		Player<TermType, StateType> createPlayer(PlayerInfo info, MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory, GameScramblerInterface gameScrambler) {
+		Player<TermType, StateType> createPlayer(PlayerInfo info, GameScramblerInterface gameScrambler) {
 		if(info instanceof RemotePlayerInfo){
-			return PlayerFactory. <TermType, StateType> createRemotePlayer((RemotePlayerInfo)info, movefactory, gameScrambler);
+			return PlayerFactory. <TermType, StateType> createRemotePlayer((RemotePlayerInfo)info, gameScrambler);
 		}else if(info instanceof RandomPlayerInfo){
 			return PlayerFactory. <TermType, StateType> createRandomPlayer((RandomPlayerInfo)info);
 		}else if(info instanceof LegalPlayerInfo){

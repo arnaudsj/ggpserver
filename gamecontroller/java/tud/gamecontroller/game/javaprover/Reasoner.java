@@ -30,6 +30,7 @@ import java.util.Vector;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
+import tud.gamecontroller.auxiliary.InvalidKIFException;
 import tud.gamecontroller.game.FluentInterface;
 import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MoveInterface;
@@ -39,7 +40,6 @@ import tud.gamecontroller.game.impl.Fluent;
 import tud.gamecontroller.game.impl.Move;
 import tud.gamecontroller.game.impl.Role;
 import cs227b.teamIago.gameProver.JavaProversGameSimulatorEnhancer;
-import cs227b.teamIago.parser.Parser;
 import cs227b.teamIago.parser.PublicAxiomsWrapper;
 import cs227b.teamIago.parser.Statement;
 import cs227b.teamIago.resolver.Atom;
@@ -216,9 +216,10 @@ public class Reasoner implements ReasonerInterface<Term, GameState> {
 		return terms;
 	}
 	
-	public GameState getStateFromString(String state) {
+	public GameState getStateFromString(String state) throws InvalidKIFException {
 		// get list of fluents
-		ExpList el = Parser.parseExpList(state);
+		ExpList el = ParserAdapter.parseExpressionList(state);
+		
 		// surround with (true ...)
 		Expression[] exps = new Expression[el.size()];
 		for (int i = 0; i < el.size(); i++) {

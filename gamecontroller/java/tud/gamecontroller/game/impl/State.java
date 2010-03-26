@@ -21,6 +21,7 @@
 package tud.gamecontroller.game.impl;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 import tud.gamecontroller.game.FluentInterface;
 import tud.gamecontroller.game.JointMoveInterface;
@@ -59,7 +60,13 @@ public class State<TermType extends TermInterface, ReasonerStateInfoType>
 	}
 
 	public MoveInterface<TermType> getLegalMove(RoleInterface<TermType> role) {
-		return getLegalMoves(role).iterator().next();
+		Collection<? extends MoveInterface<TermType>> legalMoves = getLegalMoves(role);
+		if(legalMoves != null) {
+			Iterator<? extends MoveInterface<TermType>> it = legalMoves.iterator();
+			if(it.hasNext())
+				return it.next();
+		}
+		return null;
 	}
 
 	public Collection<? extends MoveInterface<TermType>> getLegalMoves(RoleInterface<TermType> role) {

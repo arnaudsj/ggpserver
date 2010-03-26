@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009 Martin Günther <mintar@gmx.de>
+                  2010 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GameController.
 
@@ -19,9 +20,7 @@
 
 package tud.gamecontroller.logging;
 
-import tud.gamecontroller.term.TermInterface;
-
-public interface ErrorMessageListener<TermType extends TermInterface, ReasonerStateInfoType> {
+public interface ErrorMessageListener {
 
 	public abstract void notifyErrorMessage(GameControllerErrorMessage errorMessage);
 

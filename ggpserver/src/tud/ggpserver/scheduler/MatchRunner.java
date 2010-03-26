@@ -269,6 +269,11 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 				runningMatch.notifyErrorMessage(new GameControllerErrorMessage(GameControllerErrorMessage.ABORTED, "The match was aborted."));
 				logger.info("Thread for match " + matchID + " - set match to aborted");
 				runningMatch.toAborted();
+			} catch (Exception e) {
+				logger.info("Thread for match " + matchID + " - INTERRUPT");
+				runningMatch.notifyErrorMessage(new GameControllerErrorMessage(GameControllerErrorMessage.ABORTED, "The match was aborted because an exception was thrown: " + e.getMessage()));
+				logger.info("Thread for match " + matchID + " - set match to aborted");
+				runningMatch.toAborted();
 			}
 		} catch (SQLException e2) {
 			logger.severe("exception: " + e2);

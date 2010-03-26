@@ -27,10 +27,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Collection;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import tud.gamecontroller.XMLGameStateWriter;
+import tud.gamecontroller.auxiliary.InvalidKIFException;
 import tud.gamecontroller.auxiliary.Pair;
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.RoleInterface;
@@ -69,7 +71,7 @@ public class StateXMLExporter {
 		String xmlState=null;
 		List<Pair<Date,String>> stringStates = match.getStringStates();
 		for(int step=0; step<stringStates.size(); step++) {
-			xmlState = getStepXML(match, stringStates, step+1, RoleInterface.NATURE_ROLE_NAME, false, false, null, null, null);
+			xmlState = getStepXML(match, stringStates, step+1, RoleInterface.NATURE_ROLE_NAME);
 			if(xmlState != null)
 				exportStepXML(xmlState, "step_"+(step+1), zip, matchDir);
 		}
@@ -102,6 +104,11 @@ public class StateXMLExporter {
 	 * @return the xml for the specified state of the match
 	 */
 	public static <TermType extends TermInterface, ReasonerStateInfoType> 
+	String getStepXML(ServerMatch<TermType, ReasonerStateInfoType> match, List<Pair<Date, String>> stringStates, int stepNumber, String roleName) { 
+		return getStepXML(match, stringStates, stepNumber, roleName, false, false, null, null, null);
+	}
+	
+	public static <TermType extends TermInterface, ReasonerStateInfoType> 
 	String getStepXML(ServerMatch<TermType, ReasonerStateInfoType> match, List<Pair<Date, String>> stringStates, int stepNumber, String roleName, boolean playing, boolean ready, Collection<String> legalMoves, String chosenMove, Boolean confirmed) { 
 		int numberOfStates = stringStates.size();
 		if(numberOfStates > 0) {
@@ -128,7 +135,15 @@ public class StateXMLExporter {
 			}
 			
 			// get state object from string representation
-			StateInterface<TermType, ?> state = match.getGame().getStateFromString(stringState.getRight());
+			StateInterface<TermType, ?> state;
+			try {
+				state = match.getGame().getStateFromString(stringState.getRight());
+			} catch (InvalidKIFException e) {
+				Logger.getLogger(StateXMLExporter.class.getName()).severe(
+						"State in database is invalid kif! match: " + match.getMatchID()
+						+ ", step:" +  stepNumber + ", state:" + stringState.getRight());
+				return null;
+			}
 			
 			// get goal values
 			Map<? extends RoleInterface<TermType>, Integer> goalValues = null;

@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import tud.gamecontroller.logging.ErrorMessageListener;
 import tud.gamecontroller.players.Player;
 
 /**
@@ -32,7 +33,7 @@ import tud.gamecontroller.players.Player;
  * PlayerInfos. This is only needed if the match is actually to be run.
  */
 public interface RunnableMatchInterface<TermType, StateType extends StateInterface<TermType, ? extends StateType>>
-		extends MatchInterface<TermType, StateType> {
+		extends MatchInterface<TermType, StateType>, ErrorMessageListener {
 
 	Collection<? extends Player<TermType, StateType>> getPlayers();
 

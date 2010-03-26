@@ -32,20 +32,18 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Collection;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import tud.gamecontroller.ConnectionEstablishedNotifier;
 import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.auxiliary.InvalidKIFException;
 import tud.gamecontroller.game.JointMoveInterface;
-import tud.gamecontroller.game.MatchInterface;
-import tud.gamecontroller.game.MoveFactoryInterface;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
+import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.game.impl.Game;
-import tud.gamecontroller.logging.ErrorMessageListener;
+import tud.gamecontroller.game.impl.Move;
 import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.playerthreads.MoveMemory;
 import tud.gamecontroller.scrambling.GameScramblerInterface;
@@ -57,7 +55,7 @@ public class RemotePlayer<TermType extends TermInterface,
 	private String host;
 	private InetAddress hostAddress;
 	private int port;
-	private MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory;
+	// private MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory;
 	private GameScramblerInterface gameScrambler;
 	private Logger logger;
 	protected boolean firstTurn;
@@ -80,17 +78,16 @@ public class RemotePlayer<TermType extends TermInterface,
 	private static final int CONNECTION_TIMEOUT = 2000;
 	private static final int CONNECTION_TIMEOUT_BONUS = 30000;
 	
-	public RemotePlayer(String name, String host, int port, GDLVersion gdlVersion, MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory, GameScramblerInterface gamescrambler) {
+	public RemotePlayer(String name, String host, int port, GDLVersion gdlVersion, GameScramblerInterface gamescrambler) {
 		super(name, gdlVersion);
 		this.host=host;
 		this.port=port;
-		this.movefactory=movefactory;
 		this.gameScrambler=gamescrambler;
 		this.logger=Logger.getLogger("tud.gamecontroller");
 	}
 	
 	@Override
-	public void gameStart(MatchInterface<TermType, StateType> match, RoleInterface<TermType> role, ConnectionEstablishedNotifier notifier) {
+	public void gameStart(RunnableMatchInterface<TermType, StateType> match, RoleInterface<TermType> role, ConnectionEstablishedNotifier notifier) {
 		
 		super.gameStart(match, role, notifier);
 		this.firstTurn = true;
@@ -126,7 +123,10 @@ public class RemotePlayer<TermType extends TermInterface,
 		if(reply!=null){
 			descrambledReply=gameScrambler.descramble(reply);
 			try {
-				move=movefactory.getMoveFromKIF(descrambledReply);
+				TermType moveTerm = match.getGame().getTermFromString(descrambledReply);
+				if(moveTerm!=null && !moveTerm.isGround())
+					throw new InvalidKIFException("\""+descrambledReply+"\" is not a ground term.");
+				move = new Move<TermType>(moveTerm);
 			} catch (InvalidKIFException ex) {
 				String message = "Error parsing reply \""+reply+"\" from "+this+": "+ex.getMessage();
 				logErrorMessage(GameControllerErrorMessage.PARSING_ERROR, message);

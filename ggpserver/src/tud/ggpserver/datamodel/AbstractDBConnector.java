@@ -48,7 +48,6 @@ import tud.gamecontroller.ReasonerFactoryInterface;
 import tud.gamecontroller.auxiliary.Pair;
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.JointMoveInterface;
-import tud.gamecontroller.game.MoveFactoryInterface;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.impl.State;
@@ -114,9 +113,6 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 	public AbstractDBConnector(final ReasonerFactoryInterface<TermType, ReasonerStateInfoType> reasonerFactory) {
 		this.reasonerFactoryInterface = reasonerFactory;
 	}
-
-	protected abstract MoveFactoryInterface<? extends MoveInterface<TermType>> getMoveFactory();
-
 
 	public void clearCache() {
 		// this class doesn't cache anything, so there is nothing to do here.
@@ -592,8 +588,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 					}
 					result = new RunningMatch<TermType, ReasonerStateInfoType>(
 							matchID, game, startclock, playclock,
-							rolesToPlayerInfos, startTime, scrambled, tournamentID, weight, owner, this,
-							getMoveFactory(), gameScrambler);
+							rolesToPlayerInfos, startTime, scrambled, tournamentID, weight, owner, this, gameScrambler);
 				} else if (status.equals(ServerMatch.STATUS_ABORTED)) {
 					result = new AbortedMatch<TermType, ReasonerStateInfoType>(
 							matchID, game, startclock, playclock,

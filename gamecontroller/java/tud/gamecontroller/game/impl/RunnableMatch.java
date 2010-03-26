@@ -29,6 +29,7 @@ import java.util.Map;
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.RunnableMatchInterface;
+import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.Player;
 import tud.gamecontroller.term.TermInterface;
 
@@ -78,6 +79,10 @@ public class RunnableMatch<TermType extends TermInterface, ReasonerStateInfoType
 	 */
 	public Player<TermType, State<TermType, ReasonerStateInfoType>> getPlayer(RoleInterface<TermType> role) {
 		return players.get(role);
+	}
+
+	public void notifyErrorMessage(GameControllerErrorMessage errorMessage) {
+		// ignore error messages
 	}
 	
 	public void setReadyTime(Date readyTime) {

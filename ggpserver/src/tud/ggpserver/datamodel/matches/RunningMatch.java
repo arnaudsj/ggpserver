@@ -1,5 +1,7 @@
 /*
-    Copyright (C) 2009-2010 Martin Günther <mintar@gmx.de>, Nicolas JEAN <njean42@gmail.com> 
+    Copyright (C) 2009-2010 Martin Günther <mintar@gmx.de>
+                  2010 Nicolas JEAN <njean42@gmail.com> 
+                  2010 Stephan Schiffel <stephan.schiffel@gmx.de> 
 
     This file is part of GGP Server.
 
@@ -32,13 +34,10 @@ import tud.gamecontroller.GameControllerListener;
 import tud.gamecontroller.auxiliary.Pair;
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.JointMoveInterface;
-import tud.gamecontroller.game.MoveFactoryInterface;
-import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.game.impl.State;
-import tud.gamecontroller.logging.ErrorMessageListener;
 import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.Player;
 import tud.gamecontroller.players.PlayerFactory;
@@ -58,11 +57,10 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 		extends ServerMatch<TermType, ReasonerStateInfoType>
 		implements
 		RunnableMatchInterface<TermType, State<TermType, ReasonerStateInfoType>>,
-		GameControllerListener, ErrorMessageListener<TermType, ReasonerStateInfoType> {
+		GameControllerListener {
 
 	private static final Logger logger = Logger.getLogger(RunningMatch.class.getName());
 
-	private final MoveFactoryInterface<? extends MoveInterface<TermType>> moveFactory;
 	private GameScramblerInterface gameScrambler;
 	private Date readyTime;
 
@@ -108,10 +106,8 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 			String tournamentID,
 			double weight,
 			User owner, AbstractDBConnector<TermType, ReasonerStateInfoType> db,
-			MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory,
 			GameScramblerInterface gameScrambler) {
 		super(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, scrambled, tournamentID, weight, owner, db);
-		this.moveFactory = movefactory;
 		this.gameScrambler = gameScrambler;
 	}
 	
@@ -199,7 +195,7 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 			for (RoleInterface<TermType> role : getGame().getOrderedRoles()) {
 				PlayerInfo playerInfo = getRolesToPlayerInfos().get(role);
 				
-				Player<TermType, State<TermType, ReasonerStateInfoType>> player = PlayerFactory.<TermType, State<TermType, ReasonerStateInfoType>> createPlayer(playerInfo, moveFactory, gameScrambler);
+				Player<TermType, State<TermType, ReasonerStateInfoType>> player = PlayerFactory.<TermType, State<TermType, ReasonerStateInfoType>> createPlayer(playerInfo, gameScrambler);
 				players.put(role, player);
 			}
 		}

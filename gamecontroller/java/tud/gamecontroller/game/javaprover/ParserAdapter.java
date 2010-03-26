@@ -1,0 +1,67 @@
+/*
+    Copyright (C) 2010 Stephan Schiffel <stephan.schiffel@gmx.de>
+
+    This file is part of GameController.
+
+    GameController is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    GameController is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GameController.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+package tud.gamecontroller.game.javaprover;
+
+import java.util.List;
+
+import tud.gamecontroller.auxiliary.InvalidKIFException;
+import cs227b.teamIago.parser.Parser;
+import cs227b.teamIago.parser.PublicAxiomsWrapper;
+import cs227b.teamIago.parser.Statement;
+import cs227b.teamIago.resolver.Connective;
+import cs227b.teamIago.resolver.ExpList;
+import cs227b.teamIago.resolver.Expression;
+
+public class ParserAdapter {
+
+	public static Expression parseExpression(String kif) throws InvalidKIFException {
+		try{
+			ExpList list=Parser.parseDesc("(bla "+kif+")");
+			if(list.size() == 1){
+				ExpList list2=((Connective)list.get(0)).getOperands();
+				if(list2.size() == 1) {
+					return list2.get(0);
+				}
+			}
+		}catch(Exception ex){
+			throw new InvalidKIFException("Exception while parsing \""+kif+"\":"+ex.getMessage());
+		}
+		throw new InvalidKIFException("not a valid kif term:"+kif);
+	}
+
+	public static ExpList parseExpressionList(String kif) throws InvalidKIFException {
+		try{
+			kif = kif.trim();
+			if(kif.charAt(0) != '(' || kif.charAt(kif.length()-1) != ')')
+				throw new InvalidKIFException("not a valid kif list:"+kif);
+			kif = kif.substring(1, kif.length()-1).trim();
+			PublicAxiomsWrapper a = new PublicAxiomsWrapper();
+			if(!a.parseFromString(kif))
+				throw new InvalidKIFException("not a valid kif list:"+kif);
+			List<Statement> stmts = a.getStatements();
+			ExpList explist = new ExpList();
+			for (int i=0;i<stmts.size();i++)
+				explist.add(Parser.parseExpression(stmts.get(i)));	
+			return explist;
+		}catch(Exception ex){
+			throw new InvalidKIFException("Exception while parsing \""+kif+"\":"+ex.getMessage());
+		}
+	}
+}

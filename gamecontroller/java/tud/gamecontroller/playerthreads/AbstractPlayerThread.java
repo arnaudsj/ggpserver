@@ -21,11 +21,14 @@ package tud.gamecontroller.playerthreads;
 
 // import java.util.logging.Logger;
 
+import java.util.logging.Logger;
+
 import tud.gamecontroller.ConnectionEstablishedNotifier;
 import tud.gamecontroller.auxiliary.ChangeableBoolean;
-import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.RoleInterface;
+import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.StateInterface;
+import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.Player;
 import tud.gamecontroller.term.TermInterface;
 
@@ -37,13 +40,13 @@ public abstract class AbstractPlayerThread<
 	
 	protected Player<TermType, StateType> player;
 	protected RoleInterface<TermType> role;
-	protected MatchInterface<TermType, StateType> match;
+	protected RunnableMatchInterface<TermType, StateType> match;
 	private long deadline;
 	private long timeout;
 	private ChangeableBoolean connectionEstablished;
 	private ChangeableBoolean deadlineSet;
 	
-	public AbstractPlayerThread(String threadName, RoleInterface<TermType> role, Player<TermType, StateType> player, MatchInterface<TermType, StateType> match, long timeout){
+	public AbstractPlayerThread(String threadName, RoleInterface<TermType> role, Player<TermType, StateType> player, RunnableMatchInterface<TermType, StateType> match, long timeout){
 		super(threadName);
 		this.role=role;
 		this.player=player;
@@ -75,7 +78,20 @@ public abstract class AbstractPlayerThread<
 		super.start();
 	}
 	
-	public abstract void run();
+	public final void run() {
+		try {
+			doRun();
+		} catch(Exception ex) {
+			String message = "exception from player " + player + ": " + ex;
+			GameControllerErrorMessage errorMessage = new GameControllerErrorMessage(GameControllerErrorMessage.INTERNAL_ERROR, message);
+			match.notifyErrorMessage(errorMessage);
+			Logger logger = Logger.getLogger(AbstractPlayerThread.class.getName());
+			logger.severe(message);
+			ex.printStackTrace();
+		}
+	}
+	
+	public abstract void doRun();
 	
 	private void waitUntilConnectionIsEstablished() {
 		try {

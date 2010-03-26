@@ -32,14 +32,10 @@ import org.apache.commons.collections.map.ReferenceMap;
 import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.ReasonerFactoryInterface;
 import tud.gamecontroller.game.GameInterface;
-import tud.gamecontroller.game.MoveFactoryInterface;
 import tud.gamecontroller.game.RoleInterface;
-import tud.gamecontroller.game.impl.Move;
-import tud.gamecontroller.game.impl.MoveFactory;
 import tud.gamecontroller.game.impl.State;
 import tud.gamecontroller.game.javaprover.ReasonerFactory;
 import tud.gamecontroller.game.javaprover.Term;
-import tud.gamecontroller.game.javaprover.TermFactory;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.ggpserver.datamodel.matches.NewMatch;
 import tud.ggpserver.datamodel.matches.ServerMatch;
@@ -136,11 +132,6 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 		System.gc();
 	}
 	
-	@Override
-	protected MoveFactoryInterface<Move<Term>> getMoveFactory() {
-		return new MoveFactory<Term>(new TermFactory());
-	}
-
 	/////////////////// GAME ///////////////////
 	@Override
 	public Game<Term, GameState> createGame(String gameDescription,

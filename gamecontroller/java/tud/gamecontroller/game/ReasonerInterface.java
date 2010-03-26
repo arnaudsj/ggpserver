@@ -23,6 +23,8 @@ package tud.gamecontroller.game;
 import java.util.Collection;
 import java.util.List;
 
+import tud.gamecontroller.auxiliary.InvalidKIFException;
+
 public interface ReasonerInterface<
 	TermType,
 	ReasonerStateInfoType> {
@@ -49,5 +51,5 @@ public interface ReasonerInterface<
 	
 	String getKIFGameDescription();
 	
-	public ReasonerStateInfoType getStateFromString(String state);
+	public ReasonerStateInfoType getStateFromString(String state) throws InvalidKIFException;
 }

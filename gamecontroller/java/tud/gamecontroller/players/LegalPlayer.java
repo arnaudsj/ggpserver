@@ -35,7 +35,6 @@ public class LegalPlayer<
 		super(name, gdlVersion);
 	}
 
-	// MODIFIED
 	public MoveInterface<TermType> getNextMove() {
 		Collection<? extends MoveInterface<TermType>> legalMoves = getLegalMoves();
 		return legalMoves.iterator().next();

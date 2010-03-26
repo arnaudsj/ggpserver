@@ -19,8 +19,8 @@
 
 package tud.gamecontroller.playerthreads;
 
-import tud.gamecontroller.game.MatchInterface;
 import tud.gamecontroller.game.RoleInterface;
+import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.players.Player;
 import tud.gamecontroller.term.TermInterface;
@@ -29,11 +29,11 @@ public class PlayerThreadStart<
 	TermType extends TermInterface,
 	StateType extends StateInterface<TermType, ? extends StateType>> extends AbstractPlayerThread<TermType, StateType> {
 
-	public PlayerThreadStart(RoleInterface<TermType> role, Player<TermType, StateType> player, MatchInterface<TermType, StateType> match, long deadline){
+	public PlayerThreadStart(RoleInterface<TermType> role, Player<TermType, StateType> player, RunnableMatchInterface<TermType, StateType> match, long deadline){
 		super("StartMessageThread("+player.getName()+","+match.getMatchID()+")",role, player, match, deadline);
 	}
 	
-	public void run(){
+	public void doRun(){
 		player.gameStart(match, getRole(), this);
 	}
 

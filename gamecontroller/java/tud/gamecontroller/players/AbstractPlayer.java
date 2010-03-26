@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008,2009 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GameController.
 
@@ -24,16 +24,15 @@ import java.util.logging.Logger;
 
 import tud.gamecontroller.ConnectionEstablishedNotifier;
 import tud.gamecontroller.GDLVersion;
-import tud.gamecontroller.game.MatchInterface;
+import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.StateInterface;
-import tud.gamecontroller.logging.ErrorMessageListener;
 import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.term.TermInterface;
 
 public abstract class AbstractPlayer<TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>> implements Player<TermType, StateType> {
 
-	protected MatchInterface<TermType, ?> match=null;
+	protected RunnableMatchInterface<TermType, ?> match=null;
 	protected RoleInterface<TermType> role=null;
 	protected String name;
 	private long runtime;
@@ -49,7 +48,7 @@ public abstract class AbstractPlayer<TermType extends TermInterface, StateType e
 		this.gdlVersion = gdlVersion;
 	}
 	
-	public void gameStart(MatchInterface<TermType, StateType> match, RoleInterface<TermType> role, ConnectionEstablishedNotifier notifier) {
+	public void gameStart(RunnableMatchInterface<TermType, StateType> match, RoleInterface<TermType> role, ConnectionEstablishedNotifier notifier) {
 		this.match=match;
 		this.role=role;
 		this.runtime=0;
@@ -62,10 +61,8 @@ public abstract class AbstractPlayer<TermType extends TermInterface, StateType e
 	
 	protected void logErrorMessage(String type, String message) {
 		GameControllerErrorMessage errorMessage = new GameControllerErrorMessage(type, message, this.getName());
-		if (match instanceof ErrorMessageListener) {
-			((ErrorMessageListener<?, ?>) match).notifyErrorMessage(errorMessage);
-		}
-		Logger.getLogger(AbstractPlayer.class.getName()).log(Level.SEVERE, message, errorMessage);
+		match.notifyErrorMessage(errorMessage);
+		Logger.getLogger("tud.gamecontroller").log(Level.SEVERE, message, errorMessage);
 	}
 
 	public long getTotalRuntime() {

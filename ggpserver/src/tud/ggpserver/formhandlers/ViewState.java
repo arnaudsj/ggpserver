@@ -53,6 +53,6 @@ public class ViewState {
 	public String getXmlState() {
 		int stepNumber = this.stepNumber;
 		List<Pair<Date,String>> stringStates = match.getStringStates();
-		return StateXMLExporter.getStepXML(match, stringStates, stepNumber, roleName, false, false, null, null, null);
+		return StateXMLExporter.getStepXML(match, stringStates, stepNumber, roleName);
 	}
 }

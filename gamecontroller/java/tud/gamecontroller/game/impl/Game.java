@@ -26,7 +26,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Date;
 
 import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.ReasonerFactoryInterface;
@@ -270,7 +269,7 @@ public class Game<
 		return buffer.toString();
 	}
 	
-	public State<TermType, ReasonerStateInfoType> getStateFromString(String stringState) {
+	public State<TermType, ReasonerStateInfoType> getStateFromString(String stringState) throws InvalidKIFException {
 		// let's turn the stringState into a known State
 		ReasonerInterface<TermType, ReasonerStateInfoType> reasoner =
 			reasonerFactoryInterface.createReasoner(getCompleteRules(), name);
@@ -310,6 +309,11 @@ public class Game<
 			role = null;
 		}
 		return role;
+	}
+
+	public TermType getTermFromString(String kifTermString) throws InvalidKIFException {
+		TermFactoryInterface<TermType> termFactory = reasonerFactoryInterface.getTermFactory();
+		return termFactory.getTermFromKIF(kifTermString);
 	}
 	
 }
