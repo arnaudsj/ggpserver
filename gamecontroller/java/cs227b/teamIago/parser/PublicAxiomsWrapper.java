@@ -32,7 +32,7 @@ public class PublicAxiomsWrapper extends Axioms {
 	}
 
 	public boolean parseFromString(String gdl) {
-		return super.parseFromString(gdl);
+		return super.parseFromString(gdl.replace(")", ") "));
 	}
 	
 	@SuppressWarnings("unchecked")
