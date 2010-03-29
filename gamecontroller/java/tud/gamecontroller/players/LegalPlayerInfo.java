@@ -27,4 +27,9 @@ public class LegalPlayerInfo extends LocalPlayerInfo {
 		super(roleindex, "Legal", gdlVersion);
 	}
 
+	@Override
+	public String getType() {
+		return TYPE_LEGAL;
+	}
+
 }

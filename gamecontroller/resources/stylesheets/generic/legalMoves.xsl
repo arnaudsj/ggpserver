@@ -25,7 +25,7 @@
 			</xsl:choose>
 		</xsl:variable>
 		<xsl:variable name="currentStep" select="count(/match/history/step)+1"/>
-		
+		<xsl:variable name="role" select="/match/sight-of"/>		
 		<xsl:choose>
 		<xsl:when test="$playing = 1"> <!-- display something only if we are playing-->
 			<div class="legalMoves">
@@ -47,6 +47,7 @@
 										<xsl:attribute name="href">
 											javascript:location.replace("
 											<xsl:call-template name="makePlayLinkURL">
+												<xsl:with-param name="role" select="$role"/>
 												<xsl:with-param name="chosenMove" select="-2"/>
 											</xsl:call-template>
 											")
@@ -81,6 +82,7 @@
 													<xsl:attribute name="href">
 														javascript:location.replace("
 														<xsl:call-template name="makePlayLinkURL">
+															<xsl:with-param name="role" select="$role"/>
 															<xsl:with-param name="forStepNumber" select="count(/match/history/step)+1"/>
 															<xsl:with-param name="chosenMove" select="./move-number"/>
 														</xsl:call-template>
@@ -101,6 +103,7 @@
 													<xsl:attribute name="href">
 														javascript:location.replace("
 														<xsl:call-template name="makePlayLinkURL">
+															<xsl:with-param name="role" select="$role"/>
 															<xsl:with-param name="forStepNumber" select="count(/match/history/step)+1"/>
 															<xsl:with-param name="chosenMove" select="-1"/>
 														</xsl:call-template>

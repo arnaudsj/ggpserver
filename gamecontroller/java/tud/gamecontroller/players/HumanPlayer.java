@@ -93,7 +93,8 @@ public class HumanPlayer<TermType extends TermInterface, StateType extends State
 			}
 			logger.info("HumanPlayer.getNextMove(), was notified (confirm)");
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
+			logger.info("getNextMove() was interrupted, a move has been anyway selected");
 		}
 		
 		return this.moveMemory.getMove();

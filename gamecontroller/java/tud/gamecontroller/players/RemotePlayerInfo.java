@@ -51,4 +51,9 @@ public class RemotePlayerInfo extends PlayerInfo {
 	public void setPort(int port) {
 		this.port = port;
 	}
+
+	@Override
+	public String getType() {
+		return TYPE_COMPUTER;
+	}
 }

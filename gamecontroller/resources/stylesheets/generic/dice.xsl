@@ -10,8 +10,8 @@
 
 	<xsl:template name="print_dice">
 		<xsl:param name="value"/>					<!-- 1, 2, ..., 6 -->
-		<xsl:param name="color" value="'black'"/>	<!-- 'black' or 'red' -->
-		<xsl:param name="width" value="56"/>	<!-- width and height of the image -->
+		<xsl:param name="color" select="'black'"/>	<!-- 'black' or 'red' -->
+		<xsl:param name="width" select="56"/>	<!-- width and height of the image -->
 		
 		<img>
 			<xsl:attribute name="width"><xsl:value-of select="$width"/></xsl:attribute>
@@ -29,7 +29,7 @@
 	<!-- color = 'black' or 'red' -->
 	<xsl:template name="make_dice_url">
 		<xsl:param name="value"/>
-		<xsl:param name="color" value="'black'"/>
+		<xsl:param name="color" select="'black'"/>
 		<xsl:value-of select="$stylesheetURL"/>
 		<xsl:text>/generic/dice_images/die_</xsl:text>
 		<xsl:value-of select="$color"/>

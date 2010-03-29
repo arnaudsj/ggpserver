@@ -27,4 +27,9 @@ public class RandomPlayerInfo extends LocalPlayerInfo {
 		super(roleindex, "Random", gdlVersion);
 	}
 
+	@Override
+	public String getType() {
+		return TYPE_RANDOM;
+	}
+
 }

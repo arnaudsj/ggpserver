@@ -22,6 +22,12 @@ package tud.gamecontroller.players;
 import tud.gamecontroller.GDLVersion;
 
 public abstract class PlayerInfo {
+	
+	public static final String TYPE_HUMAN = "human";
+	public static final String TYPE_COMPUTER = "computer";
+	public static final String TYPE_LEGAL = "legal";
+	public static final String TYPE_RANDOM = "random";
+	
 	private int roleindex;
 	private String name;
 	
@@ -48,6 +54,8 @@ public abstract class PlayerInfo {
 	public String getName() {
 		return name;
 	}
+	
+	public abstract String getType();
 
 	/**
 	 * Two PlayerInfos are considered equal iff they have the same name.

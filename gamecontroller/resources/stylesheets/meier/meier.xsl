@@ -4,6 +4,7 @@
 
 	<xsl:import href="../generic/template.xsl"/>
 	<xsl:import href="../generic/state.xsl"/>
+	<xsl:import href="../generic/dice.xsl"/>
 	
 	
 	<xsl:template name="print_state">
@@ -13,6 +14,8 @@
 			div.dice
 			{
 				width:    300px;
+				padding-top:20px; padding-bottom:20px;
+				padding-right:20px; padding-left:20px;
 			}
 		</style>
 		
@@ -32,12 +35,12 @@
 						  <xsl:otherwise>red</xsl:otherwise>
 						</xsl:choose>
 					</xsl:variable>
-				
+					
 					<xsl:variable name="value1" select="arg[2]"/>
 					<xsl:variable name="value2" select="arg[3]"/>
 			
-					<span class="heading"><xsl:value-of select="arg[1]"/></span> has dice:</br>
-			
+					<span class="heading"><xsl:value-of select="arg[1]"/></span> has dice:<br/>
+					
 					<xsl:call-template name="print_dice">
 						<xsl:with-param name="color" select="$color"/>
 						<xsl:with-param name="value" select="$value1"/>
@@ -47,7 +50,7 @@
 						<xsl:with-param name="color" select="$color"/>
 						<xsl:with-param name="value" select="$value2"/>
 					</xsl:call-template>
-			
+					
 				</xsl:for-each>
 			
 			</xsl:if>
