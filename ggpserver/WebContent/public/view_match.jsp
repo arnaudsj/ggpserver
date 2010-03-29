@@ -31,12 +31,36 @@
 		%>
 		<jsp:setProperty name="viewMatch" property="matchID" />
 		<jsp:setProperty name="viewMatch" property="playerName" />
+		<jsp:setProperty name="viewMatch" property="userName" value="<%= request.getUserPrincipal().getName() %>" />
+	</c:catch>
+</jsp:useBean>
+
+<jsp:useBean id="availability" class="tud.ggpserver.formhandlers.inc.Availability"
+	scope="page">
+	<c:catch>
+		<jsp:setProperty name="availability" property="matchID" />
+		<jsp:setProperty name="availability" property="userName" value="<%= request.getUserPrincipal().getName() %>" />
+		<jsp:setProperty name="availability" property="available" />
+	</c:catch>
+</jsp:useBean>
+
+<jsp:useBean id="viewState" class="tud.ggpserver.formhandlers.ViewState"
+	scope="page">
+	<c:catch>
+		<jsp:setProperty name="viewState" property="matchID" />
+		<jsp:setProperty name="viewState" property="userName" value="<%= request.getUserPrincipal().getName() %>" />
 	</c:catch>
 </jsp:useBean>
 
 <c:set var="match" value="${viewMatch.match}" />
-
 <c:set var="title">Match ${match.matchID}</c:set>
+<c:catch>
+	<c:set var="userName"><%= request.getUserPrincipal().getName() %></c:set>
+</c:catch>
+
+<c:set var="matchStatus" value="${match.status}" />
+
+
 <jsp:directive.include file="/inc/header.jsp" />
 
 <table>
@@ -55,7 +79,9 @@
 			</td>
 		<tr>
 			<th>status</th>
-			<td><c:out value="${match.status}" /></td>
+			<td>
+				<c:out value="${matchStatus}" />
+			</td>
 		</tr>
 		<tr>
 			<th>start clock</th>
@@ -73,8 +99,11 @@
 			<th>
 				<table>
 					<tbody>
-					<tr><td> roles </td></tr>
-					<tr><td> players </td></tr>
+					<tr><td>roles</td></tr>
+					<tr><td>players</td></tr>
+					<c:if test="${match.status == 'scheduled'}">
+						<tr><td>status</td></tr>
+					</c:if>
 					<c:if test="${match.orderedGoalValues != null}">
 						 <tr><td> scores </td></tr>
 					</c:if>
@@ -113,12 +142,74 @@
 									</c:otherwise>
 								</c:choose>
 								</a>
+								<img src="../icons/other/players/<c:out value="${playerinfo.type}"/>.png" title="<c:out value="${playerinfo.type}"/>" />
 							</td>
 						</c:forEach>
 						<c:if test="${match.weight != 1.0}">
 							<td></td>
 						</c:if> 
 					</tr>
+					<c:if test="${match.status == 'scheduled'}">
+						<tr class="even">
+							<c:forEach var="i" begin="0" end="${match.game.numberOfRoles - 1}">
+								<c:set var="role">${match.orderedPlayerRoles[i]}</c:set>
+								<td>
+									<c:choose>
+										<c:when test="${viewMatch.statuses[i].right == 'accepted'}">
+											accepted
+											<c:if test="${userName == viewMatch.statuses[i].left}">
+												<img src="../icons/other/16-loading.gif" title="waiting for other players to accept..."/>
+												<script type="text/javascript" language="JavaScript">
+											    	setTimeout("document.location.reload()", 3000);
+											    </script>
+											</c:if>
+										</c:when>
+										<c:otherwise>
+											<c:choose>
+												<c:when test="${userName == viewMatch.statuses[i].left}">
+													<c:url value="/public/view_match.jsp" var="acceptURL">
+														<c:param name="matchID" value="${viewMatch.matchID}"/>
+														<c:param name="role" value="${role}" />
+														<c:param name="available" value="1"/>
+												    </c:url>
+												    <a href='<c:out value="${acceptURL}"/>'>
+												    	<div class="start" title="allow this game to begin"></div>
+												    	allow this game to begin
+												    </a>
+												</c:when>
+												<c:otherwise>
+													has not accepted yet
+												</c:otherwise>
+											</c:choose>
+										</c:otherwise>
+									</c:choose>
+									</a>
+									<img src="../icons/other/players/<c:out value="${playerinfo.type}"/>.png" title="<c:out value="${playerinfo.type}"/>" />
+								</td>
+							</c:forEach>
+							<c:if test="${match.weight != 1.0}">
+								<td></td>
+							</c:if> 
+						</tr>
+					</c:if>
+					<c:if test="${matchStatus == 'running'}">
+						<tr class="even">
+							<c:forEach var="i" begin="0" end="${match.game.numberOfRoles - 1}">
+								<td style="align: center;">
+									<c:if test="${ match.orderedPlayerNames[i] == userName }">
+										<c:url value="/members/play.jsp" var="playURL">
+									    	<c:param name="matchID" value="${match.matchID}" />
+									    	<c:param name="role" value="${match.orderedPlayerRoles[i]}" />
+									    </c:url>
+									    <a href='<c:out value="${playURL}" />'><div class="play" title="play match! (as <c:out value="${match.orderedPlayerRoles[i]}"/>)"><span>play</span></div></a>
+									</c:if>
+								</td>
+							</c:forEach>
+							<c:if test="${match.weight != 1.0}">
+								<td></td>
+							</c:if> 
+						</tr>
+					</c:if>
 					<c:if test="${match.orderedGoalValues != null}">
 						<tr class="even">
 							<c:forEach var="roleindex" begin="0" end="${match.game.numberOfRoles - 1}">
@@ -175,6 +266,13 @@
 
 
 <h1>Match history</h1>
+
+<c:choose>
+	<c:when test="${! viewState.viewable}">
+		The history for this game is not available yet, because some information may not be seen by all players.
+	</c:when>
+	<c:otherwise>
+
 <table>
 	<thead>
 		<tr>
@@ -291,5 +389,8 @@
 		</c:forEach>
 	</tbody>
 </table>
+
+	</c:otherwise>
+</c:choose>
 
 <jsp:directive.include file="/inc/footer.jsp" />

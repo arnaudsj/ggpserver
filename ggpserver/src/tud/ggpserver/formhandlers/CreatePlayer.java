@@ -27,7 +27,7 @@ import tud.gamecontroller.GDLVersion;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.DuplicateInstanceException;
-import tud.ggpserver.datamodel.RemotePlayerInfo;
+import tud.ggpserver.datamodel.RemoteOrHumanPlayerInfo;
 
 public class CreatePlayer {
 	private String playerName = "";
@@ -71,7 +71,7 @@ public class CreatePlayer {
 		try {
 			DBConnectorFactory.getDBConnector().createPlayerInfo(
 					playerName, "", 0, DBConnectorFactory.getDBConnector().getUser(userName),
-					RemotePlayerInfo.STATUS_NEW, GDLVersion.v1); // TODO: which GDLVersion should we use here?
+					RemoteOrHumanPlayerInfo.STATUS_NEW, GDLVersion.v1); // TODO: which GDLVersion should we use here?
 			correctlyCreated = true;
 		} catch (DuplicateInstanceException e) {
 			errors.add("player name already exists, please pick a different one");

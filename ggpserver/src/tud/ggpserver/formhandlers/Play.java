@@ -2,19 +2,18 @@ package tud.ggpserver.formhandlers;
 
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
 import tud.gamecontroller.auxiliary.Pair;
 import tud.gamecontroller.game.MoveInterface;
+import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.players.HumanPlayer;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.User;
 import tud.ggpserver.datamodel.matches.RunningMatch;
-import tud.ggpserver.datamodel.matches.ServerMatch;
 import tud.ggpserver.scheduler.MatchRunner;
 import tud.ggpserver.util.StateXMLExporter;
 
@@ -24,9 +23,10 @@ public class Play {
 	
 	protected final AbstractDBConnector<?, ?> db = DBConnectorFactory.getDBConnector();
 	private User user;
+	private String role;
 	
 	private String matchID;
-	private ServerMatch<?,?> match;
+	private RunningMatch<?,?> match;
 	private HumanPlayer<?,?> player;
 	private int stepNumber;
 	
@@ -38,21 +38,27 @@ public class Play {
 		// set our match
 		this.matchID = matchID;
 		match = MatchRunner.getInstance().getRunningMatch(matchID);
-	}
-	
-	@SuppressWarnings("unchecked")
-	public void setUserName (String userName) throws SQLException {
-		user = db.getUser(userName);
-		
 		// set stepNumber
 		if (match != null)
 			stepNumber = match.getStringStates().size(); // return the last known state of the match
-		
+	}
+	
+	public void setUserName (String userName) throws SQLException {
+		user = db.getUser(userName);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void setRole (String role) {
+		this.role = role;
 		// find our human player
-		if (match instanceof RunningMatch) {
-			int i = this.match.getOrderedPlayerNames().indexOf(user.getUserName());
-			player = (HumanPlayer) ((RunningMatch)match).getOrderedPlayers().get(i);
+		int i = 0;
+		for (RoleInterface<?> r: match.getOrderedPlayerRoles()) {
+			if (r.getPrefixForm().toUpperCase().equals(role.toUpperCase())) break;
+			i++;
 		}
+		logger.info("role "+i+": "+match.getOrderedPlayerNames().get(i)+", "+user.getUserName());
+		if (match.getOrderedPlayerNames().get(i).toUpperCase().equals(user.getUserName().toUpperCase()))  // only allow the correct logged-in user to access and play for this role
+			player = (HumanPlayer) match.getOrderedPlayers().get(i);
 	}
 	
 	public boolean isPlaying() throws SQLException {
@@ -61,8 +67,10 @@ public class Play {
 		return true;
 	}
 	
-	public boolean isEnded() {
-		return match != null;
+	public boolean isScheduled() {
+		if (MatchRunner.getInstance().getScheduledMatch(matchID) != null)
+			return true;
+		return false;
 	}
 	
 	public String getMatchID () {
@@ -70,8 +78,7 @@ public class Play {
 	}
 	
 	public String getRole () {
-		int i = match.getOrderedPlayerNames().indexOf(user.getUserName());
-		return match.getOrderedPlayerRoles().get(i).toString();
+		return this.role;
 	}
 	
 	public List<String> getLegalMoves () {
@@ -94,7 +101,7 @@ public class Play {
 	@SuppressWarnings("unchecked")
 	public void setChosenMove (int i) throws SQLException {
 		
-		if (!isPlaying())
+		if (!isPlaying()) // very important! otherwise, one could just send moves for a non-owned role, and they would be accepted
 			return;
 		
 		if (i == -2) {

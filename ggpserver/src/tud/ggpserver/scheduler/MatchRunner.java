@@ -36,6 +36,8 @@ import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnector;
+import tud.ggpserver.datamodel.HumanPlayerInfo;
+import tud.ggpserver.datamodel.RemoteOrHumanPlayerInfo;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
 import tud.ggpserver.datamodel.Tournament;
 import tud.ggpserver.datamodel.matches.NewMatch;
@@ -99,6 +101,7 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 		scheduledMatches = Collections.synchronizedMap(new LinkedHashMap<String, ScheduledMatch<TermType, ReasonerStateInfoType>>());
 		// and matchThreads map
 		matchThreads = Collections.synchronizedMap(new HashMap<String, MatchThread<TermType,ReasonerStateInfoType>>());
+		availablePlayersTracker.addAvailablePlayersListener(this);
 	}
 
 	/**
@@ -159,7 +162,11 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 		}
 	}
 	
-	public RunningMatch<TermType, ReasonerStateInfoType> getRunningMatch (String matchID) {
+	public synchronized ScheduledMatch<TermType, ReasonerStateInfoType> getScheduledMatch (String matchID) {
+		return scheduledMatches.get(matchID);
+	}
+	
+	public synchronized RunningMatch<TermType, ReasonerStateInfoType> getRunningMatch (String matchID) {
 		if (!matchThreads.containsKey(matchID)) return null;
 		return matchThreads.get(matchID).getMatch();
 	}
@@ -228,6 +235,14 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 						break;
 					}
 				}
+				if(player instanceof HumanPlayerInfo) {
+					HumanPlayerInfo humanPlayer = (HumanPlayerInfo)player;
+					if (! availablePlayersTracker.hasAccepted(match.getMatchID(), humanPlayer.getName())) {
+						logger.info(humanPlayer.getName()+" can not play, because he or she did not accept the game yet");
+						runnableMatch = null;
+						break;
+					}
+				}
 			}
 			if(runnableMatch != null) {
 				scheduledMatches.remove(runnableMatch.getMatchID());
@@ -256,6 +271,7 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 
 	private void runSingleMatch(RunningMatch<TermType, ReasonerStateInfoType> runningMatch) {
 		String matchID = runningMatch.getMatchID();
+		availablePlayersTracker.forgetAboutHumansAvailability(matchID); // it's not necessary to remember that HumanPlayers are available for this match
 		logger.info("Thread for match " + matchID + " - START");
 		try {
 			try {
@@ -306,7 +322,7 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 	}
 	
 	/**
-	 * schedules the match for running as soon as all players in the match are finished playing any other matches
+	 * schedules the match for running as soon as all players in the match have finished playing any other matches
 	 * (active status of the players is not checked)
 	 * @param match
 	 * @throws SQLException
@@ -318,6 +334,21 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 		logger.info("match " + matchID + " scheduled");
 		start();
 		notifyAboutChanges();
+	}
+	
+	// for HumanPlayers
+	public synchronized void setAccepted (String matchID, String playerName) {
+		availablePlayersTracker.setAccepted(matchID, playerName);
+		this.notifyAll();
+	}
+	
+	public synchronized boolean hasAccepted (String matchID, String playerName) {
+		return availablePlayersTracker.hasAccepted(matchID, playerName);
+	}
+	
+	// for RemotePlayers
+	public synchronized boolean isAvailable (String name) {
+		return availablePlayersTracker.isAvailable(name);
 	}
 
 	/**
@@ -433,14 +464,15 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 	 * @return a collection of all currently available players
 	 * @throws InterruptedException (if interrupt() was called on the waiting Thread)
 	 */
-	public Collection<tud.ggpserver.datamodel.RemotePlayerInfo> waitForPlayersAvailableForRoundRobin() throws InterruptedException {
+	public Collection<? extends PlayerInfo> waitForPlayersAvailableForRoundRobin() throws InterruptedException {
 		// TODO: compatible gdl
 		return availablePlayersTracker.waitForPlayersAvailableForRoundRobin();
 	}
 
 	@Override
-	public void notifyAvailable(RemotePlayerInfo playerInfo) {
+	public void notifyAvailable(RemoteOrHumanPlayerInfo playerInfo) {
 		// TODO: only call notifyAll if we are interested in this player
+		logger.info("notified that "+playerInfo.getName()+" has become available");
 		this.notifyAll();
 	}
 

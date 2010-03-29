@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import tud.gamecontroller.game.impl.Game;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
+import tud.ggpserver.datamodel.RemoteOrHumanPlayerInfo;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
 import tud.ggpserver.datamodel.User;
 import tud.ggpserver.util.Utilities;
@@ -42,7 +43,7 @@ public class EditPlayer {
 	
 	private String host = "";
 	private int port = 0;
-	private String status = RemotePlayerInfo.STATUS_INACTIVE;
+	private String status = RemoteOrHumanPlayerInfo.STATUS_INACTIVE;
 	private boolean availableForRoundRobinMatches = false;
 	private boolean availableForManualMatches = false;
 	
@@ -63,7 +64,7 @@ public class EditPlayer {
 			// this might have become corrupted is that the user tinkered
 			// manually with the POST parameters. The user input is a dropdown list,   
 			// and if the user used that, only legal options are possible.
-			status = RemotePlayerInfo.STATUS_INACTIVE;
+			status = RemoteOrHumanPlayerInfo.STATUS_INACTIVE;
 		}
 		
 		if (host.equals("")) {

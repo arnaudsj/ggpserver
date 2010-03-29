@@ -24,7 +24,11 @@ package tud.ggpserver.formhandlers;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
+
+import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.auxiliary.Pair;
+import tud.gamecontroller.players.HumanPlayer;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.matches.ServerMatch;
 import tud.ggpserver.util.StateXMLExporter;
@@ -34,12 +38,21 @@ public class ViewState {
 	private int stepNumber = -1;
 	private ServerMatch<?, ?> match;
 	private String roleName = null;
+	private String userName;
 	
 	public void setMatchID(String matchID) throws SQLException {
 		match = DBConnectorFactory.getDBConnector().getMatch(matchID);
 		if (match == null) {
 			throw new NullPointerException();
 		}
+	}
+	
+	public String getMatchID () {
+		return match.getMatchID();
+	}
+	
+	public void setUserName (String userName) {
+		this.userName = userName;
 	}
 
 	public void setStepNumber(int stepNumber) {
@@ -50,9 +63,19 @@ public class ViewState {
 		this.roleName = roleName;
 	}
 	
+	public boolean isViewable () {
+		if ( match.getGame().getGdlVersion() == GDLVersion.v1 ) return true; // if it is a GDL-I game, i.e. with complete information, anybody is allowed to see everything
+		String ownerName = match.getOwner().getUserName();
+		if (userName != null &&
+			userName.equals(ownerName) &&
+			! match.getOrderedPlayerNames().contains(ownerName) ) return true; // allow visibility to the creator of the game, but not if he also plays (he's a human, thus could use info he or she should not see)
+		if ( match.getStatus().equals(ServerMatch.STATUS_RUNNING) ) return false; // if GDL-II, and match running, nobody should have access to all of the information 
+		return true;
+	}
+	
 	public String getXmlState() {
-		int stepNumber = this.stepNumber;
 		List<Pair<Date,String>> stringStates = match.getStringStates();
+		Logger.getLogger(ViewState.class.getName()).info("StateXMLExporter.getStepXML(match, stringStates, "+stepNumber+", roleName)");
 		return StateXMLExporter.getStepXML(match, stringStates, stepNumber, roleName);
 	}
 }

@@ -1,6 +1,7 @@
 <%--
     Copyright (C) 2009 Martin Günther (mintar@gmx.de)
                   2009 Stephan Schiffel (stephan.schiffel@gmx.de)
+                  2010 Nicolas JEAN (njean42@gmail.com)
 
     This file is part of GGP Server.
 
@@ -37,6 +38,13 @@
 if (viewPlayer.getPlayer() == null) {
 	response.sendError(404, "That player doesn't exist.");
 	return;
+}
+%>
+
+<%
+if (viewPlayer.isUser()) {
+	String urlWithSessionID = response.encodeRedirectURL("../public/view_user.jsp?userName="+request.getParameter("name"));
+	response.sendRedirect(urlWithSessionID);
 }
 %>
 

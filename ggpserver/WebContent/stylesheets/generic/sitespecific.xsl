@@ -26,12 +26,14 @@
 		<xsl:param name="chosenMove" /> <!-- the chosen action (chosen move number or -1 to confirm) -->
 		<xsl:text disable-output-escaping="yes">play.jsp?matchID=</xsl:text>
 		<xsl:value-of select="/match/match-id" />
+		<xsl:text disable-output-escaping="yes">&amp;role=</xsl:text>
+		<xsl:value-of select="/match/sight-of" />
 		<xsl:text disable-output-escaping="yes">&amp;forStepNumber=</xsl:text>
 		<xsl:value-of select="$forStepNumber" />
 		<xsl:text disable-output-escaping="yes">&amp;chosenMove=</xsl:text>
 		<xsl:value-of select="$chosenMove" />
 	</xsl:template>
-
+	
 	<xsl:template name="webmaster">
 		<a href="http://www.inf.tu-dresden.de/index.php?node_id=1373&amp;ln=en">Stephan Schiffel</a>
 	</xsl:template>

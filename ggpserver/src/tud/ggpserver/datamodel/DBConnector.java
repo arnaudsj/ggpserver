@@ -389,12 +389,12 @@ public class DBConnector extends AbstractDBConnector<Term, GameState> {
 
 	/**
 	 * This method must be synchronized with getPlayerInfo(). Otherwise, the following could happen:
-	 * - Thread 1: updatePlayerInfo()  [changes player status to "active"]
+	 * - Thread 1: updatePlayerInfo()  [changes player status to STATUS_ACTIVE]
 	 * - Thread 1: clears player from cache
 	 * - Thread 2: getPlayerInfo(), re-adds player to cache
 	 * - Thread 1: super.updatePlayerInfo() calls getPlayerInfo(), passes stale result 
-	 *   (status == "inactive") to notifyPlayerStatusChange(), which will think that 
-	 *   the state was changed to "inactive" instead of "active".   
+	 *   (status == STATUS_INACTIVE) to notifyPlayerStatusChange(), which will think that 
+	 *   the state was changed to STATUS_INACTIVE instead of STATUS_ACTIVE.   
 	 */
 	@Override
 	public void updatePlayerInfo(String playerName, String host, int port,

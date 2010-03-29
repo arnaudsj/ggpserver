@@ -27,6 +27,7 @@ import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.players.LocalPlayerInfo;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.ggpserver.datamodel.DBConnectorFactory;
+import tud.ggpserver.datamodel.RemoteOrHumanPlayerInfo;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
 import tud.ggpserver.datamodel.Tournament;
 import tud.ggpserver.datamodel.User;
@@ -36,6 +37,10 @@ public class ViewPlayer {
 	
 	public void setName(String name) throws SQLException {
 		playerInfo = DBConnectorFactory.getDBConnector().getPlayerInfo(name);
+	}
+	
+	public boolean isUser () throws SQLException {
+		return DBConnectorFactory.getDBConnector().isUser(playerInfo.getName());
 	}
 	
 	public PlayerInfo getPlayer() {
@@ -53,9 +58,9 @@ public class ViewPlayer {
 	
 	public String getStatus() {
 		if(playerInfo instanceof RemotePlayerInfo){
-			return ((RemotePlayerInfo) playerInfo).getStatus();
+			return ((RemotePlayerInfo) playerInfo).getStatus().toString();
 		}else if(playerInfo instanceof LocalPlayerInfo){
-			return "active";
+			return RemoteOrHumanPlayerInfo.STATUS_ACTIVE;
 		}
 		return "?";
 	}

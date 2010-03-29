@@ -26,19 +26,26 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import tud.gamecontroller.auxiliary.Pair;
 import tud.gamecontroller.logging.GameControllerErrorMessage;
+import tud.gamecontroller.players.PlayerInfo;
 import tud.ggpserver.datamodel.DBConnectorFactory;
+import tud.ggpserver.datamodel.HumanPlayerInfo;
+import tud.ggpserver.datamodel.RemotePlayerInfo;
 import tud.ggpserver.datamodel.matches.ServerMatch;
+import tud.ggpserver.scheduler.MatchRunner;
 import tud.ggpserver.util.Utilities;
 
 
 public class ViewMatch {
 	private static final Logger logger = Logger.getLogger(ViewMatch.class.getName());
-
+	
+	private String matchID;
 	private ServerMatch<?, ?> match;
 	private int stepNumber = 1;
 	private String playerName = null;
 	private List<GameControllerErrorMessage> errorMessagesForStep = null;
+	private String userName;
 
 	public String getPlayerName() {
 		return playerName;
@@ -58,10 +65,41 @@ public class ViewMatch {
 	}
 
 	public void setMatchID(String matchID) throws SQLException {
+		this.matchID = matchID;
 		match = DBConnectorFactory.getDBConnector().getMatch(matchID);
 		errorMessagesForStep = null;
 	}
-
+	
+	public String getMatchID () {
+		return matchID;
+	}
+	
+	public void setuserName (String userName) {
+		this.userName = userName;
+	}
+	
+	public List<Pair<String,String>> getStatuses () {
+		List<Pair<String,String>> res = new LinkedList<Pair<String,String>>();
+		for (PlayerInfo p: match.getOrderedPlayerInfos()) {
+			if (p instanceof HumanPlayerInfo) { // human players
+				if (MatchRunner.getInstance().hasAccepted(match.getMatchID(), p.getName())) {
+					res.add(new Pair<String,String>(p.getName(),"accepted"));
+				} else {
+					res.add(new Pair<String,String>(p.getName(),"not yet"));
+				}
+			} else if (p instanceof RemotePlayerInfo) { // remote players
+				if (MatchRunner.getInstance().isAvailable(p.getName())) {
+					res.add(new Pair<String,String>(p.getName(),"accepted"));
+				} else {
+					res.add(new Pair<String,String>(p.getName(),"not yet"));
+				}
+			} else { // random or legal
+				res.add(new Pair<String,String>(p.getName(),"accepted"));
+			}
+		}
+		return res;
+	}
+	
 	public ServerMatch<?, ?> getMatch() {
 		return match;
 	}

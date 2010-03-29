@@ -34,6 +34,7 @@ import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
+import tud.ggpserver.datamodel.RemoteOrHumanPlayerInfo;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
 import tud.ggpserver.datamodel.matches.FinishedMatch;
 import tud.ggpserver.datamodel.matches.ServerMatch;
@@ -60,7 +61,7 @@ public class PlayerErrorTracker<TermType extends TermInterface, ReasonerStateInf
 	 */
 	@Override
 	public void notifyStatusChange(RemotePlayerInfo player) {
-		if (player.getStatus().equals(RemotePlayerInfo.STATUS_ACTIVE)) {
+		if (player.getStatus().equals(RemoteOrHumanPlayerInfo.STATUS_ACTIVE)) {
 			// reset number of offline matches in a row so that the player starts fresh when it is re-enabled  
 			numOfflineMatches.put(player.getName(), 0);
 		}
@@ -74,7 +75,7 @@ public class PlayerErrorTracker<TermType extends TermInterface, ReasonerStateInf
 	 * non-error match, this number is reset to "0".<br>
 	 * 
 	 * When a player has played MAX_ERROR_MATCHES in a row, its status is set to
-	 * "inactive".
+	 * STATUS_INACTIVE.
 	 */
 	public void updateDeadPlayers(FinishedMatch<TermType, ReasonerStateInfoType> match) {
 		for (RemotePlayerInfo playerInfo : onlyRemotePlayerInfos(match)) {
@@ -143,7 +144,7 @@ public class PlayerErrorTracker<TermType extends TermInterface, ReasonerStateInf
 			getDBConnector().updatePlayerInfo(playerInfo.getName(),
 					playerInfo.getHost(), playerInfo.getPort(),
 					playerInfo.getOwner(),
-					RemotePlayerInfo.STATUS_INACTIVE,
+					RemoteOrHumanPlayerInfo.STATUS_INACTIVE,
 					playerInfo.isAvailableForRoundRobinMatches(),
 					playerInfo.isAvailableForManualMatches(),
 					Utilities.gdlVersion(playerInfo.getGdlVersion()));

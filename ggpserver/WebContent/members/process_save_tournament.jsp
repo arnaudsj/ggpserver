@@ -50,7 +50,7 @@
     <jsp:directive.include file="/inc/header.jsp" />	
     ${saveTournament.errorString}
     <br />
-    <a href="<%= request.getContextPath() + response.encodeURL("/members/edit_tournament.jsp?tournamentID=" + request.getParameter("tournamentID")) %>">&lt;&lt;&lt; back to edit tournament page</a>
+    <a href="<%= request.getContextPath() + response.encodeURL("/members/edit_tournament.jsp?tournamentID=" + request.getParameter("tournamentID") + "#" + request.getParameter("anchor")) %>">&lt;&lt;&lt; back to edit tournament page</a>
   </c:otherwise>
 </c:choose>  
 

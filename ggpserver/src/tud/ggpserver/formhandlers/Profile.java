@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
                   2009 Stephan Schiffel <stephan.schiffel@gmx.de>
+                  2010 Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GGP Server.
 
@@ -26,15 +27,11 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
-import tud.gamecontroller.game.MatchInterface;
-import tud.ggpserver.collectionviews.ListIteratorView;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
 import tud.ggpserver.datamodel.Tournament;
 import tud.ggpserver.datamodel.User;
-import tud.ggpserver.datamodel.matches.ServerMatch;
-import tud.ggpserver.scheduler.MatchRunner;
 
 public class Profile {
 	protected final AbstractDBConnector<?, ?> db = DBConnectorFactory.getDBConnector();
@@ -50,11 +47,10 @@ public class Profile {
 	public void setUserName(String userName) throws SQLException {
 		user = getDBConnector().getUser(userName);
 	}
-
+	
 	public List<RemotePlayerInfo> getPlayers() throws SQLException {
 		assert (user != null);
-		
-		return getDBConnector().getPlayerInfosForUser(user.getUserName());
+		return db.getPlayerInfosForUser(user.getUserName());
 	}
 	
 	public List<? extends Tournament<?,?>> getTournaments() throws SQLException {
@@ -65,11 +61,4 @@ public class Profile {
 		return tournaments;
 	}
 	
-	public List<String> getMyMatchesID () throws SQLException {
-		List<? extends ServerMatch<?,?>> matches = db.getMatches(0, 100, user.getUserName(), null, null, null, ServerMatch.STATUS_RUNNING, true);
-		List<String> res = new LinkedList<String>();
-		for (MatchInterface<?,?> match: matches)
-			res.add(match.getMatchID());
-		return res;
-	}
 }

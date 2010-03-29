@@ -19,8 +19,8 @@
 
 package tud.ggpserver.scheduler;
 
-import tud.ggpserver.datamodel.RemotePlayerInfo;
+import tud.ggpserver.datamodel.RemoteOrHumanPlayerInfo;
 
 public interface AvailablePlayersListener {
-	public void notifyAvailable(RemotePlayerInfo playerInfo);
+	public void notifyAvailable(RemoteOrHumanPlayerInfo playerInfo);
 }

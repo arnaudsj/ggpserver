@@ -22,11 +22,8 @@ package tud.ggpserver.datamodel;
 
 import tud.gamecontroller.GDLVersion;
 
-public class RemotePlayerInfo extends tud.gamecontroller.players.RemotePlayerInfo {
-	public final static String STATUS_ACTIVE = "active";
-	public final static String STATUS_INACTIVE = "inactive";
-	public final static String STATUS_NEW = "new";
-
+public class RemotePlayerInfo extends tud.gamecontroller.players.RemotePlayerInfo implements RemoteOrHumanPlayerInfo {
+	
 	private final User owner;
 	private final String status;
 	private final boolean availableForRoundRobinMatches;
@@ -60,8 +57,7 @@ public class RemotePlayerInfo extends tud.gamecontroller.players.RemotePlayerInf
 	public User getOwner() {
 		return owner;
 	}
-
-
+	
 	public String getStatus() {
 		return status;
 	}
@@ -75,11 +71,11 @@ public class RemotePlayerInfo extends tud.gamecontroller.players.RemotePlayerInf
 	}
 
 	public static boolean legalStatus(String status) {
-		if (status.equals(RemotePlayerInfo.STATUS_NEW)) {
+		if (status.equals(STATUS_NEW)) {
 			return true;
-		} else if (status.equals(RemotePlayerInfo.STATUS_ACTIVE)) {
+		} else if (status.equals(STATUS_ACTIVE)) {
 			return true;
-		} else if (status.equals(RemotePlayerInfo.STATUS_INACTIVE)) {
+		} else if (status.equals(STATUS_INACTIVE)) {
 			return true;
 		} else {
 			return false;

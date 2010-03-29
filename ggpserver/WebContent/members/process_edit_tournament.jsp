@@ -46,7 +46,7 @@
 				<%
 					String urlWithSessionID = response.encodeRedirectURL("edit_tournament.jsp" 
 							+ "?tournamentID=" + request.getParameter("tournamentID")
-							+ "&page=" + request.getParameter("page")) ;
+							+ "&page=" + request.getParameter("page") + "#" + request.getParameter("anchor")) ;
 					response.sendRedirect(urlWithSessionID);
 				%>
 			</c:when> 

@@ -41,6 +41,9 @@
 		<jsp:setProperty name="viewState" property="matchID" />
 	</c:catch>
 	<c:catch>
+		<jsp:setProperty name="viewState" property="userName" value="<%= request.getUserPrincipal().getName() %>" />
+	</c:catch>
+	<c:catch>
 		<jsp:setProperty name="viewState" property="stepNumber" />
 	</c:catch>
 	<c:catch>
@@ -54,5 +57,11 @@
 		return;
 	}
 %>
+</c:if>
+<c:if test="${!viewState.viewable}">
+	<%
+		String urlWithSessionID = response.encodeRedirectURL("../public/view_match.jsp?matchID="+viewState.getMatchID());
+		response.sendRedirect(urlWithSessionID);
+	%>
 </c:if>
 <% out.clearBuffer(); // to remove newline characters up to here %>${viewState.xmlState}

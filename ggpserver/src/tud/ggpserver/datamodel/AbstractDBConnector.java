@@ -52,7 +52,6 @@ import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.impl.State;
 import tud.gamecontroller.logging.GameControllerErrorMessage;
-import tud.gamecontroller.players.HumanPlayerInfo;
 import tud.gamecontroller.players.LegalPlayerInfo;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.players.RandomPlayerInfo;
@@ -243,7 +242,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			ps.setString(2, host);
 			ps.setInt(3, port);
 			ps.setString(4, owner.getUserName());
-			ps.setString(5, status);
+			ps.setString(5, status.toString());
 			ps.setBoolean(6, true);
 			ps.setBoolean(7, true);
 			ps.setInt(8, Utilities.gdlVersion(gdlVersion));
@@ -1006,7 +1005,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			// add specific filters
 			if (status != null) {
 				where += " AND `status` = ?";
-				parameters.add(status);
+				parameters.add(status.toString());
 			}
 			if (availableForRoundRobinMatches != null) {
 				where += " AND `plays_round_robin` = ?";
@@ -1669,7 +1668,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		} 
 	}
 	
-	private boolean isUser (String player) throws SQLException {
+	public boolean isUser (String player) throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		
@@ -2011,6 +2010,8 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			ps.setInt(7, gdlVersion);
 			ps.setString(8, playerName);
 			ps.executeUpdate();
+			
+			logger.info(ps.toString());
 			
 			RemotePlayerInfo playerInfo = (RemotePlayerInfo) getPlayerInfo(playerName);
 			notifyPlayerStatusListeners(playerInfo);			

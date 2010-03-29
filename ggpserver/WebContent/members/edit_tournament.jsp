@@ -1,6 +1,7 @@
 <%--
     Copyright (C) 2009 Martin Günther (mintar@gmx.de)
                   2009 Stephan Schiffel (stephan.schiffel@gmx.de)
+                  2010 Nicolas JEAN (njean42@gmail.com)
 
     This file is part of GGP Server.
 
@@ -38,6 +39,8 @@
 <%@page import="tud.ggpserver.formhandlers.EditTournament"%>
 
 <c:set var="title">Edit Tournament ${pager.tournament.tournamentID}</c:set>
+
+<a name="page-top"/>
 
 <c:choose>
 	<c:when test="${pager.allow}">
@@ -99,6 +102,7 @@
 		    <tbody>
 		    
 			<c:forEach var="match" items="${pager.matches}" varStatus="lineInfo">
+			    
 			    <c:choose>
 				<c:when test="${lineInfo.count % 2 == 0}">
 				    <c:set var="rowClass" value="even" />
@@ -113,7 +117,7 @@
 				<td>
 				    <c:choose>
 					<c:when test="${match.status == 'new'}">
-					    <select name="gameName+${match.matchID}" size="1" onChange="theForm.action='${saveChangesURLWithNewContent}'; theForm.submit();" style="max-width:120px;">
+					    <select name="gameName+${match.matchID}" size="1" onChange="theForm.action='${saveChangesURLWithNewContent}#page-end'; theForm.submit();" style="max-width:120px;">
 						<c:forEach var="game" items="${pager.games}">
 							<c:choose>
 								<c:when test='${game.name == match.game.name}'>
@@ -127,6 +131,7 @@
 					    </select>							
 					</c:when>
 					<c:otherwise>
+					    <a name="<c:out value="${match.matchID}"/>" />
 					    <c:out value="${match.matchID}" />
 					</c:otherwise>
 				    </c:choose>
@@ -183,18 +188,24 @@
 									</option>
 							    </c:forEach>
 							    
-							    <!-- have the possibility to choose oneself as player -->
-							    <c:choose>
-								    <c:when test='${pager.userName == selectedplayerinfo.name}'>
-								    	<c:set var="playerSelected">selected="selected"</c:set>
-								    </c:when>
-								    <c:otherwise>
-								    	<c:set var="playerSelected"/>
-								    </c:otherwise>
-								</c:choose>
-						    	<option value="${pager.userName}" ${playerSelected} style="font-weight:bold;">
-									<c:out value="${pager.userName}" />
-								</option>
+							    <!-- have the possibility to choose users as players -->
+							    <c:forEach var="user" items="${pager.users}">
+								    <c:choose>
+									    <c:when test='${user.userName == selectedplayerinfo.name}'>
+									    	<c:set var="playerSelected">selected="selected"</c:set>
+									    </c:when>
+									    <c:otherwise>
+									    	<c:set var="playerSelected"/>
+									    </c:otherwise>
+									</c:choose>
+									<c:set var="playerStyle"/>
+							    	<c:if test="${user.userName == pager.userName}">
+										<c:set var="playerStyle">font-weight:bold;${playerStyle}</c:set>
+									</c:if>
+									<option value="${user.userName}" ${playerSelected} style="${playerStyle}">
+										<c:out value="${user.userName}" />
+									</option>
+								</c:forEach>
 							</select>
 					    </c:when>
 					    <c:otherwise>
@@ -232,7 +243,7 @@
 						    			<input type="text" name="goalvalue+${match.matchID}" size="3" value="${match.orderedGoalValues[roleindex]}" maxlength="4" style="text-align: right;" onChange="theForm.action='${saveChangesURLWithNoNewContent}'; theForm.submit();">
 						    		</c:when>
 						    		<c:otherwise>
-						    			<input type="hidden" name="goalvalue+${match.matchID}" value="${match.orderedGoalValues[roleindex]}">
+						    			<input type="hidden" name="goalvalue+${match.matchID}" value="${match.orderedGoalValues[roleindex]}">${match.orderedGoalValues[roleindex]}
 						    		</c:otherwise>
 						    	</c:choose>
 								<br>
@@ -281,6 +292,7 @@
 							<c:param name="action" value="<%= EditTournament.START_MATCH %>"/>
 							<c:param name="matchID" value="${match.matchID}" />
 							<c:param name="page" value="${pager.page}" />
+							<c:param name="anchor" value="${match.matchID}" />
 					    </c:url>
 					    <a href='<c:out value="${startURL}" />'><div class="start" title="start match"><span>start</span></div></a>
 					</c:when>
@@ -290,6 +302,7 @@
 							<c:param name="action" value="<%= EditTournament.ABORT_MATCH %>"/>
 							<c:param name="matchID" value="${match.matchID}" />
 							<c:param name="page" value="${pager.page}" />
+							<c:param name="anchor" value="${previousMatchID}" />
 					    </c:url>
 					    <a href='<c:out value="${abortURL}" />'><div class="abort" title="abort match"><span>abort</span></div></a>
 					</c:when>
@@ -305,6 +318,7 @@
 						<c:param name="action" value="<%= EditTournament.DELETE_MATCH %>"/>
 						<c:param name="matchID" value="${match.matchID}" />
 						<c:param name="page" value="${pager.page}" />
+						<c:param name="anchor" value="${previousMatchID}" />
 				    </c:url>
 					    
 				    <c:choose>
@@ -326,26 +340,30 @@
 						<c:param name="action" value="<%= EditTournament.CLONE_MATCH %>"/>
 						<c:param name="matchID" value="${match.matchID}" />
 						<c:param name="page" value="${pager.page}" />
+						<c:param name="anchor" value="page-end" />
 				    </c:url>
 				    <a href='<c:out value="${cloneURL}" />'><div class="clone" title="clone match"><span>clone</span></div></a>
 				</td>
 				
-				<%-- action "play" [all] --%>
+				<%-- action "play" [only scheduled or running matches, and user taking part in] --%>
 				<td class="nopadding">
-					<c:forEach var="playerinfo" items="${match.orderedPlayerInfos}">
+					<c:forEach var="i" begin="0" end="${match.game.numberOfRoles - 1}">
 						<c:choose>
-							<c:when test="${ playerinfo.name == pager.userName && match.status == 'running' }">
+							<c:when test="${ match.orderedPlayerInfos[i].name == pager.userName && (match.status == 'scheduled' || match.status == 'running') }">
 							    <c:url value="/members/play.jsp" var="playURL">
 							    	<c:param name="matchID" value="${match.matchID}" />
-									<c:param name="userName" value="${pager.userName}" />
+							    	<c:param name="role" value="${match.orderedPlayerRoles[i].name}" />
 							    </c:url>
-							    <a href='<c:out value="${playURL}" />'><div class="play" title="play match!"><span>play</span></div></a>
+							    <a href='<c:out value="${playURL}" />'><div class="play" title="play match! (as <c:out value="${match.orderedPlayerRoles[i]}"/>)"><span>play</span></div></a>
 							</c:when>
 					    </c:choose>
 					</c:forEach>
 				</td>
 				
 			    </tr>
+			    
+			    <c:set var="previousMatchID" value="${match.matchID}"/>
+			    
 			</c:forEach>
 			
 			<%-- "add new match" --%>
@@ -370,6 +388,7 @@
 					    <c:param name="tournamentID" value="${pager.tournamentID}"/>
 					    <c:param name="action" value="<%= EditTournament.ADD_MATCH %>"/>
 					    <c:param name="page" value="${pager.page}" />
+					    <c:param name="anchor" value="page-end" />
 					</c:url>
 					<a href='<c:out value="${addMatchURL}" />'>Add new match</a>
 			    </td>		
@@ -397,7 +416,9 @@
 
 	<c:otherwise>
 			<h1 class="notopborder">Access forbidden</h1>
-	</c:otherwise> 
+	</c:otherwise>
 </c:choose>
+
+<a name="page-end"/>
 
 <jsp:directive.include file="/inc/footer.jsp" />

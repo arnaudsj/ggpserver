@@ -25,6 +25,7 @@
 	<c:catch>
 		<jsp:setProperty name="play" property="matchID" />
 		<jsp:setProperty name="play" property="userName" value="<%= request.getUserPrincipal().getName() %>" />
+		<jsp:setProperty name="play" property="role"/>
 		<jsp:setProperty name="play" property="forStepNumber"/> <!-- the previous page's stepNumber, for which the action (chosenMove) is meant -->
 		<jsp:setProperty name="play" property="chosenMove"/>
 	</c:catch>
@@ -40,6 +41,12 @@
 <c:choose>
 	<c:when test="${play.playing}">
 <% out.clearBuffer(); // to remove newline characters up to here %>${play.xmlState}
+	</c:when>
+	<c:when test="${play.scheduled}">
+		<%
+			String urlWithSessionID = response.encodeRedirectURL("../public/view_match.jsp?matchID="+play.getMatchID());
+			response.sendRedirect(urlWithSessionID);
+		%>
 	</c:when>
 	<c:otherwise>
 		<%

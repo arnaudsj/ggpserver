@@ -38,6 +38,7 @@ import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.players.RandomPlayerInfo;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.Game;
+import tud.ggpserver.datamodel.RemoteOrHumanPlayerInfo;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
 import tud.ggpserver.datamodel.Tournament;
 import tud.ggpserver.datamodel.User;
@@ -56,7 +57,7 @@ public class EditTournament extends ShowMatches {
 	public static final String CLONE_MATCH = "clone_match";
 	
 	private static final Logger logger = Logger.getLogger(EditTournament.class.getName());
-
+	
 	private Tournament<?, ?> tournament = null;
 	private String action = null;
 	private ServerMatch<?, ?> match = null;
@@ -164,8 +165,8 @@ public class EditTournament extends ShowMatches {
 				for(PlayerInfo playerInfo:match.getPlayerInfos()) {
 					if(playerInfo instanceof RemotePlayerInfo) {
 						RemotePlayerInfo remotePlayerInfo = (RemotePlayerInfo)playerInfo;
-						if(!remotePlayerInfo.getStatus().equals(RemotePlayerInfo.STATUS_ACTIVE)) {
-							errorString = "start match is invalid: "+remotePlayerInfo.getName()+" is " + remotePlayerInfo.getStatus() + "(not " + RemotePlayerInfo.STATUS_ACTIVE + ")";
+						if(!remotePlayerInfo.getStatus().equals(RemoteOrHumanPlayerInfo.STATUS_ACTIVE)) {
+							errorString = "start match is invalid: "+remotePlayerInfo.getName()+" is " + remotePlayerInfo.getStatus() + "(not " + RemoteOrHumanPlayerInfo.STATUS_ACTIVE + ")";
 							break;
 						}
 						if(!remotePlayerInfo.isAvailableForManualMatches() && !remotePlayerInfo.getOwner().equals(user)) {
@@ -295,7 +296,7 @@ public class EditTournament extends ShowMatches {
 				ListIterator<? extends RemotePlayerInfo> i = allRemotePlayers.listIterator();
 				while(i.hasNext()){
 					RemotePlayerInfo p = i.next();
-					if(p.getStatus().equals(RemotePlayerInfo.STATUS_ACTIVE) &&
+					if(p.getStatus().equals(RemoteOrHumanPlayerInfo.STATUS_ACTIVE) &&
 						(p.isAvailableForManualMatches() || p.getOwner().equals(user)) &&
 						Utilities.areCompatible(p, gdlVersion)) { // compatibility check: only allow players to play games they understand!
 							playerInfos.get(gdlVersion).add(new PlayerInfoForEditTournament(p.getName(), true, p.getOwner()));
@@ -379,4 +380,10 @@ public class EditTournament extends ShowMatches {
 			return owner;
 		}
 	}
+	
+	public List<User> getUsers () throws SQLException {
+		// TODO: get only logged-in users
+		return db.getUsers(0, 10);
+	}
+	
 }

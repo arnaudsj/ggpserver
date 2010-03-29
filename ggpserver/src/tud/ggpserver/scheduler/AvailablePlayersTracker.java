@@ -29,9 +29,14 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.Iterator;
 
+import tud.gamecontroller.auxiliary.Pair;
+import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
+import tud.ggpserver.datamodel.HumanPlayerInfo;
+import tud.ggpserver.datamodel.RemoteOrHumanPlayerInfo;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
 
 /**
@@ -60,22 +65,27 @@ import tud.ggpserver.datamodel.RemotePlayerInfo;
 public class AvailablePlayersTracker<TermType extends TermInterface, ReasonerStateInfoType> implements PlayerStatusListener {
 	private static final Logger logger = Logger.getLogger(AvailablePlayersTracker.class.getName());
 
-	private Map<String, RemotePlayerInfo> activePlayers;
+	private Map<String, RemoteOrHumanPlayerInfo> activePlayers;
 	private Set<String> playingPlayers;
 
 	private Collection<AvailablePlayersListener> availablePlayersListeners = new ArrayList<AvailablePlayersListener>();
 	
+	private Set<Pair<String,String>> availableHumanPlayers;
+	
 	
 	public AvailablePlayersTracker(final AbstractDBConnector<TermType, ReasonerStateInfoType> dbConnector) {
-		activePlayers = new HashMap<String, RemotePlayerInfo>();
+		activePlayers = new HashMap<String, RemoteOrHumanPlayerInfo>();
 		playingPlayers = Collections.synchronizedSet(new HashSet<String>());
+		availableHumanPlayers = Collections.synchronizedSet(new HashSet<Pair<String,String>>());
 		
 		dbConnector.addPlayerStatusListener(this);
 		synchronized (this) {
 			try {
-				for(RemotePlayerInfo p:dbConnector.getPlayerInfos(RemotePlayerInfo.STATUS_ACTIVE)) {
+				// add active remote players
+				for(RemotePlayerInfo p:dbConnector.getPlayerInfos(RemoteOrHumanPlayerInfo.STATUS_ACTIVE)) {
 					activePlayers.put(p.getName(), p);
 				}
+				// in the constructor, we don't care about HumanPlayers yet
 			} catch (SQLException e) {
 				logger.severe("exception: " + e);
 				InternalError internalError = new InternalError();
@@ -97,7 +107,7 @@ public class AvailablePlayersTracker<TermType extends TermInterface, ReasonerSta
 		}
 	}
 	
-	private void notifyAvailablePlayersListeners(RemotePlayerInfo player) {
+	private void notifyAvailablePlayersListeners(RemoteOrHumanPlayerInfo player) {
 		for(AvailablePlayersListener l:availablePlayersListeners) {
 			l.notifyAvailable(player);
 		}
@@ -106,19 +116,43 @@ public class AvailablePlayersTracker<TermType extends TermInterface, ReasonerSta
 	/**
 	 * Returns a list of active players. Doesn't block if there is no active player.
 	 */
-	public synchronized Collection<RemotePlayerInfo> getActivePlayers() {
+	public synchronized Collection<RemoteOrHumanPlayerInfo> getActivePlayers() {
 		// return a copy, so that the internal representation is not compromised
-		return new LinkedList<RemotePlayerInfo>(activePlayers.values());
+		return new LinkedList<RemoteOrHumanPlayerInfo>(activePlayers.values());
+	}
+	
+	public synchronized void setAccepted (String matchID, String playerName) {
+		Pair<String,String> p = new Pair<String, String>(matchID, playerName);
+		this.availableHumanPlayers.add(p);
+		logger.info("Enabling pair <"+p.getLeft()+" ; "+p.getRight()+">");
+	}
+	
+	/**
+	 * removes all info about availability of HumanPlayers for the given matchID
+	 * @param matchID
+	 */
+	public synchronized void forgetAboutHumansAvailability (String matchID) {
+		Iterator<Pair<String,String>> it = availableHumanPlayers.iterator();
+		while (it.hasNext()) {
+			Pair<String,String> p = it.next();
+			if (p.getLeft().equals(matchID))
+				it.remove();
+		}
+	}
+	
+	// only for HumanPlayers
+	public boolean hasAccepted (String matchID, String playerName) {
+		return availableHumanPlayers.contains(new Pair<String,String>(matchID, playerName));
 	}
 
 	/**
 	 * Returns a list of active players. Blocks until there is at least one active player.
 	 */
-	public synchronized Collection<RemotePlayerInfo> waitForActivePlayers() throws InterruptedException {
+	public synchronized Collection<RemoteOrHumanPlayerInfo> waitForActivePlayers() throws InterruptedException {
 		while (activePlayers.isEmpty()) {
 			this.wait();
 		}
-		return new LinkedList<RemotePlayerInfo>(activePlayers.values());
+		return new LinkedList<RemoteOrHumanPlayerInfo>(activePlayers.values());
 	}
 
 	/* (non-Javadoc)
@@ -126,18 +160,27 @@ public class AvailablePlayersTracker<TermType extends TermInterface, ReasonerSta
 	 */
 	@Override
 	public synchronized void notifyStatusChange(RemotePlayerInfo player) {
-		if (player.getStatus().equals(RemotePlayerInfo.STATUS_ACTIVE)) {
+		if (player.getStatus() == RemoteOrHumanPlayerInfo.STATUS_ACTIVE) {
 			logger.info("player " + player.getName() + " is now active");
 			activePlayers.put(player.getName(), player);   // since activePlayers is a set, we don't need to worry about duplicates
 			// it is also necessary to store the new player here in case the address has changed
 			this.notifyAll();
 			notifyAvailablePlayersListeners(player);
-		} else if (player.getStatus().equals(RemotePlayerInfo.STATUS_INACTIVE)) {
+		} else if (player.getStatus() == RemoteOrHumanPlayerInfo.STATUS_INACTIVE) {
 			logger.info("player " + player.getName() + " is now inactive");
 			if (activePlayers.containsKey(player.getName())) // it could be that this player was not GDL-compatible, and therefore not in 'activePlayers'
 				activePlayers.remove(player.getName());
 			this.notifyAll();
 		}
+	}
+	
+	public boolean playerIsActive (RemoteOrHumanPlayerInfo player) {
+		if (player instanceof RemotePlayerInfo) {
+			return ((RemotePlayerInfo)player).getStatus() == RemoteOrHumanPlayerInfo.STATUS_ACTIVE;
+		} else if (player instanceof HumanPlayerInfo) {
+			return false; //return availableHumanPlayers.contains(new Pair<>);
+		}
+		return false;
 	}
 
 	public synchronized void notifyStartPlaying(String name) {
@@ -158,14 +201,16 @@ public class AvailablePlayersTracker<TermType extends TermInterface, ReasonerSta
 		return !playingPlayers.contains(name) && activePlayers.containsKey(name);
 	}
 
-	public synchronized Collection<RemotePlayerInfo> waitForPlayersAvailableForRoundRobin() throws InterruptedException {
-		Set<RemotePlayerInfo> availablePlayerSet = new HashSet<RemotePlayerInfo>();
+	public synchronized Collection<? extends PlayerInfo> waitForPlayersAvailableForRoundRobin() throws InterruptedException {
+		Set<PlayerInfo> availablePlayerSet = new HashSet<PlayerInfo>();
 		while(availablePlayerSet.isEmpty()) {
-			Collection<RemotePlayerInfo> activePlayers = waitForActivePlayers();
-			for(RemotePlayerInfo player:activePlayers) {
-				if(		player.isAvailableForRoundRobinMatches() &&
-						!isPlaying(player.getName()) ) { // TODO: only take compatible player
-					availablePlayerSet.add(player);
+			Collection<RemoteOrHumanPlayerInfo> activePlayers = waitForActivePlayers();
+			for(RemoteOrHumanPlayerInfo player:activePlayers) {
+				if (player instanceof RemotePlayerInfo) {
+					if(		((RemotePlayerInfo)player).isAvailableForRoundRobinMatches() &&
+							!isPlaying(player.getName()) ) { // TODO: only take compatible player
+						availablePlayerSet.add((RemotePlayerInfo)player);
+					}
 				}
 			}
 			if(availablePlayerSet.isEmpty()) {
@@ -174,6 +219,5 @@ public class AvailablePlayersTracker<TermType extends TermInterface, ReasonerSta
 		}
 		return availablePlayerSet;
 	}
-
 
 }

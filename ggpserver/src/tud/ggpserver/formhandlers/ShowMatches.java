@@ -24,9 +24,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Logger;
 
-import tud.gamecontroller.game.impl.Game;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.matches.ServerMatch;
@@ -45,7 +43,7 @@ public class ShowMatches extends AbstractPager {
 	private int rowCountMatches = -1;
 	private int startRow = -1;
 	
-	private static final Logger logger = Logger.getLogger(Game.class.getName());
+	//private static final Logger logger = Logger.getLogger(Game.class.getName());
 	
 
 	@Override
