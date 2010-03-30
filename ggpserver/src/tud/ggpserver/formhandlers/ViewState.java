@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 
 import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.auxiliary.Pair;
-import tud.gamecontroller.players.HumanPlayer;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.matches.ServerMatch;
 import tud.ggpserver.util.StateXMLExporter;

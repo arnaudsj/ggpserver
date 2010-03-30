@@ -12,6 +12,7 @@
 		<xsl:param name="step"/> <!-- an integer number >=1 or 'final' -->
 		<xsl:param name="role"/> <!-- the player who sees the game field -->
 		<xsl:param name="pathPrefix"/> <!-- because working with relative URLs, this can be useful (e.g. for call from history, while playing) -->
+		<xsl:param name="seconds"/> <!-- for the play mode, adds how many seconds we will wait to show next step -->
 		<xsl:value-of select="$pathPrefix"/>
 		<xsl:text disable-output-escaping="yes">view_state.jsp?matchID=</xsl:text>
 		<xsl:value-of select="/match/match-id"/>
@@ -19,6 +20,10 @@
 		<xsl:value-of select="$step"/>
 		<xsl:text disable-output-escaping="yes">&amp;role=</xsl:text>
 		<xsl:value-of select="$role"/>
+		<xsl:if test="$seconds != ''">
+			<xsl:text disable-output-escaping="yes">&amp;seconds=</xsl:text>
+			<xsl:value-of select="$seconds"/>
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template name="makePlayLinkURL">

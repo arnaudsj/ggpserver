@@ -28,6 +28,7 @@ import java.util.List;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.matches.ServerMatch;
+import tud.ggpserver.scheduler.MatchRunner;
 
 public class ShowMatches extends AbstractPager {
 	private String playerName = null;
@@ -64,10 +65,15 @@ public class ShowMatches extends AbstractPager {
 		this.startRow = startRow;
 	}
 	
+	private final boolean PREFER_DB_ACCESS = false;
 	public List<? extends ServerMatch<?, ?>> getMatches() throws SQLException {
 		if (matches == null) {
-			//logger.info(""+getStartRow()+", "+getNumDisplayedRows()+", "+playerName+", "+gameName+", "+tournamentID+", "+owner+", "+status+", "+excludeNewMatches());
-			matches = db.getMatches(getStartRow(), getNumDisplayedRows(), playerName, gameName, tournamentID, owner, status, excludeNewMatches());
+			if (status == "running" && ! PREFER_DB_ACCESS) {
+				matches = MatchRunner.getInstance().getRunningMatches();
+			} else {
+				//logger.info(""+getStartRow()+", "+getNumDisplayedRows()+", "+playerName+", "+gameName+", "+tournamentID+", "+owner+", "+status+", "+excludeNewMatches());
+				matches = db.getMatches(getStartRow(), getNumDisplayedRows(), playerName, gameName, tournamentID, owner, status, excludeNewMatches());
+			}
 		}
 		return matches;
 	}

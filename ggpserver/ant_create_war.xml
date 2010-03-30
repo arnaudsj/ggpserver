@@ -13,6 +13,7 @@
 			<fileset dir="${gamecontroller.location}/resources/">
 				<include name="stylesheets/**"/>
 				<exclude name="stylesheets/generic/sitespecific.xsl"/>
+				<exclude name="stylesheets/generic/template.xsl"/>
 			</fileset>
 		</war>
 	</target>

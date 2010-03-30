@@ -45,7 +45,7 @@ public class ViewMatch {
 	private int stepNumber = 1;
 	private String playerName = null;
 	private List<GameControllerErrorMessage> errorMessagesForStep = null;
-	private String userName;
+	//private String userName;
 
 	public String getPlayerName() {
 		return playerName;
@@ -74,9 +74,9 @@ public class ViewMatch {
 		return matchID;
 	}
 	
-	public void setuserName (String userName) {
+	/*public void setuserName (String userName) {
 		this.userName = userName;
-	}
+	}*/
 	
 	public List<Pair<String,String>> getStatuses () {
 		List<Pair<String,String>> res = new LinkedList<Pair<String,String>>();

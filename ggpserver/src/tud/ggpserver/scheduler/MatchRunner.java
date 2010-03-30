@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -169,6 +171,13 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 	public synchronized RunningMatch<TermType, ReasonerStateInfoType> getRunningMatch (String matchID) {
 		if (!matchThreads.containsKey(matchID)) return null;
 		return matchThreads.get(matchID).getMatch();
+	}
+	
+	public synchronized List<RunningMatch<TermType, ReasonerStateInfoType>> getRunningMatches () {
+		List<RunningMatch<TermType, ReasonerStateInfoType>> res = new LinkedList<RunningMatch<TermType, ReasonerStateInfoType>>();
+		for (MatchThread<TermType,ReasonerStateInfoType> match: matchThreads.values())
+			res.add(match.getMatch());
+		return res;
 	}
 	
 	/**

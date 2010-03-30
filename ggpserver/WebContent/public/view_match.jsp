@@ -31,7 +31,6 @@
 		%>
 		<jsp:setProperty name="viewMatch" property="matchID" />
 		<jsp:setProperty name="viewMatch" property="playerName" />
-		<jsp:setProperty name="viewMatch" property="userName" value="<%= request.getUserPrincipal().getName() %>" />
 	</c:catch>
 </jsp:useBean>
 
