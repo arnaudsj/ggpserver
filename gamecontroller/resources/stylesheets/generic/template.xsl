@@ -23,8 +23,7 @@
 	<xsl:import href="playerInfo.xsl"/>
 	<xsl:import href="playClock.xsl"/>
 	<xsl:import href="state.xsl"/>
-	<xsl:import href="legalMoves.xsl"/>
-
+	
 	<xsl:template name="main" match="/">
 		
 		<html>
@@ -55,10 +54,6 @@
 							<xsl:call-template name="playerInfo"/>
 							<!--<br/>-->
 							<xsl:call-template name="history"/>
-						</td>
-						
-						<td style="padding: 10px; vertical-align: top;">
-							<xsl:call-template name="legalMoves"/>
 						</td>
 						
 					</tr>

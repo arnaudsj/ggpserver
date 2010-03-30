@@ -174,7 +174,7 @@ public class Game<
 		}
 	}
 	
-	private String getCompleteRules() {
+	public String getCompleteRules() {
 		return gameDescription+"\n"+seesRules+"\n"+seesXMLRules;
 	}
 	

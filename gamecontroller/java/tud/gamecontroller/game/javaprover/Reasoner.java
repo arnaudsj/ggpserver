@@ -201,6 +201,7 @@ public class Reasoner implements ReasonerInterface<Term, GameState> {
 		ExpList el = null;
 		synchronized (gameSim) {
 			gameSim.SetGameState(state);
+			System.out.println(role);
 			Expression r = role.getTerm().getExpr();
 			el = gameSim.getSeesXMLTerms(r);
 		}

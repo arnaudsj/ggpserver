@@ -250,7 +250,11 @@ public class XMLGameStateWriter
 		 GameInterface<?, ?> game = match.getGame();
 		 GDLVersion gdlVersion = game.getGdlVersion();
 		 e=xmldoc.createElement("sight-of");
-		 e.setTextContent(role.getKIFForm().toUpperCase());
+		 if (role != null) {
+			 e.setTextContent(role.getKIFForm().toUpperCase());
+		 } else {
+			 e.setTextContent("RANDOM");
+		 }
 		 root.appendChild(e);
 		 
 		 
@@ -318,7 +322,12 @@ public class XMLGameStateWriter
 	@SuppressWarnings("unchecked")
 	private static Node createStateElement(Document xmldoc, StateInterface<? extends TermInterface, ?> currentState, RoleInterface<? extends TermInterface> role) {
 		Element state=xmldoc.createElement("state");
-		Collection<? extends TermInterface> terms = currentState.getSeesXMLTerms( (RoleInterface) role);
+		Collection<? extends TermInterface> terms;
+		if (role == null) { // GDL-I
+			terms = (Collection<? extends TermInterface>) currentState.getFluents();
+		} else {
+			terms = currentState.getSeesXMLTerms( (RoleInterface) role);
+		}
 		for(TermInterface t:terms) {
 			state.appendChild(createTermElement(xmldoc, "fact", t));
 		}
