@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+                  2010 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GGP Server.
 
@@ -26,6 +27,9 @@ import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.Game;
 
 public class ShowGames extends AbstractPager {
+	
+	private List<String> gameNames = null;
+	
 	public List<Game<?, ?>> getGames() throws SQLException {
 		return DBConnectorFactory.getDBConnector().getGames(getStartRow(), getNumDisplayedRows());
 	}
@@ -38,5 +42,17 @@ public class ShowGames extends AbstractPager {
 	@Override
 	public String getTableName() {
 		return "games";
+	}
+	
+	@Override
+	public String getTitleOfPage(int pageNumber) throws SQLException {
+		if (gameNames == null) {
+			gameNames = DBConnectorFactory.getDBConnector().getGameNames();
+		}
+		int firstGameIndex = (pageNumber - 1)*getNumDisplayedRows();
+		if (firstGameIndex>=0 && firstGameIndex < gameNames.size())
+			return gameNames.get(firstGameIndex) + ", ...";
+		else
+			return null;
 	}
 }

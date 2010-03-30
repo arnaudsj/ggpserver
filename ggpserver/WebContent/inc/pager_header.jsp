@@ -21,7 +21,7 @@
 
 <c:if test="${pager.numberOfPages > 1}">
 	<c:set var="title">
-		${title} (${pager.page}/${pager.numberOfPages})
+		${title} (${pager.page}/${pager.numberOfPages}) ${pager.pageTitle}
 	</c:set>
 </c:if>
 <jsp:directive.include file="/inc/header.jsp" />

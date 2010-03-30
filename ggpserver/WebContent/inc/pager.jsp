@@ -1,5 +1,6 @@
 <%--
     Copyright (C) 2009 Martin G�nther (mintar@gmx.de)
+                  2010 Stephan Schiffel (stephan.schiffel@gmx.de)
 
     This file is part of GGP Server.
 
@@ -22,34 +23,55 @@
 	<c:if test="${pager.numberOfPages != 1}">
 		<div class="pager">
 			<c:set var="previousI" value="-1"/> 
-			<c:if test="${pager.page != 1}">
+			<c:if test="${pager.previousPage != null}">
 				<c:url value="${pager.targetJsp}" var="pageURL">
-					<c:param name="page" value="${pager.page - 1}" />
+					<c:param name="page" value="${pager.previousPage.number}" />
 				</c:url>
-				<a href='<c:out value="${pageURL}" />'>Previous</a>
+				<c:choose>
+					<c:when test="${pager.previousPage.title != ''}">
+						<a href='<c:out value="${pageURL}"/>' title="${pager.previousPage.title}">Previous</a>
+					</c:when>
+					<c:otherwise>
+						<a href='<c:out value="${pageURL}"/>'>Previous</a>
+					</c:otherwise>
+				</c:choose>
 			</c:if>
-			<c:forEach var="i" items="${pager.linkedPages}">
-				<c:if test="${(i != previousI + 1) && (previousI != -1)}">
+			<c:forEach var="linkedPage" items="${pager.linkedPages}">
+				<c:if test="${(linkedPage.number != previousI + 1) && (previousI != -1)}">
 					...
 				</c:if>
 				<c:choose>
-					<c:when test="${i == pager.page}" >
-						<b>${i}</b>
+					<c:when test="${linkedPage.number == pager.page}">
+						<b>${linkedPage.number}</b>
 					</c:when>
 					<c:otherwise>
 						<c:url value="${pager.targetJsp}" var="pageURL">
-							<c:param name="page" value="${i}" />
+							<c:param name="page" value="${linkedPage.number}" />
 						</c:url>
-						<a href='<c:out value="${pageURL}" />'>${i}</a>
+						<c:choose>
+							<c:when test="${linkedPage.title != ''}">
+								<a href='<c:out value="${pageURL}"/>' title="${linkedPage.title}">${linkedPage.number}</a>
+							</c:when>
+							<c:otherwise>
+								<a href='<c:out value="${pageURL}"/>'>${linkedPage.number}</a>
+							</c:otherwise>
+						</c:choose>
 					</c:otherwise>
 				</c:choose>
-				<c:set var="previousI" value="${i}"/> 
+				<c:set var="previousI" value="${linkedPage.number}"/> 
 			</c:forEach>
-			<c:if test="${pager.page != pager.numberOfPages}">
+			<c:if test="${pager.nextPage != null}">
 				<c:url value="${pager.targetJsp}" var="pageURL">
-					<c:param name="page" value="${pager.page + 1}" />
+					<c:param name="page" value="${pager.nextPage.number}" />
 				</c:url>
-				<a href='<c:out value="${pageURL}" />'>Next</a>
+				<c:choose>
+					<c:when test="${pager.nextPage.title != ''}">
+						<a href='<c:out value="${pageURL}"/>' title="${pager.nextPage.title}">Next</a>
+					</c:when>
+					<c:otherwise>
+						<a href='<c:out value="${pageURL}"/>'>Next</a>
+					</c:otherwise>
+				</c:choose>
 			</c:if>
 		</div>
 	</c:if>

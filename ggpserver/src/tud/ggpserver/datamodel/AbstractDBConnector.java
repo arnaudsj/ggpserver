@@ -912,7 +912,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return gdls+")";
 	}
 
-	public List<User> getUsers(int startRow, int numDisplayedRows) throws SQLException {
+	public List<User> getUsers() throws SQLException {
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -920,9 +920,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		List<User> result = new LinkedList<User>();
 		
 		try {
-			ps = con.prepareStatement("SELECT `user_name` FROM `users` ORDER BY `user_name` LIMIT ? , ? ;");
-			ps.setInt(1, startRow);
-			ps.setInt(2, numDisplayedRows);
+			ps = con.prepareStatement("SELECT `user_name` FROM `users` ORDER BY `user_name` ;");
 			rs = ps.executeQuery();
 			
 			while (rs.next()) {
@@ -939,35 +937,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 
 		return result;
 	}
-	
-	public List<PlayerInfo> getPlayerInfos(int startRow, int numDisplayedRows) throws SQLException {
-		Connection con = getConnection();
-		PreparedStatement ps = null;
-		ResultSet rs = null;
 
-		List<PlayerInfo> result = new LinkedList<PlayerInfo>();
-		
-		try {
-			ps = con.prepareStatement("SELECT `name` FROM `players` ORDER BY `name` LIMIT ? , ? ;");
-			ps.setInt(1, startRow);
-			ps.setInt(2, numDisplayedRows);
-			rs = ps.executeQuery();
-			
-			while (rs.next()) {
-				result.add(getPlayerInfo(rs.getString("name")));
-			}
-		} finally { 
-			if (con != null)
-				try {con.close();} catch (SQLException e) {}
-			if (ps != null)
-				try {ps.close();} catch (SQLException e) {}
-			if (rs != null)
-				try {rs.close();} catch (SQLException e) {}
-		} 
-
-		return result;
-	}
-	
 	public List<RemotePlayerInfo> getPlayerInfos() throws SQLException {
 		return getPlayerInfos(null);
 	}
@@ -2508,6 +2478,31 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 
 	public User getAdminUser() throws SQLException {
 		return getUser("admin");
+	}
+
+	public List<String> getGameNames() throws SQLException {
+		Connection con = getConnection();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		List<String> result = new ArrayList<String>();
+		
+		try {
+			ps = con.prepareStatement("SELECT `name` FROM `games` ORDER BY `name`;");
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				result.add(rs.getString("name"));
+			}
+		} finally { 
+			if (con != null)
+				try {con.close();} catch (SQLException e) {}
+			if (ps != null)
+				try {ps.close();} catch (SQLException e) {}
+			if (rs != null)
+				try {rs.close();} catch (SQLException e) {}
+		} 
+
+		return result;
 	}
 
 }

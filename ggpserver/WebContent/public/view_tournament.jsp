@@ -136,7 +136,15 @@
 						<c:out value="${player.name}" />
 					</a>
 				</td>
-				<td>${viewTournament.tournamentStatistics.numberOfMatches[player]}</td>
+				<td>
+					<c:url value="show_matches.jsp" var="matchesURL">
+						<c:param name="tournamentID" value="${viewTournament.tournamentID}" />
+						<c:param name="playerName" value="${player.name}" />
+					</c:url>
+					<a href='<c:out value="${matchesURL}" />' title="show matches of ${player.name}">
+						${viewTournament.tournamentStatistics.numberOfMatches[player]}
+					</a>
+				</td>
 				<td>${viewTournament.tournamentStatistics.totalReward[player]}</td>
 				<td>${viewTournament.tournamentStatistics.averageReward[player]}</td>
 			</tr>

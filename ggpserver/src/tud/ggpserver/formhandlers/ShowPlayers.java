@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+                  2010 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GGP Server.
 
@@ -21,35 +22,22 @@ package tud.ggpserver.formhandlers;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.logging.Logger;
 
 import tud.gamecontroller.players.PlayerInfo;
 import tud.ggpserver.datamodel.DBConnectorFactory;
-import tud.ggpserver.datamodel.RemotePlayerInfo;
 
 public class ShowPlayers extends AbstractPager {
-	private static final Logger logger = Logger.getLogger(ShowPlayers.class.getName());
+	private List<? extends PlayerInfo> playerInfos = null;
 
-	public List<PlayerInfo> getPlayers() throws SQLException {
-		List<PlayerInfo> result = DBConnectorFactory.getDBConnector().getPlayerInfos(getStartRow(), getNumDisplayedRows());
-		
-		if (!onlyRemotePlayerInfos(result)) {
-			logger.severe("DBConnector.getPlayerInfos() returned a PlayerInfo that was not a RemotePlayerInfo!"); //$NON-NLS-1$
-			// this must not happen because show_players.jsp will call getOwner() on
-			// the result, which is only defined for RemotePlayerInfos.
-			assert(false);  
+	private List<? extends PlayerInfo> getAllPlayers() throws SQLException {
+		if (playerInfos == null) {
+			playerInfos = DBConnectorFactory.getDBConnector().getPlayerInfos();
 		}
-		
-		return result;
+		return playerInfos;
 	}
 	
-	private boolean onlyRemotePlayerInfos(List<PlayerInfo> result) {
-		for (PlayerInfo info : result) {
-			if (!(info instanceof RemotePlayerInfo)) {
-				return false;
-			}
-		}
-		return true;
+	public List<? extends PlayerInfo> getPlayers() throws SQLException {
+		return getAllPlayers().subList(getStartRow(), Math.min(getStartRow() + getNumDisplayedRows() - 1, getAllPlayers().size() -  1));
 	}
 
 	@Override
@@ -60,5 +48,14 @@ public class ShowPlayers extends AbstractPager {
 	@Override
 	public String getTargetJsp() {
 		return "show_players.jsp";
+	}
+
+	@Override
+	public String getTitleOfPage(int pageNumber) throws SQLException {
+		int firstIndex = (pageNumber - 1)*getNumDisplayedRows();
+		if (firstIndex>=0 && firstIndex < getAllPlayers().size())
+			return getAllPlayers().get(firstIndex) + ", ...";
+		else
+			return null;
 	}
 }

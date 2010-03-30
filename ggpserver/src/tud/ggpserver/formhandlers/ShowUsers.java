@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+                  2010 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GGP Server.
 
@@ -28,10 +29,19 @@ import tud.ggpserver.datamodel.User;
 
 public class ShowUsers extends AbstractPager {
 
-	public List<User> getUsers() throws SQLException {
-		return DBConnectorFactory.getDBConnector().getUsers(getStartRow(), getNumDisplayedRows());
+	private List<User> users = null;
+
+	private List<User> getAllUsers() throws SQLException {
+		if (users == null) {
+			users = DBConnectorFactory.getDBConnector().getUsers();
+		}
+		return users;
 	}
 	
+	public List<User> getUsers() throws SQLException {
+		return getAllUsers().subList(getStartRow(), Math.min(getStartRow() + getNumDisplayedRows() - 1, getAllUsers().size() -  1));
+	}
+
 	@Override
 	public String getTableName() {
 		return "users";
@@ -42,4 +52,12 @@ public class ShowUsers extends AbstractPager {
 		return "show_users.jsp";
 	}
 
+	@Override
+	public String getTitleOfPage(int pageNumber) throws SQLException {
+		int firstIndex = (pageNumber - 1)*getNumDisplayedRows();
+		if (firstIndex>=0 && firstIndex < getAllUsers().size())
+			return getAllUsers().get(firstIndex) + ", ...";
+		else
+			return null;
+	}
 }

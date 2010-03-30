@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+                  2010 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GGP Server.
 
@@ -20,10 +21,11 @@
 package tud.ggpserver.formhandlers;
 
 import java.sql.SQLException;
-import java.util.AbstractList;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import tud.gamecontroller.auxiliary.Pair;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 
 public abstract class AbstractPager {
@@ -79,21 +81,16 @@ public abstract class AbstractPager {
 		return (getRowCount() - 1) / getNumDisplayedRows() + 1;
 	}
 
-	public List<Integer> getLinkedPages() throws SQLException {
+	public List<LinkedPage> getLinkedPages() throws SQLException {
 		final int numPages = getNumberOfPages();
 		
 		if(numPages <= getMaxNumDisplayedLinks()){
 			// show links to all pages
-			return new AbstractList<Integer>(){
-				@Override
-				public Integer get(int index) {
-					return index+1;
-				}
-				@Override
-				public int size() {
-					return numPages;
-				}
-			};
+			ArrayList<LinkedPage> result = new ArrayList<LinkedPage>(numPages);
+			for(int i=0; i<numPages; i++){
+				result.add(getLinkedPage(i+1));
+			}
+			return result;
 		}
 		
 		// Show links to pages
@@ -105,7 +102,7 @@ public abstract class AbstractPager {
 		// half of the links for pages around the current one and
 		// 1/4th of the links for the last pages.
 		// If the regions overlap we move the middle part in the other direction so we always get exactly maxNumDisplayedLinks. 
-		LinkedList<Integer> result=new LinkedList<Integer>();
+		LinkedList<LinkedPage> result=new LinkedList<LinkedPage>();
 		
 		int lastPageStart = (getMaxNumDisplayedLinks() - 1) / 4;
 		int firstPageEnd = numPages + 1 - getMaxNumDisplayedLinks() / 4;
@@ -128,19 +125,52 @@ public abstract class AbstractPager {
 		}
 		int i;
 		for(i=1; i<=lastPageStart; i++){
-			result.add(i);	
+			result.add(getLinkedPage(i));	
 		}
 		for(i=firstPageMiddle; i<=lastPageMiddle; i++){
-			result.add(i);	
+			result.add(getLinkedPage(i));	
 		}
 		for(i=firstPageEnd; i<=numPages; i++){
-			result.add(i);	
+			result.add(getLinkedPage(i));	
 		}
 		return result;
 	}
 
+	protected LinkedPage getLinkedPage(int i) throws SQLException {
+		return new LinkedPage(i, getTitleOfPage(i));
+	}
+
+	public LinkedPage getNextPage() throws SQLException {
+		int nextPage = getPage() + 1;
+		if (nextPage <= getNumberOfPages())
+			return getLinkedPage(nextPage);
+		else
+			return null;
+	}
+
+	public LinkedPage getPreviousPage() throws SQLException {
+		int previousPage = getPage() - 1;
+		if (previousPage > 0)
+			return getLinkedPage(previousPage);
+		else
+			return null;
+	}
+
+	/**
+	 * Override this method to return a title for each page (shown as a tool-tip on the link to the page).
+	 * @param pageNumber
+	 * @return the title
+	 */
+	protected String getTitleOfPage(int pageNumber) throws SQLException {
+		return null;
+	}
+
 	protected int getRowCount() throws SQLException {
 		return DBConnectorFactory.getDBConnector().getRowCount(getTableName());
+	}
+
+	public String getPageTitle() throws SQLException {
+		return getTitleOfPage(getPage());
 	}
 
 	public int getPage() {
@@ -179,4 +209,19 @@ public abstract class AbstractPager {
 	 *    achieved by overriding getRowCount().
 	 */
 	public abstract String getTableName();
+	
+	public static class LinkedPage extends Pair<Integer, String> {
+
+		public LinkedPage(int pageNumber, String pageTitle) {
+			super(pageNumber, pageTitle);
+		}
+		
+		public String getTitle() {
+			return getRight();
+		}
+		
+		public int getNumber() {
+			return getLeft();
+		}
+	}
 }

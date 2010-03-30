@@ -307,6 +307,19 @@ div.div_filter {
   visibility:          hidden;
 }
 
+.view-bw {
+  background: url(icons/sweetie/png-8/24-zoom-bw.png) no-repeat;
+  display:             inline-block;
+  height:              22px;
+  width:               22px;
+}
+.view-bw span {
+  visibility:          hidden;
+}
+.view-bw a span {
+  visibility:          hidden;
+}
+
 /* action: edit a player / match / game / ... */
 .edit {
   background: url(icons/other/22-edit.png) no-repeat;

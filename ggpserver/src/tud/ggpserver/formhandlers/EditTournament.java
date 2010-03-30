@@ -381,9 +381,9 @@ public class EditTournament extends ShowMatches {
 		}
 	}
 	
-	public List<User> getUsers () throws SQLException {
+	public List<User> getUsers() throws SQLException {
 		// TODO: get only logged-in users
-		return db.getUsers(0, 10);
+		return db.getUsers();
 	}
 	
 }

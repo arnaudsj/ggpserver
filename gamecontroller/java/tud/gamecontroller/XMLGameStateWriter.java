@@ -232,7 +232,7 @@ public class XMLGameStateWriter
 		 Element e = null;
 		 // Document.
 		 xmldoc = impl.createDocument(null, null, null);
-		 
+
 		 xmldoc.setXmlVersion("1.0");
 		 if(stylesheet!=null){
 			 Node xsl=xmldoc.createProcessingInstruction("xml-stylesheet","type=\"text/xsl\" href=\""+stylesheet+"\"");
@@ -249,12 +249,11 @@ public class XMLGameStateWriter
 		 // indicate for which player the xml file is meant
 		 GameInterface<?, ?> game = match.getGame();
 		 GDLVersion gdlVersion = game.getGdlVersion();
-		 e=xmldoc.createElement("sight-of");
-		 if (role != null) {
-			 e.setTextContent(role.getKIFForm().toUpperCase());
-		 } else {
-			 e.setTextContent("RANDOM");
+		 if (role == null) {
+			 role = (RoleInterface<? extends TermInterface>) game.getNatureRole();
 		 }
+		 e=xmldoc.createElement("sight-of");
+		 e.setTextContent(role.getKIFForm().toUpperCase());
 		 root.appendChild(e);
 		 
 		 
@@ -322,12 +321,7 @@ public class XMLGameStateWriter
 	@SuppressWarnings("unchecked")
 	private static Node createStateElement(Document xmldoc, StateInterface<? extends TermInterface, ?> currentState, RoleInterface<? extends TermInterface> role) {
 		Element state=xmldoc.createElement("state");
-		Collection<? extends TermInterface> terms;
-		if (role == null) { // GDL-I
-			terms = (Collection<? extends TermInterface>) currentState.getFluents();
-		} else {
-			terms = currentState.getSeesXMLTerms( (RoleInterface) role);
-		}
+		Collection<? extends TermInterface> terms = currentState.getSeesXMLTerms( (RoleInterface) role);
 		for(TermInterface t:terms) {
 			state.appendChild(createTermElement(xmldoc, "fact", t));
 		}

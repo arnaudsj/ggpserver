@@ -22,6 +22,7 @@ package tud.ggpserver.formhandlers;
 
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.List;
 
 import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.players.LocalPlayerInfo;
@@ -34,6 +35,7 @@ import tud.ggpserver.datamodel.User;
 
 public class ViewPlayer {
 	private PlayerInfo playerInfo = null;
+	private List<? extends Tournament<?,?>> tournaments = null;
 	
 	public void setName(String name) throws SQLException {
 		playerInfo = DBConnectorFactory.getDBConnector().getPlayerInfo(name);
@@ -88,9 +90,15 @@ public class ViewPlayer {
 	}
 	
 	public Collection<? extends Tournament<?,?>> getTournaments() throws SQLException {
-		return DBConnectorFactory.getDBConnector().getTournamentsForPlayer(playerInfo.getName());
+		if(tournaments == null)
+			tournaments = DBConnectorFactory.getDBConnector().getTournamentsForPlayer(playerInfo.getName());
+		return tournaments;
 	}
-	
+
+	public int getNumberOfTournaments() throws SQLException {
+		return getTournaments().size();
+	}
+
 	public GDLVersion getGdlVersion () {
 		return playerInfo.getGdlVersion();
 	}

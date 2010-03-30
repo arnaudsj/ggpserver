@@ -45,7 +45,7 @@
 			<c:if test="${internal_show_goal_values == true}">
 				<th>goal values</th>
 			</c:if>
-			<th>actions</th>
+			<th colspan="2">actions</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -77,7 +77,12 @@
 
 						<%-- tournament id --%>
 						<c:if test="${internal_show_tournament==true}">
-							<td rowspan="${numberOfPlayers}"><c:out value="${match.tournamentID}" /></td>
+							<td rowspan="${numberOfPlayers}">
+								<c:url value="/public/view_tournament.jsp" var="tournamentURL">
+									<c:param name="tournamentID" value="${match.tournamentID}" />
+								</c:url>
+								<a href='<c:out value="${tournamentURL}" />'>${match.tournamentID}</a>
+							</td>
 						</c:if>
 						
 						<%-- start &amp; play clock --%>
@@ -89,7 +94,7 @@
 					</c:if>
 
 					<%-- players --%>
-					<td style="white-space:nowrap;">
+					<td>
 						<c:url value="/public/view_player.jsp" var="playerURL">
 							<c:param name="name" value="${playerinfo.name}" />
 						</c:url>
@@ -146,22 +151,56 @@
 					</c:if>
 
 					<%-- actions --%>
-			    	<c:if test="${playerinfoIndex.count==1}">
-						<td rowspan="${numberOfPlayers}">
-						    <c:url value="/public/view_state.jsp" var="viewStateURL">
-							    <c:param name="matchID" value="${match.matchID}" />
-							    <c:param name="stepNumber" value="final" />
-							</c:url>
+					
+					<%-- action "view" --%>
+					<c:choose>
+						<c:when test="${match.game.gdlVersion == 'v1' && playerinfoIndex.count == 1}">
+							<c:set var="viewRole" value="RANDOM"/>
+							<c:set var="viewRowSpan" value="${numberOfPlayers}"/>
+						</c:when>
+						<c:when test="${match.game.gdlVersion == 'v1' && playerinfoIndex.count > 1}">
+							<c:set var="viewRowSpan" value="0"/>
+						</c:when>
+						<c:otherwise>
+							<c:set var="viewRole" value="${match.orderedPlayerRoles[playerinfoIndex.count - 1]}"/>
+							<c:set var="viewRowSpan" value="1"/>
+						</c:otherwise>
+					</c:choose>
+						
+			    	<c:if test="${viewRowSpan > 0}">
+						<td rowspan="${viewRowSpan}">
 							<c:choose>
-								<c:when test="{match.goalValues==null}">
-									<c:set var="viewStateLinkTitle">View Current State</c:set>
+								<c:when test="${ match.status != 'new' && match.status != 'scheduled' }">
+								    <c:url value="/public/view_state.jsp" var="viewStateURL">
+									    <c:param name="matchID" value="${match.matchID}" />
+									    <c:param name="stepNumber" value="final" />
+									    <c:if test="${viewRole != 'RANDOM'}">
+									    	<c:param name="role" value="${viewRole}" />
+									    </c:if>
+									</c:url>
+									<c:choose>
+										<c:when test="{match.status == 'running'}">
+											<c:set var="viewStateLinkTitle">View current state</c:set>
+										</c:when>
+										<c:otherwise>
+											<c:set var="viewStateLinkTitle">View final state</c:set>
+										</c:otherwise>
+									</c:choose>
+								    <c:if test="${viewRole != 'RANDOM'}">
+								    	<c:set var="viewStateLinkTitle">${viewStateLinkTitle} as seen by ${viewRole}</c:set>
+								    </c:if>
+									<a href='<c:out value="${viewStateURL}" />'><span class="view" title="${viewStateLinkTitle}"></span></a>
 								</c:when>
 								<c:otherwise>
-									<c:set var="viewStateLinkTitle">View Final State</c:set>
+									<div class="view-bw"><span>view</span></div>
 								</c:otherwise>
 							</c:choose>
-							<a href='<c:out value="${viewStateURL}" />'><span class="view" title="${viewStateLinkTitle}"></span></a>
-
+						</td>
+					</c:if>
+					
+					<%-- action "view errors" --%>
+			    	<c:if test="${playerinfoIndex.count==1}">
+						<td rowspan="${numberOfPlayers}">
 							<c:choose>
 								<c:when test="${match.hasErrors}">
 									<c:choose>

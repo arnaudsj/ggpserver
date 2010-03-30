@@ -87,17 +87,28 @@ if (viewPlayer.isUser()) {
 				<a href='<c:out value="${URL}" />'>show matches</a>
 			</td>
 		</tr>
-		<tr>
-			<th>tournaments</th>
-			<td>
-				<c:forEach var="tournament" items="${viewPlayer.tournaments}">
-					<c:url value="view_tournament.jsp" var="URL">
-						<c:param name="tournamentID" value="${tournament.tournamentID}" />
-					</c:url>
-					<a href='<c:out value="${URL}" />'>${tournament.tournamentID}</a><br>
-				</c:forEach>
-			</td>
-		</tr>
+		<c:if test="${viewPlayer.numberOfTournaments > 0}">
+			<c:forEach var="tournament" items="${viewPlayer.tournaments}" varStatus="lineInfo">
+				<tr>
+					<c:if test="${lineInfo.count == 1}">
+						<th rowspan="${viewPlayer.numberOfTournaments}">tournaments</th>
+					</c:if>
+					<td>
+						<c:url value="view_tournament.jsp" var="URL">
+							<c:param name="tournamentID" value="${tournament.tournamentID}" />
+						</c:url>
+						<a href='<c:out value="${URL}" />'>${tournament.tournamentID}</a>
+					</td>
+					<td>
+						<c:url value="show_matches.jsp" var="URL">
+							<c:param name="tournamentID" value="${tournament.tournamentID}" />
+							<c:param name="playerName" value="${viewPlayer.name}" />
+						</c:url>
+						<a href='<c:out value="${URL}" />'>show matches</a>
+					</td>
+				</tr>
+			</c:forEach>
+		</c:if>
 	</tbody>
 </table>
 
