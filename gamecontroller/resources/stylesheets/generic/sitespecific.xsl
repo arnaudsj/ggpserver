@@ -6,7 +6,7 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-	<xsl:variable name="stylesheetURL">../../resources/stylesheets/</xsl:variable> <!-- absolute url or relative to xml of matches -->
+	<xsl:variable name="stylesheetURL">../../stylesheets/</xsl:variable> <!-- absolute url or relative to xml of matches -->
 
 	<xsl:template name="makeStepLinkURL">
 		<xsl:param name="step"/> <!-- an integer number >=1 or 'final' -->
