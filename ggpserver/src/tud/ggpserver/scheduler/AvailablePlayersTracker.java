@@ -198,6 +198,8 @@ public class AvailablePlayersTracker<TermType extends TermInterface, ReasonerSta
 	}
 
 	public synchronized boolean isAvailable(String name) {
+		logger.info(""+playingPlayers+".contains("+name+") = "+playingPlayers.contains(name));
+		logger.info(""+activePlayers+".containsKey("+name+") = "+activePlayers.containsKey(name));
 		return !playingPlayers.contains(name) && activePlayers.containsKey(name);
 	}
 

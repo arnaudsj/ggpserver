@@ -105,11 +105,11 @@ public class StateXMLExporter {
 	 */
 	public static <TermType extends TermInterface, ReasonerStateInfoType> 
 	String getStepXML(ServerMatch<TermType, ReasonerStateInfoType> match, List<Pair<Date, String>> stringStates, int stepNumber, String roleName) { 
-		return getStepXML(match, stringStates, stepNumber, roleName, false, false, null, null, null);
+		return getStepXML(match, stringStates, stepNumber, roleName, false, false, false, null, null, null);
 	}
 	
 	public static <TermType extends TermInterface, ReasonerStateInfoType> 
-	String getStepXML(ServerMatch<TermType, ReasonerStateInfoType> match, List<Pair<Date, String>> stringStates, int stepNumber, String roleName, boolean playing, boolean ready, Collection<String> legalMoves, String chosenMove, Boolean confirmed) { 
+	String getStepXML(ServerMatch<TermType, ReasonerStateInfoType> match, List<Pair<Date, String>> stringStates, int stepNumber, String roleName, boolean playing, boolean quickConfirm, boolean ready, Collection<String> legalMoves, String chosenMove, Boolean confirmed) { 
 		int numberOfStates = stringStates.size();
 		if(numberOfStates > 0) {
 			if (stepNumber < 1 || stepNumber > numberOfStates) {
@@ -142,7 +142,37 @@ public class StateXMLExporter {
 				Logger.getLogger(StateXMLExporter.class.getName()).severe(
 						"State in database is invalid kif! match: " + match.getMatchID()
 						+ ", step:" +  stepNumber + ", state:" + stringState.getRight());
+				e.printStackTrace();
 				return null;
+			}
+			
+			// get Term representation of our string chosenMove
+			TermInterface chosenMoveTerm;
+			if (chosenMove == null) {
+				chosenMoveTerm = null;
+			} else {
+				try {
+					chosenMoveTerm = match.getGame().getTermFromString(chosenMove);
+				} catch (InvalidKIFException e) {
+					Logger.getLogger(StateXMLExporter.class.getName()).severe(
+							"Invalid chosenMove! match: " + match.getMatchID()+": " + chosenMove);
+					return null;
+				}
+			}
+			
+			// get List<Term> representation of our List<String> legalMoves
+			List<TermInterface> legalTermMoves = new LinkedList<TermInterface>();
+			if (legalMoves == null) {
+				legalTermMoves = null;
+			} else {
+				try {
+					for (String move: legalMoves)
+						legalTermMoves.add(match.getGame().getTermFromString(move));
+				} catch (InvalidKIFException e) {
+					Logger.getLogger(StateXMLExporter.class.getName()).severe(
+							"Invalid legalMove in legalMoves list! match: " + match.getMatchID()+": "+legalMoves);
+					return null;
+				}
 			}
 			
 			// get goal values
@@ -160,9 +190,10 @@ public class StateXMLExporter {
 					role,
 					stringState.getLeft(),
 					playing,
+					quickConfirm,
 					ready,
-					legalMoves,
-					chosenMove,
+					legalTermMoves,
+					chosenMoveTerm,
 					confirmed
 				).toString();
 		} else {

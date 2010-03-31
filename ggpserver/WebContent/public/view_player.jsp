@@ -79,12 +79,21 @@ if (viewPlayer.isUser()) {
 			<td><c:out value="${viewPlayer.gdlVersion}"></c:out></td>
 		</tr>
 		<tr>
-			<th>matches</th>
+			<th rowspan="2">matches</th>
 			<td>
 				<c:url value="show_matches.jsp" var="URL">
 					<c:param name="playerName" value="${viewPlayer.name}" />
 				</c:url>
 				<a href='<c:out value="${URL}" />'>show matches</a>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<c:url value="show_matches.jsp" var="URL">
+					<c:param name="playerName" value="${viewPlayer.name}" />
+					<c:param name="status" value="running" />
+				</c:url>
+				<a href='<c:out value="${URL}" />'>show <u>running</u> matches</a>
 			</td>
 		</tr>
 		<c:if test="${viewPlayer.numberOfTournaments > 0}">

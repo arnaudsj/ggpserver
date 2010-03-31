@@ -29,14 +29,21 @@
 	<xsl:template name="makePlayLinkURL">
 		<xsl:param name="forStepNumber" /> <!-- the step for which the following action is meant -->
 		<xsl:param name="chosenMove" /> <!-- the chosen action (chosen move number or -1 to confirm) -->
+		<xsl:param name="confirm" /> <!-- the chosen action (chosen move number or -1 to confirm) -->
 		<xsl:text disable-output-escaping="yes">play.jsp?matchID=</xsl:text>
 		<xsl:value-of select="/match/match-id" />
 		<xsl:text disable-output-escaping="yes">&amp;role=</xsl:text>
 		<xsl:value-of select="/match/sight-of" />
 		<xsl:text disable-output-escaping="yes">&amp;forStepNumber=</xsl:text>
 		<xsl:value-of select="$forStepNumber" />
-		<xsl:text disable-output-escaping="yes">&amp;chosenMove=</xsl:text>
-		<xsl:value-of select="$chosenMove" />
+		<xsl:if test="$chosenMove != ''">
+			<xsl:text disable-output-escaping="yes">&amp;chosenMove=</xsl:text>
+			<xsl:value-of select="$chosenMove" />
+		</xsl:if>
+		<xsl:if test="$confirm != ''">
+			<xsl:text disable-output-escaping="yes">&amp;confirm=</xsl:text>
+			<xsl:value-of select="$confirm" />
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template name="webmaster">

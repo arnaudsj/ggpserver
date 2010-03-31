@@ -59,7 +59,7 @@ if (viewUser.getUser() == null) {
 			</td>
 		</tr>
 		<tr>
-			<th rowspan="2">matches</th>
+			<th rowspan="3">matches</th>
 			<td>
 				<c:url value="show_matches.jsp" var="matchesURL">
 					<c:param name="owner" value="${viewUser.user.userName}" />
@@ -73,6 +73,15 @@ if (viewUser.getUser() == null) {
 					<c:param name="playerName" value="${viewUser.user.userName}" />
 				</c:url>
 				<a href='<c:out value="${matchesURL}" />'>show matches played by ${viewUser.user.userName}</a><br>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<c:url value="show_matches.jsp" var="matchesURL">
+					<c:param name="playerName" value="${viewUser.user.userName}" />
+					<c:param name="status" value="running" />
+				</c:url>
+				<a href='<c:out value="${matchesURL}" />'>show <u>running</u> matches played by ${viewUser.user.userName}</a><br>
 			</td>
 		</tr>
 		<tr>

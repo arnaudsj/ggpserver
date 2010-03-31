@@ -28,6 +28,8 @@
 		<jsp:setProperty name="play" property="role"/>
 		<jsp:setProperty name="play" property="forStepNumber"/> <!-- the previous page's stepNumber, for which the action (chosenMove) is meant -->
 		<jsp:setProperty name="play" property="chosenMove"/>
+		<jsp:setProperty name="play" property="confirm"/>
+		<jsp:setProperty name="play" property="quickConfirm"/>
 	</c:catch>
 </jsp:useBean>
 

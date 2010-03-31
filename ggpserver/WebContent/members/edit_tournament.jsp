@@ -409,9 +409,9 @@
 						</td>
 					</c:if>
 						
-					<%-- action "play" [all] --%>
+					<%-- action "play" [only scheduled or running matches, and user taking part in] --%>
 					<td class="nopadding">
-						<c:if test="${ selectedplayerinfo.name == pager.userName && match.status == 'running' }">
+						<c:if test="${ selectedplayerinfo.name == pager.userName && (match.status == 'running' or match.status == 'scheduled') }">
 						    <c:url value="/members/play.jsp" var="playURL">
 						    	<c:param name="matchID" value="${match.matchID}" />
 								<c:param name="userName" value="${pager.userName}" />

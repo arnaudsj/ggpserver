@@ -92,22 +92,26 @@ public class Play {
 		
 		List<String> stringMoves = new LinkedList<String>();
 		for (MoveInterface<?> move: moves)
-			stringMoves.add(move.getPrefixForm());
+			stringMoves.add(move.getKIFForm());
 		
 		return stringMoves;
 		
 	}
 	
+	public void setForStepNumber(int forStepNumber) {
+		this.forStepNumber = forStepNumber;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public void setChosenMove (int i) throws SQLException {
 		
-		if (!isPlaying()) // very important! otherwise, one could just send moves for a non-owned role, and they would be accepted
+		if (!isPlaying())
 			return;
 		
-		if (i == -2) {
+		if (i == -2) { // set ready
 			this.player.setReady();
-		} else if (i == -1) {
-			this.player.confirm(forStepNumber);
+		} else if (i == -1) { // toggle quickConfirm
+			this.player.toggleQuickConfirm();
 		} else {
 			try {
 				move = player.getLegalMoves().get(i);
@@ -120,8 +124,14 @@ public class Play {
 		}
 	}
 	
-	public void setForStepNumber(int forStepNumber) {
-		this.forStepNumber = forStepNumber;
+	public void setConfirm (int i) throws SQLException {
+		
+		if (!isPlaying())
+			return;
+		
+		if (i == 1) {
+			this.player.confirm(forStepNumber);
+		}
 	}
 	
 	private boolean isReady() {
@@ -132,12 +142,12 @@ public class Play {
 		if (move == null) {
 			MoveInterface<?> m = this.player.getMove();
 			if (m != null) {
-				return m.getPrefixForm();
+				return m.getKIFForm();
 			} else {
 				return null;
 			}
 		}
-		return this.move.getPrefixForm();
+		return this.move.getKIFForm();
 	}
 	
 	private boolean getConfirmed() {
@@ -150,7 +160,12 @@ public class Play {
 	
 	public String getXmlState() {
 		List<Pair<Date,String>> stringStates = match.getStringStates();
-		return StateXMLExporter.getStepXML(match, stringStates, stepNumber, getRole(), true, isReady(), getLegalMoves(), getMove(), getConfirmed());
+		return StateXMLExporter.getStepXML(match, stringStates, stepNumber, getRole(), true, getQuickConfirm(), isReady(), getLegalMoves(), getMove(), getConfirmed());
+	}
+
+	private boolean getQuickConfirm() {
+		if (player == null) return false;
+		return player.getQuickConfirm();
 	}
 	
 }

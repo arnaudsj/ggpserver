@@ -27,11 +27,15 @@
 		<jsp:setProperty name="pager" property="tournamentID"/>
 		<jsp:setProperty name="pager" property="owner"/>
 		<jsp:setProperty name="pager" property="page"/>
+		<jsp:setProperty name="pager" property="status"/>
 	</c:catch>
 </jsp:useBean>
 
 <c:set var="title">
-	<c:choose>
+	<c:if test="${ pager.status != null }">
+		<c:out value="'${pager.status}' "/>
+    </c:if>
+    <c:choose>
 		<c:when test="${ pager.gameName != null }">
 			${pager.gameName} matches
 	    </c:when>
