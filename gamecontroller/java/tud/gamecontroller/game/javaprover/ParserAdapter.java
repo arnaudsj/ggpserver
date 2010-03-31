@@ -19,12 +19,8 @@
 
 package tud.gamecontroller.game.javaprover;
 
-import java.util.List;
-
 import tud.gamecontroller.auxiliary.InvalidKIFException;
 import cs227b.teamIago.parser.Parser;
-import cs227b.teamIago.parser.PublicAxiomsWrapper;
-import cs227b.teamIago.parser.Statement;
 import cs227b.teamIago.resolver.Connective;
 import cs227b.teamIago.resolver.ExpList;
 import cs227b.teamIago.resolver.Expression;
@@ -48,18 +44,15 @@ public class ParserAdapter {
 
 	public static ExpList parseExpressionList(String kif) throws InvalidKIFException {
 		try{
-			kif = kif.trim();
+			kif = kif.replace(")", ") ").trim();
 			if(kif.charAt(0) != '(' || kif.charAt(kif.length()-1) != ')')
 				throw new InvalidKIFException("not a valid kif list:"+kif);
-			kif = kif.substring(1, kif.length()-1).trim();
-			PublicAxiomsWrapper a = new PublicAxiomsWrapper();
-			if(!a.parseFromString(kif))
-				throw new InvalidKIFException("not a valid kif list:"+kif);
-			List<Statement> stmts = a.getStatements();
-			ExpList explist = new ExpList();
-			for (int i=0;i<stmts.size();i++)
-				explist.add(Parser.parseExpression(stmts.get(i)));	
-			return explist;
+			kif = "(bla " + kif.substring(1, kif.length()).trim();
+			ExpList list=Parser.parseDesc(kif);
+			if(list.size() != 1){
+				throw new InvalidKIFException("Exception while parsing \""+kif+"\":...");
+			}
+			return ((Connective)list.get(0)).getOperands();
 		}catch(Exception ex){
 			throw new InvalidKIFException("Exception while parsing \""+kif+"\":"+ex.getMessage());
 		}

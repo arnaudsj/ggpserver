@@ -9,7 +9,6 @@
 	
 	<xsl:template name="print_state">
 		
-		
 		<style type="text/css" media="all">
 			div.dice
 			{
@@ -102,6 +101,55 @@
 			<xsl:with-param name="excludeFluent2" select="'HAS_DICE'"/>
 		</xsl:call-template>
 
+	</xsl:template>
+	
+	
+	<xsl:template name="legalMove">
+		<xsl:param name="url"/> <!-- the URL to propose this move (no confirm) -->
+		<xsl:param name="urlWithConfirm"/> <!-- the URL to propose this move (with confirm of this move) -->
+		
+		<xsl:variable name="color">
+			black
+		</xsl:variable>
+		<xsl:variable name="prop-f" select="./move-term/prop-f" />
+		<xsl:variable name="value1" select="./move-term/arg[1]" />
+		<xsl:variable name="value2" select="./move-term/arg[2]" />
+		
+		<style>
+			a img {
+				border-style: none;
+			}
+		</style>
+		
+		<tr>
+			<td>
+				<span class="content">
+				<a>
+					<xsl:attribute name="href">
+						javascript:location.replace("<xsl:value-of select="$url" />");
+					</xsl:attribute>
+					<xsl:choose>
+						<xsl:when test="$prop-f = 'CLAIM'">
+							claim 
+							<xsl:call-template name="print_dice">
+								<xsl:with-param name="color" select="$color"/>
+								<xsl:with-param name="value" select="$value1"/>
+								<xsl:with-param name="width" select="'28'"/>
+							</xsl:call-template>
+							<xsl:call-template name="print_dice">
+								<xsl:with-param name="color" select="$color"/>
+								<xsl:with-param name="value" select="$value2"/>
+								<xsl:with-param name="width" select="'28'"/>
+							</xsl:call-template>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="./move-term" />
+						</xsl:otherwise>
+					</xsl:choose>
+				</a>
+				</span>
+			</td>
+		</tr>
 	</xsl:template>
 	
 

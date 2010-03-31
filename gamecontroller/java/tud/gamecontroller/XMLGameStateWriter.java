@@ -112,7 +112,7 @@ public class XMLGameStateWriter
 		//System.out.println( ((Game)match.getGame()).getGameDescription() );
 		
 		try {
-			os = createXMLOutputStream(match, currentState, XMLGameStateWriter.getStringMoves(moves), goalValues, stylesheet, role, null, false, false, null, null, null);
+			os = createXMLOutputStream(match, currentState, XMLGameStateWriter.getStringMoves(moves), goalValues, stylesheet, role, null, false, false, false, null, null, null);
 			fileOutputStream = new FileOutputStream(new File(matchDir+File.separator+"step_"+step+".xml"));
 			fileOutputStream.write(os.toByteArray());
 			if(goalValues!=null){ // write the final state twice (once as step_X.xml and once as finalstate.xml)
@@ -165,15 +165,16 @@ public class XMLGameStateWriter
 			RoleInterface<? extends TermInterface> role,
 			Date date,
 			boolean playing,
+			boolean quickConfirm,
 			boolean ready,
-			Collection<String> legalMoves,
-			String chosenMove,
+			List<TermInterface> legalMoves,
+			TermInterface chosenMove,
 			Boolean confirmed)
 			throws TransformerFactoryConfigurationError,
 			IllegalArgumentException {
 		ByteArrayOutputStream os=new ByteArrayOutputStream();
 		try{
-			Document xmldoc=createXML(match, currentState, stringMoves, goalValues, stylesheet, role, date, playing, ready, legalMoves, chosenMove, confirmed);
+			Document xmldoc=createXML(match, currentState, stringMoves, goalValues, stylesheet, role, date, playing, quickConfirm, ready, legalMoves, chosenMove, confirmed);
 			// Serialization through Transform.
 			DOMSource domSource = new DOMSource(xmldoc);
 			
@@ -217,9 +218,10 @@ public class XMLGameStateWriter
 			RoleInterface<? extends TermInterface> role,
 			Date date,
 			boolean playing,
+			boolean quickConfirm,
 			boolean ready,
-			Collection<String> legalMoves,
-			String chosenMove,
+			List<TermInterface> legalMoves,
+			TermInterface chosenMove,
 			Boolean confirmed)
 	throws ParserConfigurationException {
 		
@@ -291,6 +293,9 @@ public class XMLGameStateWriter
 		 if(goalValues!=null) root.appendChild(createScoresElement(xmldoc, match.getGame(), goalValues));
 		 
 		 root.appendChild(createStateElement(xmldoc, currentState, role));
+		 
+		 if (quickConfirm)
+			 root.appendChild(xmldoc.createElement("quickConfirm"));
 		 
 		 if (match instanceof RunnableMatchInterface) {
 			 Date readyTime = ((RunnableMatchInterface)match).getReadyTime();
@@ -398,17 +403,16 @@ public class XMLGameStateWriter
 		return r;
 	}
 	
-	private static Node createLegalMoves(Document xmldoc, Collection<String> legalMoves) {
+	private static Node createLegalMoves(Document xmldoc, List<TermInterface> legalMoves) {
 		Element moves = xmldoc.createElement("legalmoves");
 		int n=0;
 		if (legalMoves != null) {
-			for(String legalMove: legalMoves) {
+			for(TermInterface legalMove: legalMoves) {
 				Element move=xmldoc.createElement("move");
 				Element e=xmldoc.createElement("move-number");
 				e.setTextContent(""+n);
 				move.appendChild(e);
-				Element e2=xmldoc.createElement("move-value");
-				e2.setTextContent(legalMove);
+				Node e2=createTermElement(xmldoc, "move-term", legalMove);
 				move.appendChild(e2);
 				moves.appendChild(move);
 				n++;
@@ -417,11 +421,12 @@ public class XMLGameStateWriter
 		return moves;
 	}
 	
-	private static Node createChosenMove(Document xmldoc, String chosenMove, Boolean confirmed) {
+	private static Node createChosenMove(Document xmldoc, TermInterface chosenMove, Boolean confirmed) {
 		Element move=xmldoc.createElement("chosenmove");
-		Element e=xmldoc.createElement("move-value");
-		e.setTextContent(""+chosenMove);
-		move.appendChild(e);
+		if (chosenMove != null) {
+			Node e=createTermElement(xmldoc, "move-term", chosenMove);
+			move.appendChild(e);
+		}
 		if (confirmed != null && confirmed) {
 			Element e2=xmldoc.createElement("confirmed");
 			move.appendChild(e2);

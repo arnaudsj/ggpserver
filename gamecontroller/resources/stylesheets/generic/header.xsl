@@ -62,7 +62,7 @@
 		<div class="header" id="header">
 			
 			<span class="heading">Match:</span><span class="content"><xsl:value-of select="/match/match-id"/></span>, 
-			<span class="heading">Step:</span><span class="content"><xsl:value-of select="$currentStep"/></span>, 
+			<span class="heading">Step:</span><span class="content"><xsl:value-of select="$currentStep"/></span>
 			<!-- <select name="seconds" id="seconds">
 			  <option value="1">1</option>
 			  <option value="2">2</option>

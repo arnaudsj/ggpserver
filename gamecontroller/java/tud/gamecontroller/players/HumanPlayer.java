@@ -42,6 +42,7 @@ public class HumanPlayer<TermType extends TermInterface, StateType extends State
 	protected MoveMemory<TermType> moveMemory;
 	protected int currentStepNumber;
 	protected List<? extends MoveInterface<TermType>> currentLegalMoves;
+	protected boolean quickConfirm;
 	
 	// synchronisers
 	protected ChangeableBoolean ready;
@@ -57,6 +58,7 @@ public class HumanPlayer<TermType extends TermInterface, StateType extends State
 		logger.info("HumanPlayer("+name+")");
 		currentStepNumber = 0;
 		legalMovesAvailable = new ChangeableBoolean(false);
+		quickConfirm = false;
 	}
 	
 	@Override
@@ -196,6 +198,14 @@ public class HumanPlayer<TermType extends TermInterface, StateType extends State
 
 	public boolean hasConfirmed (int stepNumber) {
 		return confirm.getValue() > stepNumber;
+	}
+
+	public void toggleQuickConfirm() {
+		quickConfirm = !quickConfirm;
+	}
+
+	public boolean getQuickConfirm() {
+		return quickConfirm;
 	}
 	
 }

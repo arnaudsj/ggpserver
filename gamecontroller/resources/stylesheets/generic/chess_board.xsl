@@ -49,6 +49,14 @@
 		At the moment ternary fluents with a name CELL* are considered as boards.
 	-->
 	
+	<xsl:template name="linkOnCell">
+		<xsl:param name="x" />
+		<xsl:param name="y" />
+		<xsl:param name="content" />
+		<xsl:param name="piece" />
+		0
+	</xsl:template>
+	
 	<xsl:key name="by-fluent" match="fact" use="prop-f"/>
 	
 	<xsl:template name="print_all_chess_boards">
@@ -125,7 +133,8 @@
 		<xsl:param name="BorderStyle">solid #FFC</xsl:param>
 		<xsl:param name="CellWidth" select="44 + 2 * $BorderWidth"/>
 		<xsl:param name="CellHeight" select="$CellWidth"/>
-	
+		<xsl:param name="cellCallBack" /> <!-- function name to be called with parameters (x,y), the coordinates of a cell, when one clicks on it -->
+		
 		<xsl:variable name="internalCellFluentName">
 			<xsl:choose>
 				<xsl:when test="$CellFluentName!='?'"><xsl:value-of select="$CellFluentName"/></xsl:when>
@@ -156,6 +165,7 @@
 			<xsl:with-param name="CellHeight" select="$CellHeight"/>
 			<xsl:with-param name="BorderWidth" select="$BorderWidth"/>
 			<xsl:with-param name="BorderStyle" select="$BorderStyle"/>
+			<xsl:with-param name="cellCallBack" select="$cellCallBack"/>
 		</xsl:call-template>
 		
 		<!-- show remaining fluents -->
@@ -185,6 +195,7 @@
 		<xsl:param name="CellWidth" select="44 + 2 * $BorderWidth"/>
 		<xsl:param name="CellHeight" select="$CellWidth"/>
 		<xsl:param name="BoardName"/>
+		<xsl:param name="cellCallBack" /> <!-- function name to be called with parameters (x,y), the coordinates of a cell, when one clicks on it -->
 
 		<!-- try detect board fluent if it wasn't given as parameter -->
 		<xsl:variable name="internalCellFluentName">
@@ -266,6 +277,9 @@
 			{
 				position: relative;
 			}
+			a div.chesscellcontent img {
+				border-style:		none;
+			}
 		</style>
 
 		<div class="chess_board">
@@ -322,20 +336,13 @@
 						<xsl:otherwise>light</xsl:otherwise>
 					</xsl:choose>
 				</xsl:variable>
-
-				<div class="chesscellcontent">
-					<xsl:attribute name="title"><xsl:value-of select="$alt"/></xsl:attribute>
-					<xsl:attribute name="style">
-						left: <xsl:value-of select="$xPosCell"/>px;
-						top: <xsl:value-of select="$yPosCell"/>px;
-					</xsl:attribute>
-					
-					<xsl:comment>
-						x: <xsl:value-of select="$xArg"/> -&gt; <xsl:value-of select="$x"/>
-						y: <xsl:value-of select="$yArg"/> -&gt; <xsl:value-of select="$y"/>
-					</xsl:comment>
-
-					<!-- select the default image for the cell content -->
+				
+				<xsl:comment>
+					x: <xsl:value-of select="$xArg"/> -&gt; <xsl:value-of select="$x"/>
+					y: <xsl:value-of select="$yArg"/> -&gt; <xsl:value-of select="$y"/>
+				</xsl:comment>
+				
+				<!-- select the default image for the cell content -->
 					<xsl:variable name="piece">
 						<xsl:choose>
 							<xsl:when test="../fact[prop-f=$internalCellFluentName and arg[number($xArgIdx)]=$xArg and arg[number($yArgIdx)]=$yArg and arg[number($contentArgIdx)]!=$content]">MULTIPLE</xsl:when>
@@ -403,30 +410,55 @@
 					</xsl:variable>
 
 					<!-- print the image or call a user defined template to print the cell -->
+					<xsl:variable name="linkOnCell">
+						<xsl:call-template name="linkOnCell">
+							<xsl:with-param name="x" select="$xArg" />
+							<xsl:with-param name="y" select="$yArg" />
+							<xsl:with-param name="content" select="$content" />
+							<xsl:with-param name="piece" select="$piece" />
+						</xsl:call-template>
+					</xsl:variable>
+					
 					<xsl:choose>
-						<xsl:when test="$DefaultCellContent!='yes' or contains($piece, 'UNKNOWN')">
-							<xsl:call-template name="make_cell_content">
+						<xsl:when test="$linkOnCell = 1 and $cellCallBack != ''">
+							<a style="min-width: 44px; min-height: 44px;">
+								<xsl:attribute name="href">
+									javascript:<xsl:value-of select="$cellCallBack"/>("<xsl:value-of select="$xArg"/>", "<xsl:value-of select="$yArg"/>", "<xsl:value-of select="$content"/>", "<xsl:value-of select="$piece"/>");
+								</xsl:attribute>
+								<xsl:call-template name="make_cell_content_or_chess_img">
+									<xsl:with-param name="DefaultCellContent" select="$DefaultCellContent"/>
+									<xsl:with-param name="xArg" select="$xArg"/>
+									<xsl:with-param name="yArg" select="$yArg"/>
+									<xsl:with-param name="content" select="$content"/>
+									<xsl:with-param name="piece" select="$piece"/>
+									<xsl:with-param name="CellColor" select="$CellColor"/>
+									<xsl:with-param name="alt" select="$alt"/>
+									<xsl:with-param name="CellWidth" select="$CellWidth"/>
+									<xsl:with-param name="CellHeight" select="$CellHeight"/>
+									<xsl:with-param name="BorderWidth" select="$BorderWidth"/>
+									<xsl:with-param name="xPosCell" select="$xPosCell"/>
+									<xsl:with-param name="yPosCell" select="$yPosCell"/>
+								</xsl:call-template>
+							</a>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:call-template name="make_cell_content_or_chess_img">
+								<xsl:with-param name="DefaultCellContent" select="$DefaultCellContent"/>
 								<xsl:with-param name="xArg" select="$xArg"/>
 								<xsl:with-param name="yArg" select="$yArg"/>
 								<xsl:with-param name="content" select="$content"/>
 								<xsl:with-param name="piece" select="$piece"/>
-								<xsl:with-param name="background" select="$CellColor"/>
+								<xsl:with-param name="CellColor" select="$CellColor"/>
 								<xsl:with-param name="alt" select="$alt"/>
-							</xsl:call-template>
-						</xsl:when>
-						<xsl:when test="$piece=''"/> <!-- empty cell -->
-						<xsl:when test="$piece='MULTIPLE'"><b>?</b></xsl:when> <!-- multiple elements in cell -->
-						<xsl:otherwise>
-							<xsl:call-template name="make_chess_img">
-								<xsl:with-param name="piece" select="$piece"/>
-								<xsl:with-param name="background" select="$CellColor"/>
-								<xsl:with-param name="imgWidth" select="$CellWidth - 2 * $BorderWidth"/>
-								<xsl:with-param name="imgHeight" select="$CellHeight - 2 * $BorderWidth"/>
-								<xsl:with-param name="alt" select="$alt"/>
+								<xsl:with-param name="CellWidth" select="$CellWidth"/>
+								<xsl:with-param name="CellHeight" select="$CellHeight"/>
+								<xsl:with-param name="BorderWidth" select="$BorderWidth"/>
+								<xsl:with-param name="xPosCell" select="$xPosCell"/>
+								<xsl:with-param name="yPosCell" select="$yPosCell"/>
 							</xsl:call-template>
 						</xsl:otherwise>
 					</xsl:choose>
-				</div>
+				
 			</xsl:for-each>
 			<!-- print a caption with the name of the board, if defined -->
 			<xsl:if test="$BoardName!=''">
@@ -434,7 +466,59 @@
 			</xsl:if>
 		</div>
 	</xsl:template>
-
+	
+	
+	<xsl:template name="make_cell_content_or_chess_img">
+		<xsl:param name="DefaultCellContent" />
+		<xsl:param name="xArg" />
+		<xsl:param name="yArg" />
+		<xsl:param name="content" />
+		<xsl:param name="piece" />
+		<xsl:param name="CellColor" />
+		<xsl:param name="alt" />
+		<xsl:param name="CellWidth" />
+		<xsl:param name="CellHeight" />
+		<xsl:param name="BorderWidth" />
+		<xsl:param name="xPosCell" />
+		<xsl:param name="yPosCell" />
+		
+		<div class="chesscellcontent">
+			
+			<xsl:attribute name="title"><xsl:value-of select="$alt"/></xsl:attribute>
+			<xsl:attribute name="style">
+				left: <xsl:value-of select="$xPosCell"/>px;
+				top: <xsl:value-of select="$yPosCell"/>px;
+			</xsl:attribute>
+			
+			<xsl:choose>
+				<xsl:when test="$DefaultCellContent!='yes' or contains($piece, 'UNKNOWN')">
+					<xsl:call-template name="make_cell_content">
+						<xsl:with-param name="xArg" select="$xArg"/>
+						<xsl:with-param name="yArg" select="$yArg"/>
+						<xsl:with-param name="content" select="$content"/>
+						<xsl:with-param name="piece" select="$piece"/>
+						<xsl:with-param name="background" select="$CellColor"/>
+						<xsl:with-param name="alt" select="$alt"/>
+					</xsl:call-template>
+				</xsl:when>
+				<xsl:when test="$piece=''"></xsl:when><!-- empty cell -->
+				<xsl:when test="$piece='MULTIPLE'"><b>?</b></xsl:when> <!-- multiple elements in cell -->
+				<xsl:otherwise>
+					<xsl:call-template name="make_chess_img">
+						<xsl:with-param name="piece" select="$piece"/>
+						<xsl:with-param name="background" select="$CellColor"/>
+						<xsl:with-param name="imgWidth" select="$CellWidth - 2 * $BorderWidth"/>
+						<xsl:with-param name="imgHeight" select="$CellHeight - 2 * $BorderWidth"/>
+						<xsl:with-param name="alt" select="$alt"/>
+					</xsl:call-template>
+				</xsl:otherwise>
+			</xsl:choose>
+		
+		</div>
+		
+	</xsl:template>
+	
+	
 	<!-- computes a numeric coordinate from the string representation -->
 	<xsl:template name="coord2number">
 		<xsl:param name="coord"/>
