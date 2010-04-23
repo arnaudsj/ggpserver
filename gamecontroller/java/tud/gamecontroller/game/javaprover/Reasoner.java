@@ -112,7 +112,7 @@ public class Reasoner implements ReasonerInterface<Term, GameState> {
 			try {
 				return gameSim.getTheory().findp(new Predicate(new Atom("LEGAL"),expList));
 			} catch (InterruptedException e) {
-				Logger logger=Logger.getLogger("tud.gamecontroller");
+				Logger logger=Logger.getLogger(Reasoner.class.getName());
 				logger.severe("reasoner was interrupted during findp("+new Predicate(new Atom("LEGAL"),expList)+"):");
 				logger.severe(e.getMessage());
 				return false;
@@ -201,7 +201,6 @@ public class Reasoner implements ReasonerInterface<Term, GameState> {
 		ExpList el = null;
 		synchronized (gameSim) {
 			gameSim.SetGameState(state);
-			System.out.println(role);
 			Expression r = role.getTerm().getExpr();
 			el = gameSim.getSeesXMLTerms(r);
 		}

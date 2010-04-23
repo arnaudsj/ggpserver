@@ -60,7 +60,7 @@ public abstract class AbstractGameControllerRunner<
 	}
 
 	public Logger getLogger(){
-		return Logger.getLogger("tud.gamecontroller");
+		return Logger.getLogger(GameController.class.getName());
 	}
 	
 	public void run() throws InterruptedException{
@@ -76,7 +76,7 @@ public abstract class AbstractGameControllerRunner<
 		RunnableMatchInterface<TermType, State<TermType, ReasonerStateInfoType>> match=
 				new RunnableMatch<TermType, ReasonerStateInfoType>(
 						getMatchID(), game, getStartClock(), getPlayClock(), players);
-		gameController=new GameController<TermType, ReasonerStateInfoType>(match);
+		gameController=new GameController<TermType, ReasonerStateInfoType>(match, getLogger());
 
 		if(doPrintXML()){
 			
@@ -145,18 +145,13 @@ public abstract class AbstractGameControllerRunner<
 		this.gdlVersion = gdlVersion;
 	}
 
-	protected Game<TermType, ReasonerStateInfoType> createGame(File gameFile){
+	protected Game<TermType, ReasonerStateInfoType> createGame(File gameFile) throws IOException{
 		Game<TermType, ReasonerStateInfoType> game = null;
-		try{
-			String sightFile = getSightFile();
-			if (sightFile != null) {
-				game = new Game<TermType, ReasonerStateInfoType>(gameFile, reasonerFactoryInterface, gdlVersion, getStyleSheet(), new File(getSightFile()));
-			} else {
-				game = new Game<TermType, ReasonerStateInfoType>(gameFile, reasonerFactoryInterface, gdlVersion, getStyleSheet());
-			}
-		} catch (IOException e){
-			System.out.println(e);
-			System.exit(-1);
+		String sightFile = getSightFile();
+		if (sightFile != null) {
+			game = new Game<TermType, ReasonerStateInfoType>(gameFile, reasonerFactoryInterface, gdlVersion, getStyleSheet(), new File(getSightFile()));
+		} else {
+			game = new Game<TermType, ReasonerStateInfoType>(gameFile, reasonerFactoryInterface, gdlVersion, getStyleSheet());
 		}
 		return game;
 	}

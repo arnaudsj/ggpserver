@@ -32,7 +32,6 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Collection;
-import java.util.logging.Logger;
 
 import tud.gamecontroller.ConnectionEstablishedNotifier;
 import tud.gamecontroller.GDLVersion;
@@ -45,7 +44,6 @@ import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.game.impl.Game;
 import tud.gamecontroller.game.impl.Move;
 import tud.gamecontroller.logging.GameControllerErrorMessage;
-import tud.gamecontroller.playerthreads.MoveMemory;
 import tud.gamecontroller.scrambling.GameScramblerInterface;
 import tud.gamecontroller.term.TermInterface;
 
@@ -57,7 +55,6 @@ public class RemotePlayer<TermType extends TermInterface,
 	private int port;
 	// private MoveFactoryInterface<? extends MoveInterface<TermType>> movefactory;
 	private GameScramblerInterface gameScrambler;
-	private Logger logger;
 	protected boolean firstTurn;
 
 	
@@ -83,7 +80,6 @@ public class RemotePlayer<TermType extends TermInterface,
 		this.host=host;
 		this.port=port;
 		this.gameScrambler=gamescrambler;
-		this.logger=Logger.getLogger("tud.gamecontroller");
 	}
 	
 	@Override
@@ -112,12 +108,12 @@ public class RemotePlayer<TermType extends TermInterface,
 			
 	}
 
-	public MoveInterface<TermType> gamePlay(Object seesTerms, MoveMemory<TermType> moveMemory) {
+	public MoveInterface<TermType> gamePlay(Object seesTerms, ConnectionEstablishedNotifier notifier) {
 		MoveInterface<TermType> move=null;
 		String msg = constructPlayOrStopMessage("PLAY", seesTerms);
 		String reply, descrambledReply;
 		notifyStartRunning();
-		reply=sendMsg(msg, moveMemory);
+		reply=sendMsg(msg, notifier);
 		notifyStopRunning();
 		logger.info("reply from "+this.getName()+": "+reply+ " after "+getLastMessageRuntime()+"ms");
 		if(reply!=null){

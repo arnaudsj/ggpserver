@@ -11,32 +11,37 @@
 	<xsl:template name="navigation">
 		<!-- should be called from /public/view_state.jsp or /members/play.jsp, thus the prefix ../ is okay -->
 		<style>
-			.navLink {
+			div.navigation {
+				display: block;
+				padding-top: 2px;
+				padding-bottom: 3px;
+			}
+			a.navLink {
 				padding-left: 10px; padding-right: 10px;
 			}
 		</style>
 		
-		<div style="display= block; padding-top: 2px; padding-bottom: 3px;">
+		<div class="navigation">
 			<a class="navLink">
 				<xsl:attribute name="href">
 					<xsl:text disable-output-escaping="yes">../index.jsp</xsl:text>
 				</xsl:attribute>
-				Home page
-			</a>
-			
-			<a class="navLink">
-				<xsl:attribute name="href">
-					<xsl:text disable-output-escaping="yes">../public/view_match.jsp?matchID=</xsl:text>
-					<xsl:value-of select="/match/match-id"/>
-				</xsl:attribute>
-				Back to game page
+				Home Page
 			</a>
 			
 			<a class="navLink">
 				<xsl:attribute name="href">
 					<xsl:text disable-output-escaping="yes">../members/profile.jsp</xsl:text>
 				</xsl:attribute>
-				User profile
+				User Profile
+			</a>
+
+			<a class="navLink">
+				<xsl:attribute name="href">
+					<xsl:text disable-output-escaping="yes">../public/view_match.jsp?matchID=</xsl:text>
+					<xsl:value-of select="/match/match-id"/>
+				</xsl:attribute>
+				View Match
 			</a>
 		</div>
 		

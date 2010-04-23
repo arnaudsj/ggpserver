@@ -21,17 +21,14 @@
 package tud.gamecontroller.players;
 
 import java.util.Collection;
-import java.util.logging.Logger;
 
 import tud.gamecontroller.ConnectionEstablishedNotifier;
 import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.game.JointMoveInterface;
-import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
+import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.StateInterface;
-import tud.gamecontroller.logging.GameControllerErrorMessage;
-import tud.gamecontroller.playerthreads.MoveMemory;
 import tud.gamecontroller.term.TermInterface;
 
 public abstract class LocalPlayer<TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
@@ -42,7 +39,7 @@ public abstract class LocalPlayer<TermType extends TermInterface, StateType exte
 	// for GDL-II
 	protected StatesTracker<TermType, StateType> statesTracker = null;
 	
-	protected boolean firstTurn;
+	private int currentStep;
 	
 	public LocalPlayer(String name, GDLVersion gdlVersion) {
 		super(name, gdlVersion);
@@ -53,9 +50,9 @@ public abstract class LocalPlayer<TermType extends TermInterface, StateType exte
 		super.gameStart(match, role, notifier);
 		notifyStartRunning();
 		notifier.connectionEstablished();
-		this.firstTurn = true;
+		currentStep = 1;
 		if( getGdlVersion()!=match.getGame().getGdlVersion() ) {
-			Logger.getLogger(LocalPlayer.class.getName()).warning("GDL versions of player and game do not match!");
+			logger.warning("GDL versions of player and game do not match!");
 			setGdlVersion(match.getGame().getGdlVersion());
 		}
 		if(getGdlVersion() == GDLVersion.v1) {
@@ -63,22 +60,8 @@ public abstract class LocalPlayer<TermType extends TermInterface, StateType exte
 		} else {
 			statesTracker = new StatesTracker<TermType, StateType>(match.getGame(), match.getGame().getInitialState(), role);
 		}
-		try {
-			waitForReady();
-		} catch (InterruptedException e) {
-			String message = "error: "+this.getName()+" has not answered \"ready\", maybe he or she is not in front of the computer... ("+e.getMessage()+")";
-			logErrorMessage(GameControllerErrorMessage.NOREADY, message);
-			if (this instanceof HumanPlayer) {
-				((HumanPlayer<?, ?>) this).setReady();
-			}
-		}
 		notifyStopRunning();
 	}
-	
-	/*
-	 * Override this methods if a given LocalPlayer really has to wait for something before he, she or it is ready (useful for HumanPlayer)
-	 */
-	protected void waitForReady() throws InterruptedException {}
 	
 	/*
 	 * @param seesFluents is either:
@@ -86,12 +69,11 @@ public abstract class LocalPlayer<TermType extends TermInterface, StateType exte
 	 * - or with GDL-II, a "Collection<? extends FluentInterface<TermType>>" object that really are SeesTerms
 	 */
 	@SuppressWarnings("unchecked")
-	public MoveInterface<TermType> gamePlay(Object seesTerms, MoveMemory<TermType> moveMemory) {
+	public MoveInterface<TermType> gamePlay(Object seesTerms, ConnectionEstablishedNotifier notifier) {
 		notifyStartRunning();
-		moveMemory.connectionEstablished();
-		if(this.firstTurn) {
-			this.firstTurn = false;
-		} else {
+		notifier.connectionEstablished();
+		if(seesTerms != null) {
+			currentStep++;
 			// calculate the successor(s) of current state(s)
 			if (getGdlVersion() == GDLVersion.v1) { // Regular GDL
 				JointMoveInterface<TermType> jointMove = (JointMoveInterface<TermType>) seesTerms;
@@ -99,7 +81,6 @@ public abstract class LocalPlayer<TermType extends TermInterface, StateType exte
 			} else { // GDL-II
 				statesTracker.statesUpdate((Collection<TermType>) seesTerms);
 			}
-			
 		}
 		MoveInterface<TermType> move = getNextMove();
 		notifyStopRunning();
@@ -117,6 +98,10 @@ public abstract class LocalPlayer<TermType extends TermInterface, StateType exte
 	}
 	
 	protected abstract MoveInterface<TermType> getNextMove();
+	
+	protected int getCurrentStep() {
+		return currentStep;
+	}
 	
 	public String toString(){
 		return "local("+getName()+")";

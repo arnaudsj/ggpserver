@@ -19,40 +19,42 @@
 
 <%@ page contentType="application/xml" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%> 
-
+<jsp:useBean id="availability" class="tud.ggpserver.formhandlers.inc.Availability" scope="page">
+	<c:catch>
+		<jsp:setProperty name="availability" property="matchID" />
+		<jsp:setProperty name="availability" property="userName" value="<%= request.getUserPrincipal().getName() %>" />
+		<jsp:setProperty name="availability" property="available" />
+	</c:catch>
+</jsp:useBean>
 <jsp:useBean id="play"
 	class="tud.ggpserver.formhandlers.Play" scope="page">
-	<c:catch>
+	<!-- <c:catch> -->
 		<jsp:setProperty name="play" property="matchID" />
 		<jsp:setProperty name="play" property="userName" value="<%= request.getUserPrincipal().getName() %>" />
 		<jsp:setProperty name="play" property="role"/>
-		<jsp:setProperty name="play" property="forStepNumber"/> <!-- the previous page's stepNumber, for which the action (chosenMove) is meant -->
+		<jsp:setProperty name="play" property="forStepNumber"/> <%-- the step in the match for which the chosenMove/confirm is meant --%>
 		<jsp:setProperty name="play" property="chosenMove"/>
 		<jsp:setProperty name="play" property="confirm"/>
 		<jsp:setProperty name="play" property="quickConfirm"/>
-	</c:catch>
+	<!-- </c:catch> -->
 </jsp:useBean>
-
 <%
 	response.setHeader("Cache-Control","private");
 	response.setHeader("Pragma","no-cache");
 %>
-
-<c:set var="title">Play games</c:set>
-
 <c:choose>
 	<c:when test="${play.playing}">
 <% out.clearBuffer(); // to remove newline characters up to here %>${play.xmlState}
 	</c:when>
-	<c:when test="${play.scheduled}">
+	<c:when test="${play.finished}">
 		<%
-			String urlWithSessionID = response.encodeRedirectURL("../public/view_match.jsp?matchID="+play.getMatchID());
+			String urlWithSessionID = response.encodeRedirectURL("../public/view_state.jsp?matchID="+play.getMatchID()+"&stepNumber=final&role=RANDOM");
 			response.sendRedirect(urlWithSessionID);
 		%>
 	</c:when>
 	<c:otherwise>
 		<%
-			String urlWithSessionID = response.encodeRedirectURL("../public/view_state.jsp?matchID="+play.getMatchID()+"&stepNumber=final&role=RANDOM");
+			String urlWithSessionID = response.encodeRedirectURL("../public/view_match.jsp?matchID="+play.getMatchID());
 			response.sendRedirect(urlWithSessionID);
 		%>
 	</c:otherwise>

@@ -105,11 +105,11 @@ public class StateXMLExporter {
 	 */
 	public static <TermType extends TermInterface, ReasonerStateInfoType> 
 	String getStepXML(ServerMatch<TermType, ReasonerStateInfoType> match, List<Pair<Date, String>> stringStates, int stepNumber, String roleName) { 
-		return getStepXML(match, stringStates, stepNumber, roleName, false, false, false, null, null, null);
+		return getStepXML(match, stringStates, stepNumber, roleName, false, false, null, null, null);
 	}
 	
 	public static <TermType extends TermInterface, ReasonerStateInfoType> 
-	String getStepXML(ServerMatch<TermType, ReasonerStateInfoType> match, List<Pair<Date, String>> stringStates, int stepNumber, String roleName, boolean playing, boolean quickConfirm, boolean ready, Collection<String> legalMoves, String chosenMove, Boolean confirmed) { 
+	String getStepXML(ServerMatch<TermType, ReasonerStateInfoType> match, List<Pair<Date, String>> stringStates, int stepNumber, String roleName, boolean playing, boolean quickConfirm, Collection<String> legalMoves, String chosenMove, Boolean confirmed) { 
 		int numberOfStates = stringStates.size();
 		if(numberOfStates > 0) {
 			if (stepNumber < 1 || stepNumber > numberOfStates) {
@@ -191,7 +191,6 @@ public class StateXMLExporter {
 					stringState.getLeft(),
 					playing,
 					quickConfirm,
-					ready,
 					legalTermMoves,
 					chosenMoveTerm,
 					confirmed

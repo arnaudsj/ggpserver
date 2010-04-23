@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008 Stephan Schiffel <stephan.schiffel@gmx.de>
+    Copyright (C) 2008-2010 Stephan Schiffel <stephan.schiffel@gmx.de>
                   2010 Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
@@ -68,12 +68,16 @@ public class GameController<
 	private Collection<GameControllerListener> listeners;
 	
 	public GameController(RunnableMatchInterface<TermType, State<TermType, ReasonerStateInfoType>> match) {
+		this(match, Logger.getLogger(GameController.class.getName()));
+	}
+
+	public GameController(RunnableMatchInterface<TermType, State<TermType, ReasonerStateInfoType>> match, Logger logger) {
 		this.match=match;
+		this.logger=logger;
 		this.game=match.getGame();
 		this.startclock=match.getStartclock();
 		this.playclock=match.getPlayclock();
 		listeners=new LinkedList<GameControllerListener>();
-		this.logger=Logger.getLogger("tud.gamecontroller");
 		if(this.game.getGdlVersion() == GDLVersion.v2) {
 			logger.info("gdlVersion = II");
 		}
@@ -149,15 +153,22 @@ public class GameController<
 	}
 
 	private void runThreads(Collection<? extends AbstractPlayerThread<?, ?>> threads, Level loglevel) throws InterruptedException{
-		for(AbstractPlayerThread<?, ?> t:threads){
-			t.start();
-		}
-		for(AbstractPlayerThread<?, ?> t:threads){
-			if(!t.waitUntilDeadline()){
-				String message = "player "+t.getPlayer()+" timed out!";
-				GameControllerErrorMessage errorMessage = new GameControllerErrorMessage(GameControllerErrorMessage.TIMEOUT, message, t.getPlayer().getName());
-				match.notifyErrorMessage(errorMessage);
-				logger.log(loglevel, message, errorMessage);
+		try {
+			for(AbstractPlayerThread<?, ?> t:threads){
+				t.start();
+			}
+			for(AbstractPlayerThread<?, ?> t:threads){
+				if(!t.waitUntilDeadline()){
+					String message = "player "+t.getPlayer()+" timed out!";
+					GameControllerErrorMessage errorMessage = new GameControllerErrorMessage(GameControllerErrorMessage.TIMEOUT, message, t.getPlayer().getName());
+					match.notifyErrorMessage(errorMessage);
+					logger.log(loglevel, message, errorMessage);
+				}
+			}
+		} finally {
+			// interrupt the threads
+			for(AbstractPlayerThread<?, ?> t:threads){
+				if (t.isAlive()) t.interrupt();
 			}
 		}
 	}
@@ -170,7 +181,6 @@ public class GameController<
 		}
 		logger.info("Sending start messages ...");
 		runThreads(playerthreads, Level.WARNING);
-		match.setReadyTime(new Date(System.currentTimeMillis()));
 		logger.info("time after gameStart's runThreads: "+new Date(System.currentTimeMillis()));
 	}
 

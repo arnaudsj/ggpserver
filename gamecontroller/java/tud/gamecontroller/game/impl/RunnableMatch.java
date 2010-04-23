@@ -21,7 +21,6 @@ package tud.gamecontroller.game.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +37,6 @@ public class RunnableMatch<TermType extends TermInterface, ReasonerStateInfoType
 		implements RunnableMatchInterface<TermType, State<TermType, ReasonerStateInfoType>> {
 	private final Map<? extends RoleInterface<TermType>, ? extends Player<TermType, State<TermType, ReasonerStateInfoType>>> players;
 	private List<Player<TermType, State<TermType, ReasonerStateInfoType>>> orderedPlayers = null;
-	private Date readyTime;
 	
 	public RunnableMatch(String matchID, GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game, int startclock, int playclock, Map<? extends RoleInterface<TermType>, ? extends Player<TermType, State<TermType, ReasonerStateInfoType>>> players){
 		super(matchID, game, startclock, playclock);
@@ -83,14 +81,6 @@ public class RunnableMatch<TermType extends TermInterface, ReasonerStateInfoType
 
 	public void notifyErrorMessage(GameControllerErrorMessage errorMessage) {
 		// ignore error messages
-	}
-	
-	public void setReadyTime(Date readyTime) {
-		this.readyTime = readyTime;
-	}
-	
-	public Date getReadyTime() {
-		return readyTime;
 	}
 	
 }

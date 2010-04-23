@@ -99,7 +99,6 @@ public class XMLStatesToRawStates {
 		
 	}
 	
-	
 	@SuppressWarnings("null")
 	public static void xmlStatesToRawStates() throws SQLException, ParserConfigurationException, SAXException, IOException, NamingException {
 		

@@ -38,6 +38,7 @@ import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.players.RandomPlayerInfo;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.Game;
+import tud.ggpserver.datamodel.HumanPlayerInfo;
 import tud.ggpserver.datamodel.RemoteOrHumanPlayerInfo;
 import tud.ggpserver.datamodel.RemotePlayerInfo;
 import tud.ggpserver.datamodel.Tournament;
@@ -68,6 +69,7 @@ public class EditTournament extends ShowMatches {
 	private String errorString = "No error";
 
 	public List<? extends Game<?, ?>> getGames() throws SQLException {
+		// TODO: also get games that the user created
 		return db.getAllEnabledGames();
 	}
 	
@@ -171,6 +173,11 @@ public class EditTournament extends ShowMatches {
 						}
 						if(!remotePlayerInfo.isAvailableForManualMatches() && !remotePlayerInfo.getOwner().equals(user)) {
 							errorString = "start match is invalid: "+remotePlayerInfo.getName()+" is not available and not owned by "+user.getUserName();
+							break;
+						}
+					}else if(playerInfo instanceof HumanPlayerInfo) {
+						if(!db.getUser(playerInfo.getName()).isLoggedIn()) {
+							errorString = "start match is invalid: "+playerInfo.getName()+" is not logged in";
 							break;
 						}
 					}
@@ -278,44 +285,68 @@ public class EditTournament extends ShowMatches {
 		return result;
 	}*/
 
+//	public List<User> getUsers() throws SQLException {
+//		// TODO: get only logged-in users
+//		return db.getUsers();
+//	}
+
 	public Map<GDLVersion, List<PlayerInfoForEditTournament>> getPlayerInfos() throws SQLException {
 		
 		if(playerInfos == null) {
 			playerInfos = new HashMap<GDLVersion, List<PlayerInfoForEditTournament>>();
+			List<User> allUsers = db.getUsers();
+			List<? extends RemotePlayerInfo> allRemotePlayers = db.getPlayerInfos();
+			User admin=db.getAdminUser();
 			
 			for (GDLVersion gdlVersion: GDLVersion.values()) {
+				LinkedList<PlayerInfoForEditTournament> playerInfosForGdlVersion = new LinkedList<PlayerInfoForEditTournament>(); 
+				playerInfos.put(gdlVersion, playerInfosForGdlVersion);
 				
-				playerInfos.put(gdlVersion, new LinkedList<PlayerInfoForEditTournament>());
-				
-				User admin=db.getAdminUser();
-				// add local players
-				playerInfos.get(gdlVersion).add(new PlayerInfoForEditTournament(new RandomPlayerInfo(-1,gdlVersion).getName(), true, admin));
-				playerInfos.get(gdlVersion).add(new PlayerInfoForEditTournament(new LegalPlayerInfo(-1,gdlVersion).getName(), true, admin));
-				List<? extends RemotePlayerInfo> allRemotePlayers = db.getPlayerInfos();
-				// add all available players (that comply with the given GDL Version)
-				ListIterator<? extends RemotePlayerInfo> i = allRemotePlayers.listIterator();
-				while(i.hasNext()){
-					RemotePlayerInfo p = i.next();
+				// 1. add local players
+				playerInfosForGdlVersion.add(new PlayerInfoForEditTournament(new RandomPlayerInfo(-1,gdlVersion).getName(), true, admin, "local players"));
+				playerInfosForGdlVersion.add(new PlayerInfoForEditTournament(new LegalPlayerInfo(-1,gdlVersion).getName(), true, admin, "local players"));
+
+				// 2. add available remote players (that comply with the given GDL Version)
+				List<? extends RemotePlayerInfo> remotePlayers = new LinkedList<RemotePlayerInfo>(allRemotePlayers);
+				ListIterator<? extends RemotePlayerInfo> remotePlayersIt = remotePlayers.listIterator();
+				while(remotePlayersIt.hasNext()){
+					RemotePlayerInfo p = remotePlayersIt.next();
 					if(p.getStatus().equals(RemoteOrHumanPlayerInfo.STATUS_ACTIVE) &&
 						(p.isAvailableForManualMatches() || p.getOwner().equals(user)) &&
 						Utilities.areCompatible(p, gdlVersion)) { // compatibility check: only allow players to play games they understand!
-							playerInfos.get(gdlVersion).add(new PlayerInfoForEditTournament(p.getName(), true, p.getOwner()));
-							i.remove();
+						playerInfosForGdlVersion.add(new PlayerInfoForEditTournament(p.getName(), true, p.getOwner(), "available remote players"));
+						remotePlayersIt.remove();
 					}
 				}
-				// add all remaining players (but mark them as unavailable)
-				i = allRemotePlayers.listIterator();
-				while(i.hasNext()){
-					RemotePlayerInfo p = i.next();
-					playerInfos.get(gdlVersion).add(new PlayerInfoForEditTournament(p.getName(), false, p.getOwner()));
+
+				// 3. add available human players
+				List<User> users = new LinkedList<User>(allUsers);
+				ListIterator<User> usersIt = users.listIterator();
+				while(usersIt.hasNext()){
+					User user = usersIt.next();
+					if(user.isLoggedIn()) {
+						playerInfosForGdlVersion.add(new PlayerInfoForEditTournament(user.getUserName(), true, user, "available users"));
+						usersIt.remove();
+					}
 				}
 				
+				// 4. add remaining remote players (but mark them as unavailable)
+				remotePlayersIt = remotePlayers.listIterator();
+				while(remotePlayersIt.hasNext()){
+					RemotePlayerInfo p = remotePlayersIt.next();
+					playerInfosForGdlVersion.add(new PlayerInfoForEditTournament(p.getName(), false, p.getOwner(), "other remote players"));
+				}
+
+				// 5. add remaining human players (but mark them as unavailable)
+				usersIt = users.listIterator();
+				while(usersIt.hasNext()){
+					User user = usersIt.next();
+					playerInfosForGdlVersion.add(new PlayerInfoForEditTournament(user.getUserName(), false, user, "other users"));
+				}
+
 			}
-				
 		}
-		
 		return playerInfos;
-		
 	}
 	
 	public String shortMatchID(ServerMatch<?, ?> match) {
@@ -349,11 +380,13 @@ public class EditTournament extends ShowMatches {
 		private String name;
 		private boolean usable;
 		private User owner;
+		private String group;
 
-		public PlayerInfoForEditTournament(String name, boolean usable, User owner) {
+		public PlayerInfoForEditTournament(String name, boolean usable, User owner, String group) {
 			this.name = name;
 			this.usable = usable;
 			this.owner = owner;
+			this.group = group;
 		}
 
 		public void setName(String name) {
@@ -379,11 +412,14 @@ public class EditTournament extends ShowMatches {
 		public User getOwner() {
 			return owner;
 		}
-	}
-	
-	public List<User> getUsers() throws SQLException {
-		// TODO: get only logged-in users
-		return db.getUsers();
+
+		public void setGroup(String group) {
+			this.group = group;
+		}
+
+		public String getGroup() {
+			return group;
+		}
 	}
 	
 }

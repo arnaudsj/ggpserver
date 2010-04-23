@@ -21,6 +21,7 @@
 package tud.gamecontroller.cli;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.logging.Level;
@@ -247,7 +248,14 @@ public abstract class AbstractGameControllerCLIRunner<
 
 	@Override
 	protected Game<TermType, ReasonerStateInfoType> getGame() {
-		return createGame(gameFile);
+		try {
+			return createGame(gameFile);
+		} catch (IOException e) {
+			System.err.println("error loading game: "+e);
+			printUsage();
+			System.exit(-1);
+		}
+		return null;
 	}
 
 	@Override

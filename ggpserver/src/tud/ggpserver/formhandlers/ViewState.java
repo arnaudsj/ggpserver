@@ -22,15 +22,10 @@
 package tud.ggpserver.formhandlers;
 
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.List;
-import java.util.logging.Logger;
 
 import tud.gamecontroller.GDLVersion;
-import tud.gamecontroller.auxiliary.Pair;
 import tud.ggpserver.datamodel.DBConnectorFactory;
 import tud.ggpserver.datamodel.matches.ServerMatch;
-import tud.ggpserver.util.StateXMLExporter;
 
 public class ViewState {
 	
@@ -73,8 +68,6 @@ public class ViewState {
 	}
 	
 	public String getXmlState() {
-		List<Pair<Date,String>> stringStates = match.getStringStates();
-		Logger.getLogger(ViewState.class.getName()).info("StateXMLExporter.getStepXML(match, stringStates, "+stepNumber+", roleName)");
-		return StateXMLExporter.getStepXML(match, stringStates, stepNumber, roleName);
+		return match.getXmlState(stepNumber, roleName);
 	}
 }

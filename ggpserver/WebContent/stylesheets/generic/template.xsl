@@ -16,23 +16,24 @@
 
 	<xsl:import href="sitespecific.xsl"/> <!-- $stylesheetURL, makeStepLinkURL and makePlayLinkURL template -->
 	
-	<xsl:import href="navigation.xsl"/>
 	<xsl:import href="title.xsl"/>
+	<xsl:import href="navigation.xsl"/>
 	<xsl:import href="header.xsl"/>
+	<xsl:import href="play_header.xsl"/>
 	<xsl:import href="footer.xsl"/>
 	<xsl:import href="history.xsl"/>
 	<xsl:import href="playerInfo.xsl"/>
 	<xsl:import href="playClock.xsl"/>
 	<xsl:import href="state.xsl"/>
 	<xsl:import href="legalMoves.xsl"/>
-	<xsl:import href="legalMove.xsl"/>
+	<xsl:import href="playing.xsl"/>
 
 	<xsl:template name="main" match="/">
 		
 		<html>
 
 			<head>
-				<link rel="stylesheet" type="text/css" href="formate.css">
+				<link rel="stylesheet" type="text/css">
 					<xsl:attribute name="href"><xsl:value-of select="$stylesheetURL"/>generic/css/main.css</xsl:attribute>
 				</link>
 				<xsl:call-template name="title"/>
@@ -42,7 +43,14 @@
 				
 				<xsl:call-template name="navigation" />
 				
-				<xsl:call-template name="header" />
+				<xsl:choose>
+					<xsl:when test="$playing = 0">
+						<xsl:call-template name="header" />
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:call-template name="play_header" />
+					</xsl:otherwise>
+				</xsl:choose>
 				
 				<table>
 					<tr>

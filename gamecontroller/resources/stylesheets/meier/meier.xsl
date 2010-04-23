@@ -106,7 +106,6 @@
 	
 	<xsl:template name="legalMove">
 		<xsl:param name="url"/> <!-- the URL to propose this move (no confirm) -->
-		<xsl:param name="urlWithConfirm"/> <!-- the URL to propose this move (with confirm of this move) -->
 		
 		<xsl:variable name="color">
 			black
@@ -125,9 +124,7 @@
 			<td>
 				<span class="content">
 				<a>
-					<xsl:attribute name="href">
-						javascript:location.replace("<xsl:value-of select="$url" />");
-					</xsl:attribute>
+					<xsl:attribute name="href">javascript:location.replace("<xsl:value-of select="$url" />");</xsl:attribute>
 					<xsl:choose>
 						<xsl:when test="$prop-f = 'CLAIM'">
 							claim 

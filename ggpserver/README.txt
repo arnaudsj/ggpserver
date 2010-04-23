@@ -52,8 +52,8 @@ mysql -u root -p < 03_add_games.sql
 
 # Add the following lines to the first grant section of the /etc/tomcat5.5/policy.d/04webapps.policy file:
 
-// The permissions granted to the balancer WEB-INF/classes and WEB-INF/lib directory
-grant codeBase "file:/usr/share/tomcat5.5/webapps/ggpserver/-" {
+// The permissions granted to the WEB-INF/classes and WEB-INF/lib directory
+grant codeBase "file:${catalina.home}/webapps/ggpserver/-" {
         permission java.net.SocketPermission "*", "connect,resolve";  // required for database access to 127.0.0.1:3306 and for connecting to the players
         permission java.util.PropertyPermission "file.encoding", "read";
         permission java.util.PropertyPermission "java.io.tmpdir", "read";
@@ -63,9 +63,13 @@ grant codeBase "file:/usr/share/tomcat5.5/webapps/ggpserver/-" {
         permission java.io.FilePermission "${catalina.base}${file.separator}logs", "read, write";
         permission java.io.FilePermission "${catalina.base}${file.separator}logs${file.separator}*", "read, write";
         permission java.io.FilePermission "${java.io.tmpdir}${file.separator}*", "read, write, delete"; // required for exporting tournaments/matches
+		permission java.lang.RuntimePermission "getClassLoader"; // required for logging
+		permission java.lang.RuntimePermission "accessDeclaredMembers";
 };
 
-# change the codeBase according to your tomcat installation
+grant codeBase "file:${catalina.home}/bin/tomcat-juli.jar" {
+        permission java.io.FilePermission "${catalina.base}${file.separator}webapps${file.separator}ggpserver${file.separator}WEB-INF${file.separator}classes${file.separator}logging.properties", "read";
+};
 
 # ========================================================================================
 

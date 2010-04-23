@@ -21,7 +21,6 @@
 package tud.gamecontroller.game;
 
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import tud.gamecontroller.logging.ErrorMessageListener;
@@ -35,13 +34,9 @@ import tud.gamecontroller.players.Player;
 public interface RunnableMatchInterface<TermType, StateType extends StateInterface<TermType, ? extends StateType>>
 		extends MatchInterface<TermType, StateType>, ErrorMessageListener {
 
-	Collection<? extends Player<TermType, StateType>> getPlayers();
+	public Collection<? extends Player<TermType, StateType>> getPlayers();
 
-	List<? extends Player<TermType, StateType>> getOrderedPlayers();
+	public List<? extends Player<TermType, StateType>> getOrderedPlayers();
 
-	Player<TermType, StateType> getPlayer(RoleInterface<TermType> role);
-	
-	public void setReadyTime(Date readyTime);
-	public Date getReadyTime();
-
+	public Player<TermType, StateType> getPlayer(RoleInterface<TermType> role);
 }

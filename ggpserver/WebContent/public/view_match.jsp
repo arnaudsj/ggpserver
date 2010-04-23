@@ -34,8 +34,7 @@
 	</c:catch>
 </jsp:useBean>
 
-<jsp:useBean id="availability" class="tud.ggpserver.formhandlers.inc.Availability"
-	scope="page">
+<jsp:useBean id="availability" class="tud.ggpserver.formhandlers.inc.Availability" scope="page">
 	<c:catch>
 		<jsp:setProperty name="availability" property="matchID" />
 		<jsp:setProperty name="availability" property="userName" value="<%= request.getUserPrincipal().getName() %>" />
@@ -148,86 +147,72 @@
 							<td></td>
 						</c:if> 
 					</tr>
-					<c:if test="${match.status == 'scheduled'}">
-						<tr class="even">
-							<c:forEach var="i" begin="0" end="${match.game.numberOfRoles - 1}">
-								<c:set var="role">${match.orderedPlayerRoles[i]}</c:set>
-								<td>
-									<c:choose>
-										<c:when test="${viewMatch.statuses[i].right == 'accepted'}">
-											accepted
-											<c:if test="${userName == viewMatch.statuses[i].left}">
-												<img src="../icons/other/16-loading.gif" title="waiting for other players to accept..."/>
-												<script type="text/javascript" language="JavaScript">
-											    	setTimeout("document.location.reload()", 3000);
-											    </script>
-											</c:if>
-										</c:when>
-										<c:otherwise>
-											<c:choose>
-												<c:when test="${userName == viewMatch.statuses[i].left}">
-													<c:url value="/public/view_match.jsp" var="acceptURL">
-														<c:param name="matchID" value="${viewMatch.matchID}"/>
-														<c:param name="role" value="${role}" />
-														<c:param name="available" value="1"/>
-												    </c:url>
-												    <a href='<c:out value="${acceptURL}"/>'>
-												    	<div class="start" title="allow this game to begin"></div>
-												    	allow this game to begin
-												    </a>
-												</c:when>
-												<c:otherwise>
-													has not accepted yet
-												</c:otherwise>
-											</c:choose>
-										</c:otherwise>
-									</c:choose>
-									</a>
-									<img src="../icons/other/players/<c:out value="${playerinfo.type}"/>.png" title="<c:out value="${playerinfo.type}"/>" />
-								</td>
-							</c:forEach>
-							<c:if test="${match.weight != 1.0}">
-								<td></td>
-							</c:if> 
-						</tr>
-					</c:if>
-					<c:if test="${matchStatus == 'running'}">
-						<tr class="even">
-							<c:forEach var="i" begin="0" end="${match.game.numberOfRoles - 1}">
-								<td style="align: center;">
-									<c:if test="${ match.orderedPlayerNames[i] == userName }">
+					<tr class="even">
+						<c:forEach var="roleindex" begin="0" end="${match.game.numberOfRoles - 1}">
+							<td align="center">
+								<c:choose>
+									<c:when test="${match.status == 'scheduled'}">
+										<c:set var="role">${match.orderedPlayerRoles[roleindex]}</c:set>
+										<c:choose>
+											<c:when test="${viewMatch.statuses[roleindex].right == 'accepted'}">
+												accepted
+												<c:if test="${userName == viewMatch.statuses[roleindex].left}">
+													<%-- TODO: set more sensible timeout (e.g., depending on the start clock) or use an iframe+javascript --%>
+													<img src="../icons/other/16-loading.gif" title="waiting for other players to accept..."/>
+													<script type="text/javascript" language="JavaScript">
+												    	setTimeout("document.location.reload()", 3000);
+												    </script>
+												</c:if>
+											</c:when>
+											<c:when test="${userName == viewMatch.statuses[roleindex].left}">
+												<%-- TODO: use another JSP for setting a player to available --%>
+												<c:url value="/public/view_match.jsp" var="acceptURL">
+													<c:param name="matchID" value="${viewMatch.matchID}"/>
+													<c:param name="role" value="${role}" />
+													<c:param name="available" value="1"/>
+											    </c:url>
+											    <a href='<c:out value="${acceptURL}"/>'>
+											    	<div class="start" title="allow this game to begin"></div>
+											    	allow this game to begin
+											    </a>
+											</c:when>
+											<c:otherwise>
+												has not accepted yet
+											</c:otherwise>
+										</c:choose>
+										</a>
+										<img src="../icons/other/players/<c:out value="${playerinfo.type}"/>.png" title="<c:out value="${playerinfo.type}"/>" alt="<c:out value="${playerinfo.type}"/>">
+									</c:when>
+
+									<c:when test="${matchStatus == 'running' && match.orderedPlayerNames[roleindex] == userName}">
 										<c:url value="/members/play.jsp" var="playURL">
 									    	<c:param name="matchID" value="${match.matchID}" />
-									    	<c:param name="role" value="${match.orderedPlayerRoles[i]}" />
+									    	<c:param name="role" value="${match.orderedPlayerRoles[roleindex]}" />
 									    </c:url>
-									    <a href='<c:out value="${playURL}" />'><div class="play" title="play match! (as <c:out value="${match.orderedPlayerRoles[i]}"/>)"><span>play</span></div></a>
-									</c:if>
-								</td>
-							</c:forEach>
-							<c:if test="${match.weight != 1.0}">
-								<td></td>
-							</c:if> 
-						</tr>
-					</c:if>
-					<c:if test="${match.orderedGoalValues != null}">
-						<tr class="even">
-							<c:forEach var="roleindex" begin="0" end="${match.game.numberOfRoles - 1}">
-								<td>
-									<c:choose>
-										<c:when test="${ match.orderedPlayerInfos[roleindex].name == viewMatch.playerName }">
-											<span class="highlight">${match.orderedGoalValues[roleindex]}</span>
-										</c:when>
-										<c:otherwise>
-											${match.orderedGoalValues[roleindex]}
-										</c:otherwise>
-									</c:choose>
-								</td>
-							</c:forEach>
-							<c:if test="${match.weight != 1.0}">
-								<td>*${match.weight}</td>
-							</c:if> 
-						</tr>
-					</c:if>
+									    <a href='<c:out value="${playURL}" />'><div class="play" title="play match! (as <c:out value="${match.orderedPlayerRoles[roleindex]}"/>)"><span>play</span></div></a>
+									</c:when>
+
+									<c:when test="${match.orderedGoalValues != null}">
+										<c:choose>
+											<c:when test="${ match.orderedPlayerInfos[roleindex].name == viewMatch.playerName }">
+												<span class="highlight">${match.orderedGoalValues[roleindex]}</span>
+											</c:when>
+											<c:otherwise>
+												${match.orderedGoalValues[roleindex]}
+											</c:otherwise>
+										</c:choose>
+									</c:when>
+
+									<c:otherwise>
+										---
+									</c:otherwise>
+								</c:choose>
+							</td>
+						</c:forEach>
+						<c:if test="${match.weight != 1.0}">
+							<td>*${match.weight}</td>
+						</c:if> 
+					</tr>
 					</tbody>
 				</table>
 			</td>
@@ -291,20 +276,18 @@
 		<tr>
 		
 		<c:forEach var="role" items="${match.orderedPlayerRoles}">
-			<th>
-				<div style="align: center;">
-					<c:out value="${role}"/>
-					<c:if test="${viewMatch.gdlVersion == 2}">
-						<c:url value="view_state.jsp" var="stateURL">
-							<c:param name="matchID" value="${match.matchID}" />
-							<c:param name="stepNumber" value="1" />
-							<c:param name="role" value="${role}" />
-						</c:url>
-						<a href='<c:out value="${stateURL}" />'>
-							<span class="view" title="View initial state from ${role}'s perspective"></span></a>
-						</a>
-					</c:if>
-				</div>
+			<th align="center">
+				<c:out value="${role}"/>
+				<c:if test="${viewMatch.gdlVersion == 2}">
+					<c:url value="view_state.jsp" var="stateURL">
+						<c:param name="matchID" value="${match.matchID}" />
+						<c:param name="stepNumber" value="1" />
+						<c:param name="role" value="${role}" />
+					</c:url>
+					<a href='<c:out value="${stateURL}" />'>
+						<span class="view" title="View initial state from ${role}'s perspective"></span></a>
+					</a>
+				</c:if>
 			</th>
 		</c:forEach>
 		</tr>
@@ -348,38 +331,36 @@
 					</c:otherwise>
 				</c:choose>
 				
-				<td>
-					<center>
-						<c:choose>
-							<c:when test="${!empty viewMatch.errorMessages}">
-								<c:choose>
-									<c:when test="${ viewMatch.playerName == null }">
-										<c:set var="errorclass" value="errors" />
-									</c:when>
-									<c:when test="<%= viewMatch.hasErrorForPlayer() %>">
-										<c:set var="errorclass" value="errors" />
-									</c:when>
-									<c:otherwise>
-										<c:set var="errorclass" value="errors_bw" />
-									</c:otherwise>
-								</c:choose>
-								<c:url value="view_errors.jsp" var="errorURL">
-									<c:param name="matchID" value="${match.matchID}" />
-									<c:if test="${ viewMatch.playerName != null }">
-										<c:param name="playerName" value="${viewMatch.playerName}" />
-									</c:if>
-								</c:url>
-								<div class="${errorclass}">
-									<a href='<c:out value="${errorURL}" />#step<c:out value="${stepNumber}" />'>
-										<span>errors</span>
-									</a>
-								</div>
-							</c:when>
-							<c:otherwise>
-								<div class="no_errors" />
-							</c:otherwise>
-						</c:choose>
-					</center>
+				<td align="center">
+					<c:choose>
+						<c:when test="${!empty viewMatch.errorMessages}">
+							<c:choose>
+								<c:when test="${ viewMatch.playerName == null }">
+									<c:set var="errorclass" value="errors" />
+								</c:when>
+								<c:when test="<%= viewMatch.hasErrorForPlayer() %>">
+									<c:set var="errorclass" value="errors" />
+								</c:when>
+								<c:otherwise>
+									<c:set var="errorclass" value="errors_bw" />
+								</c:otherwise>
+							</c:choose>
+							<c:url value="view_errors.jsp" var="errorURL">
+								<c:param name="matchID" value="${match.matchID}" />
+								<c:if test="${ viewMatch.playerName != null }">
+									<c:param name="playerName" value="${viewMatch.playerName}" />
+								</c:if>
+							</c:url>
+							<div class="${errorclass}">
+								<a href='<c:out value="${errorURL}" />#step<c:out value="${stepNumber}" />'>
+									<span>errors</span>
+								</a>
+							</div>
+						</c:when>
+						<c:otherwise>
+							<div class="no_errors"></div>
+						</c:otherwise>
+					</c:choose>
 				</td>
 				<td> <%-- State timestamp --%>
 					<fmt:formatDate value="${viewMatch.timestamp}" pattern="dd.MM.yyyy HH:mm:ss z"/>

@@ -38,6 +38,7 @@
 	<thead>
 		<tr>
 			<th>user name</th>
+			<th>logged in</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -51,9 +52,20 @@
 				</c:otherwise>
 			</c:choose>
 			<tr class="${rowClass}">
-				<td><c:url value="view_user.jsp" var="userURL">
-					<c:param name="userName" value="${user.userName}" />
-				</c:url> <a href='<c:out value="${userURL}" />'>${user.userName}</a></td>
+				<td>
+					<c:url value="view_user.jsp" var="userURL">
+						<c:param name="userName" value="${user.userName}" />
+					</c:url>
+					<a href='<c:out value="${userURL}" />'>${user.userName}</a>
+				</td>
+				<td>
+					<c:set var="checked">
+						<c:if test="${user.loggedIn}">
+							checked="checked"
+						</c:if>
+					</c:set>
+					<input type="checkbox" name="loggedin_${user.userName}" ${checked} disabled="disabled">
+				</td>
 			</tr>
 		</c:forEach>
 	</tbody>

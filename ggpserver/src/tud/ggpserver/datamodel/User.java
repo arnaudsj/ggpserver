@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+    Copyright (C) 2009 Martin Günther <mintar@gmx.de>
+                  2010 Stephan Schiffel <stephan.schiffel@gmx.de> 
 
     This file is part of GGP Server.
 
@@ -21,6 +22,9 @@ package tud.ggpserver.datamodel;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.logging.Logger;
+
+import tud.ggpserver.webapp.UserTracker;
 
 
 public class User {
@@ -60,6 +64,73 @@ public class User {
 
 	public boolean isAdmin() {
 		return hasRole(ADMIN_ROLE);
+	}
+
+	public boolean isLoggedIn() {
+		return UserTracker.getInstance().isLoggedIn(this);
+	}
+
+//	/*
+//	 * notifying the UserTracker about the logout is delayed for a second because SessionAttributeTracker.attributeRemoved
+//	 *  + attributeAdded is called every request and we don't want to constantly add and remove the user.  
+//	 */
+//	private NotifyLogoutThread notifyLogoutThread = null;
+//
+//	private static class NotifyLogoutThread extends Thread {
+//		private User user;
+//		private boolean loggedOut = false;
+//
+//		NotifyLogoutThread(User user) {
+//			this.user = user;
+//		}
+//
+//		@Override
+//		public void run() {
+//			loggedOut = false;
+//			try {
+//				wait(1000);
+//				loggedOut = true;
+//				UserTracker.getInstance().notifyLogout(user);
+//			} catch (InterruptedException e) {
+//				// logout process stopped
+//			}
+//		}
+//	};
+//	
+//	public synchronized void scheduleNotifyLogout() {
+//		if (notifyLogoutThread == null || !notifyLogoutThread.isAlive()) {
+//			Logger.getLogger(User.class.getName()).info(userName);
+//			notifyLogoutThread = new NotifyLogoutThread(this);
+//			notifyLogoutThread.start();
+//		}
+//	}
+//
+//	/**
+//	 * stops the currently running notifyLogoutThread (if any)
+//	 * returns true if it could be stopped before calling notifyLogout of the UserTracker  
+//	 * @return
+//	 */
+//	public synchronized boolean stopNotifyLogout() {
+//		if (notifyLogoutThread != null && notifyLogoutThread.isAlive()) {
+//			Logger.getLogger(User.class.getName()).info(userName);
+//			notifyLogoutThread.interrupt();
+//			try {
+//				notifyLogoutThread.join();
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			return !notifyLogoutThread.loggedOut;
+//		}
+//		return false;
+//	}
+
+	public void notifyLogin() {
+		UserTracker.getInstance().notifyLogin(this);
+	}
+
+	public void notifyLogout() {
+		UserTracker.getInstance().notifyLogout(this);
 	}
 
 	@Override

@@ -20,6 +20,7 @@
 package tud.ggpserver.formhandlers;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -131,13 +132,10 @@ public class SaveTournament {
 					parseGoalValue(key.substring(PREFIX_GOALVALUE.length()), params);
 				} else if (key.startsWith(PREFIX_WEIGHT)) {
 					parseWeight(key.substring(PREFIX_WEIGHT.length()), params);
+				} else if (key.equals("newContent") || key.equals("page")) {
+					// ignore these values
 				} else {
-					String message = "Map<String,String[]> - Unknown parameter: " + key + " (values ";
-					for (String value : params) {
-						message += value + " ";
-					}
-					message += ")";
-					logger.warning(message);
+					logger.warning("Unknown parameter: " + key + " (values " + Arrays.toString(params) + ")");
 				}
 			}
 			

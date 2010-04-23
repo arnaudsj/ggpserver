@@ -12,50 +12,16 @@
 	  	* background ("light" or "dark" according to the position and if the board is checkered)
 -->
 
-<!--
- // TODO: use this for the multiple boards
- 
-<xsl:key name="by-artist" match="cd" use="artist"/>
-
-<xsl:template match="/catalog">
-  <html>
-  <body>
-    <h2>My CD Collection</h2>
-	
-    <xsl:for-each select="cd">
-      <xsl:if test="generate-id(.) = generate-id(key('by-artist', artist)[1])">
-	artist: <xsl:value-of select="artist"/>
-        <br/>
-	  <xsl:for-each select="key('by-artist', artist)">
-	    title: <xsl:value-of select="title"/>
-            <br/>
-	  </xsl:for-each>
-      </xsl:if>
-    </xsl:for-each>
-
-  </body>
-  </html>
-</xsl:template>
--->
-
-
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 	<xsl:import href="board.xsl"/>
 	<xsl:import href="state.xsl"/>
+	<xsl:import href="chess_board_play_link.xsl"/>
 
 	<!--
 		print_all_chess_boards prints a chessboard for all detected board fluents.
 		At the moment ternary fluents with a name CELL* are considered as boards.
 	-->
-	
-	<xsl:template name="linkOnCell">
-		<xsl:param name="x" />
-		<xsl:param name="y" />
-		<xsl:param name="content" />
-		<xsl:param name="piece" />
-		0
-	</xsl:template>
 	
 	<xsl:key name="by-fluent" match="fact" use="prop-f"/>
 	
@@ -76,6 +42,11 @@
 
 		<xsl:param name="CellWidth" select="44 + 2 * $BorderWidth"/>
 		<xsl:param name="CellHeight" select="$CellWidth"/>
+		
+		<xsl:call-template name="selectCellJavaScript">
+			<xsl:with-param name="xArgIdx" select="$xArgIdx" />
+			<xsl:with-param name="yArgIdx" select="$yArgIdx" />
+		</xsl:call-template>
 		
 		<xsl:for-each select="fact">
 			<xsl:sort select="prop-f"/>
@@ -133,7 +104,6 @@
 		<xsl:param name="BorderStyle">solid #FFC</xsl:param>
 		<xsl:param name="CellWidth" select="44 + 2 * $BorderWidth"/>
 		<xsl:param name="CellHeight" select="$CellWidth"/>
-		<xsl:param name="cellCallBack" /> <!-- function name to be called with parameters (x,y), the coordinates of a cell, when one clicks on it -->
 		
 		<xsl:variable name="internalCellFluentName">
 			<xsl:choose>
@@ -148,6 +118,11 @@
 			</xsl:choose>
 		</xsl:variable>
 		
+		<xsl:call-template name="selectCellJavaScript">
+			<xsl:with-param name="xArgIdx" select="$xArgIdx" />
+			<xsl:with-param name="yArgIdx" select="$yArgIdx" />
+		</xsl:call-template>
+
 		<xsl:call-template name="chess_board">
 			<xsl:with-param name="CellFluentName" select="$internalCellFluentName"/>
 			<xsl:with-param name="Width" select="$Width"/>
@@ -165,7 +140,6 @@
 			<xsl:with-param name="CellHeight" select="$CellHeight"/>
 			<xsl:with-param name="BorderWidth" select="$BorderWidth"/>
 			<xsl:with-param name="BorderStyle" select="$BorderStyle"/>
-			<xsl:with-param name="cellCallBack" select="$cellCallBack"/>
 		</xsl:call-template>
 		
 		<!-- show remaining fluents -->
@@ -195,7 +169,6 @@
 		<xsl:param name="CellWidth" select="44 + 2 * $BorderWidth"/>
 		<xsl:param name="CellHeight" select="$CellWidth"/>
 		<xsl:param name="BoardName"/>
-		<xsl:param name="cellCallBack" /> <!-- function name to be called with parameters (x,y), the coordinates of a cell, when one clicks on it -->
 
 		<!-- try detect board fluent if it wasn't given as parameter -->
 		<xsl:variable name="internalCellFluentName">
@@ -413,18 +386,24 @@
 					<xsl:variable name="linkOnCell">
 						<xsl:call-template name="linkOnCell">
 							<xsl:with-param name="x" select="$xArg" />
+							<xsl:with-param name="xArgIdx" select="$xArgIdx" />
 							<xsl:with-param name="y" select="$yArg" />
+							<xsl:with-param name="yArgIdx" select="$yArgIdx" />
 							<xsl:with-param name="content" select="$content" />
+							<xsl:with-param name="contentArgIdx" select="$contentArgIdx" />
 							<xsl:with-param name="piece" select="$piece" />
+							<xsl:with-param name="BoardName" select="$BoardName" />
 						</xsl:call-template>
 					</xsl:variable>
 					
 					<xsl:choose>
-						<xsl:when test="$linkOnCell = 1 and $cellCallBack != ''">
-							<a style="min-width: 44px; min-height: 44px;">
-								<xsl:attribute name="href">
-									javascript:<xsl:value-of select="$cellCallBack"/>("<xsl:value-of select="$xArg"/>", "<xsl:value-of select="$yArg"/>", "<xsl:value-of select="$content"/>", "<xsl:value-of select="$piece"/>");
+						<xsl:when test="$linkOnCell != ''">
+							<a>
+								<xsl:attribute name="style">
+								 	min-width: <xsl:value-of select="$CellWidth - 2 * $BorderWidth"/>px;
+								 	min-height: <xsl:value-of select="$CellHeight - 2 * $BorderWidth"/>px;
 								</xsl:attribute>
+								<xsl:attribute name="href"><xsl:value-of select="$linkOnCell"/></xsl:attribute>
 								<xsl:call-template name="make_cell_content_or_chess_img">
 									<xsl:with-param name="DefaultCellContent" select="$DefaultCellContent"/>
 									<xsl:with-param name="xArg" select="$xArg"/>
@@ -438,6 +417,7 @@
 									<xsl:with-param name="BorderWidth" select="$BorderWidth"/>
 									<xsl:with-param name="xPosCell" select="$xPosCell"/>
 									<xsl:with-param name="yPosCell" select="$yPosCell"/>
+									<xsl:with-param name="BoardName" select="$BoardName"/>
 								</xsl:call-template>
 							</a>
 						</xsl:when>
@@ -455,6 +435,7 @@
 								<xsl:with-param name="BorderWidth" select="$BorderWidth"/>
 								<xsl:with-param name="xPosCell" select="$xPosCell"/>
 								<xsl:with-param name="yPosCell" select="$yPosCell"/>
+								<xsl:with-param name="BoardName" select="$BoardName"/>
 							</xsl:call-template>
 						</xsl:otherwise>
 					</xsl:choose>
@@ -464,6 +445,20 @@
 			<xsl:if test="$BoardName!=''">
 				<p style="text-align: center">Board <xsl:value-of select="$BoardName"/></p>
 			</xsl:if>
+			
+			<xsl:call-template name="legalMoveLinks">
+				<xsl:with-param name="xArgIdx" select="$xArgIdx" />
+				<xsl:with-param name="yArgIdx" select="$yArgIdx" />
+				<xsl:with-param name="BoardName" select="$BoardName" />
+
+				<xsl:with-param name="internalMinX" select="$internalMinX"/>
+				<xsl:with-param name="internalMinY" select="$internalMinY"/>
+				<xsl:with-param name="mirrorY" select="$mirrorY"/>
+				<xsl:with-param name="CellWidth" select="$CellWidth"/>
+				<xsl:with-param name="CellHeight" select="$CellHeight"/>
+				<xsl:with-param name="BorderWidth" select="$BorderWidth"/>
+				<xsl:with-param name="internalHeight" select="$internalHeight"/>
+			</xsl:call-template>
 		</div>
 	</xsl:template>
 	
@@ -481,9 +476,10 @@
 		<xsl:param name="BorderWidth" />
 		<xsl:param name="xPosCell" />
 		<xsl:param name="yPosCell" />
+		<xsl:param name="BoardName" />
 		
 		<div class="chesscellcontent">
-			
+			<xsl:attribute name="id">chess_board_cell_<xsl:value-of select="$BoardName"/>_<xsl:value-of select="$xArg"/>_<xsl:value-of select="$yArg"/></xsl:attribute>
 			<xsl:attribute name="title"><xsl:value-of select="$alt"/></xsl:attribute>
 			<xsl:attribute name="style">
 				left: <xsl:value-of select="$xPosCell"/>px;
@@ -652,6 +648,21 @@
 				<xsl:text>44.png</xsl:text>
 			</xsl:attribute>
 		</img>
+	</xsl:template>
+
+	<!-- linkOnCell is called by print_chess_state for each cell of the board
+	     and should return a url for the link or nothing if there should not be a link.
+	     The default implementation returns nothing.
+	 -->
+	<xsl:template name="linkOnCell">
+		<xsl:param name="x" />
+		<xsl:param name="xArgIdx"/>
+		<xsl:param name="y" />
+		<xsl:param name="yArgIdx" />
+		<xsl:param name="content" />
+		<xsl:param name="contentArgIdx" />
+		<xsl:param name="piece" />
+		<xsl:param name="BoardName" />
 	</xsl:template>
 
 </xsl:stylesheet>

@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import tud.gamecontroller.ConnectionEstablishedNotifier;
 import tud.gamecontroller.GDLVersion;
+import tud.gamecontroller.GameController;
 import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.StateInterface;
@@ -38,6 +39,8 @@ public abstract class AbstractPlayer<TermType extends TermInterface, StateType e
 	private long runtime;
 	private long startRunningTime;
 	private long lastMessageRuntime;
+	protected static final Logger logger = Logger.getLogger(GameController.class.getName());
+		// it is important to use the same logger here that is used in the AbstractGameControllerRunner 
 	
 	private GDLVersion gdlVersion = null;
 
@@ -62,7 +65,7 @@ public abstract class AbstractPlayer<TermType extends TermInterface, StateType e
 	protected void logErrorMessage(String type, String message) {
 		GameControllerErrorMessage errorMessage = new GameControllerErrorMessage(type, message, this.getName());
 		match.notifyErrorMessage(errorMessage);
-		Logger.getLogger("tud.gamecontroller").log(Level.SEVERE, message, errorMessage);
+		logger.log(Level.SEVERE, message, errorMessage);
 	}
 
 	public long getTotalRuntime() {

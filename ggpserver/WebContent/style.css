@@ -66,8 +66,8 @@ div#header {
     clear:              both;
     margin-top:         5px;
     margin-bottom:      10px;
-//    background-image:   url(gfx/GGPHeaderBlau900.png);
-//    background-repeat:  no-repeat;
+/*    background-image:   url(gfx/GGPHeaderBlau900.png);
+    background-repeat:  no-repeat; */
     width:              900px;
     height:             115px;
 }

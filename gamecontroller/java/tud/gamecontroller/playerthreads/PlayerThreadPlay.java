@@ -20,6 +20,7 @@
 
 package tud.gamecontroller.playerthreads;
 
+import tud.gamecontroller.ConnectionEstablishedNotifier;
 import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
@@ -31,7 +32,7 @@ public class PlayerThreadPlay<
 		TermType extends TermInterface,
 		StateType extends StateInterface<TermType, ? extends StateType>
 		> extends AbstractPlayerThread<TermType, StateType>
-		implements MoveMemory<TermType> {
+		implements ConnectionEstablishedNotifier {
 
 	protected MoveInterface<TermType> move;
 	protected Object seesTerms;
@@ -44,17 +45,8 @@ public class PlayerThreadPlay<
 	public MoveInterface<TermType> getMove() {
 		return move;
 	}
-	public void setMove (MoveInterface<TermType> move) {
-		this.move = move;
-	}
 	public void doRun(){
-		MoveInterface<TermType> definitiveMove = player.gamePlay(seesTerms, this);
-		if (definitiveMove == null) {
-			// the player.gamePlay method has been interrupted, let our move be the move that was chosen last (= this.move)
-		} else {
-			// the player.gamePlay returned a move value (the player confirmed his or her move), let's consider definitiveMove as the move we want to return
-			move = definitiveMove;
-		}
+		move = player.gamePlay(seesTerms, this);
 	}
 	
 	@Override

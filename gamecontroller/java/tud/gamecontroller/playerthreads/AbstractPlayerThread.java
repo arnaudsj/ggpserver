@@ -85,8 +85,7 @@ public abstract class AbstractPlayerThread<
 			String message = "exception from player " + player + ": " + ex;
 			GameControllerErrorMessage errorMessage = new GameControllerErrorMessage(GameControllerErrorMessage.INTERNAL_ERROR, message);
 			match.notifyErrorMessage(errorMessage);
-			Logger logger = Logger.getLogger(AbstractPlayerThread.class.getName());
-			logger.severe(message);
+			Logger.getLogger(AbstractPlayerThread.class.getName()).severe(message);
 			ex.printStackTrace();
 		}
 	}

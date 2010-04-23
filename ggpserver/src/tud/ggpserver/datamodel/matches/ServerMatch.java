@@ -28,6 +28,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
+
+import org.apache.commons.collections.map.ReferenceMap;
 
 import tud.gamecontroller.auxiliary.Pair;
 import tud.gamecontroller.game.GameInterface;
@@ -43,6 +46,8 @@ import tud.ggpserver.collectionviews.Mapping;
 import tud.ggpserver.collectionviews.Mappings;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.User;
+import tud.ggpserver.formhandlers.ViewState;
+import tud.ggpserver.util.StateXMLExporter;
 
 public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateInfoType>
 		extends Match<TermType, ReasonerStateInfoType>{
@@ -86,9 +91,9 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 	 * State 0 = initial state, State 1 = state after first joint move, ..., State n = final state
 	 */
 	protected List<Pair<Date, String>> stringStates = null;
-	
-	protected List<List<String>> jointMovesStrings;
-	
+
+	protected Map<Integer, String> xmlStates = null;
+
 	/**
 	 * - errors from the start message and first play message go to index 0
 	 * - errors from the second play message go to index 1
@@ -337,5 +342,24 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 		buffer.append(getErrorMessages());
 		buffer.append("]");
 		return buffer.toString();
+	}
+
+	@SuppressWarnings("unchecked")
+	protected Map<Integer, String> getXmlStates() {
+		if (xmlStates == null)
+			xmlStates = new ReferenceMap(ReferenceMap.SOFT, ReferenceMap.SOFT);
+		return xmlStates;
+	}
+	
+	public String getXmlState(int stepNumber, String roleName) {
+		Map<Integer, String> xmlStates = getXmlStates();
+		String xmlState = xmlStates.get(stepNumber);
+		if (xmlState == null) {
+			List<Pair<Date,String>> stringStates = getStringStates();
+			Logger.getLogger(ViewState.class.getName()).info("StateXMLExporter.getStepXML(match, stringStates, "+stepNumber+", roleName)");
+			xmlState = StateXMLExporter.getStepXML(this, stringStates, stepNumber, roleName);
+			xmlStates.put(stepNumber, xmlState);
+		}
+		return xmlState;
 	}
 }

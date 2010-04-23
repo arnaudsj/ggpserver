@@ -24,6 +24,7 @@
 
 <jsp:directive.include file="/inc/pager.jsp" />
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%> 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <fmt:setLocale value="en_US"/>
 <c:set var="internal_show_tournament">
@@ -72,7 +73,7 @@
 									<c:param name="playerName" value="${pager.playerName}" />
 								</c:if>
 							</c:url>
-							<a href='<c:out value="${matchURL}" />'>${match.matchID}</a>
+							<a href='<c:out value="${matchURL}" />'>${fn:replace(match.matchID, ".", ".&#8203;")}</a>
 						</td>
 
 						<%-- tournament id --%>

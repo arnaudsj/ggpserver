@@ -356,8 +356,6 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 
 	public Game<TermType, ReasonerStateInfoType> getGame(String name) throws SQLException {
 		
-		logger.info("AbstractDbConnector.getGame("+name+")");
-		
 		Connection con = getConnection();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -386,10 +384,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 				
 			}
 			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		finally { 
+		} finally { 
 			if (con != null)
 				try {con.close();} catch (SQLException e) {}
 			if (ps != null)
@@ -1084,35 +1079,6 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 		return result;
 	}
 
-	public List<ServerMatch<TermType, ReasonerStateInfoType>> getSelectedMatches(String sql_select) {
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
-		List<ServerMatch<TermType, ReasonerStateInfoType>> result = new LinkedList<ServerMatch<TermType, ReasonerStateInfoType>>();
-		
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(sql_select + ";");
-			
-			rs = ps.executeQuery();
-			
-			while (rs.next()) {
-				result.add(getMatch(rs.getString("match_id")));
-			}
-		} catch(java.sql.SQLException e) {}
-		finally { 
-			if (con != null)
-				try {con.close();} catch (SQLException e) {}
-			if (ps != null)
-				try {ps.close();} catch (SQLException e) {}
-			if (rs != null)
-				try {rs.close();} catch (SQLException e) {}
-		} 
-
-		return result;
-	}
-	
 	/**
 	 * @return an SQL statement to return the MatchInfos of all matches that the filter will match
 	 * 
@@ -1743,10 +1709,8 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			
 			while (rs.next()) {
 				int errorMsgStepNumber = rs.getInt("step_number");   // step number counting starts with 1 
-				assert (errorMsgStepNumber > 0);
-
-				if (errorMsgStepNumber > numberOfStates) {
-					String message = "errorMsgStepNumber bigger than numberOfStates! Causing match id: " + matchID;
+				if (errorMsgStepNumber < 1 || errorMsgStepNumber > numberOfStates) {
+					String message = "errorMsgStepNumber smaller 1 or bigger than numberOfStates! Causing match id: " + matchID;
 					logger.severe(message);        //$NON-NLS-1$s
 					throw new InternalError(message);					
 				}

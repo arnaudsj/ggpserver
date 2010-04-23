@@ -52,9 +52,14 @@ import tud.ggpserver.datamodel.dblists.ErrorMessageAccessor;
 import tud.ggpserver.datamodel.dblists.JointMovesAccessor;
 import tud.ggpserver.datamodel.dblists.StringStateAccessor;
 
-
+	/**
+	 * It's possible to have several RunningMatch instances representing 
+	 * the same match: We can't assume that the first instance is cached.
+	 * Only one of them will actually be running the match, but the others
+	 * can be used for display.   
+	 */
 public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
-		extends ServerMatch<TermType, ReasonerStateInfoType>
+		extends StartedMatch<TermType, ReasonerStateInfoType>
 		implements
 		RunnableMatchInterface<TermType, State<TermType, ReasonerStateInfoType>>,
 		GameControllerListener {
@@ -62,22 +67,6 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 	private static final Logger logger = Logger.getLogger(RunningMatch.class.getName());
 
 	private GameScramblerInterface gameScrambler;
-	private Date readyTime;
-
-	/**
-	 * JointMove 0 = joint move leading from initial state to State 1.
-	 * This list always has one less element than the states list.
-	 * 
-	 * jointMoves will only be non-empty if they were calculated by 
-	 * running this match. If this match comes from the database 
-	 * instead, jointMoves will be empty.
-	 * 
-	 * It's possible to have several RunningMatch instances representing 
-	 * the same match: We can't assume that the first instance is cached.
-	 * Only one of them will actually be running the match, but the others
-	 * can be used for display.   
-	 */
-	private List<JointMoveInterface<? extends TermInterface>> jointMoves = new LinkedList<JointMoveInterface<? extends TermInterface>>();   // all joint moves executed so far
 
 	private Map<RoleInterface<TermType>, Player<TermType, State<TermType, ReasonerStateInfoType>>> players;
 	private List<Player<TermType, State<TermType, ReasonerStateInfoType>>> orderedPlayers = null;
@@ -136,12 +125,10 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 	
 	@Override
 	public List<List<String>> getJointMovesStrings() {
-		{
-			if (jointMovesStrings == null) {
-				jointMovesStrings = new DynamicDBBackedList<List<String>>(new JointMovesAccessor(getMatchID(), getDB()), true); 
-			}
-			return jointMovesStrings;
+		if (jointMovesStrings == null) {
+			jointMovesStrings = new DynamicDBBackedList<List<String>>(new JointMovesAccessor(getMatchID(), getDB()), true); 
 		}
+		return jointMovesStrings;
 	}
 
 	@Override
@@ -187,9 +174,7 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 	}
 	
 	private synchronized void initPlayers() {
-		logger.info(Integer.toHexString(System.identityHashCode(this))+"-initPlayers()");
 		if (players == null) {
-			logger.info(Integer.toHexString(System.identityHashCode(this))+"-players == null !");
 			players = new HashMap<RoleInterface<TermType>, Player<TermType, State<TermType, ReasonerStateInfoType>>>();
 			
 			for (RoleInterface<TermType> role : getGame().getOrderedRoles()) {
@@ -237,7 +222,7 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 		// only store the non-terminal states, because the terminal state will be stored in gameStopped()
 		if (!currentState.isTerminal()) {
 			// usually, the initial state won't be terminal, but of course it's possible to write such a stupid game
-			updateXmlState(currentState, null);
+			updateState(currentState);
 		}
 	}
 
@@ -249,19 +234,16 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 		
 		if (!currentState.isTerminal()) {
 			// only store the non-terminal states, because the terminal state will be stored in gameStopped()
-			updateXmlState(currentState, null);
+			updateState(currentState);
 		}		
 	}
 
 	@Override
 	public void gameStopped(StateInterface<? extends TermInterface, ?> currentState, Map<? extends RoleInterface<?>, Integer> goalValues) {
 		assert(currentState.isTerminal());
-		
+
 		updateGoalValues(goalValues);
-		updateXmlState(currentState, goalValues);
-		
-		// Clear the jointMoves list, they are only needed for running matches.
-		jointMoves = new LinkedList<JointMoveInterface<? extends TermInterface>>();
+		updateState(currentState);
 	}
 	
 	/* (non-Javadoc)
@@ -269,10 +251,14 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 	 */
 	@Override
 	public void notifyErrorMessage(GameControllerErrorMessage errorMessage) {
-		try {
-			getDB().addErrorMessage(getMatchID(), stepNumber, errorMessage);
-		} catch (SQLException e) {
-			logger.severe("GameControllerErrorMessage - exception: " + e); //$NON-NLS-1$
+		if(stepNumber < 1) {
+			logger.severe("error before step 1 in match " + getMatchID() + ":" + errorMessage);
+		} else {
+			try {
+				getDB().addErrorMessage(getMatchID(), stepNumber, errorMessage);
+			} catch (SQLException e) {
+				logger.severe("GameControllerErrorMessage - exception: " + e); //$NON-NLS-1$
+			}
 		}
 	}
 
@@ -285,19 +271,6 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 	}
 
 	private void updateJointMove(JointMoveInterface<? extends TermInterface> jointMove) {
-//		// update jointMovesStrings 
-//		List<String> jointMoveString = new LinkedList<String>();
-//		for (MoveInterface<? extends TermInterface> move : jointMove.getOrderedMoves()) {
-//			jointMoveString.add(move.getKIFForm());
-//		}
-//		jointMovesStrings.add(jointMoveString);
-
-		// update jointMoves
-		jointMoves.add(jointMove);
-		
-
-		assert(stepNumber == jointMoves.size());
-		
 		try {
 			getDB().addJointMove(getMatchID(), stepNumber, jointMove);
 		} catch (SQLException e) {
@@ -307,20 +280,13 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 		}
 	}
 
-	private void updateXmlState(StateInterface<? extends TermInterface, ?> currentState, Map<? extends RoleInterface<?>, Integer> goalValues) {
-		/* MODIFIED (COMMENTED) [this was valid when there was only Regular GDL] 
-		 * -- XMLGameStateWriter.createXMLOutputStream(this, currentState, jointMoves, goalValues, getGame().getStylesheet()).toString();
-		 */
-		String xmlState = currentState.toString();
-		System.out.println("xmlState = "+xmlState);
+	private void updateState(StateInterface<? extends TermInterface, ?> currentState) {
+		String state = currentState.toString();
 		
-//		xmlStates.add(xmlState);
-//		int stepNumber = getNumberOfStates();
-
 		assert (stepNumber == getStringStates().size() + 1);
-		
+	
 		try {
-			getDB().addState(getMatchID(), stepNumber, xmlState);
+			getDB().addState(getMatchID(), stepNumber, state);
 		} catch (SQLException e) {
 			logger.severe("StateInterface<? extends TermInterface,?>, Map<? extends RoleInterface<?>,Integer> - exception: " + e); //$NON-NLS-1$
 		} catch (DuplicateInstanceException e) {
@@ -328,11 +294,7 @@ public class RunningMatch<TermType extends TermInterface, ReasonerStateInfoType>
 		}
 	}
 	
-	public void setReadyTime(Date readyTime) {
-		this.readyTime = readyTime;
-	}
-	
-	public Date getReadyTime() {
-		return readyTime;
+	public int getCurrentStep() {
+		return stepNumber;
 	}
 }

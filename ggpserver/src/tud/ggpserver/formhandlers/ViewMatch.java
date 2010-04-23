@@ -45,7 +45,8 @@ public class ViewMatch {
 	private int stepNumber = 1;
 	private String playerName = null;
 	private List<GameControllerErrorMessage> errorMessagesForStep = null;
-	//private String userName;
+	
+	private List<Pair<String,String>> statuses = null; 
 
 	public String getPlayerName() {
 		return playerName;
@@ -78,26 +79,28 @@ public class ViewMatch {
 		this.userName = userName;
 	}*/
 	
-	public List<Pair<String,String>> getStatuses () {
-		List<Pair<String,String>> res = new LinkedList<Pair<String,String>>();
-		for (PlayerInfo p: match.getOrderedPlayerInfos()) {
-			if (p instanceof HumanPlayerInfo) { // human players
-				if (MatchRunner.getInstance().hasAccepted(match.getMatchID(), p.getName())) {
-					res.add(new Pair<String,String>(p.getName(),"accepted"));
-				} else {
-					res.add(new Pair<String,String>(p.getName(),"not yet"));
+	public List<Pair<String,String>> getStatuses() {
+		if( statuses == null ) { 
+			statuses = new LinkedList<Pair<String,String>>();
+			for (PlayerInfo p: match.getOrderedPlayerInfos()) {
+				if (p instanceof HumanPlayerInfo) { // human players
+					if (MatchRunner.getInstance().hasAccepted(match.getMatchID(), p.getName())) {
+						statuses.add(new Pair<String,String>(p.getName(),"accepted"));
+					} else {
+						statuses.add(new Pair<String,String>(p.getName(),"not yet"));
+					}
+				} else if (p instanceof RemotePlayerInfo) { // remote players
+					if (MatchRunner.getInstance().isAvailable(p.getName())) {
+						statuses.add(new Pair<String,String>(p.getName(),"accepted"));
+					} else {
+						statuses.add(new Pair<String,String>(p.getName(),"not yet"));
+					}
+				} else { // random or legal
+					statuses.add(new Pair<String,String>(p.getName(),"accepted"));
 				}
-			} else if (p instanceof RemotePlayerInfo) { // remote players
-				if (MatchRunner.getInstance().isAvailable(p.getName())) {
-					res.add(new Pair<String,String>(p.getName(),"accepted"));
-				} else {
-					res.add(new Pair<String,String>(p.getName(),"not yet"));
-				}
-			} else { // random or legal
-				res.add(new Pair<String,String>(p.getName(),"accepted"));
 			}
 		}
-		return res;
+		return statuses;
 	}
 	
 	public ServerMatch<?, ?> getMatch() {

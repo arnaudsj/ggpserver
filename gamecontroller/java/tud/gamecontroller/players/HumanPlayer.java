@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2010 Stephan Schiffel <stephan.schiffel@gmx.de>, Nicolas JEAN <njean42@gmail.com>
+    Copyright (C) 2010 Stephan Schiffel <stephan.schiffel@gmx.de>
+                  2010 Nicolas JEAN <njean42@gmail.com>
 
     This file is part of GameController.
 
@@ -19,193 +20,163 @@
 
 package tud.gamecontroller.players;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.LinkedList;
-import java.util.logging.Logger;
 
+import tud.gamecontroller.ConnectionEstablishedNotifier;
 import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.auxiliary.ChangeableBoolean;
-import tud.gamecontroller.auxiliary.ChangeableInt;
-import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MoveInterface;
+import tud.gamecontroller.game.RoleInterface;
+import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.StateInterface;
-import tud.gamecontroller.playerthreads.MoveMemory;
 import tud.gamecontroller.term.TermInterface;
 
 
 public class HumanPlayer<TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
 		extends LocalPlayer<TermType, StateType> {
 	
-	protected static final Logger logger = Logger.getLogger(HumanPlayer.class.getName());
-	
-	protected MoveMemory<TermType> moveMemory;
-	protected int currentStepNumber;
 	protected List<? extends MoveInterface<TermType>> currentLegalMoves;
 	protected boolean quickConfirm;
+	protected MoveInterface<TermType> move;
 	
 	// synchronisers
-	protected ChangeableBoolean ready;
-	protected ChangeableInt confirm; // should always contain the stepNumber of the game step that should now be confirmed (i.e., HumanPlayer confirmed the last one, or the game went further)
+	protected ChangeableBoolean confirmed;
 	protected ChangeableBoolean legalMovesAvailable;
 	
+	private long messageReceiveTime;
 	
 	public HumanPlayer(String name) {
 		super(name, GDLVersion.v2);
-		ready = new ChangeableBoolean(false);
-		confirm = new ChangeableInt(0);
+		confirmed = new ChangeableBoolean(false);
 		currentLegalMoves = null;
 		logger.info("HumanPlayer("+name+")");
-		currentStepNumber = 0;
 		legalMovesAvailable = new ChangeableBoolean(false);
 		quickConfirm = false;
+		move = null;
+	}
+	
+	public MoveInterface<TermType> getMove() {
+		return move;
+	}
+
+	protected void waitForConfirmed(long timeout) {
+		logger.info("waiting for a confirm from " + name + " ...");
+		long endTime = System.currentTimeMillis() + timeout;
+		long timeLeft = timeout;
+		try {
+			synchronized (confirmed) {
+				while(!confirmed.isTrue() && timeLeft>0) {
+					confirmed.wait(timeLeft);
+					timeLeft = endTime - System.currentTimeMillis();
+				}
+			}
+		} catch (InterruptedException e) {
+			logger.severe("InterruptedException: "+e);
+		}
+		if(confirmed.isTrue()) {
+			logger.info("move was confirmed by " + name);
+		}else{
+			logger.info("time ran out for " + name);
+		}
 	}
 	
 	@Override
-	protected void waitForReady() throws InterruptedException {
-		logger.info("waiting for "+name+" to be ready...");
-		synchronized (ready) {
-			while (! ready.isTrue())
-				ready.wait();
-		}
-		logger.info(name+" is ready!");
+	public void gameStart(RunnableMatchInterface<TermType, StateType> match, RoleInterface<TermType> role, ConnectionEstablishedNotifier notifier) {
+		messageReceiveTime = System.currentTimeMillis();
+		super.gameStart(match, role, notifier);
+		computeLegalMoves();
+		waitForConfirmed(messageReceiveTime + match.getStartclock()*1000 - 100 - System.currentTimeMillis());
 	}
-	
-	public void setReady () {
-		synchronized (ready) {
-			ready.setTrue();
-			ready.notify();
-		}
+
+	@Override
+	public MoveInterface<TermType> gamePlay(Object seesTerms, ConnectionEstablishedNotifier notifier) {
+		messageReceiveTime = System.currentTimeMillis();
+		return super.gamePlay(seesTerms, notifier);
 	}
-	
-	public boolean isReady () {
-		if (ready == null) return false;
-		return ready.isTrue();
-	}
-	
+
 	@Override
 	protected MoveInterface<TermType> getNextMove() {
-		logger.info("HumanPlayer.getNextMove(), waiting for a confirm...");
-		
-		try {
-			synchronized (confirm) {
-				while (confirm.getValue() <= currentStepNumber) { // as long as we haven't confirm our move (confirm.value > currentStepNumber)
-					confirm.wait();
-				}
-			}
-			logger.info("HumanPlayer.getNextMove(), was notified (confirm)");
-		} catch (InterruptedException e) {
-			//e.printStackTrace();
-			logger.info("getNextMove() was interrupted, a move has been anyway selected");
+		if(getCurrentStep() != 1) {
+			computeLegalMoves();
 		}
-		
-		return this.moveMemory.getMove();
-		
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Override
-	public MoveInterface<TermType> gamePlay(Object seesTerms, MoveMemory<TermType> moveMemory) {
-		
-		logger.info("HumanPlayer.gamePlay(···)");
-		
-		notifyStartRunning();
-		moveMemory.connectionEstablished();
-		
-		if(this.firstTurn) {
-			this.firstTurn = false;
-		} else {
-			// calculate the successor(s) of current state(s)
-			if (getGdlVersion() == GDLVersion.v1) { // Regular GDL
-				JointMoveInterface<TermType> jointMove = (JointMoveInterface<TermType>) seesTerms;
-				currentState = currentState.getSuccessor(jointMove);
-			} else { // GDL-II
-				statesTracker.statesUpdate((Collection<TermType>) seesTerms);
-			}
-			
-		}
-		
-		synchronized (legalMovesAvailable) {
-			synchronized (confirm) {
-				this.moveMemory = moveMemory;
-				this.currentStepNumber++;
-				confirm.setValue(currentStepNumber);
-				if (getGdlVersion() == GDLVersion.v1) { // Regular GDL
-					currentLegalMoves = new LinkedList(currentState.getLegalMoves(role));
-				} else { // GDL-II
-					currentLegalMoves = new LinkedList(statesTracker.computeLegalMoves());
-				}
-				
-				logger.info("new currentLegalMoves: "+currentLegalMoves);
-				moveMemory.setMove(currentLegalMoves.iterator().next()); // sets default move for our player, in case he or she doesn't choose one
-				this.legalMovesAvailable.setTrue();
-				logger.info("legalMovesAvailable set to True");
-			}
-		}
-		
-		MoveInterface<TermType> move = getNextMove();
-		
+		waitForConfirmed(messageReceiveTime + match.getPlayclock()*1000 - 100 - System.currentTimeMillis());
 		synchronized (legalMovesAvailable) {
 			legalMovesAvailable.setFalse();
 		}
-		
-		notifyStopRunning();
 		return move;
-		
 	}
-	
-	public List<? extends MoveInterface<TermType>> getLegalMoves () {
-		
+
+	private void computeLegalMoves() {
+		synchronized (legalMovesAvailable) {
+			assert(!legalMovesAvailable.isTrue()); // otherwise we could forget an already submitted move
+			synchronized (confirmed) {
+				confirmed.setFalse();
+				if (getGdlVersion() == GDLVersion.v1) { // Regular GDL
+					currentLegalMoves = new ArrayList<MoveInterface<TermType>>(currentState.getLegalMoves(role));
+				} else { // GDL-II
+					currentLegalMoves = new ArrayList<MoveInterface<TermType>>(statesTracker.computeLegalMoves());
+				}
+				
+				logger.info("new currentLegalMoves: "+currentLegalMoves);
+				move = currentLegalMoves.iterator().next(); // sets default move for our player, in case he or she doesn't choose one
+				if(quickConfirm && currentLegalMoves.size() == 1) {
+					logger.info("quick confirming move: " + move);
+					confirmed.setTrue();
+					confirmed.notifyAll();
+				}else{
+					legalMovesAvailable.setTrue();
+					logger.info("legalMovesAvailable set to True");
+				}
+			}
+		}
+	}
+
+	public List<? extends MoveInterface<TermType>> getLegalMoves() {
 		synchronized (legalMovesAvailable) {
 			if (legalMovesAvailable.isTrue()) {
-				return this.currentLegalMoves;
+				return currentLegalMoves;
 			} else {
 				return null; // error value meaning there are no available moves at the moment
 			}
 		}
 	}
 	
-	public boolean setMove (MoveInterface<TermType> move, int stepNumber) {
-		logger.info("HumanPayer, setMove ("+move+", "+stepNumber+"))");
-		if (stepNumber == confirm.getValue()) {
-			moveMemory.setMove(move);
+	public boolean setMove(MoveInterface<TermType> move, int stepNumber) {
+		logger.info("setMove("+move+", "+stepNumber+")");
+		if (stepNumber == getCurrentStep()) {
+			this.move = move;
 			return true;
 		} else {
-			logger.info("The server asks us to setMove() for step "+stepNumber+", but we should now set for step "+confirm.getValue());
+			logger.warning("The server asks us to setMove() for step "+stepNumber+", but we are in step "+getCurrentStep());
 			return false; // notifying the action cannot be performed
 		}
 	}
 	
-	public MoveInterface<TermType> getMove () {
-		if (moveMemory == null) return null;
-		return moveMemory.getMove();
-	}
-	
-	public boolean confirm (int stepNumber) {
-		logger.info("confirm("+stepNumber+") - currentStepNumber="+currentStepNumber+"; confirm.getValue()="+confirm.getValue());
-		if (stepNumber == confirm.getValue()) {
-			synchronized(confirm) {
-				confirm.setValue(stepNumber+1);
-				confirm.notify();
+	public boolean confirm(int stepNumber) {
+		logger.info("confirm("+stepNumber+") - currentStepNumber="+getCurrentStep());
+		synchronized(confirmed) {
+			if (stepNumber == getCurrentStep() && !confirmed.isTrue()) {
+				confirmed.setTrue();
+				confirmed.notifyAll();
+				return true;
+			} else {
+				logger.warning("wrong step or move was already confirmed!");
+				return false;
 			}
-			return true;
-		} else {
-			logger.info("The server asks us to confirm() for step "+stepNumber+", but it has already been done.");
-			return false;
 		}
-		
 	}
 
-	public boolean hasConfirmed (int stepNumber) {
-		return confirm.getValue() > stepNumber;
-	}
-
-	public void toggleQuickConfirm() {
-		quickConfirm = !quickConfirm;
+	public boolean hasConfirmed(int stepNumber) {
+		return stepNumber == getCurrentStep() && confirmed.isTrue();
 	}
 
 	public boolean getQuickConfirm() {
 		return quickConfirm;
+	}
+
+	public void setQuickConfirm(boolean quickConfirm) {
+		this.quickConfirm = quickConfirm;
 	}
 	
 }

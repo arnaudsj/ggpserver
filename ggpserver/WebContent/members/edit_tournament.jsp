@@ -19,13 +19,13 @@
     along with GGP Server.  If not, see <http://www.gnu.org/licenses/>.
 --%>
 
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	 pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+ 
 <jsp:useBean id="pager"
 	     class="tud.ggpserver.formhandlers.EditTournament" scope="page">
-    <c:catch>
+    <!-- <c:catch> -->
 	<% // this is for catching NumberFormatExceptions and the like  %>
 	<jsp:setProperty name="pager" property="playerName"/>
 	<jsp:setProperty name="pager" property="gameName"/>
@@ -34,7 +34,7 @@
 	<% // we set the userName after the owner, such that the owner gets overwritten by the userName for non-admin users %>
 	<jsp:setProperty name="pager" property="userName" value="<%= request.getUserPrincipal().getName()%>" />
 	<jsp:setProperty name="pager" property="page" />
-    </c:catch>
+    <!-- </c:catch> -->
 </jsp:useBean>
 <%@page import="tud.ggpserver.formhandlers.EditTournament"%>
 
@@ -138,7 +138,7 @@
 								<c:url value="/public/view_match.jsp" var="matchURL">
 									<c:param name="matchID" value="${match.matchID}" />
 								</c:url>
-								<a name="<c:out value='${match.matchID}'/>" href="<c:out value='${matchURL}'/>"><c:out value='${match.matchID}'/></a>
+								<a name="<c:out value='${match.matchID}'/>" href="<c:out value='${matchURL}'/>">${fn:replace(match.matchID, ".", ".&#8203;")}</a>
 							</c:otherwise>
 						    </c:choose>
 						</td>
@@ -178,9 +178,16 @@
 						<c:choose>
 						    <c:when test="${match.status == 'new'}">
 								<select name="playerInfos+${match.matchID}" size="1" onChange="theForm.action='${saveChangesURLWithNoNewContent}'; theForm.submit();" style="max-width:120px;">
-
-									<optgroup label="computer players">
+									<c:set var="playerGroup"/>
 								    <c:forEach var="playerinfo" items="${pager.playerInfos[match.game.gdlVersion]}">
+								    	<c:if test="${playerGroup != playerinfo.group}">
+											<c:if test="${playerGroup!=''}">
+												</optgroup>
+											</c:if>
+											<c:set var="playerGroup">${playerinfo.group}</c:set>
+								    		<optgroup label="${playerinfo.group}">
+								    	</c:if>
+
 										<c:choose>
 										    <c:when test='${playerinfo.name == selectedplayerinfo.name}'>
 										    	<c:set var="playerSelected">selected="selected"</c:set>
@@ -193,7 +200,7 @@
 										<c:if test="${!playerinfo.usable}">
 											<c:set var="playerStyle">color:#D3D3D3;${playerStyle}</c:set>
 										</c:if>
-										<c:if test="${playerinfo.owner == navigationUserBean.user}">
+										<c:if test="${playerinfo.owner == pager.userName}">
 											<c:set var="playerStyle">font-weight:bold;${playerStyle}</c:set>
 										</c:if>
 										<option value="${playerinfo.name}" ${playerSelected} style="${playerStyle}">
@@ -203,29 +210,6 @@
 									<option value="${playerinfo.name}" ${playerSelected} style="${playerStyle}">
 										<c:out value="${playerinfo.name}" />
 									</option>
-									</optgroup>
-
-								    <!-- have the possibility to choose users as players -->
-									<optgroup label="human players">
-								    <c:forEach var="user" items="${pager.users}">
-									    <c:choose>
-										    <c:when test='${user.userName == selectedplayerinfo.name}'>
-										    	<c:set var="playerSelected">selected="selected"</c:set>
-										    </c:when>
-										    <c:otherwise>
-										    	<c:set var="playerSelected"/>
-										    </c:otherwise>
-										</c:choose>
-										<c:set var="playerStyle"/>
-								    	<c:if test="${user.userName == pager.userName}">
-											<c:set var="playerStyle">font-weight:bold;${playerStyle}</c:set>
-										</c:if>
-										<option value="${user.userName}" ${playerSelected} style="${playerStyle}">
-											<c:out value="${user.userName}" />
-										</option>
-									</c:forEach>
-									</optgroup>
-									
 								</select>
 						    </c:when>
 						    <c:otherwise>
@@ -279,7 +263,7 @@
 						    		</c:when>
 						    		<c:otherwise>
 						    			<input type="hidden" name="goalvalue+${match.matchID}" value="${match.orderedGoalValues[playerinfoIndex.count - 1]}">
-						    			${match.orderedGoalValues[playerinfoIndex.count - 1]}
+						    			<c:out value="${match.orderedGoalValues[playerinfoIndex.count - 1]}"/>
 						    		</c:otherwise>
 						    	</c:choose>
 							</c:otherwise>
@@ -416,6 +400,7 @@
 						    	<c:param name="matchID" value="${match.matchID}" />
 								<c:param name="userName" value="${pager.userName}" />
 								<c:param name="role" value="${match.orderedPlayerRoles[playerinfoIndex.count - 1]}" />
+								<c:param name="available" value="1" />
 						    </c:url>
 						    <a href='<c:out value="${playURL}" />'><div class="play" title="play match!"><span>play</span></div></a>
 						</c:if>

@@ -38,6 +38,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import tud.gamecontroller.GameController;
+
 public class GameScrambler implements GameScramblerInterface {
 
 	private List<String> wordlist;
@@ -46,6 +48,8 @@ public class GameScrambler implements GameScramblerInterface {
 	private Pattern identifierPattern;
 	private Random random;
 	private boolean firstTimeEmptyWordlist=true;
+	private static final Logger logger = Logger.getLogger(GameController.class.getName());
+	// it is important to use the same logger here that is used in the AbstractGameControllerRunner 
 
 	public GameScrambler(File wordlistfile){
 		this(GameScrambler.wordlistFromFile(wordlistfile));
@@ -101,7 +105,7 @@ public class GameScrambler implements GameScramblerInterface {
 					scrambledIdentifier=getNewWord();
 					scrambling.put(lowercaseIdentifier, scrambledIdentifier);
 					descrambling.put(scrambledIdentifier, identifier);
-					Logger.getLogger("tud.gamecontroller").info("scrambling: "+lowercaseIdentifier+" -> "+scrambledIdentifier);
+					logger.info("scrambling: "+lowercaseIdentifier+" -> "+scrambledIdentifier);
 				}
 			}
 			scrambled.append(scrambledIdentifier);
@@ -125,7 +129,7 @@ public class GameScrambler implements GameScramblerInterface {
 			identifier=m.group(2).toLowerCase();
 			descrambledIdentifier=descrambling.get(identifier);
 			if(descrambledIdentifier==null){
-				Logger.getLogger("tud.gamecontroller").warning("in GameScrambler.descramble: found no match for "+identifier);
+				logger.warning("in GameScrambler.descramble: found no match for "+identifier);
 				descrambledIdentifier=identifier;
 			}
 			descrambled.append(descrambledIdentifier);
@@ -142,7 +146,7 @@ public class GameScrambler implements GameScramblerInterface {
 		}else{
 			word=generateWord();
 			if(firstTimeEmptyWordlist){
-				Logger.getLogger("tud.gamecontroller").warning("in GameScrambler: wordlist is empty - using generic identifiers");
+				logger.warning("in GameScrambler: wordlist is empty - using generic identifiers");
 				firstTimeEmptyWordlist=false;
 			}
 		}
@@ -163,7 +167,7 @@ public class GameScrambler implements GameScramblerInterface {
 		try {
 			return wordlistFromReader(new FileReader(wordlistfile));
 		} catch (FileNotFoundException e) {
-			Logger.getLogger("tud.gamecontroller").severe(
+			logger.severe(
 					"error reading file: " + wordlistfile + "\n"
 					+ "GameScrambler will use generic identifiers to scramble the game!\n" 
 					+ e.getMessage());
@@ -191,7 +195,7 @@ public class GameScrambler implements GameScramblerInterface {
 				line = bufferedReader.readLine();
 			}
 		} catch (IOException e) {
-			Logger.getLogger("tud.gamecontroller").severe(
+			logger.severe(
 					"error reading from input reader!\n"
 					+ "GameScrambler will use generic identifiers to scramble the game!\n" 
 					+ e.getMessage());

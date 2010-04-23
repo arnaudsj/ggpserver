@@ -9,20 +9,10 @@
 -->
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+	<xsl:import href="variables.xsl"/>
+
 	<xsl:template name="history">
-		
-		<xsl:variable name="playing">
-			<xsl:choose>
-				<xsl:when test="count(/match/legalmoves) = 1">1</xsl:when>
-				<xsl:otherwise>0</xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable>
-		
-		<xsl:variable name="pathPrefix">
-			<xsl:choose>
-				<xsl:when test="$playing = 1">../public/</xsl:when>
-			</xsl:choose>
-		</xsl:variable>
 		
 		<div class="history">
 
@@ -49,6 +39,7 @@
 					</thead>
 					<tbody>
 						<xsl:for-each select="match/history/step">
+							<xsl:sort select="number(step-number)" order="descending" data-type="number"/>
 							<tr>
 								<td>
 									<span class="heading">
@@ -56,8 +47,7 @@
 										<xsl:attribute name="href">
 											<xsl:call-template name="makeStepLinkURL">
 												<xsl:with-param name="step" select="./step-number"/>
-												<xsl:with-param name="role" select="/match/sight-of"/>
-												<xsl:with-param name="pathPrefix" select="$pathPrefix"/>
+												<xsl:with-param name="role" select="$role"/>
 											</xsl:call-template>
 										</xsl:attribute>
 										<xsl:value-of select="./step-number"/>.

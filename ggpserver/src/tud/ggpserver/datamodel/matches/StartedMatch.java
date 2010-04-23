@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+    Copyright (C) 2010 Stephan Schiffel <stephan.schiffel@gmx.de> 
 
     This file is part of GGP Server.
 
@@ -19,26 +19,28 @@
 
 package tud.ggpserver.datamodel.matches;
 
-import java.sql.SQLException;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import tud.gamecontroller.auxiliary.Pair;
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.impl.State;
-import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.User;
 
-public class NewMatch<TermType extends TermInterface, ReasonerStateInfoType>
+/**
+ * StartedMatch is a ServerMatch which has been started.
+ * StartedMatch contains common features of running, finished and aborted matches. 
+ */
+public abstract class StartedMatch<TermType extends TermInterface, ReasonerStateInfoType>
 		extends ServerMatch<TermType, ReasonerStateInfoType> {
 
-	public NewMatch(
+	protected List<List<String>> jointMovesStrings = null;
+	
+	public StartedMatch(
 			String matchID,
 			GameInterface<TermType, State<TermType, ReasonerStateInfoType>> game,
 			int startclock,
@@ -48,47 +50,9 @@ public class NewMatch<TermType extends TermInterface, ReasonerStateInfoType>
 			boolean scrambled,
 			String tournamentID,
 			double weight,
-			User owner,
-			AbstractDBConnector<TermType, ReasonerStateInfoType> db) {
+			User owner, AbstractDBConnector<TermType, ReasonerStateInfoType> db) {
 		super(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, scrambled, tournamentID, weight, owner, db);
 	}
 
-	/**
-	 * Sets this matches status to "running", and returns the new running match.
-	 * This object must not be used any more after calling this method.
-	 */
-	public RunningMatch<TermType, ReasonerStateInfoType> toRunning() throws SQLException {
-		getDB().setMatchStatus(getMatchID(), ServerMatch.STATUS_RUNNING);
-		RunningMatch<TermType, ReasonerStateInfoType> runningMatch = getDB().getRunningMatch(getMatchID());
-		runningMatch.xmlStates = xmlStates;
-		return runningMatch;
-	}
-	
-	public ScheduledMatch<TermType, ReasonerStateInfoType> toScheduled() throws SQLException {
-		getDB().setMatchStatus(getMatchID(), ServerMatch.STATUS_SCHEDULED);
-		return getDB().getScheduledMatch(getMatchID());
-	}
-	
-	@Override
-	public String getStatus() {
-		return ServerMatch.STATUS_NEW;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<List<GameControllerErrorMessage>> getErrorMessages() {
-		return Collections.EMPTY_LIST;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<List<String>> getJointMovesStrings() {
-		return Collections.EMPTY_LIST;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<Pair<Date,String>> getStringStates() {
-		return Collections.EMPTY_LIST;
-	}
+	public abstract List<List<String>> getJointMovesStrings();
 }

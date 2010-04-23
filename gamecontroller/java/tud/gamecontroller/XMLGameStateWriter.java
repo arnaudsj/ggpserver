@@ -112,7 +112,7 @@ public class XMLGameStateWriter
 		//System.out.println( ((Game)match.getGame()).getGameDescription() );
 		
 		try {
-			os = createXMLOutputStream(match, currentState, XMLGameStateWriter.getStringMoves(moves), goalValues, stylesheet, role, null, false, false, false, null, null, null);
+			os = createXMLOutputStream(match, currentState, XMLGameStateWriter.getStringMoves(moves), goalValues, stylesheet, role, null, false, false, null, null, null);
 			fileOutputStream = new FileOutputStream(new File(matchDir+File.separator+"step_"+step+".xml"));
 			fileOutputStream.write(os.toByteArray());
 			if(goalValues!=null){ // write the final state twice (once as step_X.xml and once as finalstate.xml)
@@ -121,9 +121,9 @@ public class XMLGameStateWriter
 				fileOutputStream.write(os.toByteArray());
 			}
 		} catch (FileNotFoundException ex) {
-			Logger.getLogger("tud.gamecontroller").warning("Exception occured while generation xml:"+ex.getMessage());
+			Logger.getLogger(XMLGameStateWriter.class.getName()).warning("Exception occured while generation xml:"+ex.getMessage());
 		} catch (IOException ex) {
-			Logger.getLogger("tud.gamecontroller").warning("Exception occured while generation xml:"+ex.getMessage());
+			Logger.getLogger(XMLGameStateWriter.class.getName()).warning("Exception occured while generation xml:"+ex.getMessage());
 		} finally {
 			if (os != null) {
 				try {
@@ -166,7 +166,6 @@ public class XMLGameStateWriter
 			Date date,
 			boolean playing,
 			boolean quickConfirm,
-			boolean ready,
 			List<TermInterface> legalMoves,
 			TermInterface chosenMove,
 			Boolean confirmed)
@@ -174,7 +173,7 @@ public class XMLGameStateWriter
 			IllegalArgumentException {
 		ByteArrayOutputStream os=new ByteArrayOutputStream();
 		try{
-			Document xmldoc=createXML(match, currentState, stringMoves, goalValues, stylesheet, role, date, playing, quickConfirm, ready, legalMoves, chosenMove, confirmed);
+			Document xmldoc=createXML(match, currentState, stringMoves, goalValues, stylesheet, role, date, playing, quickConfirm, legalMoves, chosenMove, confirmed);
 			// Serialization through Transform.
 			DOMSource domSource = new DOMSource(xmldoc);
 			
@@ -187,11 +186,11 @@ public class XMLGameStateWriter
 			serializer.setOutputProperty(OutputKeys.INDENT,"yes");
 			serializer.transform(domSource, streamResult);
 		} catch (TransformerConfigurationException ex) {
-			Logger.getLogger("tud.gamecontroller").warning("Exception occured while generation xml:"+ex.getMessage());
+			Logger.getLogger(XMLGameStateWriter.class.getName()).warning("Exception occured while generation xml:"+ex.getMessage());
 		} catch (ParserConfigurationException ex) {
-			Logger.getLogger("tud.gamecontroller").warning("Exception occured while generation xml:"+ex.getMessage());
+			Logger.getLogger(XMLGameStateWriter.class.getName()).warning("Exception occured while generation xml:"+ex.getMessage());
 		} catch (TransformerException ex) {
-			Logger.getLogger("tud.gamecontroller").warning("Exception occured while generation xml:"+ex.getMessage());
+			Logger.getLogger(XMLGameStateWriter.class.getName()).warning("Exception occured while generation xml:"+ex.getMessage());
 		}
 		return os;
 	}
@@ -219,7 +218,6 @@ public class XMLGameStateWriter
 			Date date,
 			boolean playing,
 			boolean quickConfirm,
-			boolean ready,
 			List<TermInterface> legalMoves,
 			TermInterface chosenMove,
 			Boolean confirmed)
@@ -298,11 +296,7 @@ public class XMLGameStateWriter
 			 root.appendChild(xmldoc.createElement("quickConfirm"));
 		 
 		 if (match instanceof RunnableMatchInterface) {
-			 Date readyTime = ((RunnableMatchInterface)match).getReadyTime();
 			 if (playing) {
-				 if (ready) {
-					 root.appendChild(createReadyTime(xmldoc, readyTime));
-				 }
 				 root.appendChild(createLegalMoves(xmldoc, legalMoves));
 				 root.appendChild(createChosenMove(xmldoc, chosenMove, confirmed));
 			 }
@@ -349,7 +343,7 @@ public class XMLGameStateWriter
 				}
 			}
 		}else{
-			Logger.getLogger("tud.gamecontroller").warning("in XMLGameStateWriter.createStateElement: unsupported expression in state:"+term);
+			Logger.getLogger(XMLGameStateWriter.class.getName()).warning("in XMLGameStateWriter.createStateElement: unsupported expression in state:"+term);
 		}
 		return termElement;
 	}
@@ -393,16 +387,6 @@ public class XMLGameStateWriter
 		return history;
 	}
 	
-	private static Node createReadyTime(Document xmldoc, Date readyTime) {
-		Element r = xmldoc.createElement("ready");
-		if (readyTime != null) {
-			Element t = xmldoc.createElement("timestamp");
-			t.setTextContent(Long.toString(readyTime.getTime()));
-			r.appendChild(t);
-		}
-		return r;
-	}
-	
 	private static Node createLegalMoves(Document xmldoc, List<TermInterface> legalMoves) {
 		Element moves = xmldoc.createElement("legalmoves");
 		int n=0;
@@ -410,7 +394,7 @@ public class XMLGameStateWriter
 			for(TermInterface legalMove: legalMoves) {
 				Element move=xmldoc.createElement("move");
 				Element e=xmldoc.createElement("move-number");
-				e.setTextContent(""+n);
+				e.setTextContent(Integer.toString(n));
 				move.appendChild(e);
 				Node e2=createTermElement(xmldoc, "move-term", legalMove);
 				move.appendChild(e2);

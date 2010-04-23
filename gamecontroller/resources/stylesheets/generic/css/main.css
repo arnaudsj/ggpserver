@@ -41,8 +41,9 @@ div.header {
 }
 
 div.footer {
-	position: fixed;
+	/* position: fixed;
 	bottom: 0px;
+	*/
 	padding: 10px;
 	font-size: smaller;
 }

@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2009 Martin Günther <mintar@gmx.de> 
+    Copyright (C) 2009 Martin Günther <mintar@gmx.de>
+                  2010 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GGP Server.
 
@@ -20,25 +21,18 @@
 package tud.ggpserver.datamodel.matches;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
-import tud.gamecontroller.auxiliary.Pair;
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.impl.State;
-import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.term.TermInterface;
 import tud.ggpserver.datamodel.AbstractDBConnector;
 import tud.ggpserver.datamodel.User;
-import tud.ggpserver.datamodel.dblists.ErrorMessageAccessor;
-import tud.ggpserver.datamodel.dblists.JointMovesAccessor;
-import tud.ggpserver.datamodel.dblists.StaticDBBackedList;
-import tud.ggpserver.datamodel.dblists.StringStateAccessor;
 
 public class AbortedMatch<TermType extends TermInterface, ReasonerStateInfoType>
-		extends ServerMatch<TermType, ReasonerStateInfoType> {
+		extends StoppedMatch<TermType, ReasonerStateInfoType> {
 
 	public AbortedMatch(
 			String matchID,
@@ -54,34 +48,8 @@ public class AbortedMatch<TermType extends TermInterface, ReasonerStateInfoType>
 		super(matchID, game, startclock, playclock, rolesToPlayerInfos, startTime, scrambled, tournamentID, weight, owner, db);
 	}
 
-
 	@Override
 	public String getStatus() {
 		return ServerMatch.STATUS_ABORTED;
 	}
-	
-	
-	@Override
-	public List<List<String>> getJointMovesStrings() {
-		if (jointMovesStrings == null) {
-			jointMovesStrings = new StaticDBBackedList<List<String>>(new JointMovesAccessor(getMatchID(), getDB()), true); 
-		}
-		return jointMovesStrings;
-	}
-
-	@Override
-	public List<Pair<Date,String>> getStringStates() {
-		if (stringStates == null) {
-			stringStates = new StaticDBBackedList<Pair<Date,String>>(new StringStateAccessor(getMatchID(), getDB(), getGame().getStylesheet()), false);
-		}
-		return stringStates;
-	}
-
-	@Override
-	public List<List<GameControllerErrorMessage>> getErrorMessages() {
-		if (errorMessages == null) {
-			errorMessages = new StaticDBBackedList<List<GameControllerErrorMessage>>(new ErrorMessageAccessor(getMatchID(), getDB()), true);
-		}
-		return errorMessages;
-	}	
 }

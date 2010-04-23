@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009 Stephan Schiffel <stephan.schiffel@gmx.de> 
+    Copyright (C) 2009-2010 Stephan Schiffel <stephan.schiffel@gmx.de> 
 
     This file is part of GGP Server.
 
@@ -93,10 +93,13 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 
 	private AvailablePlayersTracker<TermType, ReasonerStateInfoType> availablePlayersTracker;
 
+	private AbstractDBConnector<TermType, ReasonerStateInfoType> db;
+	
 	/**
 	 *  private constructor
 	 */
 	private MatchRunner(AbstractDBConnector<TermType, ReasonerStateInfoType> db) {
+		this.db = db;
 		availablePlayersTracker = new AvailablePlayersTracker<TermType, ReasonerStateInfoType>(db);
 		matchRunnerThread = null;
 		// scheduledMatches must be synchronized because it is also accessed from the runMatches thread
@@ -164,6 +167,13 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 		}
 	}
 	
+	public synchronized List<RunningMatch<TermType, ReasonerStateInfoType>> getRunningMatches() {
+		List<RunningMatch<TermType, ReasonerStateInfoType>> res = new LinkedList<RunningMatch<TermType, ReasonerStateInfoType>>();
+		for (MatchThread<TermType,ReasonerStateInfoType> match: matchThreads.values())
+			res.add(match.getMatch());
+		return res;
+	}
+
 	public synchronized ScheduledMatch<TermType, ReasonerStateInfoType> getScheduledMatch (String matchID) {
 		return scheduledMatches.get(matchID);
 	}
@@ -172,14 +182,18 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 		if (!matchThreads.containsKey(matchID)) return null;
 		return matchThreads.get(matchID).getMatch();
 	}
-	
-	public synchronized List<RunningMatch<TermType, ReasonerStateInfoType>> getRunningMatches () {
-		List<RunningMatch<TermType, ReasonerStateInfoType>> res = new LinkedList<RunningMatch<TermType, ReasonerStateInfoType>>();
-		for (MatchThread<TermType,ReasonerStateInfoType> match: matchThreads.values())
-			res.add(match.getMatch());
-		return res;
+
+	/**
+	 * like AbstractDBConnector.getMatch but returns the currently running match if the match is running currently
+	 */
+	public synchronized ServerMatch<TermType, ReasonerStateInfoType> getMatch(String matchID) throws SQLException {
+		MatchThread<TermType, ReasonerStateInfoType> matchThread = matchThreads.get(matchID);
+		if (matchThread != null)
+			return matchThread.getMatch();
+		else
+			return db.getMatch(matchID);
 	}
-	
+
 	/**
 	 * the main loop
 	 * @throws SQLException
@@ -268,7 +282,7 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 				availablePlayersTracker.notifyStartPlaying(p.getName());
 			}
 		}
-		MatchThread<TermType, ReasonerStateInfoType> thread = new MatchThread<TermType, ReasonerStateInfoType>("runSingleMatch("+match.getMatchID()+")", match) {
+		MatchThread<TermType, ReasonerStateInfoType> thread = new MatchThread<TermType, ReasonerStateInfoType>(match) {
 			@Override
 			public void run(){
 				runSingleMatch(match);
@@ -295,9 +309,11 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 				logger.info("Thread for match " + matchID + " - set match to aborted");
 				runningMatch.toAborted();
 			} catch (Exception e) {
-				logger.info("Thread for match " + matchID + " - INTERRUPT");
+				e.printStackTrace();
+				logger.severe("Thread for match " + matchID + " - Exception");
+				logger.severe(e.toString());
 				runningMatch.notifyErrorMessage(new GameControllerErrorMessage(GameControllerErrorMessage.ABORTED, "The match was aborted because an exception was thrown: " + e.getMessage()));
-				logger.info("Thread for match " + matchID + " - set match to aborted");
+				logger.severe("Thread for match " + matchID + " - set match to aborted");
 				runningMatch.toAborted();
 			}
 		} catch (SQLException e2) {

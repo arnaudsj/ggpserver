@@ -128,4 +128,11 @@
 		<display-name>GGPServerContextListener</display-name>
 		<listener-class>tud.ggpserver.webapp.GGPServerContextListener</listener-class>
 	</listener>
+
+	<listener>
+		<description>An HttpSessionAttributeListener that keeps track of the session attributes.</description>
+		<display-name>SessionAttributeTracker</display-name>
+		<listener-class>tud.ggpserver.webapp.SessionAttributeTracker</listener-class>
+	</listener>
+  
 </web-app>

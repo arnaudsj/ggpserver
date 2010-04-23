@@ -27,7 +27,6 @@ import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
 import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.StateInterface;
-import tud.gamecontroller.playerthreads.MoveMemory;
 
 public interface Player<TermType, StateType extends StateInterface<TermType, ? extends StateType>> extends NamedObject{
 	
@@ -40,7 +39,7 @@ public interface Player<TermType, StateType extends StateInterface<TermType, ? e
 	 * 			- sees(player1, move(player2, moveX)) <- does(player2, moveX)
 	 * 			- and likewise for every other pair of players
 	 */
-	public MoveInterface<TermType> gamePlay(Object seesFluents, MoveMemory<TermType> moveMemory);
+	public MoveInterface<TermType> gamePlay(Object seesFluents, ConnectionEstablishedNotifier notifier);
 	
 	public void gameStop(Object seesTerms, ConnectionEstablishedNotifier notifier);
 	/**

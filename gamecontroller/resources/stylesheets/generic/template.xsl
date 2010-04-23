@@ -55,10 +55,9 @@
 							<!--<br/>-->
 							<xsl:call-template name="history"/>
 						</td>
-						
 					</tr>
 				</table>
-				
+
 				<xsl:call-template name="footer"/>
 			</body>
 		</html>
