@@ -30,7 +30,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import tud.gamecontroller.game.RoleInterface;
@@ -194,43 +193,30 @@ public abstract class AbstractRoundRobinScheduler<TermType extends TermInterface
 		
 		List<Map<RoleInterface<TermType>, PlayerInfo>> matchesToRolesToPlayerInfos = createPlayerInfos(nextGame, availablePlayers);
 		
-		if (logger.isLoggable(Level.CONFIG)) {
-			// debug mode -- you can change this by editing the
-			// logging.properties file (and starting the VM with special
-			// arguments).
-			// For now, this only really makes sense when executing
-			// RoundRobinSchedulerTest. The reason to reduce start and play
-			// clock is to speed up games.
-			playclock = 5;
-			startclock = 5;
-		} else {
-			int playclockMin = getPlayClockMin();
-			int playclockMax = getPlayClockMax();
-			
-			// pick playclock as a multiple of 5 somewhere between playclockMin and playclockMax distributed according to a logistic distribution
-			playclock =
-				Math.max(playclockMin,
-						Math.min(
-							playclockMin + 5 * (int)Math.round(
-								logisticDistributionQuantile(random.nextDouble(), (getPlayClockMean() - playclockMin) / 5.0, getPlayClockStdDeviation() / 5.0)),
-							playclockMax
-							)
-						);
-			// playclock =  playclockMin + 5 * random.nextInt( ( playclockMax - playclockMin) / 5 + 1 );
-			
-			int startclockMin = getStartClockMin();
-			int startclockMax = getStartClockMax();
-			// the same for startclock
-			startclock = 
-				Math.max(startclockMin,
+		int playclockMin = getPlayClockMin();
+		int playclockMax = getPlayClockMax();
+		
+		// pick playclock as a multiple of 5 somewhere between playclockMin and playclockMax distributed according to a logistic distribution
+		playclock =
+			Math.max(playclockMin,
 					Math.min(
-						startclockMin + 5 * (int)Math.round(
-							logisticDistributionQuantile(random.nextDouble(), (getStartClockMean() - startclockMin) / 5.0, getStartClockStdDeviation() / 5.0)),
-						startclockMax
+						playclockMin + 5 * (int)Math.round(
+							logisticDistributionQuantile(random.nextDouble(), (getPlayClockMean() - playclockMin) / 5.0, getPlayClockStdDeviation() / 5.0)),
+						playclockMax
 						)
 					);
-			// startclock =  startclockMin + 5 * random.nextInt( ( startclockMax - startclockMin) / 5 + 1 );
-		}
+		
+		int startclockMin = getStartClockMin();
+		int startclockMax = getStartClockMax();
+		// the same for startclock
+		startclock = 
+			Math.max(startclockMin,
+				Math.min(
+					startclockMin + 5 * (int)Math.round(
+						logisticDistributionQuantile(random.nextDouble(), (getStartClockMean() - startclockMin) / 5.0, getStartClockStdDeviation() / 5.0)),
+					startclockMax
+					)
+				);
 
 		logger.info("creating " + matchesToRolesToPlayerInfos.size() + " " + nextGame.getName() + " matches (startclock: " + startclock + ", playclock: " + playclock + ")");
 		for (Map<RoleInterface<TermType>, PlayerInfo> rolesToPlayerInfos : matchesToRolesToPlayerInfos) {

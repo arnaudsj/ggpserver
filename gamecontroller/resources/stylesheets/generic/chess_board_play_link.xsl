@@ -33,11 +33,14 @@
 								<xsl:with-param name="chosenMove" select="move-number"/>
 							</xsl:call-template>");
 					</script>
-					<xsl:call-template name="makeLinkOnCell">
+					<xsl:variable name="moveString"><xsl:for-each select="move-term"><xsl:call-template name="move2text"/></xsl:for-each></xsl:variable>
+					<xsl:call-template name="makeOverlayOnCell">
 						<xsl:with-param name="xArg" select="$x" />
 						<xsl:with-param name="yArg" select="$y" />
 						<xsl:with-param name="url">javascript:selectCell("<xsl:value-of select="$BoardName"/>", "<xsl:value-of select="$x"/>", "<xsl:value-of select="$y"/>")</xsl:with-param>
 						<xsl:with-param name="BoardName" select="$BoardName"/>
+						<xsl:with-param name="type" select="'MARK'"/>
+						<xsl:with-param name="title" select="$moveString"/>
 						<xsl:with-param name="internalMinX" select="$internalMinX"/>
 						<xsl:with-param name="internalMinY" select="$internalMinY"/>
 						<xsl:with-param name="mirrorY" select="$mirrorY"/>
@@ -61,11 +64,13 @@
 								<xsl:with-param name="chosenMove" select="move-number"/>
 							</xsl:call-template>");
 					</script>
-					<xsl:call-template name="makeLinkOnCell">
+					<xsl:call-template name="makeOverlayOnCell">
 						<xsl:with-param name="xArg" select="$x1" />
 						<xsl:with-param name="yArg" select="$y1" />
 						<xsl:with-param name="url">javascript:selectCell("<xsl:value-of select="$BoardName"/>", "<xsl:value-of select="$x1"/>", "<xsl:value-of select="$y1"/>")</xsl:with-param>
 						<xsl:with-param name="BoardName" select="$BoardName"/>
+						<xsl:with-param name="type" select="'SOURCE'"/>
+						<xsl:with-param name="title" select="concat('move from ', $x1, ',', $y1)"/>
 						<xsl:with-param name="internalMinX" select="$internalMinX"/>
 						<xsl:with-param name="internalMinY" select="$internalMinY"/>
 						<xsl:with-param name="mirrorY" select="$mirrorY"/>
@@ -74,11 +79,13 @@
 						<xsl:with-param name="BorderWidth" select="$BorderWidth"/>
 						<xsl:with-param name="internalHeight" select="$internalHeight"/>
 					</xsl:call-template>
-					<xsl:call-template name="makeLinkOnCell">
+					<xsl:call-template name="makeOverlayOnCell">
 						<xsl:with-param name="xArg" select="$x2" />
 						<xsl:with-param name="yArg" select="$y2" />
 						<xsl:with-param name="url">javascript:selectCell("<xsl:value-of select="$BoardName"/>", "<xsl:value-of select="$x2"/>", "<xsl:value-of select="$y2"/>")</xsl:with-param>
 						<xsl:with-param name="BoardName" select="$BoardName"/>
+						<xsl:with-param name="type" select="'DEST'"/>
+						<xsl:with-param name="title" select="concat('move to ', $x2, ',', $y2)"/>
 						<xsl:with-param name="internalMinX" select="$internalMinX"/>
 						<xsl:with-param name="internalMinY" select="$internalMinY"/>
 						<xsl:with-param name="mirrorY" select="$mirrorY"/>
@@ -93,11 +100,88 @@
 
 	</xsl:template>
 
-	<xsl:template name="makeLinkOnCell">
+	<xsl:template name="selectedMove">
+		<xsl:param name="xArgIdx"/>
+		<xsl:param name="yArgIdx" />
+		<xsl:param name="BoardName" />
+		<xsl:param name="internalMinX"/>
+		<xsl:param name="internalMinY"/>
+		<xsl:param name="mirrorY"/>
+		<xsl:param name="CellWidth"/>
+		<xsl:param name="CellHeight"/>
+		<xsl:param name="BorderWidth"/>
+		<xsl:param name="internalHeight"/>
+	
+		<xsl:for-each select="/match/chosenmove[contains(move-term/prop-f, $BoardName)]">
+			<xsl:variable name="moveString"><xsl:for-each select="move-term"><xsl:call-template name="move2text"/></xsl:for-each></xsl:variable>
+			<xsl:choose>
+				<!-- (MARK X Y) -->
+				<xsl:when test="count(move-term/arg)=2">
+					<xsl:variable name="x" select="move-term/arg[number($xArgIdx)]"/>
+					<xsl:variable name="y" select="move-term/arg[number($yArgIdx)]"/>
+					<xsl:call-template name="makeOverlayOnCell">
+						<xsl:with-param name="xArg" select="$x" />
+						<xsl:with-param name="yArg" select="$y" />
+						<xsl:with-param name="BoardName" select="$BoardName"/>
+						<xsl:with-param name="type" select="'CHOSENMOVE'"/>
+						<xsl:with-param name="title" select="$moveString"/>
+						<xsl:with-param name="internalMinX" select="$internalMinX"/>
+						<xsl:with-param name="internalMinY" select="$internalMinY"/>
+						<xsl:with-param name="mirrorY" select="$mirrorY"/>
+						<xsl:with-param name="CellWidth" select="$CellWidth"/>
+						<xsl:with-param name="CellHeight" select="$CellHeight"/>
+						<xsl:with-param name="BorderWidth" select="$BorderWidth"/>
+						<xsl:with-param name="internalHeight" select="$internalHeight"/>
+					</xsl:call-template>
+				</xsl:when>
+				<!-- (MOVE X1 Y1 X2 Y2) or (MOVE PIECE X1 Y1 X2 Y2) -->
+				<xsl:when test="count(move-term/arg)=4 or count(move-term/arg)=5">
+					<xsl:variable name="offset" select="count(move-term/arg) - 4"/>
+					<xsl:variable name="x1" select="move-term/arg[number($xArgIdx)+$offset]"/>
+					<xsl:variable name="y1" select="move-term/arg[number($yArgIdx)+$offset]"/>
+					<xsl:variable name="x2" select="move-term/arg[number($xArgIdx)+$offset+2]"/>
+					<xsl:variable name="y2" select="move-term/arg[number($yArgIdx)+$offset+2]"/>
+					<xsl:call-template name="makeOverlayOnCell">
+						<xsl:with-param name="xArg" select="$x1" />
+						<xsl:with-param name="yArg" select="$y1" />
+						<xsl:with-param name="BoardName" select="$BoardName"/>
+						<xsl:with-param name="type" select="'CHOSENMOVE'"/>
+						<xsl:with-param name="title" select="$moveString"/>
+						<xsl:with-param name="internalMinX" select="$internalMinX"/>
+						<xsl:with-param name="internalMinY" select="$internalMinY"/>
+						<xsl:with-param name="mirrorY" select="$mirrorY"/>
+						<xsl:with-param name="CellWidth" select="$CellWidth"/>
+						<xsl:with-param name="CellHeight" select="$CellHeight"/>
+						<xsl:with-param name="BorderWidth" select="$BorderWidth"/>
+						<xsl:with-param name="internalHeight" select="$internalHeight"/>
+					</xsl:call-template>
+					<xsl:call-template name="makeOverlayOnCell">
+						<xsl:with-param name="xArg" select="$x2" />
+						<xsl:with-param name="yArg" select="$y2" />
+						<xsl:with-param name="BoardName" select="$BoardName"/>
+						<xsl:with-param name="type" select="'CHOSENMOVE'"/>
+						<xsl:with-param name="title" select="$moveString"/>
+						<xsl:with-param name="internalMinX" select="$internalMinX"/>
+						<xsl:with-param name="internalMinY" select="$internalMinY"/>
+						<xsl:with-param name="mirrorY" select="$mirrorY"/>
+						<xsl:with-param name="CellWidth" select="$CellWidth"/>
+						<xsl:with-param name="CellHeight" select="$CellHeight"/>
+						<xsl:with-param name="BorderWidth" select="$BorderWidth"/>
+						<xsl:with-param name="internalHeight" select="$internalHeight"/>
+					</xsl:call-template>
+				</xsl:when>
+			</xsl:choose>
+		</xsl:for-each>
+
+	</xsl:template>
+
+	<xsl:template name="makeOverlayOnCell">
 		<xsl:param name="xArg"/>
 		<xsl:param name="yArg"/>
-		<xsl:param name="url"/>
+		<xsl:param name="url" select="''"/>
 		<xsl:param name="BoardName"/>
+		<xsl:param name="type"/>
+		<xsl:param name="title"/>
 
 		<xsl:param name="internalMinX"/>
 		<xsl:param name="internalMinY"/>
@@ -129,69 +213,47 @@
 			</xsl:choose>
 		</xsl:variable>
 		
-		<div>
-			<xsl:attribute name="id">chess_cell_link_<xsl:value-of select="$BoardName"/>_<xsl:value-of select="$xArg"/>_<xsl:value-of select="$yArg"/></xsl:attribute>
+		<xsl:variable name="color">
+			<xsl:choose>
+				<xsl:when test="$type='MARK' or $type='DEST'">green</xsl:when>
+				<xsl:when test="$type='SOURCE'">red</xsl:when>
+				<xsl:when test="$type='CHOSENMOVE'">white</xsl:when>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:variable name="opacity">
+			<xsl:choose>
+				<xsl:when test="$type='MARK' or $type='SOURCE'">0.3</xsl:when>
+				<xsl:when test="$type='DEST'">0.0</xsl:when>
+				<xsl:when test="$type='CHOSENMOVE'">0.6</xsl:when>
+			</xsl:choose>
+		</xsl:variable>
+		<div class="chesscellcontent">
+			<xsl:attribute name="id">chess_cell_<xsl:choose><xsl:when test="$type='CHOSENMOVE'">chosenmove</xsl:when><xsl:otherwise>link</xsl:otherwise></xsl:choose>_<xsl:value-of select="$BoardName"/>_<xsl:value-of select="$xArg"/>_<xsl:value-of select="$yArg"/></xsl:attribute>
 			<xsl:attribute name="style">
-				position: absolute;
 				left: <xsl:value-of select="$xPosCell"/>px;
 				top: <xsl:value-of select="$yPosCell"/>px;
+			 	background-color: <xsl:value-of select="$color"/>;
+			 	opacity: <xsl:value-of select="$opacity"/>;
+			</xsl:attribute>
+				<!--  position: absolute;
 			 	width: <xsl:value-of select="$CellWidth - 2 * $BorderWidth"/>px;
 			 	height: <xsl:value-of select="$CellHeight - 2 * $BorderWidth"/>px;
-			 	background-color: red;
-			 	opacity: 0.2;
-			</xsl:attribute>
-			<a>
-				<xsl:attribute name="style">
-					display: block;
-				 	width: <xsl:value-of select="$CellWidth - 2 * $BorderWidth"/>px;
-				 	height: <xsl:value-of select="$CellHeight - 2 * $BorderWidth"/>px;
-				</xsl:attribute>
-				<xsl:attribute name="href"><xsl:value-of select="$url"/></xsl:attribute>
-			</a>
+			 	-->
+			<xsl:if test="$url!=''">
+				<a>
+					<xsl:attribute name="style">
+						display: block;
+					 	width: <xsl:value-of select="$CellWidth - 2 * $BorderWidth"/>px;
+					 	height: <xsl:value-of select="$CellHeight - 2 * $BorderWidth"/>px;
+					</xsl:attribute>
+					<xsl:attribute name="title"><xsl:value-of select="$title"/></xsl:attribute>
+					<xsl:attribute name="href"><xsl:value-of select="$url"/></xsl:attribute>
+				</a>
+			</xsl:if>
 		</div>		
 
 	</xsl:template>
 
-	<!-- linkOnCell is called by print_chess_state for each cell of the board
-	     and should return a url for the link or nothing if there should not be a link.
-	     
-	     Here we make a link on every cell that is part of some move.
-	     
-	     TODO: support multiple boards 
-	-->
-<!-- 	<xsl:template name="linkOnCell">
-		<xsl:param name="x" />
-		<xsl:param name="xArgIdx"/>
-		<xsl:param name="y" />
-		<xsl:param name="yArgIdx" />
-		<xsl:param name="content" />
-		<xsl:param name="contentArgIdx" />
-		<xsl:param name="piece" />
-		<xsl:param name="BoardName" />
-		
-		<xsl:if test="$BoardName = '' and
-			/match/legalmoves/move[contains(move-term/prop-f, $BoardName) and
-				( (count(move-term/arg)=2 and move-term/arg[number($xArgIdx)]=$x and move-term/arg[number($yArgIdx)]=$y)
-				  or
-				  (count(move-term/arg)=4 and 
-			      	(move-term/arg[number($xArgIdx)]=$x and move-term/arg[number($yArgIdx)]=$y or
-			       	move-term/arg[number($xArgIdx)+2]=$x and move-term/arg[number($yArgIdx)+2]=$y)
-			      )
-			      or
-				  (count(move-term/arg)=5 and 
-			      	(move-term/arg[number($xArgIdx)+1]=$x and move-term/arg[number($yArgIdx)+1]=$y or
-			       	move-term/arg[number($xArgIdx)+3]=$x and move-term/arg[number($yArgIdx)+3]=$y)
-			      )
-				 )
-			 ]">
-			<xsl:text disable-output-escaping="yes">javascript:selectCell(</xsl:text>
-				'<xsl:value-of select="$x" />',
-				'<xsl:value-of select="$y" />'
-			<xsl:text disable-output-escaping="yes">)</xsl:text>
-		</xsl:if>
-	</xsl:template>
-	-->
-	
 	<xsl:template name="selectCellJavaScript">
 		<xsl:param name="xArgIdx" />
 		<xsl:param name="yArgIdx" />
@@ -206,9 +268,9 @@
 				*/
 				function highlightChessBoardCell(board, x, y, highlight) {
 					if (highlight) {
-						document.getElementById("chess_cell_link_"+board+"_"+x+"_"+y).style.backgroundColor = "green";
+						document.getElementById("chess_cell_link_"+board+"_"+x+"_"+y).style.opacity = 0.3;
 					} else {
-						document.getElementById("chess_cell_link_"+board+"_"+x+"_"+y).style.backgroundColor = "red";
+						document.getElementById("chess_cell_link_"+board+"_"+x+"_"+y).style.opacity = 0.0;
 					}
 				};
 			]]>

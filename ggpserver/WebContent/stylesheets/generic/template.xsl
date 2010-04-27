@@ -26,7 +26,7 @@
 	<xsl:import href="playClock.xsl"/>
 	<xsl:import href="state.xsl"/>
 	<xsl:import href="legalMoves.xsl"/>
-	<xsl:import href="playing.xsl"/>
+	<xsl:import href="variables.xsl"/>
 
 	<xsl:template name="main" match="/">
 		

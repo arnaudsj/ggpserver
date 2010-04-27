@@ -23,10 +23,12 @@
 					<xsl:if test="/match/quickConfirm">
 						<xsl:attribute name="checked" />
 					</xsl:if>
+					<xsl:variable name="confirm" select="count(/match/legalmoves/move)=1"/>
 					<xsl:attribute name="onclick">
 							if (checked) {
 								location.replace("<xsl:call-template name="makePlayLinkURL">
 									<xsl:with-param name="quickConfirm">true</xsl:with-param>
+									<xsl:with-param name="confirm" select="$confirm"/>
 								</xsl:call-template>");
 							} else {
 								location.replace("<xsl:call-template name="makePlayLinkURL">
@@ -36,52 +38,50 @@
 					</xsl:attribute>
 				</input>
 				<span title="When this box is checked, you will not be prompted when you have only one possible move, it will be automatically confirmed. This can be more pleasant if you have to play 'NOOPs' very often.">Quick confirm (?)</span>
+				<br/>
 				
-				<style type="text/css" media="all">
-					td:last-child {padding-right: 20px;} /*prevent Mozilla scrollbar from hiding cell content*/
-				</style>
-				
-				<div style="overflow: auto; max-height: 420px; overflow-x: hidden;">
-					<xsl:choose>
-						<xsl:when test="/match/chosenmove/confirmed"> <!-- reload the page in case the move has been confirmed... -->
-							move confirmed: <xsl:for-each select="/match/chosenmove"><xsl:call-template name="move2text"/></xsl:for-each>
-							<br/>
-							<xsl:call-template name="loadingImg" />
-							<script language="JavaScript" type="text/javascript">
-								<![CDATA[
-									setTimeout("document.location.reload();", 2500);
-								]]>
-							</script>
-						</xsl:when>
-						<xsl:when test="count(/match/legalmoves/move) = 0"> <!-- reload the page if we don't have the legalMoves yet -->
-							waiting for next state
-							<br/>
-							<xsl:call-template name="loadingImg" />
-							<script language="JavaScript" type="text/javascript">
-								<![CDATA[
-									setTimeout("document.location.reload();", 2500);
-								]]>
-							</script>
-						</xsl:when>
-						<xsl:otherwise>
+				<xsl:choose>
+					<xsl:when test="/match/chosenmove/confirmed"> <!-- reload the page in case the move has been confirmed... -->
+						move confirmed: <xsl:for-each select="/match/chosenmove/move-term"><xsl:call-template name="move2text"/></xsl:for-each>
+						<br/>
+						<xsl:call-template name="loadingImg" />
+						<script language="JavaScript" type="text/javascript">
+							<![CDATA[
+								setTimeout("document.location.reload();", 2500);
+							]]>
+						</script>
+					</xsl:when>
+					<xsl:when test="count(/match/legalmoves/move) = 0"> <!-- reload the page if we don't have the legalMoves yet -->
+						waiting for next state
+						<br/>
+						<xsl:call-template name="loadingImg" />
+						<script language="JavaScript" type="text/javascript">
+							<![CDATA[
+								setTimeout("document.location.reload();", 2500);
+							]]>
+						</script>
+					</xsl:when>
+					<xsl:otherwise>
+						<span class="heading">Confirm move: </span>
+						<span class="content">
+							<a>
+								<xsl:attribute name="href">
+									javascript:location.replace("
+									<xsl:call-template name="makePlayLinkURL">
+										<xsl:with-param name="confirm" select="'true'"/>
+									</xsl:call-template>
+									")
+								</xsl:attribute>
+									<xsl:for-each select="/match/chosenmove/move-term"><xsl:call-template name="move2text"/></xsl:for-each>
+							</a>
+						</span>
+						<br/>
+						<div style="overflow: auto; max-height: 420px; overflow-x: hidden;">
+							<style type="text/css" media="all">
+								td:last-child {padding-right: 20px;} /*prevent Mozilla scrollbar from hiding cell content*/
+							</style>
 							<table>
 								<tbody>
-									<tr>
-										<td>
-											<span class="content">
-											<a>
-												<xsl:attribute name="href">
-													javascript:location.replace("
-													<xsl:call-template name="makePlayLinkURL">
-														<xsl:with-param name="confirm" select="'true'"/>
-													</xsl:call-template>
-													")
-												</xsl:attribute>
-												Confirm move <xsl:for-each select="/match/chosenmove"><xsl:call-template name="move2text"/></xsl:for-each>
-											</a>
-											</span>
-										</td>
-									</tr>
 									<xsl:for-each select="/match/legalmoves/move">
 										<xsl:sort select="move-term"/>
 										<tr><td>
@@ -96,10 +96,9 @@
 									</xsl:for-each>
 								</tbody>
 							</table>
-						</xsl:otherwise>
-					</xsl:choose>
-				</div>
-	
+						</div>
+					</xsl:otherwise>
+				</xsl:choose>
 			</div>
 		</xsl:if>
 
@@ -138,7 +137,12 @@
 		</img>
 	</xsl:template>
 	
-	<xsl:template name="move2text">(<xsl:value-of select="prop-f"/><xsl:for-each select="arg">&#160;<xsl:value-of select="."/></xsl:for-each>)</xsl:template>
+	<xsl:template name="move2text">
+		<xsl:if test="count(arg)>0">(</xsl:if>
+		<xsl:value-of select="prop-f"/>
+		<xsl:for-each select="arg">&#160;<xsl:value-of select="."/></xsl:for-each>
+		<xsl:if test="count(arg)>0">)</xsl:if>
+	</xsl:template>
 	
 	<xsl:template name="legalMove">
 		<xsl:param name="url"/> <!-- the URL to propose this move -->

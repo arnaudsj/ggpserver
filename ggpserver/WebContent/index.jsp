@@ -1,6 +1,6 @@
 <%--
     Copyright (C) 2009 Martin Günther (mintar@gmx.de)
-                  2009 Stephan Schiffel (stephan.schiffel@gmx.de)
+                  2009-2010 Stephan Schiffel (stephan.schiffel@gmx.de)
 
     This file is part of GGP Server.
 
@@ -47,14 +47,13 @@
 	We do not host your player. To participate in a match, your player has to run on a computer with a working internet connection.
 	After <a href="<%= request.getContextPath() + response.encodeURL("/register/register.jsp") %>">registration</a>/<a href="<%= request.getContextPath() + response.encodeURL("/login/login.jsp") %>">login</a>, 
 	you can add your player (you have to enter host name or IP address and the port your player is running on). Your player will automatically be pitted
-	against other players if you set its status to "active".
+	against other players if you set its status to "active" and check "available for round robin play".
 
 <h1 class="notopborder">Recent changes</h1>
 	<ul>
-		<li><span style="text-color:red;">You can now play yourself!</span> When manually creating a match, you can select any logged in user as a player.</li>
+		<li><span style="color:red;">You can now play yourself!</span> When manually creating a match, you can select any logged in user as a player. The match starts when all users have accepted to play on their profile page.</li>
 		<li>You can now define arbitrary filters for the matches you want to see. For the filtered matches you can view a chart showing the performance of the players over time.</li>
 		<li>Support for GDL with incomplete information (GDL-II/GDL v2) and non-determinism was added. However, you need a GDL-II compliant player to play GDL-II games. &quot;Normal&quot; GDL games and players will still work as before. Please wait for our paper which will explain all the details about GDL-II.</li>
-		<li>A few changes under the hood should make the creation of style sheets for the visualization easier.</li>
 	</ul>
 
 <h1 class="notopborder">Sourceforge project</h1>

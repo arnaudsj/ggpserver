@@ -171,6 +171,8 @@
 	</form>
 
 <h1>Hints</h1>
-<jsp:directive.include file="/inc/player_hints.jsp" />
+<ul>
+	<jsp:directive.include file="/inc/player_hints.jsp" />
+</ul>
 
 <jsp:directive.include file="/inc/footer.jsp" />

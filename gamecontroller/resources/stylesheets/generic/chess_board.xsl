@@ -446,6 +446,20 @@
 				<p style="text-align: center">Board <xsl:value-of select="$BoardName"/></p>
 			</xsl:if>
 			
+			<xsl:call-template name="selectedMove">
+				<xsl:with-param name="xArgIdx" select="$xArgIdx" />
+				<xsl:with-param name="yArgIdx" select="$yArgIdx" />
+				<xsl:with-param name="BoardName" select="$BoardName" />
+
+				<xsl:with-param name="internalMinX" select="$internalMinX"/>
+				<xsl:with-param name="internalMinY" select="$internalMinY"/>
+				<xsl:with-param name="mirrorY" select="$mirrorY"/>
+				<xsl:with-param name="CellWidth" select="$CellWidth"/>
+				<xsl:with-param name="CellHeight" select="$CellHeight"/>
+				<xsl:with-param name="BorderWidth" select="$BorderWidth"/>
+				<xsl:with-param name="internalHeight" select="$internalHeight"/>
+			</xsl:call-template>
+
 			<xsl:call-template name="legalMoveLinks">
 				<xsl:with-param name="xArgIdx" select="$xArgIdx" />
 				<xsl:with-param name="yArgIdx" select="$yArgIdx" />

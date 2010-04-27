@@ -54,19 +54,63 @@
 <c:set var="title">User Profile</c:set>
 <jsp:directive.include file="/inc/header.jsp" />
 
-	<script type="text/javascript" language="JavaScript">
-	
-		function confirm_delete(matchid, url) {
-			var result = confirm("Do you really want to delete the tournament " + matchid + "? All included matches will be deleted too!");
-			if (result == true) {
-				window.location=url;
-			}
-		}
-	
-	</script>
+<c:if test="${matches.someRunningMatches}">
+	<h1>Currently Playing</h1>
+	<ul>
+		<c:forEach var="match" items="${matches.myRunningMatches}">
+			<c:forEach var="i" begin="0" end="${match.game.numberOfRoles - 1}">
+				<c:if test="${match.orderedPlayerNames[i] == profile.userName}">
+					<li>
+						<c:url value="/members/play.jsp" var="playURL">
+							<c:param name="matchID" value="${match.matchID}" />
+							<c:param name="role" value="${match.orderedPlayerRoles[i]}" />
+					    </c:url>
+					    <a href='<c:out value="${playURL}"/>'>
+					    	<div class="play" title="play"></div>
+					    	play <c:out value="${match.matchID}"/> as <c:out value="${match.orderedPlayerRoles[i]}"/>
+					    </a>
+					</li>
+				</c:if>
+			</c:forEach>
+		</c:forEach>
+	</ul>
+</c:if>
 
-<h1 class="notopborder">My Players</h1>
+<c:if test="${matches.someScheduledMatches}">
+	<h1>You could begin playing</h1>
+	<ul>
+		<c:forEach var="match" items="${matches.myScheduledMatches}">
+			<li>
+				<c:url value="/public/view_match.jsp" var="matchURL">
+					<c:param name="matchID" value="${match.left.matchID}"/>
+				</c:url>
+				<a href="${matchURL}"><c:out value="${match.left.matchID}"/></a> 
+				<c:choose>
+					<c:when test="${match.right}">
+						<img src="../icons/other/16-loading.gif" title="waiting for other players to accept..."/>
+					</c:when>
+					<c:otherwise>
+						<c:url value="/members/profile.jsp" var="acceptURL">
+							<c:param name="matchID" value="${match.left.matchID}"/>
+							<c:param name="available" value="1"/>
+					    </c:url>
+					    <a href='<c:out value="${acceptURL}"/>'>
+					    	<div class="start" title="allow this match to begin"></div>
+					    	allow this match to begin
+					    </a>
+					</c:otherwise>
+				</c:choose>
+			</li>
+		</c:forEach>
+	</ul>
+	<c:if test="${matches.atLeastOneAcceptedScheduledMatch}">
+		<script type="text/javascript" language="JavaScript">
+	    	setTimeout("document.location.reload()", 3000);
+	    </script>
+	</c:if>
+</c:if>
 
+<h1>Your Players</h1>
 <table>
 	<thead>
 		<tr>
@@ -131,8 +175,16 @@
 	</tbody>
 </table>
 
-<h1>My Matches</h1>
+<h1>Your Matches</h1>
+	<script type="text/javascript" language="JavaScript">
 	
+		function confirm_delete(matchid, url) {
+			var result = confirm("Do you really want to delete the tournament " + matchid + "? All included matches will be deleted too!");
+			if (result == true) {
+				window.location=url;
+			}
+		}
+	</script>
 	<table>
 		<thead>
 			<tr>
@@ -205,69 +257,6 @@
 	</c:url>
 	<a href='<c:out value="${matchesURL}" />'>Show matches in which I took part</a><br>
 	
-
-<c:if test="${matches.someRunningMatches}">
-
-<h1>You are currently playing</h1>
-	
-	<ul>
-	<c:forEach var="match" items="${matches.myRunningMatches}">
-		<c:forEach var="i" begin="0" end="${match.game.numberOfRoles - 1}">
-			<c:if test="${match.orderedPlayerNames[i] == profile.userName}">
-				<li>
-					<c:url value="/members/play.jsp" var="playURL">
-						<c:param name="matchID" value="${match.matchID}" />
-						<c:param name="role" value="${match.orderedPlayerRoles[i]}" />
-				    </c:url>
-				    <a href='<c:out value="${playURL}"/>'>
-				    	<div class="play" title="play"></div>
-				    	play <c:out value="${match.matchID}"/> as <c:out value="${match.orderedPlayerRoles[i]}"/>
-				    </a>
-				</li>
-			</c:if>
-		</c:forEach>
-	</c:forEach>
-	</ul>
-	
-</c:if>
-
-
-<c:if test="${matches.someScheduledMatches}">
-
-	<h1>You could begin playing</h1>
-	
-		<ul>
-		<c:forEach var="match" items="${matches.myScheduledMatches}">
-			<li>
-				<c:out value="${match.left.matchID}"/> 
-				<c:choose>
-					<c:when test="${match.right}">
-						<img src="../icons/other/16-loading.gif" title="waiting for other players to accept..."/>
-					</c:when>
-					<c:otherwise>
-						<c:url value="/members/profile.jsp" var="acceptURL">
-							<c:param name="matchID" value="${match.left.matchID}"/>
-							<c:param name="available" value="1"/>
-					    </c:url>
-					    <a href='<c:out value="${acceptURL}"/>'>
-					    	<div class="start" title="allow this game to begin"></div>
-					    	allow this game to begin
-					    </a>
-					</c:otherwise>
-				</c:choose>
-			</li>
-		</c:forEach>
-		</ul>
-		
-		<c:if test="${matches.atLeastOneAcceptedScheduledMatch}">
-			<script type="text/javascript" language="JavaScript">
-		    	setTimeout("document.location.reload()", 3000);
-		    </script>
-		</c:if>
-
-</c:if>
-
-
 <h1>Hints</h1>
 <ul>
 	<jsp:directive.include file="/inc/player_hints.jsp" />

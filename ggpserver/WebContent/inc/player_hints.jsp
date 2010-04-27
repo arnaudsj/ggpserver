@@ -1,5 +1,5 @@
 <%--
-    Copyright (C) 2009 Stephan Schiffel (stephan.schiffel@gmx.de)
+    Copyright (C) 2009-2010 Stephan Schiffel (stephan.schiffel@gmx.de)
 
     This file is part of GGP Server.
 
