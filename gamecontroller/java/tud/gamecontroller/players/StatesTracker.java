@@ -20,6 +20,7 @@
 
 package tud.gamecontroller.players;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -69,6 +70,9 @@ public class StatesTracker<TermType extends TermInterface, StateType extends Sta
 				"statesUpdate for \"" + role + "\" seeing " + seesTerms
 				+ " with " + currentPossibleStates.size() + " currentPossibleStates yields "
 				+ nextPossibleStates.size() + " nextPossibleStates");
+		if (nextPossibleStates.size()==0) {
+			logger.severe("no successor state for states: " + Arrays.toString(currentPossibleStates.toArray()) + ", seesTerms: " + seesTerms);
+		}
 		currentPossibleStates = nextPossibleStates;
 		return Collections.unmodifiableCollection(currentPossibleStates);
 	}
@@ -103,9 +107,9 @@ public class StatesTracker<TermType extends TermInterface, StateType extends Sta
 	
 	
 	private boolean isPossible(StateType state, JointMoveInterface<TermType> jointMove, Collection<TermType> seesTerms) {
-		Collection<TermType> shouldSee = state.getSeesTerms(role, jointMove); 
+		Collection<TermType> shouldSee = state.getSeesTerms(role, jointMove);
+		// System.out.println(role + " sees "+ shouldSee + " in " + state + " with " + jointMove);
 		return shouldSee.equals(seesTerms);
-		//System.out.println(shouldSee+".equals( "+seesFluents+" ) = "+b);
 	}
 	
 	/** 

@@ -121,7 +121,7 @@ public class GameController<
 		gameStart();
 		while(!currentState.isTerminal()){
 			Thread.sleep(DELAY_BEFORE_NEXT_MESSAGE);
-			JointMoveInterface<TermType> jointMove = gamePlay(step, priorJointMove, currentState);
+			JointMoveInterface<TermType> jointMove = gamePlay(step, priorJointMove, priorState);
 			priorState=currentState; 
 			currentState=currentState.getSuccessor(jointMove);
 			fireGameStep(jointMove, currentState);
