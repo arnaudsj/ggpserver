@@ -74,6 +74,7 @@ public class AvailablePlayersTracker<TermType extends TermInterface, ReasonerSta
 	
 	
 	public AvailablePlayersTracker(final AbstractDBConnector<TermType, ReasonerStateInfoType> dbConnector) {
+		logger.info("initializing AvailablePlayersTracker ...");
 		activePlayers = new HashMap<String, RemoteOrHumanPlayerInfo>();
 		playingPlayers = Collections.synchronizedSet(new HashSet<String>());
 		availableHumanPlayers = Collections.synchronizedSet(new HashSet<Pair<String,String>>());
@@ -108,8 +109,11 @@ public class AvailablePlayersTracker<TermType extends TermInterface, ReasonerSta
 	}
 	
 	private void notifyAvailablePlayersListeners(RemoteOrHumanPlayerInfo player) {
-		for(AvailablePlayersListener l:availablePlayersListeners) {
-			l.notifyAvailable(player);
+		synchronized(availablePlayersListeners) {
+			for(AvailablePlayersListener l:availablePlayersListeners) {
+				logger.info("notify listener " + l + " about player " + player.getName());
+				l.notifyAvailable(player);
+			}
 		}
 	}
 
@@ -141,7 +145,7 @@ public class AvailablePlayersTracker<TermType extends TermInterface, ReasonerSta
 	}
 	
 	// only for HumanPlayers
-	public boolean hasAccepted (String matchID, String playerName) {
+	public synchronized boolean hasAccepted (String matchID, String playerName) {
 		return availableHumanPlayers.contains(new Pair<String,String>(matchID, playerName));
 	}
 
@@ -160,13 +164,14 @@ public class AvailablePlayersTracker<TermType extends TermInterface, ReasonerSta
 	 */
 	@Override
 	public synchronized void notifyStatusChange(RemotePlayerInfo player) {
-		if (player.getStatus() == RemoteOrHumanPlayerInfo.STATUS_ACTIVE) {
+		logger.info("notifyStatusChange called:" + player);
+		if (player.getStatus().equals(RemoteOrHumanPlayerInfo.STATUS_ACTIVE)) {
 			logger.info("player " + player.getName() + " is now active");
 			activePlayers.put(player.getName(), player);   // since activePlayers is a set, we don't need to worry about duplicates
 			// it is also necessary to store the new player here in case the address has changed
 			this.notifyAll();
 			notifyAvailablePlayersListeners(player);
-		} else if (player.getStatus() == RemoteOrHumanPlayerInfo.STATUS_INACTIVE) {
+		} else if (player.getStatus().equals(RemoteOrHumanPlayerInfo.STATUS_INACTIVE)) {
 			logger.info("player " + player.getName() + " is now inactive");
 			if (activePlayers.containsKey(player.getName())) // it could be that this player was not GDL-compatible, and therefore not in 'activePlayers'
 				activePlayers.remove(player.getName());
@@ -174,15 +179,6 @@ public class AvailablePlayersTracker<TermType extends TermInterface, ReasonerSta
 		}
 	}
 	
-	public boolean playerIsActive (RemoteOrHumanPlayerInfo player) {
-		if (player instanceof RemotePlayerInfo) {
-			return ((RemotePlayerInfo)player).getStatus() == RemoteOrHumanPlayerInfo.STATUS_ACTIVE;
-		} else if (player instanceof HumanPlayerInfo) {
-			return false; //return availableHumanPlayers.contains(new Pair<>);
-		}
-		return false;
-	}
-
 	public synchronized void notifyStartPlaying(String name) {
 		playingPlayers.add(name);
 		this.notifyAll();

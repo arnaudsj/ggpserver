@@ -54,7 +54,7 @@ public class ShowPlayers extends AbstractPager {
 	public String getTitleOfPage(int pageNumber) throws SQLException {
 		int firstIndex = (pageNumber - 1)*getNumDisplayedRows();
 		if (firstIndex>=0 && firstIndex < getAllPlayers().size())
-			return getAllPlayers().get(firstIndex) + ", ...";
+			return getAllPlayers().get(firstIndex).getName() + ", ...";
 		else
 			return null;
 	}

@@ -100,6 +100,7 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 	 */
 	private MatchRunner(AbstractDBConnector<TermType, ReasonerStateInfoType> db) {
 		this.db = db;
+		logger.info("creating AvailablePlayersTracker ...");
 		availablePlayersTracker = new AvailablePlayersTracker<TermType, ReasonerStateInfoType>(db);
 		matchRunnerThread = null;
 		// scheduledMatches must be synchronized because it is also accessed from the runMatches thread
@@ -107,6 +108,7 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 		// and matchThreads map
 		matchThreads = Collections.synchronizedMap(new HashMap<String, MatchThread<TermType,ReasonerStateInfoType>>());
 		availablePlayersTracker.addAvailablePlayersListener(this);
+		logger.info("done");
 	}
 
 	/**
@@ -498,7 +500,7 @@ public class MatchRunner<TermType extends TermInterface, ReasonerStateInfoType> 
 	public void notifyAvailable(RemoteOrHumanPlayerInfo playerInfo) {
 		// TODO: only call notifyAll if we are interested in this player
 		logger.info("notified that "+playerInfo.getName()+" has become available");
-		this.notifyAll();
+		notifyAboutChanges();
 	}
 
 }

@@ -267,6 +267,7 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 
 	private void notifyPlayerStatusListeners(RemotePlayerInfo result) {
 		for (PlayerStatusListener listener : playerStatusListeners) {
+			logger.info("notify listener:" + listener);
 			listener.notifyStatusChange(result);
 		}
 	}
@@ -1948,7 +1949,9 @@ public abstract class AbstractDBConnector<TermType extends TermInterface, Reason
 			logger.info(ps.toString());
 			
 			RemotePlayerInfo playerInfo = (RemotePlayerInfo) getPlayerInfo(playerName);
-			notifyPlayerStatusListeners(playerInfo);			
+			logger.info("new player info:" + playerInfo);
+			notifyPlayerStatusListeners(playerInfo);
+			logger.info("notified listeners.");
 		} finally { 
 			if (con != null)
 				try {con.close();} catch (SQLException e) {}
