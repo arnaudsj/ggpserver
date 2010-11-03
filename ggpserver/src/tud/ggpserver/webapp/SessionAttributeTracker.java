@@ -75,17 +75,21 @@ public class SessionAttributeTracker implements HttpSessionAttributeListener {
 
 	public void attributeAdded(HttpSessionBindingEvent se) {
 		HttpSession session = se.getSession();
+		logger.info("se:" + se + ", se.name:" + se.getName() + ", se.value:" + se.getValue());
 		User user = (User)session.getAttribute(SESSION_USER_ATTRIBUTE); 
 		if (user == null) {
 			user = userAttribute(se);
 			if (user != null) {
 				session.setAttribute(SESSION_USER_ATTRIBUTE, user);
 				user.notifyLogin();
+			} else {
+				logger.info("user is null");
 			}
 		}
 	}
 
 	public void attributeRemoved(HttpSessionBindingEvent se) {
+		logger.info("se:" + se + ", se.value:" + se.getValue());
 		if (se.getName().equals(SESSION_USER_ATTRIBUTE)) {
 			User user = (User)se.getValue();
 			user.notifyLogout();

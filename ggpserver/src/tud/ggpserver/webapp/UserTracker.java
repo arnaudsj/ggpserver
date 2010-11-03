@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import tud.ggpserver.datamodel.DBConnector;
 import tud.ggpserver.datamodel.User;
 
 /**
