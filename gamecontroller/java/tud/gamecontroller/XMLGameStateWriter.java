@@ -327,6 +327,29 @@ public class XMLGameStateWriter
 		return state;
 	}
 
+//	// version for Stanford (GGP competition 2010) 
+//	private static Node createTermElement(Document xmldoc, String elementName, TermInterface term) {
+//		Element termElement=xmldoc.createElement(elementName);
+//		Element e=xmldoc.createElement("relation");
+//		e.setTextContent(term.getName().toLowerCase());
+//		termElement.appendChild(e);
+//		if(!term.isVariable()){
+//			for(TermInterface arg:term.getArgs()){
+//				if(arg.isConstant()){
+//					e=xmldoc.createElement("argument");
+//					e.setTextContent(arg.getName().toLowerCase());
+//					termElement.appendChild(e);
+//				}else{
+//					termElement.appendChild(createTermElement(xmldoc, "argument", arg));
+//				}
+//			}
+//		}else{
+//			Logger.getLogger(XMLGameStateWriter.class.getName()).warning("in XMLGameStateWriter.createStateElement: unsupported expression in state:"+term);
+//		}
+//		return termElement;
+//	}
+
+	
 	private static Node createTermElement(Document xmldoc, String elementName, TermInterface term) {
 		Element termElement=xmldoc.createElement(elementName);
 		Element e=xmldoc.createElement("prop-f");
