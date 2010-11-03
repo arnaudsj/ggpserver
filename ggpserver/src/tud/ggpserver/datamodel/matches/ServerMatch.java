@@ -92,7 +92,7 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 	 */
 	protected List<Pair<Date, String>> stringStates = null;
 
-	protected Map<Integer, String> xmlStates = null;
+	protected Map<Pair<Integer, String>, String> xmlStates = null;
 
 	/**
 	 * - errors from the start message and first play message go to index 0
@@ -345,20 +345,23 @@ public abstract class ServerMatch<TermType extends TermInterface, ReasonerStateI
 	}
 
 	@SuppressWarnings("unchecked")
-	protected Map<Integer, String> getXmlStates() {
+	protected Map<Pair<Integer, String>, String> getXmlStates() {
 		if (xmlStates == null)
 			xmlStates = new ReferenceMap(ReferenceMap.SOFT, ReferenceMap.SOFT);
 		return xmlStates;
 	}
 	
 	public String getXmlState(int stepNumber, String roleName) {
-		Map<Integer, String> xmlStates = getXmlStates();
+		Map<Pair<Integer, String>, String> xmlStates = getXmlStates();
 		String xmlState = xmlStates.get(stepNumber);
+		List<Pair<Date,String>> stringStates = getStringStates();
+		int numberOfStates = stringStates.size();
 		if (xmlState == null) {
-			List<Pair<Date,String>> stringStates = getStringStates();
 			Logger.getLogger(ViewState.class.getName()).info("StateXMLExporter.getStepXML(match, stringStates, "+stepNumber+", roleName)");
 			xmlState = StateXMLExporter.getStepXML(this, stringStates, stepNumber, roleName);
-			xmlStates.put(stepNumber, xmlState);
+			if (stepNumber<=numberOfStates && stepNumber>0) {
+				xmlStates.put(new Pair<Integer, String>(stepNumber, roleName), xmlState);
+			}
 		}
 		return xmlState;
 	}
