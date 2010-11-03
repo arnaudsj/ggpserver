@@ -88,6 +88,9 @@
 			<tr>
 			    <th>match/game</th>
 			    <th>status</th>
+			    <c:if test="${pager.owner==null}">
+			    	<th>owner</th>
+			    </c:if>
 			    <th>start clock</th>
 			    <th>play clock</th>
 			    <th>players</th>
@@ -148,7 +151,19 @@
 			    	<c:if test="${playerinfoIndex.count==1}">
 						<td rowspan="${numberOfPlayers}"><c:out value="${match.status}" /></td>
 					</c:if>
-					
+
+					<!-- owner -->
+			    	<c:if test="${playerinfoIndex.count==1}">
+					    <c:if test="${pager.owner==null}">
+							<td rowspan="${numberOfPlayers}">
+								<c:url value="/public/view_user.jsp" var="ownerURL">
+									<c:param name="userName" value="${match.owner.userName}" />
+								</c:url>
+								<a href="${ownerURL}"><c:out value="${match.owner.userName}" /></a>
+							</td>
+						</c:if>
+					</c:if>
+						
 					<!-- start clock -->
 			    	<c:if test="${playerinfoIndex.count==1}">
 						<td rowspan="${numberOfPlayers}">
@@ -434,6 +449,7 @@
 					<c:url value="process_edit_tournament.jsp" var="addMatchURL">
 					    <c:param name="tournamentID" value="${pager.tournamentID}"/>
 					    <c:param name="action" value="<%= EditTournament.ADD_MATCH %>"/>
+						<c:param name="owner" value="${pager.owner}" />
 					    <c:param name="page" value="${pager.page}" />
 					    <c:param name="anchor" value="page-end" />
 					</c:url>
