@@ -20,10 +20,34 @@
 
 	<xsl:template name="print_match_info">
 		<span class="heading">Match:</span><span class="content"><xsl:value-of select="/match/match-id"/></span>, 
-		<span class="heading">Step:</span><span class="content"><xsl:value-of select="$currentStep"/></span>
-		<xsl:if test="$role!='RANDOM'">
-			, <span class="heading">Seen by:</span><span class="content"><xsl:value-of select="$role"/></span>
-		</xsl:if>
+		<span class="heading">Step:</span><span class="content"><xsl:value-of select="$currentStep"/></span>,
+		<span class="heading">Seen by:</span><span class="content">
+			<script language="JavaScript" type="text/javascript">
+				// &lt;!--
+						function change_viewpoint(role) {
+							newLocation = "<xsl:call-template name="makeStepLinkURL"><xsl:with-param name="step" select="$currentStep"/><xsl:with-param name="role" select="'THEROLE'"/></xsl:call-template>";
+							newLocation = newLocation.replace("THEROLE", role);
+							location.replace(newLocation);
+						}
+				// --&gt;
+			</script>
+			<select name="view_of_role" size="1" onclick="javascript:change_viewpoint(this.value)">
+				<xsl:for-each select="match/role">
+					<xsl:choose>
+						<xsl:when test="translate($role, 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') = translate(., 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')">
+							<option selected="selected">
+								<xsl:value-of select="translate(., 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"/>
+							</option>
+						</xsl:when>
+						<xsl:otherwise>
+							<option>
+								<xsl:value-of select="translate(., 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"/>
+							</option>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:for-each>
+			</select>
+		</span>
 		<br/>
 	</xsl:template>
 
