@@ -70,7 +70,7 @@ public abstract class TermDelegator<TermType extends TermInterface> implements T
 	}
 
 	public boolean equals(Object obj) {
-		if(obj instanceof TermDelegator){
+		if(obj instanceof TermDelegator<?>){
 			return term.equals(((TermDelegator<?>)obj).getTerm());
 		}else if(obj instanceof TermInterface){
 			return term.equals(obj);

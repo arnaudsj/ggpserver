@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2010 Nicolas JEAN <njean42@gmail.com>
-                  2010 Stephan Schiffel <stephan.schiffel@gmx.de>
+                  2010,2011 Stephan Schiffel <stephan.schiffel@gmx.de>
 
     This file is part of GameController.
 
@@ -20,14 +20,18 @@
 
 package tud.gamecontroller.players;
 
+import java.util.AbstractCollection;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 import java.util.logging.Logger;
 
+import tud.auxiliary.CrossProductMap;
 import tud.gamecontroller.game.GameInterface;
 import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MoveInterface;
@@ -78,37 +82,40 @@ public class StatesTracker<TermType extends TermInterface, StateType extends Sta
 	}
 	
 	public Collection<JointMoveInterface<TermType>> computeJointMoves(StateType state) {
-		int nbJointMoves = 1;
+		// compute legal moves for all roles
+		HashMap<RoleInterface<TermType>, Collection<? extends MoveInterface<TermType>>> legalMovesMap = new HashMap<RoleInterface<TermType>, Collection<? extends MoveInterface<TermType>>>();
 		for(RoleInterface<TermType> role: this.game.getOrderedRoles()) {
-			nbJointMoves *= state.getLegalMoves(role).size();
+			legalMovesMap.put(role, state.getLegalMoves(role));
 		}
-		//System.out.println("\nThere are "+nbJointMoves+" possible JointMoves.");
-		Vector<JointMoveInterface<TermType>> legalJointMoves = new Vector<JointMoveInterface<TermType>>(nbJointMoves);
-		for (int i = 0; i < nbJointMoves; i++)
-			legalJointMoves.add(new JointMove<TermType>( game.getOrderedRoles() ));
-		
-		for(RoleInterface<TermType> role: game.getOrderedRoles()) {
-			//System.out.println("\nFilling JointMoves with move of "+role);
-			Collection<? extends MoveInterface<TermType>> legalMoves = state.getLegalMoves(role);
-			int nbLm = legalMoves.size();
-			int moveIndex=0;
-			for (MoveInterface<TermType> move : legalMoves) {
-				for (int i = moveIndex * nbJointMoves/nbLm; i < (moveIndex+1) * nbJointMoves/nbLm; i++) {
-					//System.out.print(i+"·");
-					JointMoveInterface<TermType> currentJointMove = legalJointMoves.get(i);
-					currentJointMove.put(role, move);
-				}
-				moveIndex++;
+		// build the cross product
+		final CrossProductMap<RoleInterface<TermType>, MoveInterface<TermType>> jointMovesMap = new CrossProductMap<RoleInterface<TermType>, MoveInterface<TermType>>(legalMovesMap);
+		// wrap the elements of the cross product in JointMove<TermType>
+		// the following is an on-the-fly collection that just refers to "jointMoves" above 
+		Collection<JointMoveInterface<TermType>> jointMoves = new AbstractCollection<JointMoveInterface<TermType>>(){
+			@Override
+			public Iterator<JointMoveInterface<TermType>> iterator() {
+				final Iterator<Map<RoleInterface<TermType>, MoveInterface<TermType>>> iterator = jointMovesMap.iterator();
+				return new Iterator<JointMoveInterface<TermType>>(){
+					@Override public boolean hasNext() { return iterator.hasNext(); }
+
+					@Override public JointMoveInterface<TermType> next() { return new JointMove<TermType>(game.getOrderedRoles(), iterator.next()); }
+
+					@Override public void remove() { iterator.remove();	}
+				};
 			}
-		}
-		//System.out.println("oneStatesTracker.legalJointMoves(...) = "+legalJointMoves);
-		return legalJointMoves;
+
+			@Override
+			public int size() {
+				return jointMovesMap.size();
+			}
+		};
+		// System.out.println("legal joint moves: " + jointMoves);
+		return jointMoves;
 	}
-	
 	
 	private boolean isPossible(StateType state, JointMoveInterface<TermType> jointMove, Collection<TermType> seesTerms) {
 		Collection<TermType> shouldSee = state.getSeesTerms(role, jointMove);
-		// System.out.println(role + " sees "+ shouldSee + " in " + state + " with " + jointMove);
+		System.out.println(role + " sees "+ shouldSee + " in " + state + " with " + jointMove);
 		return shouldSee.equals(seesTerms);
 	}
 	

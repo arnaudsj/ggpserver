@@ -22,6 +22,7 @@ package tud.gamecontroller.game.impl;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MoveInterface;
@@ -39,6 +40,12 @@ public class JointMove<TermType extends TermInterface>
 		super();
 		this.orderedRoles=orderedRoles;
 	}
+
+	public JointMove(List<? extends RoleInterface<TermType>> orderedRoles, Map<RoleInterface<TermType>, MoveInterface<TermType>> moveMap){
+		super(moveMap);
+		this.orderedRoles=orderedRoles;
+	}
+
 	/**
 	 * 
 	 */
