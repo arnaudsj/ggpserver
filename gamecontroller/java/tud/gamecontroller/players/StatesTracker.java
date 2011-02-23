@@ -84,7 +84,7 @@ public class StatesTracker<TermType extends TermInterface, StateType extends Sta
 	public Collection<JointMoveInterface<TermType>> computeJointMoves(StateType state) {
 		// compute legal moves for all roles
 		HashMap<RoleInterface<TermType>, Collection<? extends MoveInterface<TermType>>> legalMovesMap = new HashMap<RoleInterface<TermType>, Collection<? extends MoveInterface<TermType>>>();
-		for(RoleInterface<TermType> role: this.game.getOrderedRoles()) {
+		for(RoleInterface<TermType> role: game.getOrderedRoles()) {
 			legalMovesMap.put(role, state.getLegalMoves(role));
 		}
 		// build the cross product
@@ -115,7 +115,7 @@ public class StatesTracker<TermType extends TermInterface, StateType extends Sta
 	
 	private boolean isPossible(StateType state, JointMoveInterface<TermType> jointMove, Collection<TermType> seesTerms) {
 		Collection<TermType> shouldSee = state.getSeesTerms(role, jointMove);
-		System.out.println(role + " sees "+ shouldSee + " in " + state + " with " + jointMove);
+		// logger.info(role + " sees "+ shouldSee + " in " + state + " with " + jointMove);
 		return shouldSee.equals(seesTerms);
 	}
 	
