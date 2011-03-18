@@ -508,6 +508,8 @@
 						<xsl:with-param name="content" select="$content"/>
 						<xsl:with-param name="piece" select="$piece"/>
 						<xsl:with-param name="background" select="$CellColor"/>
+						<xsl:with-param name="width" select="$CellWidth - 2 * $BorderWidth"/>
+						<xsl:with-param name="height" select="$CellHeight - 2 * $BorderWidth"/>
 						<xsl:with-param name="alt" select="$alt"/>
 					</xsl:call-template>
 				</xsl:when>

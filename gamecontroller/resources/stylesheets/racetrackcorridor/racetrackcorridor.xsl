@@ -33,20 +33,20 @@
 			div.track {
 				position: relative;
 				float:left;
-				width 130px;
+				width 154px;
 			}
 			div.track div.wall {
 				position:absolute;
-				width:80px;
+				width:96px;
 				height:4px;
 				background-color: #666666;
 			}
 		</style>
-		<div style="width:270px; height:200px;">
+		<div style="width:318px; height:240px;">
 			<xsl:call-template name="make_track">
 				<xsl:with-param name="track" select="'WLANE'"/>
 			</xsl:call-template>
-			<div style="float:left; height:200px; width:2px; background-color: #666666; margin-left: 4px; margin-right: 4px;"></div>
+			<div style="float:left; height:240px; width:2px; background-color: #666666; margin-left: 4px; margin-right: 4px;"></div>
 			<xsl:call-template name="make_track">
 				<xsl:with-param name="track" select="'BLANE'"/>
 			</xsl:call-template>
@@ -73,8 +73,7 @@
 				<xsl:with-param name="contentArgIdx">3</xsl:with-param>
 				<xsl:with-param name="xArgIdx">2</xsl:with-param>
 				<xsl:with-param name="yArgIdx">1</xsl:with-param>
-				<xsl:with-param name="CellWidth">40</xsl:with-param>
-				<xsl:with-param name="CellHeight">40</xsl:with-param>
+				<xsl:with-param name="BoardName" select="$track"/>
 			</xsl:call-template>
 			
 			<!--			Draw horizontal walls -->
@@ -90,8 +89,8 @@
 					</xsl:variable>
 					<xsl:variable name="ycoord" select="6-translate(./arg[2], 'ABCDE', '12345')"/>
 					<xsl:attribute name="style">
-						left: <xsl:value-of select="($xcoord - 1)*40"/>px;
-						top: <xsl:value-of select="-2 + ($ycoord - 1)*40"/>px;
+						left: <xsl:value-of select="($xcoord - 1)*48"/>px;
+						top: <xsl:value-of select="-2 + ($ycoord - 1)*48"/>px;
 					</xsl:attribute>
 				</div>
 			</xsl:for-each>
