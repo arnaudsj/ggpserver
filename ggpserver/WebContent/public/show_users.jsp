@@ -38,6 +38,9 @@
 	<thead>
 		<tr>
 			<th>user name</th>
+			<c:if test='${navigationUserBean.user.admin}'>
+				<th>email address</th>
+			</c:if>
 			<th>logged in</th>
 		</tr>
 	</thead>
@@ -58,6 +61,11 @@
 					</c:url>
 					<a href='<c:out value="${userURL}" />'>${user.userName}</a>
 				</td>
+				<c:if test='${navigationUserBean.user.admin}'>
+					<td>
+						<a href='mailto:<c:out value="${user.emailAddress}"></c:out>'><c:out value="${user.emailAddress}"></c:out></a>
+					</td>
+				</c:if>
 				<td>
 					<c:set var="checked">
 						<c:if test="${user.loggedIn}">

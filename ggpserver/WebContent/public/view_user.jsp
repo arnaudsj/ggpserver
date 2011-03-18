@@ -1,6 +1,6 @@
 <%--
     Copyright (C) 2009 Martin Günther (mintar@gmx.de)
-                  2009 Stephan Schiffel (stephan.schiffel@gmx.de)
+                  2009,2011 Stephan Schiffel (stephan.schiffel@gmx.de)
 
     This file is part of GGP Server.
 
@@ -21,6 +21,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
 <jsp:useBean id="viewUser"
 	class="tud.ggpserver.formhandlers.ViewUser" scope="page">
 	<c:catch>
@@ -46,6 +47,23 @@ if (viewUser.getUser() == null) {
 		<tr>
 			<th>user name</th>
 			<td><c:out value="${viewUser.user.userName}"></c:out></td>
+		</tr>
+		<c:if test='${navigationUserBean.user.admin}'>
+			<tr>
+				<th>email address</th>
+				<td><a href='mailto:<c:out value="${viewUser.user.emailAddress}"></c:out>'><c:out value="${viewUser.user.emailAddress}"></c:out></a></td>
+			</tr>
+		</c:if>
+		<tr>
+			<th>logged in</th>
+			<td>
+				<c:set var="checked">
+					<c:if test="${viewUser.user.loggedIn}">
+						checked="checked"
+					</c:if>
+				</c:set>
+				<input type="checkbox" name="loggedin" ${checked} disabled="disabled">
+			</td>
 		</tr>
 		<tr>
 			<th>players</th>
